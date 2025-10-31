@@ -1,0 +1,36 @@
+@startchen
+
+entity Beneficiary {
+    beneficiaryID <<key>>
+    name
+    email
+    phones {
+        local
+        cell
+    }
+    residence {
+        state
+        municipality
+        parish
+    }
+    sexo M F
+    birthdate
+    nacionalidad Ven Ext
+    maritalStatus
+    concubinage
+    education
+    educationDate
+    work
+    
+}
+entity Caso {
+}
+entity Seguimiento {
+}
+entity Profesor {
+}
+entity Alumno {
+}
+
+
+@endchen
