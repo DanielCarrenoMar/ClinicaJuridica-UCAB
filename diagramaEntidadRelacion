@@ -13,16 +13,36 @@ entity Beneficiary {
         municipality
         parish
     }
-    sexo M F
+    sexo
+    'M F'
     birthdate
     nacionalidad Ven Ext
     maritalStatus
     concubinage
     education
+    '0 14'
     educationDate
-    work
-    
+    dwellingType
+    '(Quinta/Casa Urb, Apartamento, Bloque, Casa de Barrio, )'
+    isWorking
 }
+entity BeneficiaryWork {
+    workCondition
+    '(Patrono, Empleado, Obrero, Cuanta propia)'
+}
+entity BeneficiaryNoWork{
+    wantWork
+}
+entity BeneficiaryWantWork{
+}
+entity BeneficiaryNoWantWork{
+    activityCondition
+    '(Ama de casa, Estudiante, Pensionado/Jubilado, Otra)'
+}
+
+Beneficiary =>= U {BeneficiaryWork, BeneficiaryNoWork}
+BeneficiaryNoWork =>= U {BeneficiaryWantWork, BeneficiaryNoWantWork}
+
 entity Caso {
 }
 entity Seguimiento {
