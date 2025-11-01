@@ -1,0 +1,191 @@
+enum Gender {
+  M
+  F
+}
+
+enum Nationality {
+  Ven
+  Ext
+}
+
+enum FloorMaterial {
+  Earth
+  Cement
+  Ceramic
+  "Granite/Parquet/Marble"
+}
+
+enum WallMaterial {
+  "Cardboard/Palm/Waste"
+  Bahareque
+  "Unfinished Block"
+  "Finished Block"
+}
+
+enum RoofMaterial {
+  "Wood/Cardboard/Palm"
+  "Zinc/Acerolit"
+  "Concrete Slab/Tiles"
+}
+
+enum DrinkingWaterService {
+  "Inside dwelling"
+  "Outside dwelling"
+  "No service"
+}
+
+enum SewageService {
+  "Toilet to sewer/Septic tank"
+  "Toilet without connection (pipe)"
+  "Pit toilet or latrine"
+  "No service"
+}
+
+enum TrashPickupService {
+  "Arrives at dwelling"
+  "Does not arrive/Container"
+  "No service"
+}
+
+enum EducationLevel {
+  "None"
+  Primary
+  Basic
+  "High School"
+  "Mid-level Technician"
+  "Superior Technician"
+  University
+}
+
+enum EducationPeriod {
+  Years
+  Semesters
+  Trimesters
+}
+
+enum WorkCondition {
+  Employer
+  Employee
+  Worker
+  "Self-employed"
+}
+
+enum ActivityCondition {
+  "Homemaker"
+  Student
+  "Pensioner/Retired"
+  Other
+}
+
+enum CaseStatus {
+  Open
+  Closed
+  Pending
+}
+
+Table Beneficiary {
+  beneficiaryID int [pk]
+  name varchar
+  email varchar
+  phone_local varchar
+  phone_cell varchar
+  residence_state varchar
+  residence_municipality varchar
+  residence_parish varchar
+  gender Gender
+  birthdate date
+  nationality Nationality
+  maritalStatus varchar
+  concubinage boolean
+  educationYears int
+  educationDate date
+  dwellingType varchar
+  bedrooms int
+  bathrooms int
+  floorMaterial FloorMaterial
+  wallMaterial WallMaterial
+  roofMaterial RoofMaterial
+  drinkingWaterService DrinkingWaterService
+  sewageService SewageService
+  trashPickupService TrashPickupService
+  artifact_refrigerator Int
+  artifact_washingMachine Int
+  artifact_computer Int
+  artifact_satelliteCable Int
+  artifact_internet Int
+  artifact_car Int
+  artifact_motorcycle Int
+  isWorking boolean
+  householdSize int
+  isHeadOfHousehold boolean
+  headOfHouseholdEducation EducationLevel
+  headOfHouseholdEducationPeriod EducationPeriod
+  householdMembersWorking int
+  householdMembersNotWorking int
+  children7to12 int
+  childrenStudying int
+  monthlyIncome decimal
+}
+
+Table BeneficiaryWork {
+  beneficiaryID int [pk, ref: > Beneficiary.beneficiaryID]
+  workCondition WorkCondition
+}
+
+Table BeneficiaryNoWork {
+  beneficiaryID int [pk, ref: > Beneficiary.beneficiaryID]
+  wantWork boolean
+}
+
+Table BeneficiaryWantWork {
+  beneficiaryID int [pk, ref: > BeneficiaryNoWork.beneficiaryID]
+}
+
+Table BeneficiaryNoWantWork {
+  beneficiaryID int [pk, ref: > BeneficiaryNoWork.beneficiaryID]
+  activityCondition ActivityCondition
+}
+
+Table Case {
+  caseID int [pk]
+  description text
+  status CaseStatus
+  startDate date
+  endDate date
+  beneficiaryID int
+  professorID int
+}
+
+Table Professor {
+  professorID int [pk]
+  name varchar
+  email varchar
+}
+
+Table Student {
+  studentID int [pk]
+  name varchar
+  email varchar
+  caseID int
+}
+
+Table FollowUp {
+  followUpID int [pk]
+  date date
+  description text
+  caseID int
+}
+
+Table Document {
+  documentID int [pk]
+  fileName varchar
+  fileType varchar
+  uploadDate date
+  caseID int
+}
+
+Ref: Case.beneficiaryID > Beneficiary.beneficiaryID
+Ref: Case.professorID > Professor.professorID
+Ref: Student.caseID > Case.caseID
+Ref: FollowUp.caseID > Case.caseID
+Ref: Document.caseID > Case.caseID
