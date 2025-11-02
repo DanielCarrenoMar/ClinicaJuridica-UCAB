@@ -84,9 +84,9 @@ enum CaseStatus {
 }
 
 Table Beneficiary {
-  beneficiaryID int [pk]
-  name varchar
-  email varchar
+  idBeneficiary int [pk]
+  name varchar [not null]
+  email varchar [not null, unique]
   phone_local varchar
   phone_cell varchar
   residence_state varchar
@@ -123,69 +123,40 @@ Table Beneficiary {
   householdMembersWorking int
   householdMembersNotWorking int
   children7to12 int
-  childrenStudying int
-  monthlyIncome decimal
-}
-
-Table BeneficiaryWork {
-  beneficiaryID int [pk, ref: > Beneficiary.beneficiaryID]
+  childrenStudying int 
+  monthlyIncome decimal [not null]
   workCondition WorkCondition
-}
-
-Table BeneficiaryNoWork {
-  beneficiaryID int [pk, ref: > Beneficiary.beneficiaryID]
   wantWork boolean
-}
-
-Table BeneficiaryWantWork {
-  beneficiaryID int [pk, ref: > BeneficiaryNoWork.beneficiaryID]
-}
-
-Table BeneficiaryNoWantWork {
-  beneficiaryID int [pk, ref: > BeneficiaryNoWork.beneficiaryID]
   activityCondition ActivityCondition
 }
 
 Table Case {
-  caseID int [pk]
+  idCase int [pk]
+  idBeneficiary int
   description text
   status CaseStatus
   startDate date
   endDate date
-  beneficiaryID int
-  professorID int
 }
+Ref: Case.idBeneficiary > Beneficiary.idBeneficiary
 
 Table Professor {
-  professorID int [pk]
+  idProfessor int [pk]
   name varchar
-  email varchar
+  email varchar [unique]
 }
 
 Table Student {
   studentID int [pk]
   name varchar
-  email varchar
-  caseID int
+  email varchar [unique]
 }
 
-Table FollowUp {
-  followUpID int [pk]
-  date date
-  description text
-  caseID int
-}
-
-Table Document {
-  documentID int [pk]
+Table Support {
+  idSupport int [pk]
+  idCase int
   fileName varchar
   fileType varchar
   uploadDate date
-  caseID int
 }
-
-Ref: Case.beneficiaryID > Beneficiary.beneficiaryID
-Ref: Case.professorID > Professor.professorID
-Ref: Student.caseID > Case.caseID
-Ref: FollowUp.caseID > Case.caseID
-Ref: Document.caseID > Case.caseID
+Ref: Support.idCase > Case.idCase
