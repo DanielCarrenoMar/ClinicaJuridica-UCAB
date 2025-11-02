@@ -1,63 +1,63 @@
 @startchen
 
 entity Beneficiary {
-    'beneficiaryID <<key>>
-    'name
-    'email
-    'phones {
-    '    local
-    '    cell
-    '}
-    'residence {
-    '    state
-    '    municipality
-    '    parish
-    '}
-    'sexo
-    ''(M,F)'
-    'birthdate
-    'nacionalidad Ven Ext
-    'maritalStatus
-    'concubinage
-    'education
-    ''(0-14)'
-    'educationDate
-    'dwellingType
-    'bedrooms
-    'bathrooms
-    'floorMaterial
-    ''(Tierra, Cemento, Ceramica, Granito/Parquet/Marmol)'
-    'wallMaterial
-    ''(Carton/Palma/Desechos, Bahareque, Bloque sin frizar, Bloque frizado)'
-    'roofMaterial
-    ''(Madera/Carton/Palma, Zinc/Acerolit, Platabanda/Tejas)'
-    'drinkingWaterService
-    ''(Dentro de la vivienda, Fuera de la vivienda, No tiene servicio)'
-    'sewageService
-    ''Poceta a cloaca/Poze septico, Poceta sin conexion (tubo), Excusado de hoyo o letrina, No tiene)'
-    'pickUpTrashService
-    ''(Llega vivienda, No llega vivienda/Container, No tiene)'
-    'domesticArtifacts {
-    '    refrigerator
-    '    washingMachine
-    '    computer
-    '    satelliteCable
-    '    internet
-    '    car
-    '    motorcycle
-    '}
-    'isWorking
-    'householdSize
-    'isHeadOfHousehold
-    'headOfHouseholdEducation
-    ''(Sin Nivel, Primaria, Basica, Media Diversificada, Tecnico Medio, Tecnico Superior, Universitaria)'
-    'headOfHouseholdEducationPeriod
-    ''(Años, Semestres, Trimestres)'
-    'householdMembersWorking
-    'householdMembersNotWorking
-    'children7to12
-    'childrenStudying
-    'monthlyIncome
+    beneficiaryID <<key>>
+    name
+    email
+    phones {
+        local
+        cell
+    }
+    residence {
+        state
+        municipality
+        parish
+    }
+    sexo
+    '(M,F)'
+    birthdate
+    nacionalidad Ven Ext
+    maritalStatus
+    concubinage
+    education
+    '(0-14)'
+    educationDate
+    dwellingType
+    bedrooms
+    bathrooms
+    floorMaterial
+    '(Tierra, Cemento, Ceramica, Granito/Parquet/Marmol)'
+    wallMaterial
+    '(Carton/Palma/Desechos, Bahareque, Bloque sin frizar, Bloque frizado)'
+    roofMaterial
+    '(Madera/Carton/Palma, Zinc/Acerolit, Platabanda/Tejas)'
+    drinkingWaterService
+    '(Dentro de la vivienda, Fuera de la vivienda, No tiene servicio)'
+    sewageService
+    'Poceta a cloaca/Poze septico, Poceta sin conexion (tubo), Excusado de hoyo o letrina, No tiene)'
+    pickUpTrashService
+    '(Llega vivienda, No llega vivienda/Container, No tiene)'
+    domesticArtifacts {
+        refrigerator
+        washingMachine
+        computer
+        satelliteCable
+        internet
+        car
+        motorcycle
+    }
+    isWorking
+    householdSize
+    isHeadOfHousehold
+    headOfHouseholdEducation
+    '(Sin Nivel, Primaria, Basica, Media Diversificada, Tecnico Medio, Tecnico Superior, Universitaria)'
+    headOfHouseholdEducationPeriod
+    '(Años, Semestres, Trimestres)'
+    householdMembersWorking
+    householdMembersNotWorking
+    children7to12
+    childrenStudying
+    monthlyIncome
 }
 entity BeneficiaryWork {
     workCondition
