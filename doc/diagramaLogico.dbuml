@@ -83,6 +83,11 @@ enum CaseStatus {
   Pending
 }
 
+enum BenefitType {
+  direct 
+  indirect
+}
+
 Table Beneficiary {
   idBeneficiary int [pk]
   name varchar [not null]
@@ -139,6 +144,15 @@ Table Case {
   endDate date
 }
 Ref: Case.idBeneficiary > Beneficiary.idBeneficiary
+
+Table AssociatesToCase {
+  idCase int [pk]
+  idBeneficiary int [pk]
+  benefitType BenefitType
+  relationship text
+}
+Ref: AssociatesToCase.idCase < Case.idCase
+Ref: AssociatesToCase.idBeneficiary < Beneficiary.idBeneficiary
 
 Table Professor {
   idProfessor int [pk]
