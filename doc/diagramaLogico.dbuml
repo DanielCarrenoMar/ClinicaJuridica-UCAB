@@ -88,6 +88,11 @@ enum BenefitType {
   indirect
 }
 
+enum CaseLocations {
+  "UCAB-Gy"
+  "Casa Barandariam"
+}
+
 Table Beneficiary {
   idBeneficiary int [pk]
   name varchar [not null]
@@ -137,40 +142,62 @@ Table Beneficiary {
 
 Table Case {
   idCase int [pk]
-  idBeneficiary int
-  description text
+  idBeneficiary int [ref: > Beneficiary.idBeneficiary]
   status CaseStatus
-  startDate date
-  endDate date
+  location CaseLocations
+  term text
+  caseType text
+  processType text
+  nextDate date
+  synthesisProblem text
 }
-Ref: Case.idBeneficiary > Beneficiary.idBeneficiary
 
 Table AssociatesToCase {
-  idCase int [pk]
-  idBeneficiary int [pk]
+  idCase int [pk, ref: < Case.idCase]
+  idBeneficiary int [pk, ref: < Beneficiary.idBeneficiary]
   benefitType BenefitType
   relationship text
-}
-Ref: AssociatesToCase.idCase < Case.idCase
-Ref: AssociatesToCase.idBeneficiary < Beneficiary.idBeneficiary
-
-Table Professor {
-  idProfessor int [pk]
-  name varchar
-  email varchar [unique]
-}
-
-Table Student {
-  studentID int [pk]
-  name varchar
-  email varchar [unique]
 }
 
 Table Support {
   idSupport int [pk]
-  idCase int
   fileName varchar
   fileType varchar
   uploadDate date
 }
-Ref: Support.idCase > Case.idCase
+
+Table ConsignedSupport {
+  idSupport int [pk, ref: < Support.idSupport]
+  idCase int [pk, ref: < Case.idCase]
+}
+
+Table CaseAction {
+  idCase int [pk]
+  idCaseAction int [pk]
+  idUserCreator int [ref: > User.idUser]
+  createAt date
+  description text
+}
+
+Table User {
+  idUser int [pk]
+  name varchar
+  email varchar [unique]
+  userType varchar
+}
+
+Table Professor {
+  idUser int [pk, ref: > User.idUser]
+}
+
+Table Student {
+  idUser int [pk, ref: > User.idUser]
+  isActive bool
+}
+
+Table UserCaseInter {
+  idUSer int [pk, ref: > User.idUser]
+  idCase int [pk, ref: > Case.idCase]
+  startDate date [not null]
+  endDate date [default: null]
+}
