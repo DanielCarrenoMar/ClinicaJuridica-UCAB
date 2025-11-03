@@ -1,10 +1,10 @@
 <mxfile host="65bd71144e">
     <diagram id="5TmfYvpxK_SqypsVTQOh" name="Diagrama">
-        <mxGraphModel dx="1424" dy="2470" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1424" dy="2675" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="2" value="Beneficiario" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
+                <mxCell id="2" value="Solicitante" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
                     <mxGeometry x="140" y="95" width="175" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="3" value="&lt;ul style=&quot;padding-inline-start: 24px; margin-bottom: 0px; color: rgb(204, 204, 204); font-family: &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, sans-serif; font-size: 13px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(24, 24, 24); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;&quot;&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;beneficiarioID&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;nombre&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;correo&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;telefonos&lt;/code&gt;&lt;ul style=&quot;padding-inline-start: 24px;&quot;&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;local&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;celular&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;residencia&lt;/code&gt;&lt;ul style=&quot;padding-inline-start: 24px;&quot;&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;estado&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;municipio&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;parroquia&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;sexo&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;fechaNacimiento&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;nacionalidad&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;estadoCivil&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;concubinato&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;educacion&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;fechaEducacion&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;tipoVivienda&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;habitaciones&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;banos&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;materialPiso&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;materialParedes&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;materialTecho&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;servicioAguaPotable&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;servicioAguasNegras&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;servicioAseoUrbano&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;artefactosDomesticos&lt;/code&gt;&lt;ul style=&quot;padding-inline-start: 24px;&quot;&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;nevera&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;lavadora&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;computadora&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;cableSatelital&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;internet&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;carro&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;moto&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;trabaja&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;personasHogar&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;esJefeDeHogar&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;educacionJefeHogar&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;periodoEducacionJefeHogar&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;miembrosHogarTrabajan&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;miembrosHogarNoTrabajan&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;ninos7a12&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;ninosEstudian&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code style=&quot;font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11.999px; color: rgb(208, 208, 208); background-color: rgb(60, 60, 60); padding: 1px 3px; border-radius: 4px; white-space: pre-wrap;&quot;&gt;ingresoMensual&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -201,56 +201,39 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="92" value="" style="group" parent="1" vertex="1" connectable="0">
-                    <mxGeometry x="447.5" y="140" width="120" height="85" as="geometry"/>
+                    <mxGeometry x="610" y="145" width="120" height="85" as="geometry"/>
                 </mxCell>
                 <mxCell id="93" value="Asocia" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" parent="92" vertex="1">
                     <mxGeometry y="25" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="94" value="N:M" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;align=center;" parent="92" vertex="1">
+                <mxCell id="94" value="1:N" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;align=center;" parent="92" vertex="1">
                     <mxGeometry x="40" width="40" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="95" value="" style="endArrow=none;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="93" target="2" edge="1">
+                <mxCell id="97" value="" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="93" target="38" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="578" y="120" as="sourcePoint"/>
-                        <mxPoint x="685" y="120" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="96" value="(0,N)" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="95" connectable="0" vertex="1">
-                    <mxGeometry x="1" relative="1" as="geometry">
-                        <mxPoint x="35" as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="97" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="93" target="38" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="458" y="120" as="sourcePoint"/>
+                        <mxPoint x="640" y="220" as="sourcePoint"/>
                         <mxPoint x="325" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="98" value="(0,N)" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="97" connectable="0" vertex="1">
+                <mxCell id="98" value="(1,1)" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="97" connectable="0" vertex="1">
                     <mxGeometry x="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="EDJJ-AGH39mIzSxpKUqN-98" value="tipoBeneficiario" style="ellipse;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
-                    <mxGeometry x="457.5" y="260" width="100" height="30" as="geometry"/>
+                    <mxGeometry x="355.92" y="420" width="100" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="EDJJ-AGH39mIzSxpKUqN-99" value="parentesco" style="ellipse;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
-                    <mxGeometry x="457.5" y="230" width="100" height="30" as="geometry"/>
+                    <mxGeometry x="355.92" y="390" width="100" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="EDJJ-AGH39mIzSxpKUqN-101" value="" style="endArrow=none;html=1;rounded=0;exitX=0.077;exitY=0.559;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitPerimeter=0;" parent="1" source="93" target="EDJJ-AGH39mIzSxpKUqN-98" edge="1">
+                <mxCell id="EDJJ-AGH39mIzSxpKUqN-101" value="" style="endArrow=none;html=1;rounded=0;exitX=0.077;exitY=0.559;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitPerimeter=0;" parent="1" target="EDJJ-AGH39mIzSxpKUqN-98" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="530" y="300" as="sourcePoint"/>
-                        <mxPoint x="690" y="300" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="EDJJ-AGH39mIzSxpKUqN-102" value="" style="endArrow=none;html=1;rounded=0;exitX=0.077;exitY=0.55;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitPerimeter=0;" parent="1" source="93" target="EDJJ-AGH39mIzSxpKUqN-99" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="548" y="220" as="sourcePoint"/>
-                        <mxPoint x="585" y="250" as="targetPoint"/>
+                        <mxPoint x="355.92000000000024" y="235.53999999999996" as="sourcePoint"/>
+                        <mxPoint x="589.1800000000001" y="337" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="EDJJ-AGH39mIzSxpKUqN-103" value="(directo, indirecto)" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="557.5" y="260" width="110" height="30" as="geometry"/>
+                    <mxGeometry x="460.49" y="420" width="110" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="EDJJ-AGH39mIzSxpKUqN-104" value="Estudiante" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
                     <mxGeometry x="1279.9999999999998" y="596.25" width="175" height="60" as="geometry"/>
@@ -430,7 +413,7 @@
                 <mxCell id="aYMJliW7l5YJLbD92_7f-104" value="estaActivo" style="ellipse;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
                     <mxGeometry x="1302" y="685" width="100" height="35" as="geometry"/>
                 </mxCell>
-                <mxCell id="aYMJliW7l5YJLbD92_7f-105" value="idBeneficiario" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" parent="1" vertex="1">
+                <mxCell id="aYMJliW7l5YJLbD92_7f-105" value="idSolicitante" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" parent="1" vertex="1">
                     <mxGeometry x="164.66999999999996" y="53" width="100" height="35" as="geometry"/>
                 </mxCell>
                 <mxCell id="aYMJliW7l5YJLbD92_7f-106" value="nombre" style="ellipse;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
@@ -1030,15 +1013,68 @@
                         <mxPoint x="1378" y="606" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-109" value="fechaCreacion" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="164.67" y="-1343" width="175.33" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-110" value="" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.003;exitY=0.049;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" target="F9QcTAbn-ofSQPfSvSQg-109">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="140.66999999999993" y="-1260" as="sourcePoint"/>
+                        <mxPoint x="174.66999999999993" y="-1273" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="140.66999999999993" y="-1325"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-111" value="cedula" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="164.67" y="-1383" width="175.33" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-112" value="" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.003;exitY=0.049;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" target="F9QcTAbn-ofSQPfSvSQg-111">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="140.66999999999993" y="-1300" as="sourcePoint"/>
+                        <mxPoint x="174.66999999999993" y="-1313" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="140.66999999999993" y="-1365"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-114" value="Beneficiario" style="shape=ext;margin=3;double=1;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="170" width="162.5" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-115" value="idBeneficiario" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" vertex="1" parent="1">
+                    <mxGeometry x="355.92" y="237.5" width="100" height="32" as="geometry"/>
+                </mxCell>
+                <mxCell id="F9QcTAbn-ofSQPfSvSQg-116" value="cedula" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="355.92" y="269.5" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="UxHul2DZvdMMlZmWCauu-109" value="nombre" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="355.92" y="299.5" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="UxHul2DZvdMMlZmWCauu-110" value="sexo" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="355.92" y="329.5" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="UxHul2DZvdMMlZmWCauu-111" value="edad" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="355.92" y="359.5" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="UxHul2DZvdMMlZmWCauu-112" value="" style="endArrow=none;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="93" target="F9QcTAbn-ofSQPfSvSQg-114">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="580" y="190" as="sourcePoint"/>
+                        <mxPoint x="325" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="UxHul2DZvdMMlZmWCauu-113" value="(0,N)" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" connectable="0" vertex="1" parent="UxHul2DZvdMMlZmWCauu-112">
+                    <mxGeometry x="1" relative="1" as="geometry">
+                        <mxPoint x="35" y="-3" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
     <diagram id="4qFMS36wyiiwmZeZLMZl" name="Supuestos">
-        <mxGraphModel dx="574" dy="270" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="574" dy="475" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="RAYBkIz1RWP06Id279hd-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Supuestos Semanticos&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada Soporte tiene un identificador unico&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Las acciones de los casos se indentifican segun el identificador del Caso asociado&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Tanto el estudiante como el profesor se pueden identificar pror sus cedula y se guardan sus nombres y email&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                <mxCell id="RAYBkIz1RWP06Id279hd-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Supuestos Semanticos&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada Soporte tiene un identificador unico&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Las acciones de los casos se indentifican segun el identificador del Caso asociado&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Tanto el estudiante como el profesor se pueden identificar pror sus cedula y se guardan sus nombres y email&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Un beneficiario se puede indentificar con la id de lcaso asociado y un identificador secuencial&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
                     <mxGeometry width="850" height="530" as="geometry"/>
                 </mxCell>
             </root>
