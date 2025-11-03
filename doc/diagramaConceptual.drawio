@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="5TmfYvpxK_SqypsVTQOh" name="Diagrama">
-        <mxGraphModel dx="2126" dy="3256" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1349" dy="2613" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -1038,7 +1038,7 @@
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="RAYBkIz1RWP06Id279hd-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Supuestos Semanticos&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada Soporte tiene un identificador unico&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Las acciones de los casos se indentifican segun el identificador del Caso asociado&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Tanto el estudiante como el profesor se pueden identificar pror sus cedula y se guardan sus nombres y email&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                <mxCell id="RAYBkIz1RWP06Id279hd-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Supuestos Semanticos&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada Soporte tiene un identificador unico&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Las acciones de los casos se indentifican segun el identificador del Caso asociado&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Tanto el estudiante como el profesor se pueden identificar pror sus cedula y se guardan sus nombres y email&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada caso tiene una id unica para su identificación&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
                     <mxGeometry width="850" height="530" as="geometry"/>
                 </mxCell>
             </root>
