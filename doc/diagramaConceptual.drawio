@@ -55,6 +55,11 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
+                <mxCell id="Y-uSuKmQFB4RpaMfP0dM-109" style="edgeStyle=none;html=1;exitX=0;exitY=0;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="57">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1396" y="-10" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
                 <mxCell id="57" value="Soporte" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
                     <mxGeometry x="1395.67" y="90" width="175" height="60" as="geometry"/>
                 </mxCell>
@@ -86,7 +91,7 @@
                         <mxPoint x="1282.67" y="180" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="64" value="(1,N)" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="63" connectable="0" vertex="1">
+                <mxCell id="64" value="(0,N)" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="63" connectable="0" vertex="1">
                     <mxGeometry x="1" relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="65" value="" style="endArrow=none;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="58" target="38" edge="1">
@@ -291,7 +296,7 @@
                 <mxCell id="EZQNVuFqgf-XE86A-eKG-107" value="" style="group" parent="1" vertex="1" connectable="0">
                     <mxGeometry x="1200" y="336" width="120" height="85" as="geometry"/>
                 </mxCell>
-                <mxCell id="EZQNVuFqgf-XE86A-eKG-108" value="Responsable" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" parent="EZQNVuFqgf-XE86A-eKG-107" vertex="1">
+                <mxCell id="EZQNVuFqgf-XE86A-eKG-108" value="Registra" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" parent="EZQNVuFqgf-XE86A-eKG-107" vertex="1">
                     <mxGeometry y="25" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="EZQNVuFqgf-XE86A-eKG-109" value="1:N" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;align=center;" parent="EZQNVuFqgf-XE86A-eKG-107" vertex="1">
@@ -1027,7 +1032,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="b7MU76sGBFRkTho6uGQO-109" value="Nucleo" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
-                    <mxGeometry x="1395.67" y="-90" width="175" height="60" as="geometry"/>
+                    <mxGeometry x="1395.67" y="-100" width="175" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="b7MU76sGBFRkTho6uGQO-110" value="" style="group" parent="1" vertex="1" connectable="0">
                     <mxGeometry x="1190" y="-20" width="120" height="80" as="geometry"/>
@@ -1146,7 +1151,7 @@
                     <mxGeometry x="624.0000000000002" y="-138.5" width="250" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="b7MU76sGBFRkTho6uGQO-134" value="idNucleo" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" parent="1" vertex="1">
-                    <mxGeometry x="1419.67" y="-130" width="100" height="35" as="geometry"/>
+                    <mxGeometry x="1419.67" y="-145" width="100" height="35" as="geometry"/>
                 </mxCell>
                 <mxCell id="b7MU76sGBFRkTho6uGQO-136" value="" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.006;exitY=0.068;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" target="b7MU76sGBFRkTho6uGQO-134" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -1313,6 +1318,14 @@
                 <mxCell id="2o5u6w7hcLKp41RykwF1-112" value="fechaAccion" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
                     <mxGeometry x="1436.59" y="272.5" width="83.41" height="35" as="geometry"/>
                 </mxCell>
+                <mxCell id="2QoCjh4m9g4DKrvBifDe-112" style="edgeStyle=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="2QoCjh4m9g4DKrvBifDe-109">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1390" y="-12" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="2QoCjh4m9g4DKrvBifDe-109" value="Archivo" style="ellipse;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="1439.67" y="-30" width="80.33" height="35" as="geometry"/>
+                </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
@@ -1321,7 +1334,7 @@
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="RAYBkIz1RWP06Id279hd-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Supuestos Semánticos&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada Soporte tiene un identificador único&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Las acciones de los casos se identifican según el identificador del Caso asociado&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Tanto el estudiante como el profesor se pueden identificar por sus cedula y se guardan sus nombres y email&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Un beneficiario se puede identificar con la id del caso asociado y un identificador secuencial&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;De las citas también se quiere guardar las observaciones realizadas en estas y las citas históricas con sus fechas. Incluyendo el estado de si se realizo, no se realizo o esta próxima a realizarse&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;El id del Núcleo es el mismo nombre, que no se puede repetir entre núcleos&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;El periodo de educación se convierte a meses y se almacena&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;La id del caso se compone por su núcleo, periodo académico y numero secuencial&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Estatus tiene un numero secuencial justo con el id del casos asociado para su identificación&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                <mxCell id="RAYBkIz1RWP06Id279hd-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Supuestos Semánticos&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Cada Soporte tiene un identificador único&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Las acciones de los casos se identifican según el identificador del Caso asociado&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Tanto el estudiante como el profesor se pueden identificar por sus cedula y se guardan sus nombres y email&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Un beneficiario se puede identificar con la id del caso asociado y un identificador secuencial&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;De las citas también se quiere guardar las observaciones realizadas en estas y las citas históricas con sus fechas. Incluyendo el estado de si se realizo, no se realizo o esta próxima a realizarse&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;El id del Núcleo es el mismo nombre, que no se puede repetir entre núcleos&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;El periodo de educación se convierte a meses y se almacena&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;La id del caso se compone por su núcleo, periodo académico y numero secuencial&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Estatus tiene un numero secuencial justo con el id del casos asociado para su identificación&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: rgb(63, 63, 63); font-weight: normal;&quot;&gt;Se trabaja con el modelo E/R extendido con la notacion de disjunto cuando no tiene la conexion entre subclases y solapado cuando si existe ese arco que conecta una subclase con otra.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
                     <mxGeometry width="850" height="530" as="geometry"/>
                 </mxCell>
                 <mxCell id="vup-lCYTlAYCStnuwmQK-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Semantica no Reflejada&lt;/font&gt;&lt;/h1&gt;&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ol&gt;&lt;li&gt;&lt;br&gt;&lt;/li&gt;&lt;li&gt;&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
