@@ -5,6 +5,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
+    "generate": "prisma generate",
+    "postinstall": "prisma generate",
     "start": "pnpm tsc && node dist/index.js"
   },
   "keywords": [],
