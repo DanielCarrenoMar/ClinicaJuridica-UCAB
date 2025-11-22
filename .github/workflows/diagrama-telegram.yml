@@ -50,7 +50,7 @@ jobs:
           if [ ${#jpg_files[@]} -gt 0 ]; then
             for FILE in "${jpg_files[@]}"; do
               echo "✅ Enviando imagen: $FILE"
-              CAPTION="**Diagrama Actualizado**: $(basename "$FILE" .jpg)"
+              CAPTION="$(basename "$FILE" .jpg)"
 
               curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendPhoto" \
                 -F chat_id="$CHAT_ID" \
