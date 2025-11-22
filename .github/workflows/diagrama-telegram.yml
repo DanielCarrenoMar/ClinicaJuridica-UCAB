@@ -44,18 +44,24 @@ jobs:
           CHAT_ID: ${{ secrets.ID_GROUP_TELEGRAM }}
           TOPIC_ID: '114'
         run: |
-          FILE=$(find doc -name "*.jpg" | head -n 1)
-          if [ -n "$FILE" ]; then
-            echo "✅ Imagen generada en: $FILE"
-            curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendPhoto" \
-              -F chat_id="$CHAT_ID" \
-              -F message_thread_id="$TOPIC_ID" \
-              -F photo="@$FILE" \
-              -F caption="**Diagrama Conceptual Actualizado**" \
-              -F parse_mode="Markdown"
+          shopt -s nullglob
+          jpg_files=(doc/export/*.jpg)
+
+          if [ ${#jpg_files[@]} -gt 0 ]; then
+            for FILE in "${jpg_files[@]}"; do
+              echo "✅ Enviando imagen: $FILE"
+              CAPTION="**Diagrama Actualizado**: $(basename "$FILE" .jpg)"
+
+              curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendPhoto" \
+                -F chat_id="$CHAT_ID" \
+                -F message_thread_id="$TOPIC_ID" \
+                -F photo="@$FILE" \
+                -F caption="$CAPTION" \
+                -F parse_mode="Markdown"
+            done
           else
-            echo "❌ ERROR: La acción terminó pero no generó el archivo JPG en la carpeta doc/."
+            echo "❌ ERROR: La acción terminó pero no generó archivos JPG en la carpeta doc/export/."
             echo "Contenido de la carpeta doc/:"
-            ls -la doc/
+            ls -R doc/
             exit 1
           fi
