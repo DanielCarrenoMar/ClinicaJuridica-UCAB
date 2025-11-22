@@ -1,38 +1,42 @@
 name: Exportar Diagrama y Notificar a Telegram
 
-# Se ejecuta solo cuando hay un push en el archivo específico
 on:
   push:
     paths:
-      - 'doc/diagramaConceptual.drawio'
+      - 'doc/diagramaConceptual.drawio' # GitHub verifica el cambio AQUÍ, gratis.
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   convert-and-send:
     runs-on: ubuntu-latest
     steps:
-      # 1. Descargar el código del repositorio
+      # 1. Descarga ULTRA rápida (solo la última versión del archivo)
       - name: Checkout del código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Solo 1 commit. Más rápido imposible.
 
-      # 2. Convertir el archivo .drawio a .jpg usando una Action existente
+      # 2. Conversión Directa
+      # Como el workflow solo se activó porque el archivo cambió,
+      # es seguro decirle "convierte todo lo que encuentres en doc/"
       - name: Convertir Draw.io a JPG
         uses: rlespinasse/drawio-export-action@v2
         with:
-          path: doc/ # Carpeta donde buscará archivos .drawio
+          path: doc/
           format: jpg
-          output: export/ # Carpeta temporal donde guardará la imagen generada
+          output: export/
+          action-mode: all # <--- Esto evita el error del "shallow repository"
 
-      # 3. Enviar la imagen generada a Telegram
       - name: Enviar a Telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.ID_GROUP_TELEGRAM }}
           token: ${{ secrets.APIKEY_BOT_TELEGRAM }}
-          # La acción anterior genera el archivo con el mismo nombre pero extensión .jpg
-          # Si tu archivo es doc/diagramaConceptual.drawio, el output será export/doc/diagramaConceptual.jpg
           photo: export/doc/diagramaConceptual.jpg
           message: |
             🚀 **Diagrama Actualizado**
             
-            Se ha detectado un cambio en el diagrama conceptual.
-            Adjunto la nueva versión en imagen.
+            Se ha detectado un cambio y se ha generado la imagen automáticamente.
