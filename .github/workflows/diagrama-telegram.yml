@@ -21,20 +21,21 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Preparar archivo
+      - name: 🔍 Verificar fuente
         run: |
-          mkdir -p temp_work
-          # Copiamos el archivo a una carpeta temporal limpia
-          cp doc/diagramaConceptual.drawio temp_work/diagrama.drawio
-          mkdir -p export
+          if [ -f "doc/diagramaConceptual.drawio" ]; then
+            echo "✅ Archivo fuente encontrado."
+            ls -l doc/diagramaConceptual.drawio
+          else
+            echo "❌ ERROR: No se encuentra doc/diagramaConceptual.drawio"
+            exit 1
+          fi
 
       - name: Convertir Draw.io a JPG
         uses: rlespinasse/drawio-export-action@v2
         with:
-          # Ahora le decimos: trabaja SOLO en esta carpeta temporal
-          path: temp_work
+          path: doc
           format: jpg
-          output: export
           action-mode: all
 
       - name: 🔍 Debug - Listar archivos generados
@@ -42,20 +43,15 @@ jobs:
           echo "Listando contenido de la carpeta export:"
           ls -R export/
 
-      - name: Enviar a Telegram (Con Topic)
-        if: success()
+      - name: Enviar a Telegram
         env:
           TOKEN: ${{ secrets.APIKEY_BOT_TELEGRAM }}
           CHAT_ID: ${{ secrets.ID_GROUP_TELEGRAM }}
           TOPIC_ID: '114'
         run: |
-          # Como renombramos el archivo a 'diagrama.drawio', la salida será 'diagrama.jpg'
-          # La acción suele replicar la estructura, así que buscamos en export/temp_work/ o directo en export/
-          
-          FILE=$(find export -name "*.jpg" | head -n 1)
-          
+          FILE=$(find doc -name "*.jpg" | head -n 1)
           if [ -n "$FILE" ]; then
-            echo "✅ Imagen encontrada en: $FILE"
+            echo "✅ Imagen generada en: $FILE"
             curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendPhoto" \
               -F chat_id="$CHAT_ID" \
               -F message_thread_id="$TOPIC_ID" \
@@ -63,6 +59,8 @@ jobs:
               -F caption="**Diagrama Conceptual Actualizado**" \
               -F parse_mode="Markdown"
           else
-            echo "❌ ERROR: No se generó ninguna imagen."
+            echo "❌ ERROR: La acción terminó pero no generó el archivo JPG en la carpeta doc/."
+            echo "Contenido de la carpeta doc/:"
+            ls -la doc/
             exit 1
           fi
