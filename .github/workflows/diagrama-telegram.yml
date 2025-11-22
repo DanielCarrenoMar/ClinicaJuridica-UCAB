@@ -3,7 +3,7 @@ name: Exportar Diagrama y Notificar a Telegram
 on:
   push:
     paths:
-      - 'doc/diagramaConceptual.drawio' # GitHub verifica el cambio AQUÍ, gratis.
+      - 'doc/diagramaConceptual.drawio'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,30 +13,33 @@ jobs:
   convert-and-send:
     runs-on: ubuntu-latest
     steps:
-      # 1. Descarga ULTRA rápida (solo la última versión del archivo)
       - name: Checkout del código
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1 # Solo 1 commit. Más rápido imposible.
+          fetch-depth: 1
 
-      # 2. Conversión Directa
-      # Como el workflow solo se activó porque el archivo cambió,
-      # es seguro decirle "convierte todo lo que encuentres en doc/"
       - name: Convertir Draw.io a JPG
         uses: rlespinasse/drawio-export-action@v2
         with:
           path: doc/
           format: jpg
           output: export/
-          action-mode: all # <--- Esto evita el error del "shallow repository"
+          action-mode: all
+
+      - name: 🔍 Debug - Listar archivos generados
+        run: |
+          echo "Listando contenido de la carpeta export:"
+          ls -R export/
 
       - name: Enviar a Telegram
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ID_GROUP_TELEGRAM }}
-          token: ${{ secrets.APIKEY_BOT_TELEGRAM }}
-          photo: export/doc/diagramaConceptual.jpg
-          message: |
-            🚀 **Diagrama Actualizado**
-            
-            Se ha detectado un cambio y se ha generado la imagen automáticamente.
+        env:
+          TOKEN: ${{ secrets.APIKEY_BOT_TELEGRAM }}
+          CHAT_ID: ${{ secrets.ID_GROUP_TELEGRAM }}
+          TOPIC_ID: '114'
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendPhoto" \
+            -F chat_id="$CHAT_ID" \
+            -F message_thread_id="$TOPIC_ID" \
+            -F photo="@export/diagramaConceptual.jpg" \
+            -F caption="**Diagrama Conceptual Actualizado**" \
+            -F parse_mode="Markdown"
