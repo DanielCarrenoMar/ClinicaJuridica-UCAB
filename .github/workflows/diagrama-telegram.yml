@@ -38,11 +38,6 @@ jobs:
           format: jpg
           action-mode: all
 
-      - name: 🔍 Debug - Listar archivos generados
-        run: |
-          echo "Listando contenido de la carpeta export:"
-          ls -R export/
-
       - name: Enviar a Telegram
         env:
           TOKEN: ${{ secrets.APIKEY_BOT_TELEGRAM }}
