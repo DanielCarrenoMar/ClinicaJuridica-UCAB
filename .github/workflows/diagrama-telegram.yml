@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   convert-and-send:
     runs-on: ubuntu-latest
@@ -17,6 +20,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Verificar archivos y crear carpetas
+        run: |
+          echo "📂 Estructura actual de archivos:"
+          ls -R
+          echo "--------------------------------"
+          echo "🛠 Creando carpeta export..."
+          mkdir -p export
 
       - name: Convertir Draw.io a JPG
         uses: rlespinasse/drawio-export-action@v2
