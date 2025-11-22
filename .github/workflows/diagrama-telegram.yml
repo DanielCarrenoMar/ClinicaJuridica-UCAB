@@ -21,16 +21,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 🔍 Verificar fuente
-        run: |
-          if [ -f "doc/diagramaConceptual.drawio" ]; then
-            echo "✅ Archivo fuente encontrado."
-            ls -l doc/diagramaConceptual.drawio
-          else
-            echo "❌ ERROR: No se encuentra doc/diagramaConceptual.drawio"
-            exit 1
-          fi
-
       - name: Convertir Draw.io a JPG
         uses: rlespinasse/drawio-export-action@v2
         with:
