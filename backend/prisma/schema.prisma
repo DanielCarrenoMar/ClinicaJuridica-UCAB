@@ -12,138 +12,245 @@ datasource db {
 1) Los nombres pasan a tener dos atributos (firstName, lastName) en vez de uno solo (fullName)
 */
 
-enum CaseStatus {
+enum CaseStatusType {
   OPEN
   IN_PROGRESS
   ON_PAUSE
   CLOSED
 }
 
+enum GenderType {
+  M
+  F
+  O
+}
+
+enum ColaboratorType {
+  CJ_1
+  CJ_2
+  VOLUNTEER
+}
+
+enum IDType {
+  V
+  E
+  J
+}
+
+enum WorkConditionType {
+  EMPLOYER
+  EMPLOYEE
+  WORKER
+  SELF_EMPLOYED
+}
+
+enum ActivityConditionType {
+  HOUSEWIFE
+  STUDENT
+  RETIRED
+  OTHER
+}
+
+enum WasteCollectionType {
+  HOME_COLLECTION
+  PUBLIC_CONTAINER
+  NONE
+}
+
+enum WastewaterType {
+  SEWER_OR_SEPTIC
+  UNCONNECTED_TOILET
+  LATRINE
+  NONE
+}
+
+enum WaterServiceType {
+  INDOOR
+  OUTDOOR
+  NONE
+}
+
+enum RoofMaterialType {
+  WOOD_PALM_CARDBOARD
+  ZINC_SHEET
+  CONCRETE_OR_TILES
+}
+
+enum WallMaterialType {
+  WASTE_MATERIALS
+  BAHAREQUE
+  UNPLASTERED_BLOCK
+  PLASTERED_BLOCK
+}
+
+enum FloorMaterialType {
+  DIRT
+  CEMENT
+  CERAMIC
+  GRANITE_PARQUET_MARBLE
+}
+
 model User {
-  idUser      Int       @id @default(autoincrement())
-  email       String    @unique
-  password    String
+  idUser      Int       @id //Cedula de identidad
   firstName   String
   lastName    String
+  gender GenderType
+  email       String    @unique
   isActive    Boolean   @default(true)
-  phoneNumber String?
+  password    String?
 
   // Relaciones
-  assignments CaseAssignment[] // Un usuario puede estar asignado a varios casos
-  caseLogs    CaseLog[]        // Un usuario genera logs/historial
+  caseStatus  CaseStatus[]
+  colaborator Colaborator?
+  teacher Teacher?
 
   @@map("users")
 }
 
-model Student {
+model Colaborator {
+  idUser Int @id
+  typeColaborator ColaboratorType
 
+  user User @relation(fields: [idUser], references: [idUser])
+
+  @@map("colaborators")
 }
 
 model Teacher {
+  idUser Int @id
   isAdmin Boolean @default(false)
+
+  user User  @relation(fields: [idUser], references: [idUser])
+}
+
+model CaseStatus {
+  idCaseStatus Int @default(autoincrement())
+  idUser     Int
+  idCase     Int
+  statusCase CaseStatusType
+
+  User User @relation(fields: [idUser], references: [idUser])
+  Case Case @relation(fields: [idCase], references: [idCase])
+
+  createdAt  DateTime @default(now())
+  @@id([idCaseStatus, idUser, idCase])
+  @@map("caseStatuses")
+}
+
+model Beneficiary {
+  idBeneficiary Int @id // Cedula
+  firstName String
+  lastName String
+  idType IDType
+  birthDate DateTime
+  gender GenderType
+
+  idParish Int
+  idCase Int
+
+  parish Parish @relation(fields: [idParish], references: [idParish])
+  case Case @relation(fields: [idCase], references: [idCase])
+
+  @@map("beneficiaries")
 }
 
 model Applicant {
-  id             Int       @id @default(autoincrement())
-  rut            String    @unique // ID Nacional/DNI
+  idApplicant Int @id // Cedula de identidad
   firstName      String
   lastName       String
-  birthDate      DateTime
-  gender         String?
-  maritalStatus  String?
-  phone          String?
-  email          String?
-  educationLevel String?
-  occupation     String?
+  email          String
+  phoneCell      String
+  phoneHome      String
+  maritalStatus  String
+  concubinage    Boolean
+  isWorking     Boolean
+  workCondition WorkConditionType?
+  isLookingJob   Boolean
+  activityCondition ActivityConditionType?
+  isHouseHoldHead Boolean
+  educationLevel Int // De 0 a 14
+  educationMonths Int
+  educationLevelHousehold Int? // De 0 a 14
+  educationMonthsHousehold Int?
 
-  // Relaciones
-  address           Address?           // Relación 1 a 1 con dirección
-  socioeconomicInfo SocioeconomicInfo? // Ficha socioeconómica
-  familyMembers     FamilyMember[]     // Grupo familiar
-  cases             Case[]             // Un solicitante puede tener varios casos
-  beneficiaries     Beneficiary[]      // Beneficiarios asociados
+  // Vivienda
+  typeResidence String?
+  roomsAmount  Int?
+  bathroomsAmount Int?
+  roofMaterial      RoofMaterialType?
+  wallMaterial      WallMaterialType?
+  floorMaterial     FloorMaterialType?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Servicios
+  waterService      WaterServiceType?
+  wastewaterService WastewaterType?
+  wasteCollection   WasteCollectionType?
 
+  // Falta lo de artefactos domesticos que no se 
+  // si son respuestas SI o no o por que ahora es multivaluado
+
+  idFamilyHouse Int
+  familyHouse   FamilyHouse @relation(fields: [idFamilyHouse], references: [idFamilyHouse])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   @@map("applicants")
 }
 
-model Address {
-  id          Int     @id @default(autoincrement())
-  street      String
-  number      String?
-  details     String? // Depto, Block, etc.
-  
-  // Ubicación Geográfica (Jerarquía: Región -> Comuna)
-  communeId   Int
-  commune     Commune @relation(fields: [communeId], references: [id])
+model Parish {
+  idParish Int @id @default(autoincrement())
+  name String
 
-  // Relación con Solicitante
-  applicantId Int       @unique
-  applicant   Applicant @relation(fields: [applicantId], references: [id])
+  idMunicipality Int
+  municipality municipality @relation(fields: [idMunicipality], references: [idMunicipality])
 
-  @@map("addresses")
+  @@map("parishes")
+}
+
+model municipality {
+  idMunicipality Int @id @default(autoincrement())
+  name String
+
+  idRegion Int
+  region Region @relation(fields: [idRegion], references: [id])
+  parishes Parish[]
+
+  @@map("municipalities")
 }
 
 model Region {
   id       Int       @id @default(autoincrement())
   name     String
-  communes Commune[] // Una región tiene muchas comunas
+  
+  municipalities municipality[]
 
   @@map("regions")
 }
 
-model Commune {
-  id        Int       @id @default(autoincrement())
-  name      String
-  regionId  Int
-  region    Region    @relation(fields: [regionId], references: [id])
-  addresses Address[]
-
-  @@map("communes")
-}
-
-model SocioeconomicInfo {
-  id            Int     @id @default(autoincrement())
-  income        Decimal?
-  householdSize Int?
-  housingType   String? // Propia, Arrendada, Allegado
-  healthSystem  String? // Fonasa, Isapre
-  vulnerabilityIndex String? // RSH o similar
-
-  applicantId   Int       @unique
-  applicant     Applicant @relation(fields: [applicantId], references: [id])
-
-  @@map("socioeconomic_infos")
-}
-
-model FamilyMember {
-  id           Int      @id @default(autoincrement())
-  fullName     String
-  relationship String   // Hijo, Esposo, Madre, etc.
-  birthDate    DateTime?
-  occupation   String?
+model FamilyHouse {
+  idFamilyHouse Int @id @default(autoincrement())
+  memberWorkingCount Int
+  membersNonWorkingCount Int
+  childrens7to12Count Int
+  childrensStudentCount Int
+  monthlyIncome Float
   
-  applicantId  Int
-  applicant    Applicant @relation(fields: [applicantId], references: [id])
+  applicants Applicant[]
 
-  @@map("family_members")
+  @@map("familyHouses")
 }
 
-// --------------------------------------------------------
-// CASE MANAGEMENT (Centro y Derecha del Diagrama)
-// --------------------------------------------------------
+// POR REVISAR
 
 model Case {
-  id            Int      @id @default(autoincrement())
+  idCase        Int      @id @default(autoincrement())
   caseNumber    String   @unique // Número de rol o carpeta interna
   entryDate     DateTime @default(now())
   description   String   @db.Text
   observations  String?  @db.Text
   
   // Estados y Clasificaciones
-  status        CaseStatus @default(OPEN)
+  status        CaseStatusType @default(OPEN)
   
   legalAreaId   Int
   legalArea     LegalArea  @relation(fields: [legalAreaId], references: [id]) // Materia
@@ -179,23 +286,6 @@ model CaseAssignment {
   case      Case     @relation(fields: [caseId], references: [id])
 
   @@map("case_assignments")
-}
-
-model Beneficiary {
-  id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  rut         String?
-  birthDate   DateTime?
-  
-  // Un beneficiario puede estar ligado a un caso específico y a un solicitante
-  caseId      Int
-  case        Case      @relation(fields: [caseId], references: [id])
-  
-  applicantId Int?
-  applicant   Applicant? @relation(fields: [applicantId], references: [id])
-
-  @@map("beneficiaries")
 }
 
 // --------------------------------------------------------
