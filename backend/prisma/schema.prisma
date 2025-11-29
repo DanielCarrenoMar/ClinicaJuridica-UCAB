@@ -8,9 +8,9 @@ datasource db {
 }
 
 //CONSIDERACIONES
-/*
-1) Los nombres pasan a tener dos atributos (firstName, lastName) en vez de uno solo (fullName)
-*/
+/**
+ * 1) Los nombres pasan a tener dos atributos (firstName, lastName) en vez de uno solo (fullName)
+ */
 
 enum CaseStatusType {
   OPEN
@@ -26,8 +26,8 @@ enum GenderType {
 }
 
 enum ColaboratorType {
-  CJ_1
-  CJ_2
+  STUDENT
+  GRADUATE
   VOLUNTEER
 }
 
@@ -90,96 +90,148 @@ enum FloorMaterialType {
   GRANITE_PARQUET_MARBLE
 }
 
+enum LegalAreaType {
+  PERSONS
+  GOODS
+  CONTRACTS
+  ORDINARY_COURTS
+  CHILD_PROTECTION_COURTS
+  SUCCESSIONS
+  CRIMINAL_MATERIAL
+  LABOR_MATERIAL
+  COMMERCIAL_MATERIAL
+  ADMINISTRATIVE_MATERIAL
+  OTHERS
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+enum BeneficiaryType {
+  DIRECT
+  INDIRECT
+}
+
 model User {
-  idUser      Int       @id //Cedula de identidad
-  firstName   String
-  lastName    String
-  gender GenderType
-  email       String    @unique
-  isActive    Boolean   @default(true)
-  password    String?
+  idUser    Int        @id //Cedula de identidad
+  firstName String
+  lastName  String
+  gender    GenderType
+  email     String     @unique
+  isActive  Boolean    @default(true)
+  password  String?
 
   // Relaciones
-  caseStatus  CaseStatus[]
-  colaborator Colaborator?
-  teacher Teacher?
+  caseStatus         CaseStatus[]
+  colaborator        Colaborator?
+  teacher            Teacher?
+  apointments        Appointment[]
+  caseAssignments    CaseAssignment[]
+  caseActions        CaseAction[]
+  executeActions     ExecuteAction[]
+  attenpAppointments AttenpAppointment[]
 
-  @@map("users")
+  @@map("Users")
 }
 
 model Colaborator {
-  idUser Int @id
+  idUser          Int             @id
   typeColaborator ColaboratorType
+
+  idSubject Int?
+  section   String?
+  subject   Subject? @relation(fields: [idSubject, section], references: [idSubject, section])
 
   user User @relation(fields: [idUser], references: [idUser])
 
-  @@map("colaborators")
+  @@map("Colaborators")
 }
 
 model Teacher {
-  idUser Int @id
+  idUser  Int     @id
   isAdmin Boolean @default(false)
 
-  user User  @relation(fields: [idUser], references: [idUser])
+  user User @relation(fields: [idUser], references: [idUser])
+
+  subjects Subject[]
+
+  @@map("Teachers")
+}
+
+model Subject {
+  idSubject Int // RNC
+  section   String
+  name      String
+
+  idTeacher Int
+  teacher   Teacher @relation(fields: [idTeacher], references: [idUser])
+
+  colaborators Colaborator[]
+
+  @@id([idSubject, section])
 }
 
 model CaseStatus {
-  idCaseStatus Int @default(autoincrement())
-  idUser     Int
-  idCase     Int
-  statusCase CaseStatusType
+  idCaseStatus Int            @default(autoincrement())
+  idUser       Int
+  idCase       Int
+  statusCase   CaseStatusType
 
   User User @relation(fields: [idUser], references: [idUser])
-  Case Case @relation(fields: [idCase], references: [idCase])
+  //Case Case @relation(fields: [idCase], references: [idCase])
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+
   @@id([idCaseStatus, idUser, idCase])
-  @@map("caseStatuses")
+  @@map("CaseStatuses")
 }
 
 model Beneficiary {
-  idBeneficiary Int @id // Cedula
-  firstName String
-  lastName String
-  idType IDType
-  birthDate DateTime
-  gender GenderType
+  idBeneficiary Int        @id // Cedula
+  firstName     String
+  lastName      String
+  idType        IDType
+  birthDate     DateTime
+  gender        GenderType
 
   idParish Int
-  idCase Int
 
   parish Parish @relation(fields: [idParish], references: [idParish])
-  case Case @relation(fields: [idCase], references: [idCase])
 
-  @@map("beneficiaries")
+  cases IsBeneficiaryOf[]
+
+  @@map("Beneficiaries")
 }
 
 model Applicant {
-  idApplicant Int @id // Cedula de identidad
-  firstName      String
-  lastName       String
-  email          String
-  phoneCell      String
-  phoneHome      String
-  maritalStatus  String
-  concubinage    Boolean
-  isWorking     Boolean
-  workCondition WorkConditionType?
-  isLookingJob   Boolean
-  activityCondition ActivityConditionType?
-  isHouseHoldHead Boolean
-  educationLevel Int // De 0 a 14
-  educationMonths Int
-  educationLevelHousehold Int? // De 0 a 14
+  idApplicant              Int                    @id // Cedula de identidad
+  firstName                String
+  lastName                 String
+  email                    String
+  phoneCell                String
+  phoneHome                String
+  maritalStatus            String
+  concubinage              Boolean
+  isWorking                Boolean
+  workCondition            WorkConditionType?
+  isLookingJob             Boolean
+  activityCondition        ActivityConditionType?
+  isHouseHoldHead          Boolean
+  educationLevel           Int // De 0 a 14
+  educationMonths          Int
+  educationLevelHousehold  Int? // De 0 a 14
   educationMonthsHousehold Int?
 
   // Vivienda
-  typeResidence String?
-  roomsAmount  Int?
+  typeResidence   String?
+  roomsAmount     Int?
   bathroomsAmount Int?
-  roofMaterial      RoofMaterialType?
-  wallMaterial      WallMaterialType?
-  floorMaterial     FloorMaterialType?
+  roofMaterial    RoofMaterialType?
+  wallMaterial    WallMaterialType?
+  floorMaterial   FloorMaterialType?
 
   // Servicios
   waterService      WaterServiceType?
@@ -192,166 +244,266 @@ model Applicant {
   idFamilyHouse Int
   familyHouse   FamilyHouse @relation(fields: [idFamilyHouse], references: [idFamilyHouse])
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  @@map("applicants")
+  cases Case[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Applicants")
 }
 
 model Parish {
-  idParish Int @id @default(autoincrement())
-  name String
+  idParish Int    @id @default(autoincrement())
+  name     String
 
   idMunicipality Int
-  municipality municipality @relation(fields: [idMunicipality], references: [idMunicipality])
+  municipality   Municipality @relation(fields: [idMunicipality], references: [idMunicipality])
 
-  @@map("parishes")
+  beneficiaries Beneficiary[]
+  nucleus       Nucleus[]
+
+  @@map("Parishes")
 }
 
-model municipality {
-  idMunicipality Int @id @default(autoincrement())
-  name String
+model Municipality {
+  idMunicipality Int    @id @default(autoincrement())
+  name           String
 
   idRegion Int
-  region Region @relation(fields: [idRegion], references: [id])
+  region   Region   @relation(fields: [idRegion], references: [id])
   parishes Parish[]
 
-  @@map("municipalities")
+  @@map("Municipalities")
 }
 
 model Region {
-  id       Int       @id @default(autoincrement())
-  name     String
-  
-  municipalities municipality[]
+  id   Int    @id @default(autoincrement())
+  name String
 
-  @@map("regions")
+  municipalities Municipality[]
+
+  @@map("Regions")
 }
 
 model FamilyHouse {
-  idFamilyHouse Int @id @default(autoincrement())
-  memberWorkingCount Int
+  idFamilyHouse          Int   @id @default(autoincrement())
+  memberWorkingCount     Int
   membersNonWorkingCount Int
-  childrens7to12Count Int
-  childrensStudentCount Int
-  monthlyIncome Float
-  
+  childrens7to12Count    Int
+  childrensStudentCount  Int
+  monthlyIncome          Float
+
   applicants Applicant[]
 
-  @@map("familyHouses")
+  @@map("FamilyHouses")
 }
 
-// POR REVISAR
-
 model Case {
-  idCase        Int      @id @default(autoincrement())
-  caseNumber    String   @unique // Número de rol o carpeta interna
-  entryDate     DateTime @default(now())
-  description   String   @db.Text
-  observations  String?  @db.Text
-  
-  // Estados y Clasificaciones
-  status        CaseStatusType @default(OPEN)
-  
-  legalAreaId   Int
-  legalArea     LegalArea  @relation(fields: [legalAreaId], references: [id]) // Materia
+  idCase       Int     @id @default(autoincrement())
+  description  String
+  observations String?
+  tramitType   Int // entre 0 y 85
 
-  courtId       Int?
-  court         Court?     @relation(fields: [courtId], references: [id]) // Tribunal
+  idLegalArea Int
+  idCourt     Int?
+  idApplicant Int
+  idNucleus   Int
 
-  // Relaciones Principales
-  applicantId   Int
-  applicant     Applicant @relation(fields: [applicantId], references: [id])
+  legalArea LegalArea @relation(fields: [idLegalArea], references: [idLegalArea])
+  court     Court?    @relation(fields: [idCourt], references: [idCourt])
+  applicant Applicant @relation(fields: [idApplicant], references: [idApplicant])
+  nucleus   Nucleus   @relation(fields: [idNucleus], references: [idNucleus])
 
-  // Relaciones Secundarias
-  assignments    CaseAssignment[] // Estudiantes/Profesores asignados
-  documents      Document[]       // Documentos/Soportes
-  opposingParties OpposingParty[] // Contraparte
-  logs           CaseLog[]        // Historial de cambios
-  beneficiaries  Beneficiary[]    // A quien beneficia el caso (si es distinto al solicitante)
+  assignments   CaseAssignment[]
+  actions       CaseAction[]
+  beneficiaries IsBeneficiaryOf[]
+  suportDocs    SuportDocument[]
+  appointments  Appointment[]
 
-  @@map("cases")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  semester           Semester? @relation(fields: [semesterIdSemester], references: [idSemester])
+  semesterIdSemester Int?
+
+  @@map("Cases")
+}
+
+model SuportDocument {
+  idCase           Int
+  idSuportDocument Int    @default(autoincrement())
+  typeDocument     String
+  description      String
+
+  case Case @relation(fields: [idCase], references: [idCase])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([idCase, idSuportDocument])
+  @@map("SuportDocuments")
+}
+
+model Nucleus {
+  idNucleus Int    @id @default(autoincrement())
+  name      String
+
+  idParish Int
+  parish   Parish @relation(fields: [idParish], references: [idParish])
+
+  cases Case[]
+
+  @@map("Nucleus")
+}
+
+model Appointment {
+  idCase            Int
+  date              DateTime
+  statusAppointment AppointmentStatus @default(SCHEDULED)
+  observations      String?
+
+  case Case @relation(fields: [idCase], references: [idCase])
+
+  idUser             Int
+  user               User                @relation(fields: [idUser], references: [idUser])
+  attenpAppointments AttenpAppointment[]
+
+  @@id([idCase, date])
+  @@map("Appointments")
+}
+
+model LegalArea {
+  idLegalArea   Int           @id @default(autoincrement())
+  typeLegalArea LegalAreaType
+  description   String
+  subject       String // No se que es materia en Ambito Legal
+
+  cases Case[]
+
+  @@map("LegalAreas")
 }
 
 model CaseAssignment {
-  id        Int      @id @default(autoincrement())
-  startDate DateTime @default(now())
-  endDate   DateTime?
-  isActive  Boolean  @default(true)
-  roleInCase String? // Rol específico en el caso si difiere del rol de usuario
+  idUser     Int
+  idCase     Int
+  idSemester Int
+  startDate  DateTime  @default(now())
+  endDate    DateTime?
 
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  user     User     @relation(fields: [idUser], references: [idUser])
+  case     Case     @relation(fields: [idCase], references: [idCase])
+  semester Semester @relation(fields: [idSemester], references: [idSemester])
 
-  caseId    Int
-  case      Case     @relation(fields: [caseId], references: [id])
-
-  @@map("case_assignments")
+  @@id([idUser, idCase, idSemester])
+  @@map("CaseAssignments")
 }
 
-// --------------------------------------------------------
-// LEGAL ENTITIES (Derecha del Diagrama)
-// --------------------------------------------------------
+model Semester {
+  idSemester Int      @id @default(autoincrement())
+  term       String // Ej: "2023-15", "2023-30"
+  startDate  DateTime
+  endDate    DateTime
 
-model LegalArea {
-  id          Int    @id @default(autoincrement())
-  name        String // Ej: Familia, Civil, Laboral
-  description String?
-  cases       Case[]
+  caseAssignments CaseAssignment[]
+  cases           Case[]
 
-  @@map("legal_areas")
+  @@map("Semesters")
 }
 
 model Court {
-  id       Int    @id @default(autoincrement())
-  name     String // Ej: 1er Juzgado de Letras
-  address  String?
-  city     String?
-  cases    Case[]
+  idCourt   Int    @id @default(autoincrement())
+  typeCourt String
+  name      String
 
-  @@map("courts")
+  cases        Case[]
+  recordCourts RecordCourt[]
+
+  @@map("Courts")
 }
 
-model OpposingParty {
-  id        Int     @id @default(autoincrement())
-  fullName  String
-  rut       String?
-  address   String?
-  lawyer    String? // Abogado de la contraparte
+model RecordCourt {
+  idRecordCourt Int     @id @default(autoincrement())
+  caseNumber    String
+  year          Int
+  observations  String?
 
-  caseId    Int
-  case      Case    @relation(fields: [caseId], references: [id])
+  idCourt Int
+  court   Court @relation(fields: [idCourt], references: [idCourt])
 
-  @@map("opposing_parties")
+  documents DocumentRecordCourt[]
+
+  createdAt DateTime @default(now())
+
+  @@map("RecordCourts")
 }
 
-model Document {
-  id         Int      @id @default(autoincrement())
-  fileName   String
-  fileUrl    String
-  fileType   String   // PDF, DOCX, IMG
-  uploadedAt DateTime @default(now())
-  
-  caseId     Int
-  case       Case     @relation(fields: [caseId], references: [id])
+model DocumentRecordCourt {
+  // Falta Complementar mejor esta tabla Falta Info
+  idRecordCourt         Int
+  idDocumentRecordCourt Int    @default(autoincrement())
+  typeDocument          String
 
-  @@map("documents")
+  recordCourt RecordCourt @relation(fields: [idRecordCourt], references: [idRecordCourt])
+
+  createdAt DateTime @default(now())
+
+  @@id([idRecordCourt, idDocumentRecordCourt])
+  @@map("DocumentRecordCourts")
 }
 
-// --------------------------------------------------------
-// SYSTEM LOGS (Historial)
-// --------------------------------------------------------
+model CaseAction {
+  idCase       Int
+  idCaseAction Int    @default(autoincrement())
+  title        String
+  description  String
 
-model CaseLog {
-  id          Int      @id @default(autoincrement())
-  action      String   // "Created", "Updated Status", "File Uploaded"
-  details     String?
-  timestamp   DateTime @default(now())
+  case Case @relation(fields: [idCase], references: [idCase])
 
-  caseId      Int
-  case        Case     @relation(fields: [caseId], references: [id])
+  idUser Int?
 
-  userId      Int?
-  user        User?    @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [idUser], references: [idUser])
 
-  @@map("case_logs")
+  createdAt      DateTime        @default(now())
+  executeActions ExecuteAction[]
+
+  @@id([idCaseAction, idCase])
+  @@map("CaseActions")
+}
+
+model ExecuteAction {
+  idUser       Int
+  idCaseAction Int
+  idCase       Int
+  dateExecuted DateTime
+
+  user   User       @relation(fields: [idUser], references: [idUser])
+  action CaseAction @relation(fields: [idCaseAction, idCase], references: [idCaseAction, idCase])
+
+  @@id([idUser, idCaseAction])
+  @@map("ExecuteActions")
+}
+
+model IsBeneficiaryOf {
+  idBeneficiary   Int
+  idCase          Int
+  description     String
+  typeBeneficiary BeneficiaryType
+  relationship    String
+
+  beneficiary Beneficiary @relation(fields: [idBeneficiary], references: [idBeneficiary])
+  case        Case        @relation(fields: [idCase], references: [idCase])
+
+  @@id([idBeneficiary, idCase])
+  @@map("IsBeneficiaryOf")
+}
+
+model AttenpAppointment {
+  idUser Int
+  idCase Int
+  date   DateTime
+
+  user        User        @relation(fields: [idUser], references: [idUser])
+  appointment Appointment @relation(fields: [idCase, date], references: [idCase, date])
+
+  @@id([idUser, idCase, date])
+  @@map("AttendAppointments")
 }
