@@ -3,12 +3,265 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlserver"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Users {
+//CONSIDERACIONES
+/*
+1) Los nombres pasan a tener dos atributos (firstName, lastName) en vez de uno solo (fullName)
+*/
+
+enum CaseStatus {
+  OPEN
+  IN_PROGRESS
+  ON_PAUSE
+  CLOSED
+}
+
+model User {
+  idUser      Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  firstName   String
+  lastName    String
+  isActive    Boolean   @default(true)
+  phoneNumber String?
+
+  // Relaciones
+  assignments CaseAssignment[] // Un usuario puede estar asignado a varios casos
+  caseLogs    CaseLog[]        // Un usuario genera logs/historial
+
+  @@map("users")
+}
+
+model Student {
+
+}
+
+model Teacher {
+  isAdmin Boolean @default(false)
+}
+
+model Applicant {
+  id             Int       @id @default(autoincrement())
+  rut            String    @unique // ID Nacional/DNI
+  firstName      String
+  lastName       String
+  birthDate      DateTime
+  gender         String?
+  maritalStatus  String?
+  phone          String?
+  email          String?
+  educationLevel String?
+  occupation     String?
+
+  // Relaciones
+  address           Address?           // Relación 1 a 1 con dirección
+  socioeconomicInfo SocioeconomicInfo? // Ficha socioeconómica
+  familyMembers     FamilyMember[]     // Grupo familiar
+  cases             Case[]             // Un solicitante puede tener varios casos
+  beneficiaries     Beneficiary[]      // Beneficiarios asociados
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("applicants")
+}
+
+model Address {
+  id          Int     @id @default(autoincrement())
+  street      String
+  number      String?
+  details     String? // Depto, Block, etc.
+  
+  // Ubicación Geográfica (Jerarquía: Región -> Comuna)
+  communeId   Int
+  commune     Commune @relation(fields: [communeId], references: [id])
+
+  // Relación con Solicitante
+  applicantId Int       @unique
+  applicant   Applicant @relation(fields: [applicantId], references: [id])
+
+  @@map("addresses")
+}
+
+model Region {
+  id       Int       @id @default(autoincrement())
+  name     String
+  communes Commune[] // Una región tiene muchas comunas
+
+  @@map("regions")
+}
+
+model Commune {
+  id        Int       @id @default(autoincrement())
+  name      String
+  regionId  Int
+  region    Region    @relation(fields: [regionId], references: [id])
+  addresses Address[]
+
+  @@map("communes")
+}
+
+model SocioeconomicInfo {
+  id            Int     @id @default(autoincrement())
+  income        Decimal?
+  householdSize Int?
+  housingType   String? // Propia, Arrendada, Allegado
+  healthSystem  String? // Fonasa, Isapre
+  vulnerabilityIndex String? // RSH o similar
+
+  applicantId   Int       @unique
+  applicant     Applicant @relation(fields: [applicantId], references: [id])
+
+  @@map("socioeconomic_infos")
+}
+
+model FamilyMember {
+  id           Int      @id @default(autoincrement())
+  fullName     String
+  relationship String   // Hijo, Esposo, Madre, etc.
+  birthDate    DateTime?
+  occupation   String?
+  
+  applicantId  Int
+  applicant    Applicant @relation(fields: [applicantId], references: [id])
+
+  @@map("family_members")
+}
+
+// --------------------------------------------------------
+// CASE MANAGEMENT (Centro y Derecha del Diagrama)
+// --------------------------------------------------------
+
+model Case {
+  id            Int      @id @default(autoincrement())
+  caseNumber    String   @unique // Número de rol o carpeta interna
+  entryDate     DateTime @default(now())
+  description   String   @db.Text
+  observations  String?  @db.Text
+  
+  // Estados y Clasificaciones
+  status        CaseStatus @default(OPEN)
+  
+  legalAreaId   Int
+  legalArea     LegalArea  @relation(fields: [legalAreaId], references: [id]) // Materia
+
+  courtId       Int?
+  court         Court?     @relation(fields: [courtId], references: [id]) // Tribunal
+
+  // Relaciones Principales
+  applicantId   Int
+  applicant     Applicant @relation(fields: [applicantId], references: [id])
+
+  // Relaciones Secundarias
+  assignments    CaseAssignment[] // Estudiantes/Profesores asignados
+  documents      Document[]       // Documentos/Soportes
+  opposingParties OpposingParty[] // Contraparte
+  logs           CaseLog[]        // Historial de cambios
+  beneficiaries  Beneficiary[]    // A quien beneficia el caso (si es distinto al solicitante)
+
+  @@map("cases")
+}
+
+model CaseAssignment {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  isActive  Boolean  @default(true)
+  roleInCase String? // Rol específico en el caso si difiere del rol de usuario
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  caseId    Int
+  case      Case     @relation(fields: [caseId], references: [id])
+
+  @@map("case_assignments")
+}
+
+model Beneficiary {
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  rut         String?
+  birthDate   DateTime?
+  
+  // Un beneficiario puede estar ligado a un caso específico y a un solicitante
+  caseId      Int
+  case        Case      @relation(fields: [caseId], references: [id])
+  
+  applicantId Int?
+  applicant   Applicant? @relation(fields: [applicantId], references: [id])
+
+  @@map("beneficiaries")
+}
+
+// --------------------------------------------------------
+// LEGAL ENTITIES (Derecha del Diagrama)
+// --------------------------------------------------------
+
+model LegalArea {
+  id          Int    @id @default(autoincrement())
+  name        String // Ej: Familia, Civil, Laboral
+  description String?
+  cases       Case[]
+
+  @@map("legal_areas")
+}
+
+model Court {
+  id       Int    @id @default(autoincrement())
+  name     String // Ej: 1er Juzgado de Letras
+  address  String?
+  city     String?
+  cases    Case[]
+
+  @@map("courts")
+}
+
+model OpposingParty {
+  id        Int     @id @default(autoincrement())
+  fullName  String
+  rut       String?
+  address   String?
+  lawyer    String? // Abogado de la contraparte
+
+  caseId    Int
+  case      Case    @relation(fields: [caseId], references: [id])
+
+  @@map("opposing_parties")
+}
+
+model Document {
+  id         Int      @id @default(autoincrement())
+  fileName   String
+  fileUrl    String
+  fileType   String   // PDF, DOCX, IMG
+  uploadedAt DateTime @default(now())
+  
+  caseId     Int
+  case       Case     @relation(fields: [caseId], references: [id])
+
+  @@map("documents")
+}
+
+// --------------------------------------------------------
+// SYSTEM LOGS (Historial)
+// --------------------------------------------------------
+
+model CaseLog {
+  id          Int      @id @default(autoincrement())
+  action      String   // "Created", "Updated Status", "File Uploaded"
+  details     String?
+  timestamp   DateTime @default(now())
+
+  caseId      Int
+  case        Case     @relation(fields: [caseId], references: [id])
+
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@map("case_logs")
 }
