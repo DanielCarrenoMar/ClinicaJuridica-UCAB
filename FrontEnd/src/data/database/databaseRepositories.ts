@@ -1,5 +1,5 @@
-import type { Beneficiary } from "../domain/models/beneficiary";
-import type { ApplicantRepository, BeneficiaryRepository } from "../domain/repositories";
+import type { Beneficiary } from "../../domain/models/beneficiary";
+import type { ApplicantRepository, BeneficiaryRepository } from "../../domain/repositories";
 
 // Simulación de base de datos en memoria
 let mockBeneficiaries: Beneficiary[] = [
