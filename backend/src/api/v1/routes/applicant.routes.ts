@@ -1,5 +1,6 @@
 import express from 'express';
 import * as applicantController from '../controllers/applicant.controller.js';
+import applicantService from '../services/applicant.service.js';
 
 const router = express.Router();
 

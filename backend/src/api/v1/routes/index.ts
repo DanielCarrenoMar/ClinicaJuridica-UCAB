@@ -1,6 +1,7 @@
 import express from 'express';
 import caseRoutes from './case.routes.js';
 import applicantRoutes from './applicant.routes.js';
+import userRoutes from './user.routes.js';
 
 const router = express.Router();
 
@@ -22,5 +23,8 @@ router.use('/cases', caseRoutes);
 
 // Usar rutas de solicitantes
 router.use('/applicants', applicantRoutes);
+
+// Usar rutas de usuarios
+router.use('/users', userRoutes);
 
 export default router;

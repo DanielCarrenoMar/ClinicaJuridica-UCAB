@@ -2,7 +2,7 @@
 import prisma from '../../../config/database.js';
 
 class ApplicantService {
-  // Obtener todos los solicitantes
+// Obtener todos los solicitantes
   async getAllApplicants() {
     try {
       const applicants = await prisma.applicant.findMany({
@@ -232,7 +232,7 @@ class ApplicantService {
         message: 'Solicitante creado exitosamente'
       };
     } catch (error) {
-      console.log('📦 Modo desarrollo: creando applicant mock');
+      console.log('Haz creado al solicitante' + data.firstName);
       const newId = Math.floor(Math.random() * 9000) + 1000;
       return {
         success: true,
