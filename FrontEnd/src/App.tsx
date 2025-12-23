@@ -3,6 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useBeneficiary } from './domain/useCaseHooks/useBeneficiary'
+import ButtonText from './components/ButtonText'
+import { Button } from './components/Button'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -20,6 +22,10 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
+      <ButtonText title="Agregar Beneficiario"/>
+      <ButtonText title="Agregar Beneficiario" variant="outlined" />
+      <Button />
+      <Button variant="outlined"/>
       <h1>Vite + React</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>

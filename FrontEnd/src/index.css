@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+@plugin "@midudev/tailwind-animations"
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Poppins", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -22,4 +24,13 @@
   --color-surface: #FFFFFF;
   --color-background: #E9E9E9;
   --color-onSurface: #10141A;
+
+  --text-title-large: 2.25rem;
+  --text-title-small: 2rem;
+  --text-label-large: 1.375rem;
+  --text-label-medium: 1.375rem;
+  --text-label-small: 1.125rem;
+  --text-body-large: 0.8125rem;
+  --text-body-medium: 0.8125rem;
+  --text-body-small: 0.75rem;
 }
