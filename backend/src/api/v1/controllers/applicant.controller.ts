@@ -1,18 +1,17 @@
 import type { Request, Response } from 'express';
 import applicantService from '../services/applicant.service.js';
 
-// Obtener todos los solicitantes
 export const getAllApplicants = async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await applicantService.getAllApplicants();
-    res.json(result);
+    if (result && result.data) {
+      res.json(result.data);
+    } else {
+      res.json(result); 
+    }
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ error: errorMessage });
   }
 };
 
@@ -87,7 +86,7 @@ export const createApplicant = async (req: Request, res: Response): Promise<void
   try {
     const applicantData = req.body;
 
-    // Validaciones básicas
+    // Validación que ya tenías
     if (!applicantData.firstName || !applicantData.lastName || !applicantData.email) {
       res.status(400).json({
         success: false,
@@ -103,14 +102,11 @@ export const createApplicant = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    res.status(201).json(result);
+    // Devolvemos el dato creado para que el front lo vea
+    res.status(201).json(result.data || result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ success: false, error: errorMessage });
   }
 };
 

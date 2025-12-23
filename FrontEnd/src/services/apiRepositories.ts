@@ -1,30 +1,7 @@
-import type { Beneficiary } from "../domain/models/beneficiary";
 import type { ApplicantRepository, BeneficiaryRepository } from "../domain/repositories";
 
-// Simulación de base de datos en memoria
-let mockBeneficiaries: Beneficiary[] = [
-    {
-        idBeneficiary: "V12345678",
-        name: "Pedro",
-        lastName: "Perez",
-        sex: "M"
-    },
-    {
-        idBeneficiary: "V87654321",
-        name: "Maria",
-        lastName: "Gomez",
-        sex: "F"
-    },
-    {
-        idBeneficiary: "V32415172",
-        name: "Pedro",
-        lastName: "Carvajal",
-        sex: "M"
-    }
-];
-
 export function getBeneficiaryRepository(): BeneficiaryRepository {
-    const API_URL = "http://localhost:4000/api/v1/applicants";
+    const API_URL = "http://localhost:3000/api/v1/applicants";
 
     return {
     findAllBeneficiaries: async () => {

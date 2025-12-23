@@ -3,7 +3,6 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useBeneficiary } from './domain/useCaseHooks/useBeneficiary'
-import type { Beneficiary } from "./domain/models/beneficiary";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,22 +10,23 @@ function App() {
   // Extraemos addBeneficiary del hook
   const { beneficiaries, loading, error, addBeneficiary } = useBeneficiary()
 
-  //Ejemplo de enviar información a express.
   const handleCreate = async () => {
-    let nuevo: Beneficiary = {
-      idBeneficiary: "V19332190",
-      name: "Juan",
-      lastName: "Manual",
-      sex: "M"
-    };
-
-    try {
-      await addBeneficiary(nuevo);
-      console.log("¡Agregado!");
-    } catch (err) {
-      console.error("Fallo al agregar", err);
-    }
+  // Ajustamos los campos para que coincidan con la validación del backend
+  const nuevo: any = {
+    idBeneficiary: "V19332190",
+    firstName: "Juan", // Antes era 'name'
+    lastName: "Manual",
+    email: "juan.manual@example.com", // Campo obligatorio en el controlador
+    sex: "M"
   };
+
+  try {
+    await addBeneficiary(nuevo);
+    console.log("¡Enviado al servidor profesional!");
+  } catch (err) {
+    console.error("Error en la petición", err);
+  }
+};
 
   return (
     <>
