@@ -6,13 +6,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
 }
 
-export const Button: FC<ButtonProps> = ({ 
+function Button ({ 
   variant = 'filled', 
   icon = <Plus />, 
   className = '',
+  children,
   ...props 
-}) => {
-  const baseStyles = "flex items-center border-1 justify-center p-3 rounded-full text-body-medium text-base transition-colors duration-200 cursor-pointer";
+}: ButtonProps) {
+  const baseStyles = `flex items-center border-1 justify-start gap-2 p-3 rounded-full text-body-medium text-base transition-colors duration-200 cursor-pointer`;
   
   const variantStyles = {
     filled: "text-onSurface border border-transparent bg-surface/70 hover:bg-surface",
@@ -26,6 +27,7 @@ export const Button: FC<ButtonProps> = ({
       {...props}
     >
       {icon}
+      {children}
     </button>
   );
 };

@@ -1,8 +1,6 @@
-import { useState } from 'react'
+import Button from '#components/Button.tsx'
 import './App.css'
 import { useBeneficiary } from './domain/useCaseHooks/useBeneficiary'
-import ButtonText from './components/ButtonText'
-import { Button } from './components/Button'
 import LateralMenuLayer from './layers/LateralMenuLayer'
 
 function App() {
@@ -12,10 +10,9 @@ function App() {
 
   return (
     <LateralMenuLayer locationId='home'>
-      <ButtonText text="Agregar Beneficiario"/>
-      <ButtonText text="Agregar Beneficiario" variant="outlined" />
       <Button />
       <Button variant="outlined"/>
+      <Button variant="active"/>
       
       <div className="card">
       <h1>Lista de Beneficiarios</h1>
