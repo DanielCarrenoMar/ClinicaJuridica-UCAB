@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -27,4 +27,39 @@
   --text-body-large: 0.8125rem;
   --text-body-medium: 0.8125rem;
   --text-body-small: 0.75rem;
+}
+
+@layer fonts {
+  .text-title-large {
+    font-size: var(--text-title-large);
+    font-weight: bolder;
+  }
+  .text-title-small {
+    font-size: var(--text-title-small);
+    font-weight: bold;
+  }
+  .text-label-large {
+    font-size: var(--text-label-large);
+    font-weight: bold;
+  }
+  .text-label-medium {
+    font-size: var(--text-label-medium);
+    font-weight: normal;
+  }
+  .text-label-small {
+    font-size: var(--text-label-small);
+    font-weight: normal;
+  }
+  .text-body-large {
+    font-size: var(--text-body-large);
+    font-weight: bold;
+  }
+  .text-body-medium {
+    font-size: var(--text-body-medium);
+    font-weight: normal;
+  }
+  .text-body-small {
+    font-size: var(--text-body-small);
+    font-weight: lighter;
+  }
 }
