@@ -1,7 +1,7 @@
 import Button from '#components/Button.tsx';
 import Logo from '#components/Logo.tsx';
 import { AngleLeft, AngleRight } from 'flowbite-react-icons/outline';
-import { Children, cloneElement, isValidElement, type FC, type ReactElement, type ReactNode } from 'react';
+import { Children, cloneElement, isValidElement, type FC, type ReactElement, type ReactNode, Fragment } from 'react';
 
 interface LateralMenuProps {
   children: ReactNode;
@@ -23,6 +23,17 @@ export const LateralMenu: FC<LateralMenuProps> = ({
   onToggleCollapse,
 }) => {
   
+  const renderChildren = (children: ReactNode): ReactNode => {
+    return Children.map(children, (child) => {
+      if (!isValidElement(child)) return child;
+
+      if (child.type === Fragment) {
+        return <Fragment>{renderChildren((child as ReactElement<any>).props.children)}</Fragment>;
+      }
+
+      return cloneElement(child as ReactElement<any>, { isCollapsed, activeItemId });
+    });
+  };
 
   return (
     <aside 
@@ -37,12 +48,7 @@ export const LateralMenu: FC<LateralMenuProps> = ({
         </div>
 
         <nav className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar">
-          {Children.map(children, (child) => {
-              if (isValidElement(child)) {
-                  return cloneElement(child as ReactElement<any>, { isCollapsed, activeItemId });
-              }
-              return child;
-          })}
+          {renderChildren(children)}
         </nav>
       </div>
       <div>

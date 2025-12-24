@@ -29,8 +29,8 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
                 }
                 {
                     permission <= 1 && <>
-                        <LateralMenuItem id='semesters' label='Usuarios' icon={<Clock />} link='/semestres' />
-                        <LateralMenuItem id='nuclei' label='Usuarios' icon={<MapPinAlt />} link='/nucleos' />
+                        <LateralMenuItem id='semesters' label='Semestres' icon={<Clock />} link='/semestres' />
+                        <LateralMenuItem id='nuclei' label='Nucleos' icon={<MapPinAlt />} link='/nucleos' />
                         <LateralMenuItem id='config' label='Configuración' icon={<Cog />} link='/configuracion' />
                     </>
                 }
