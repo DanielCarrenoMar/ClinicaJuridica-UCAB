@@ -1,6 +1,5 @@
 import type { FC, ReactNode } from 'react';
 import { ButtonText } from './ButtonText';
-import { Home, User } from 'flowbite-react-icons/solid';
 import { useNavigate } from 'react-router';
 
 export interface MenuItem {
@@ -19,10 +18,7 @@ interface LateralMenuProps {
 }
 
 export const LateralMenu: FC<LateralMenuProps> = ({
-  items = [
-  { id: 'home', label: 'Inicio', icon: <Home />, link: '/' },
-  { id: 'users', label: 'Usuarios', icon: <User />, link: '/users' },
-],
+  items,
   activeItemId,
   className = '',
   isCollapsed = false,
@@ -46,13 +42,13 @@ export const LateralMenu: FC<LateralMenuProps> = ({
         {items.map((item) => (
           <ButtonText
             key={item.id}
-            title={isCollapsed ? '' : item.label}
+            text={isCollapsed ? '' : item.label}
             icon={item.icon}
+            variant={item.id === activeItemId ? 'active' : 'filled'}
             onClick={() => navigate(item.link)}
             className={`
               w-full transition-all duration-300
               ${isCollapsed ? 'justify-center px-0 aspect-square' : 'justify-start'}
-              ${item.id === activeItemId ? 'active' : ''}
             `}
           />
         ))}

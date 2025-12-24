@@ -1,23 +1,22 @@
 import type { ReactNode } from "react"
-import { useLocation } from "react-router"
 import { LateralMenu } from "#components/LateralMenu.tsx"
+import { Home, User } from "flowbite-react-icons/outline";
 
 interface LateralMenuLayerProps {
+    locationId: string;
     children: ReactNode;
 }
 
-function LateralMenuLayer({children}: LateralMenuLayerProps) {
-    const location = useLocation();
-
-    const getActiveId = (path: string) => {
-        if (path === '/') return 'home';
-        if (path.startsWith('/users')) return 'users';
-        return '';
-    };
-
+function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
     return (
         <>
-            <LateralMenu activeItemId={getActiveId(location.pathname)} />
+            <LateralMenu 
+                activeItemId={locationId}
+                items={[
+                    { id: 'home', label: 'Inicio', icon: <Home />, link: '/' },
+                    { id: 'users', label: 'Usuarios', icon: <User />, link: '/users' },
+                ]} 
+            />
         
             <main className="flex-1 overflow-y-auto p-6">
                 {children}

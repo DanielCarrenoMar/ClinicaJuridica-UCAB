@@ -11,9 +11,9 @@ function App() {
   const { beneficiaries, loading, error } = useBeneficiary()
 
   return (
-    <LateralMenuLayer>
-      <ButtonText title="Agregar Beneficiario"/>
-      <ButtonText title="Agregar Beneficiario" variant="outlined" />
+    <LateralMenuLayer locationId='home'>
+      <ButtonText text="Agregar Beneficiario"/>
+      <ButtonText text="Agregar Beneficiario" variant="outlined" />
       <Button />
       <Button variant="outlined"/>
       
