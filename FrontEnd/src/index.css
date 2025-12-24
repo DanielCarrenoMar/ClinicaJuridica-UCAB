@@ -11,6 +11,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+svg{
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
 @theme {
   --color-success: #4990E2;
   --color-warning: #F39C0F;
