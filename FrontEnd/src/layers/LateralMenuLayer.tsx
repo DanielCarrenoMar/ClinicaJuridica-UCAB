@@ -14,7 +14,7 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
     let permission = 1
 
     return (
-        <div className="flex gap-3">
+        <div className="flex gap-3 h-full">
             <LateralMenu activeItemId={locationId} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)}>
                 <LateralMenuItem id='home' label='Inicio' icon={<Home />} link='/' />
                 <LateralMenuItem id='createCase' label='Crear Caso' icon={<Plus />} link='/crearCaso' />
