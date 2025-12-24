@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode, FC } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Plus } from "flowbite-react-icons/outline";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
