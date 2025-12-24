@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { Book, CalendarMonth, Home, Plus, User } from "flowbite-react-icons/outline";
+import { Book, CalendarMonth, Home, InfoCircle, Plus, User } from "flowbite-react-icons/outline";
+import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 
 interface LateralMenuLayerProps {
     locationId: string;
@@ -19,6 +20,8 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
                 <LateralMenuItem id='createCase' label='Crear Caso' icon={<Plus />} link='/createCase' />
                 <LateralMenuItem id='calendar' label='Calendario' icon={<CalendarMonth />} link='/calendar' />
                 <LateralMenuItem id='actions' label='Historial de Accciones' icon={<Book />} link='/actions' />
+                <LateralMenuItem id='reports' label='Generar Reportes' icon={<InfoCircle />} link='/reports' />
+                <LateralMenuTitle label='Administración' />
                 <LateralMenuItem id='users' label='Usuarios' icon={<User />} link='/users' />
                 {
                     role === 'teacher' && <>

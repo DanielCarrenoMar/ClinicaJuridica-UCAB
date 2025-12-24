@@ -1,14 +1,14 @@
 import Button from "#components/Button.tsx";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
+import type { MenuItem } from "./LateralMenu";
 
-interface LateralMenuItemProps {
+interface LateralMenuItemProps extends MenuItem {
     id: string;
     label: string;
     icon: ReactNode;
     link: string;
     onClick?: () => void;
-    isCollapsed?: boolean;
     activeItemId?: string;
 }
 

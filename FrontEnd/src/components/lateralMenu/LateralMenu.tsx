@@ -10,6 +10,10 @@ interface LateralMenuProps {
   onToggleCollapse?: () => void;
 }
 
+export interface MenuItem {
+    isCollapsed?: boolean;
+}
+
 export const LateralMenu: FC<LateralMenuProps> = ({
   children,
   activeItemId,
@@ -22,8 +26,7 @@ export const LateralMenu: FC<LateralMenuProps> = ({
   return (
     <aside 
       className={`
-        flex h-full transition-all duration-300 ease-in-out
-        py-6 gap-6
+        flex h-full transition-all duration-300 ease-in-out gap-6
         ${className}
       `}
     >
@@ -32,7 +35,7 @@ export const LateralMenu: FC<LateralMenuProps> = ({
         logo
         </div>
 
-        <nav className="flex-1 flex flex-col gap-3 overflow-y-auto no-scrollbar">
+        <nav className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar">
           {Children.map(children, (child) => {
               if (isValidElement(child)) {
                   return cloneElement(child as ReactElement<any>, { isCollapsed, activeItemId });
