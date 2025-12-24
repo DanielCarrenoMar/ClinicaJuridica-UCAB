@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { Book, CalendarMonth, Home, InfoCircle, Plus, User } from "flowbite-react-icons/outline";
+import { Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 
 interface LateralMenuLayerProps {
@@ -11,27 +11,27 @@ interface LateralMenuLayerProps {
 
 function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    let role = 'user'
+    let permission = 1
 
     return (
-        <div className="flex">
+        <div className="flex gap-3">
             <LateralMenu activeItemId={locationId} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)}>
                 <LateralMenuItem id='home' label='Inicio' icon={<Home />} link='/' />
-                <LateralMenuItem id='createCase' label='Crear Caso' icon={<Plus />} link='/createCase' />
-                <LateralMenuItem id='calendar' label='Calendario' icon={<CalendarMonth />} link='/calendar' />
-                <LateralMenuItem id='actions' label='Historial de Accciones' icon={<Book />} link='/actions' />
-                <LateralMenuItem id='reports' label='Generar Reportes' icon={<InfoCircle />} link='/reports' />
+                <LateralMenuItem id='createCase' label='Crear Caso' icon={<Plus />} link='/crearCaso' />
+                <LateralMenuItem id='calendar' label='Calendario' icon={<CalendarMonth />} link='/calendario' />
+                <LateralMenuItem id='actions' label='Historial de Accciones' icon={<Book />} link='/acciones' />
+                <LateralMenuItem id='reports' label='Generar Reportes' icon={<InfoCircle />} link='/reportes' />
                 <LateralMenuTitle label='Administración' />
-                <LateralMenuItem id='users' label='Usuarios' icon={<User />} link='/users' />
                 {
-                    role === 'teacher' && <>
-                        <LateralMenuItem id='adminPanel' label='Panel Admin' icon={<User />} link='/adminPanel' />
+                    permission <= 2 && <>
+                        <LateralMenuItem id='users' label='Usuarios' icon={<UsersGroup />} link='/usuarios' />
                     </>
                 }
                 {
-                    role === 'admin' && <>
-                        <LateralMenuItem id='users' label='Usuarios' icon={<User />} link='/users' />
-                        <LateralMenuItem id='users' label='Usuarios' icon={<User />} link='/users' />
+                    permission <= 1 && <>
+                        <LateralMenuItem id='semesters' label='Usuarios' icon={<Clock />} link='/semestres' />
+                        <LateralMenuItem id='nuclei' label='Usuarios' icon={<MapPinAlt />} link='/nucleos' />
+                        <LateralMenuItem id='config' label='Configuración' icon={<Cog />} link='/configuracion' />
                     </>
                 }
             </LateralMenu>

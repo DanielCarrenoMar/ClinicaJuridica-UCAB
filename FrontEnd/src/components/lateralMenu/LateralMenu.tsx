@@ -1,5 +1,6 @@
 import Button from '#components/Button.tsx';
-import { AngleLeft } from 'flowbite-react-icons/outline';
+import Logo from '#components/Logo.tsx';
+import { AngleLeft, AngleRight } from 'flowbite-react-icons/outline';
 import { Children, cloneElement, isValidElement, type FC, type ReactElement, type ReactNode } from 'react';
 
 interface LateralMenuProps {
@@ -32,7 +33,7 @@ export const LateralMenu: FC<LateralMenuProps> = ({
     >
       <div className='flex flex-col'>
         <div className={`flex items-center justify-center py-4 transition-all duration-300`}>
-        logo
+          <Logo variant={isCollapsed ? 'symbol' : 'logotype'} />
         </div>
 
         <nav className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar">
@@ -45,7 +46,7 @@ export const LateralMenu: FC<LateralMenuProps> = ({
         </nav>
       </div>
       <div>
-        <Button icon={<AngleLeft />} onClick={onToggleCollapse}/>
+        <Button icon={!isCollapsed ? <AngleLeft /> : <AngleRight />} onClick={onToggleCollapse}/>
       </div>
     
     </aside>
