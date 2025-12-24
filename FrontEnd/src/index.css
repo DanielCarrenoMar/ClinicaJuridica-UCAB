@@ -16,7 +16,7 @@
   --color-warning: #F39C0F;
   --color-error: #E84C3C;
   --color-surface: #FFFFFF;
-  --color-background: #E9E9E9;
+  --background-image-background: radial-gradient(#9ca3af 1px, transparent 1px), linear-gradient(#E4E4E4, #E4E4E4);
   --color-onSurface: #10141A;
 
   --text-title-large: 2.25rem;
