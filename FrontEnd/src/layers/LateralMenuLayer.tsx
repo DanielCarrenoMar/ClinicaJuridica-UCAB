@@ -35,7 +35,7 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
                     </>
                 }
             </LateralMenu>
-            <main>
+            <main className="flex-1">
                 {children}
             </main>
         </div>
