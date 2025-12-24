@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
+import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, Search, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
+import Button from "#components/Button.tsx";
 
 interface LateralMenuLayerProps {
     locationId: string;
@@ -35,8 +36,25 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
                     </>
                 }
             </LateralMenu>
-            <main className="flex-1">
-                {children}
+            <main className="flex-1 flex flex-col">
+                <header className="flex justify-end items-center gap-6 pb-4">
+                    <span className="flex gap-3">
+                        <Button icon={<Search />} className="bg-surface hover:bg-gray-50" />
+                        <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
+                    </span>
+                    <div className="flex items-center gap-3 ml-2">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-body-medium font-bold text-onSurface">Minervis</p>
+                            <p className="text-body-small text-onSurface/70">Coordinadora</p>
+                        </div>
+                        <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-surface/40">
+                            <User className="w-6 h-6" />
+                        </div>
+                    </div>
+                </header>
+                <div className="flex-1 overflow-y-auto">
+                    {children}
+                </div>
             </main>
         </div>
     )

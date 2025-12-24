@@ -38,23 +38,21 @@ export const LateralMenu: FC<LateralMenuProps> = ({
   return (
     <aside 
       className={`
-        flex h-full transition-all duration-300 ease-in-out gap-6
+        flex flex-col h-full transition-all duration-300 ease-in-out
         ${className}
       `}
     >
-      <div className='flex flex-col'>
-        <div className={`flex items-center justify-center py-4 transition-all duration-300`}>
+      <header className={`flex items-center justify-start pb-4 transition-all duration-300`}>
           <Logo variant={isCollapsed ? 'symbol' : 'logotype'} />
-        </div>
-
+      </header>
+      <div className='flex gap-2'>
         <nav className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar">
           {renderChildren(children)}
         </nav>
+        <div>
+          <Button icon={!isCollapsed ? <AngleLeft /> : <AngleRight />} onClick={onToggleCollapse}/>
+        </div>
       </div>
-      <div>
-        <Button icon={!isCollapsed ? <AngleLeft /> : <AngleRight />} onClick={onToggleCollapse}/>
-      </div>
-    
     </aside>
   );
 };
