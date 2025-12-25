@@ -8,7 +8,9 @@
     "dev": "tsx src/index.ts",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test:user-flow": "tsx test-user-flow.ts",
+    "test:user-http": "tsx test-user-http.ts"
   },
   "keywords": [],
   "author": "",

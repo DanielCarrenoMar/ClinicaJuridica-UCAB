@@ -10,6 +10,7 @@ router.get('/test', (req, res) => {
   res.json({ 
     message: 'API v1 está funcionando',
     endpoints: {
+      usuarios: '/users',
       casos: '/cases',
       solicitantes: '/applicants',  
       beneficiarios: '/beneficiaries (próximamente)',

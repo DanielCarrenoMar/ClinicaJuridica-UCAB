@@ -1,86 +1,25 @@
-// Base de datos mock para desarrollo
-console.log('🔧 Usando base de datos mock para desarrollo');
+import 'dotenv/config';
+import { PrismaClient } from '../../prisma/generated/client.js';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const mockDB = {
-  // --- MOCK PARA CASOS ---
-  case: {
-    findMany: async () => {
-      console.log('📦 findMany: Devolviendo casos mock');
-      return [
-        {
-          idCase: 1,
-          description: "Caso de prueba - Asesoría legal familiar",
-          observations: "Cliente necesita orientación sobre custodia",
-          tramitType: 15,
-          idLegalArea: 1,
-          idCourt: null,
-          idApplicant: 1,
-          idNucleus: 1,
-          semesterIdSemester: null,
-          createdAt: new Date('2024-01-15'),
-          updatedAt: new Date('2024-01-15')
-        },
-        {
-          idCase: 2,
-          description: "Caso laboral - Despido injustificado",
-          observations: "Trabajador despedido sin causa justa",
-          tramitType: 25,
-          idLegalArea: 8,
-          idCourt: 1,
-          idApplicant: 2,
-          idNucleus: 2,
-          semesterIdSemester: 1,
-          createdAt: new Date('2024-02-20'),
-          updatedAt: new Date('2024-02-20')
-        }
-      ];
-    },
-    
-    findUnique: async ({ where }: any) => {
-      console.log(`📦 findUnique: Buscando caso ID ${where.idCase}`);
-      const cases = [
-        { idCase: 1, description: "Caso 1" }, // ... (versión resumida para el ejemplo)
-        { idCase: 2, description: "Caso 2" }
-      ];
-      return cases.find(c => c.idCase === where.idCase) || null;
-    },
-    
-    create: async (data: any) => {
-      console.log('📦 create: Creando nuevo caso', data.data);
-      const newId = Math.floor(Math.random() * 9000) + 1000;
-      return {
-        idCase: newId,
-        ...data.data,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-    }
-  },
+// Configuración de Prisma con PostgreSQL
+const connectionString = process.env.DATABASE_URL;
 
-  // --- MOCK PARA USUARIOS ---
-  user: {
-    upsert: async ({ where, create }: any) => {
-      console.log(`📦 mockDB.user.upsert: Verificando/Creando usuario ${create.email}`);
-      return {
-        ...create,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-    },
-    findMany: async () => {
-      console.log('📦 findMany: Devolviendo usuarios mock');
-      return []; 
-    }
-  },
+if (!connectionString) {
+  throw new Error('DATABASE_URL no está configurado en las variables de entorno. Por favor, configura DATABASE_URL en tu archivo .env');
+}
 
-  // --- MÉTODOS DE CONEXIÓN ---
-  $connect: async () => {
-    console.log('✅ Conectado a base de datos mock');
-  },
-  
-  $disconnect: async () => {
-    console.log('👋 Desconectado de base de datos mock');
-  }
-};
+let prisma: PrismaClient;
 
-export default mockDB;
+try {
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  prisma = new PrismaClient({ adapter });
+  console.log('✅ Prisma Client configurado con PostgreSQL');
+} catch (error) {
+  console.error('❌ Error al configurar Prisma:', error);
+  throw error;
+}
+
+export default prisma;

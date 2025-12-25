@@ -1,87 +1,157 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import userService from '../services/user.service.js';
 
-class UserController {
-  // Obtener todos los usuarios
-  async getAllUsers(req: Request, res: Response) {
-    try {
-      const result = await userService.getAllUsers();
-      return res.status(200).json(result);
-    } catch (error: any) {
-      return res.status(500).json({
+// Obtener todos los usuarios
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const result = await userService.getAllUsers();
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+// Obtener un usuario por ID (Cédula)
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const idUser = parseInt(id);
+
+    if (isNaN(idUser)) {
+      return res.status(400).json({
         success: false,
-        message: 'Error al obtener usuarios',
-        error: error.message
+        message: 'ID inválido. Debe ser un número.'
       });
     }
-  }
 
-  // Obtener un usuario por ID (Cédula)
-  async getUserById(req: Request, res: Response) {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ success: false, message: 'ID (Cédula) inválido' });
-      }
-
-      const result = await userService.getUserById(id);
-      return res.status(result.success ? 200 : 404).json(result);
-    } catch (error: any) {
-      return res.status(500).json({ success: false, error: error.message });
+    const result = await userService.getUserById(idUser);
+    
+    if (!result.success) {
+      return res.status(404).json(result);
     }
+
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
   }
+};
 
-  // Crear un nuevo usuario
-  async createUser(req: Request, res: Response) {
-    try {
-      const { idUser, firstName, lastName, email, gender } = req.body;
+// Crear un nuevo usuario
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const userData = req.body;
 
-      // Validación básica: que no falten datos obligatorios
-      if (!idUser || !firstName || !lastName || !email || !gender) {
-        return res.status(400).json({
-          success: false,
-          message: 'Faltan campos obligatorios (Cédula, nombre, apellido, email o género)'
-        });
-      }
-
-      const result = await userService.createUser(req.body);
-      return res.status(201).json(result);
-    } catch (error: any) {
-      return res.status(500).json({ success: false, error: error.message });
+    // Validaciones básicas
+    if (!userData.idUser || !userData.firstName || !userData.lastName || !userData.email || !userData.gender) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos requeridos: idUser, firstName, lastName, email, gender'
+      });
     }
-  }
 
-  // Actualizar usuario
-  async updateUser(req: Request, res: Response) {
-    try {
-      const id = parseInt(req.params.id);
-      const result = await userService.updateUser(id, req.body);
-      return res.status(200).json(result);
-    } catch (error: any) {
-      return res.status(500).json({ success: false, error: error.message });
+    const result = await userService.createUser(userData);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
     }
-  }
 
-  // Eliminar usuario
-  async deleteUser(req: Request, res: Response) {
-    try {
-      const id = parseInt(req.params.id);
-      const result = await userService.deleteUser(id);
-      return res.status(200).json(result);
-    } catch (error: any) {
-      return res.status(500).json({ success: false, error: error.message });
+    res.status(201).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+// Actualizar un usuario
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const idUser = parseInt(id);
+    const userData = req.body;
+
+    if (isNaN(idUser)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID inválido. Debe ser un número.'
+      });
     }
-  }
 
-  // Endpoint especial para meter los 3 usuarios de prueba (Seed)
-  async seedUsers(req: Request, res: Response) {
-    try {
-      const result = await userService.seedInitialUsers();
-      return res.status(201).json(result);
-    } catch (error: any) {
-      return res.status(500).json({ success: false, error: error.message });
+    const result = await userService.updateUser(idUser, userData);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
     }
-  }
-}
 
-export default new UserController();
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+// Eliminar un usuario
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const idUser = parseInt(id);
+
+    if (isNaN(idUser)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID inválido. Debe ser un número.'
+      });
+    }
+
+    const result = await userService.deleteUser(idUser);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+// Seed: Poblar la base de datos con usuarios de prueba
+export const seedUsers = async (req: Request, res: Response) => {
+  try {
+    const result = await userService.seedInitialUsers();
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.status(201).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
