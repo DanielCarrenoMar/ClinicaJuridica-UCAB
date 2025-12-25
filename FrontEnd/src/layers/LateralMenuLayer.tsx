@@ -42,15 +42,15 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
                         <Button icon={<Search />} className="bg-surface hover:bg-gray-50" />
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
                     </span>
-                    <div className="flex items-center gap-3 ml-2">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-body-medium font-bold text-onSurface">Minervis</p>
-                            <p className="text-body-small text-onSurface/70">Coordinadora</p>
-                        </div>
+                    <span className="flex items-center gap-3 ml-2">
                         <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-surface/40">
                             <User className="w-6 h-6" />
                         </div>
-                    </div>
+                        <div className=" hidden sm:block">
+                            <h4 className="text-body-large text-onSurface">Minervis</h4>
+                            <p className="text-body-small text-onSurface/70">Coordinadora</p>
+                        </div>
+                    </span>
                 </header>
                 <div className="flex-1 overflow-y-auto">
                     {children}
