@@ -99,7 +99,7 @@ function DashBoard() {
                     <Box className="col-span-4 h-full flex flex-col gap-2">
                         <span className="flex items-center justify-between pb-2">
                             <h2 className="text-label-small text-onSurface">Ultimas acciones</h2>
-                            <Button variant="outlined" icon={<Search/>} />
+                            <Button icon={<Search />} />
                         </span>
                         
                         <span className="px-0 py-2 text-body-small text-onSurface/70 border-b border-onSurface/10">

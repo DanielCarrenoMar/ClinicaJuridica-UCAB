@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, Search, User, UsersGroup } from "flowbite-react-icons/outline";
+import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
+import GeneralSearch from "#components/GeneralSearch.tsx";
 
 interface LateralMenuLayerProps {
     locationId: string;
@@ -38,8 +39,8 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
             </LateralMenu>
             <main className="flex-1 flex flex-col">
                 <header className="flex justify-end items-center gap-6 pb-4">
-                    <span className="flex gap-3">
-                        <Button icon={<Search />} className="bg-surface hover:bg-gray-50" />
+                    <span className="flex flex-1 justify-end gap-3">
+                        <GeneralSearch/>
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
                     </span>
                     <span className="flex items-center gap-3 ml-2">
