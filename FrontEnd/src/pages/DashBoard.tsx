@@ -2,6 +2,7 @@ import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
 import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
 import AccionCard from "#components/ActionCard.tsx";
+import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
 
 const mockActions = [
@@ -49,17 +50,17 @@ function DashBoard() {
                         
                         <span className="px-0 py-2 text-body-small text-onSurface/70 border-b border-onSurface/10">
                             <ul className="flex gap-5">
-                                <li>
-                                    <p className="w-36 shrink-0">Usuario</p>
+                                <li className="flex-1">
+                                    <p>Usuario</p>
                                 </li>
-                                <li>
-                                    <p className="w-36 shrink-0">ID Caso</p>
+                                <li className="flex-1">
+                                    <p>ID Caso</p>
                                 </li>
-                                <li>
-                                    <p className="w-36 shrink-0">Fecha Creacion</p>
+                                <li className="flex-1">
+                                    <p>Fecha Creacion</p>
                                 </li>
-                                <li>
-                                    <p className="w-36 shrink-0">Descripcción</p>
+                                <li className="flex-3">
+                                    <p>Descripcción</p>
                                 </li>
                             </ul>
                         </span>
@@ -76,8 +77,11 @@ function DashBoard() {
                             ))}
                         </div>
                     </Box>
-                    <Box className="col-span-2">
-                        hola
+                    <Box className="col-span-2 h-full flex flex-col">
+                        <h2 className="text-label-small text-onSurface mb-4">Estado de Casos</h2>
+                        <div className="flex-1 flex items-center justify-center">
+                            <CasesDonutChart />
+                        </div>
                     </Box>
                 </section>
             </div>
