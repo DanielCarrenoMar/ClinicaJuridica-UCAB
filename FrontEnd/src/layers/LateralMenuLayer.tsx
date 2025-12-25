@@ -10,11 +10,13 @@ type LateralmenuPages = 'home' | 'createCase' | 'calendar' | 'actions' | 'report
 interface LateralMenuLayerProps {
     locationId: LateralmenuPages;
     alwaysShowSearch?: boolean;
+    defaultSearchText?: string;
     children: ReactNode;
 }
 
-function LateralMenuLayer({locationId, alwaysShowSearch = false,children}: LateralMenuLayerProps) {
+function LateralMenuLayer({locationId, alwaysShowSearch = false, defaultSearchText = '', children}: LateralMenuLayerProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(alwaysShowSearch || defaultSearchText !== '');
     let permission = 1
 
     return (
@@ -42,7 +44,12 @@ function LateralMenuLayer({locationId, alwaysShowSearch = false,children}: Later
             <main className="flex-1 flex flex-col">
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
-                        <GeneralSearch alwaysShowSearch={alwaysShowSearch} />
+                        <GeneralSearch 
+                            alwaysShowSearch={alwaysShowSearch} 
+                            isOpen={isSearchOpen} 
+                            onToggle={setIsSearchOpen}
+                            defaultValue={defaultSearchText}
+                        />
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
                     </span>
                     <span className="flex items-center gap-3 ml-2">

@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router';
 
 interface GeneralSearchProps {
     alwaysShowSearch?: boolean;
+    isOpen: boolean;
+    onToggle: (isOpen: boolean) => void;
+    defaultValue?: string;
 }
 
-export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) {
-  const [isOpen, setIsOpen] = useState(alwaysShowSearch);
+export default function GeneralSearch({ alwaysShowSearch, isOpen, onToggle, defaultValue = '' }: GeneralSearchProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -18,14 +20,14 @@ export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) 
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         if (alwaysShowSearch) return;
-        setIsOpen(false);
+        onToggle(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [alwaysShowSearch, onToggle]);
 
   useEffect(() => {
     if (isOpen) {
@@ -63,7 +65,7 @@ export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) 
     >
       <button 
         onClick={() => { 
-          if (!isOpen) setIsOpen(true)
+          if (!isOpen) onToggle(true)
           else searchInputText()
         }}
         className="group p-3 flex items-center justify-center cursor-pointer hover:bg-surface rounded-full transition-colors"
@@ -73,6 +75,7 @@ export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) 
       <div className={`flex-1 flex items-center gap-2 px-2 min-w-0 opacity-0 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
         <input 
           ref={inputRef}
+          defaultValue={defaultValue}
           type="text" 
           placeholder="Buscar" 
           className="w-full bg-transparent border-none outline-none text-body-small text-onSurface placeholder:text-onSurface/50 h-full "
@@ -86,7 +89,7 @@ export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) 
           onClick={() => {
             if (inputRef.current == null) return
             if (inputRef.current.value === '') {
-              if (!alwaysShowSearch) setIsOpen(false);
+              if (!alwaysShowSearch) onToggle(false);
               return;
             }
             inputRef.current.value = '';
