@@ -13,7 +13,7 @@ function Button ({
   children,
   ...props 
 }: ButtonProps) {
-  const baseStyles = `flex items-center border-1 justify-start gap-2 p-3 rounded-full text-body-medium text-base transition-colors duration-200 cursor-pointer ${!children && 'w-fit'}`;
+  const baseStyles = `group flex items-center border-1 justify-start gap-2 p-3 rounded-full text-body-medium transition-colors duration-200 cursor-pointer ${!children && 'w-fit'}`;
   
   const variantStyles = {
     filled: "text-onSurface border border-transparent bg-surface/70 hover:bg-surface",
@@ -26,7 +26,9 @@ function Button ({
       className={`${baseStyles} ${variantStyles[variant]} ${className}`}
       {...props}
     >
-      {icon}
+      <span className="group-hover:animate-pulsing group-hover:animate-duration-400">
+        {icon}
+      </span>
       {children}
     </button>
   );
