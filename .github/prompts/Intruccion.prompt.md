@@ -1,12 +1,12 @@
 ---
 agent: agent
 ---
-- Se usa typescript
-- Para los estilos se usa TailwindCss
-- Se usan los imports {} from
-- Implementa las clases de tailwind usando las variables contenidas en el idex.css
-- Sin comentarios innecesarios
-- Las funciones se definen con function nombreFuncion() {}
-- En las medidas de tailwind usa las clases predefinidas, no uses medidas personalizadas
-- Se usan todos los nombres de variables en ingles y camelCase
-- El texto que vera el usuario debe estar en español
+- Se usa typescript.
+- Para los estilos se usa TailwindCss.
+- Se usan los imports {} from.
+- Implementa las clases de tailwind usando las variables contenidas en el idex.css.
+- Sin comentarios innecesarios.
+- Las funciones se definen con function nombreFuncion() {}.
+- En las medidas de tailwind usa las clases predefinidas, no uses medidas personalizadas.
+- Se usan todos los nombres de variables en ingles y camelCase.
+- El texto que vera el usuario debe estar en español. Incluidos los links de rutas.
