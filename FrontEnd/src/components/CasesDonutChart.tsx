@@ -28,8 +28,8 @@ export const data = {
 
 export default function CasesDonutChart() {
   return (
-    <div className="flex flex-col gap-8 w-full h-full p-4">
-        <div className='flex-1 mx-6'>
+    <div className="flex flex-col w-full gap-8 mx-8">
+        <div className='flex-1'>
             <Doughnut 
               data={data} 
               options={{
