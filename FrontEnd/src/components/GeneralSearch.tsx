@@ -59,7 +59,7 @@ export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) 
     <div 
       id='searchContainer'
       ref={containerRef}
-      className={`h-10bg-surface/70 flex items-center overflow-hidden`}
+      className={`bg-surface/70 flex items-center overflow-hidden`}
     >
       <button 
         onClick={() => { 
