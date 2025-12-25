@@ -79,24 +79,6 @@ const mockActions = [
         description: "Redacción de recurso de apelación."
     },
     {
-        name: "Alejandro Vielma",
-        id: "GY_24_24_123",
-        date: "01/01/2025",
-        description: "Actualización de expediente: Incorporación de boleta de notificación."
-    },
-    {
-        name: "Pedro Carvajal",
-        id: "GY_24_24_124",
-        date: "02/01/2025",
-        description: "Envío de reporte mensual de avances estratégicos."
-    },
-    {
-        name: "Daniel Carreño",
-        id: "GY_24_24_125",
-        date: "03/01/2025",
-        description: "Redacción de recurso de apelación."
-    },
-    {
         name: "Emilio Falconi",
         id: "GY_24_24_126",
         date: "04/01/2025",
@@ -109,7 +91,7 @@ function DashBoard() {
         <LateralMenuLayer locationId='home'>
             <div className="flex flex-col gap-3 h-full">
                 <section className="flex">
-                    <Button className="h-14 w-3xs">
+                    <Button className="h-14 w-96">
                         Nuevo Caso
                     </Button>
                 </section>
