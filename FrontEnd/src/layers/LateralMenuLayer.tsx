@@ -6,12 +6,14 @@ import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import GeneralSearch from "#components/GeneralSearch.tsx";
 
+type LateralmenuPages = 'home' | 'createCase' | 'calendar' | 'actions' | 'reports' | 'users' | 'semesters' | 'nuclei' | 'config' | 'none'; 
 interface LateralMenuLayerProps {
-    locationId: string;
+    locationId: LateralmenuPages;
+    alwaysShowSearch?: boolean;
     children: ReactNode;
 }
 
-function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
+function LateralMenuLayer({locationId, alwaysShowSearch = false,children}: LateralMenuLayerProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     let permission = 1
 
@@ -40,7 +42,7 @@ function LateralMenuLayer({locationId,children}: LateralMenuLayerProps) {
             <main className="flex-1 flex flex-col">
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
-                        <GeneralSearch/>
+                        <GeneralSearch alwaysShowSearch={alwaysShowSearch} />
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
                     </span>
                     <span className="flex items-center gap-3 ml-2">

@@ -10,6 +10,7 @@ import Users from '#pages/Users.tsx';
 import Semesters from '#pages/Semesters.tsx';
 import Nuclei from '#pages/Nuclei.tsx';
 import Config from '#pages/Config.tsx';
+import SearchCases from '#pages/SearchCases.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
       <Route path="/semestres" element={<Semesters />} />
       <Route path="/nucleos" element={<Nuclei />} />
       <Route path="/configuracion" element={<Config />} />
+      <Route path="/busqueda" element={<SearchCases />} />
     </Routes>
   </BrowserRouter>
 )

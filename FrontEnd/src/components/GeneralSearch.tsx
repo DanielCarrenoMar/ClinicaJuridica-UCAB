@@ -3,15 +3,21 @@ import { animate } from 'animejs';
 import { Search, Close } from "flowbite-react-icons/outline";
 import { useNavigate } from 'react-router';
 
-export default function GeneralSearch() {
-  const [isOpen, setIsOpen] = useState(false);
+interface GeneralSearchProps {
+    alwaysShowSearch?: boolean;
+}
+
+export default function GeneralSearch({ alwaysShowSearch }: GeneralSearchProps) {
+  const [isOpen, setIsOpen] = useState(alwaysShowSearch);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        if (alwaysShowSearch) return;
         setIsOpen(false);
       }
     }
@@ -20,7 +26,6 @@ export default function GeneralSearch() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
 
   useEffect(() => {
     if (isOpen) {
@@ -28,7 +33,7 @@ export default function GeneralSearch() {
         width: ['40px', '100%'],
         backgroundColor: ['rgba(255,255,255,0.7)', 'rgba(255,255,255,1)'],
         borderRadius: ['100px', '24px'],
-        duration: 300,
+        duration: isFirstRender.current ? 0 : 300,
         easing: 'easeOutQuad',
         complete: () => {
             if(inputRef.current) inputRef.current.focus();
@@ -39,10 +44,11 @@ export default function GeneralSearch() {
         width: ['100%', '40px'],
         backgroundColor: ['rgba(255,255,255,1)', 'rgba(255,255,255,0.7)'],
         borderRadius: ['24px', '100px'],
-        duration: 300,
+        duration: isFirstRender.current ? 0 : 300,
         easing: 'easeOutQuad'
       });
     }
+    if (isFirstRender.current) isFirstRender.current = false;
   }, [isOpen]);
 
   function searchInputText(){
@@ -53,7 +59,7 @@ export default function GeneralSearch() {
     <div 
       id='searchContainer'
       ref={containerRef}
-      className="h-10 bg-surface/70 flex items-center overflow-hidden shadow-sm"
+      className={`h-10bg-surface/70 flex items-center overflow-hidden`}
     >
       <button 
         onClick={() => { 
@@ -64,19 +70,23 @@ export default function GeneralSearch() {
       >
         <Search className="group-hover:animate-pulsing group-hover:animate-duration-400" />
       </button>
-      <div className="flex-1 flex items-center gap-2 px-2 min-w-0 opacity-0"
-            style={{ opacity: isOpen ? 1 : 0, transition: 'opacity 0.2s 0.1s' }}>
+      <div className={`flex-1 flex items-center gap-2 px-2 min-w-0 opacity-0 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
         <input 
           ref={inputRef}
           type="text" 
           placeholder="Buscar" 
-          className="w-full bg-transparent border-none outline-none text-body-small text-onSurface placeholder:text-onSurface/50 font-light h-full"
+          className="w-full bg-transparent border-none outline-none text-body-small text-onSurface placeholder:text-onSurface/50 h-full "
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              searchInputText();
+            }
+          }}
         />
         <button 
           onClick={() => {
             if (inputRef.current == null) return
             if (inputRef.current.value === '') {
-              setIsOpen(false);
+              if (!alwaysShowSearch) setIsOpen(false);
               return;
             }
             inputRef.current.value = '';
