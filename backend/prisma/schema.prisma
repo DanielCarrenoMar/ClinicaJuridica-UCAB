@@ -7,503 +7,459 @@ datasource db {
   provider = "postgresql"
 }
 
-//CONSIDERACIONES
-/**
- * 1) Los nombres pasan a tener dos atributos (firstName, lastName) en vez de uno solo (fullName)
- */
+// Enums
 
-enum CaseStatusType {
-  OPEN
-  IN_PROGRESS
-  ON_PAUSE
-  CLOSED
-}
-
-enum GenderType {
+enum Gender {
   M
   F
-  O
 }
 
-enum ColaboratorType {
-  STUDENT
-  GRADUATE
-  VOLUNTEER
+enum UserType {
+  STUDENT     @map("E")
+  TEACHER     @map("P")
+  COORDINATOR @map("C")
 }
 
-enum IDType {
-  V
-  E
-  J
+enum TeacherType {
+  REGULAR   @map("R")
+  VOLUNTEER @map("V") // Visiting -> Voluntario
 }
 
-enum WorkConditionType {
-  EMPLOYER
-  EMPLOYEE
-  WORKER
-  SELF_EMPLOYED
+enum StudentType {
+  REGULAR   @map("R")
+  VOLUNTEER @map("V") // Visiting -> Voluntario
+  GRADUATE  @map("E") // External -> Egresado
+  SERVICE   @map("S")
 }
 
-enum ActivityConditionType {
-  HOUSEWIFE
-  STUDENT
-  RETIRED
-  OTHER
-}
-
-enum WasteCollectionType {
-  HOME_COLLECTION
-  PUBLIC_CONTAINER
-  NONE
-}
-
-enum WastewaterType {
-  SEWER_OR_SEPTIC
-  UNCONNECTED_TOILET
-  LATRINE
-  NONE
-}
-
-enum WaterServiceType {
-  INDOOR
-  OUTDOOR
-  NONE
-}
-
-enum RoofMaterialType {
-  WOOD_PALM_CARDBOARD
-  ZINC_SHEET
-  CONCRETE_OR_TILES
-}
-
-enum WallMaterialType {
-  WASTE_MATERIALS
-  BAHAREQUE
-  UNPLASTERED_BLOCK
-  PLASTERED_BLOCK
-}
-
-enum FloorMaterialType {
-  DIRT
-  CEMENT
-  CERAMIC
-  GRANITE_PARQUET_MARBLE
-}
-
-enum LegalAreaType {
-  PERSONS
-  GOODS
-  CONTRACTS
-  ORDINARY_COURTS
-  CHILD_PROTECTION_COURTS
-  SUCCESSIONS
-  CRIMINAL_MATERIAL
-  LABOR_MATERIAL
-  COMMERCIAL_MATERIAL
-  ADMINISTRATIVE_MATERIAL
-  OTHERS
-}
-
-enum AppointmentStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELED
+enum IdType {
+  VENEZUELAN @map("V")
+  FOREIGNER  @map("E")
+  LEGAL      @map("J")
 }
 
 enum BeneficiaryType {
-  DIRECT
-  INDIRECT
+  BENEFICIARY @map("B")
+  APPLICANT   @map("S") // Spouse -> Solicitante
 }
 
-model User {
-  idUser    Int        @id //Cedula de identidad
-  firstName String
-  lastName  String
-  gender    GenderType
-  email     String     @unique
-  isActive  Boolean    @default(true)
-  password  String?
-
-  // Relaciones
-  caseStatus         CaseStatus[]
-  colaborator        Colaborator?
-  teacher            Teacher?
-  apointments        Appointment[]
-  caseAssignments    CaseAssignment[]
-  caseActions        CaseAction[]
-  executeActions     ExecuteAction[]
-  attenpAppointments AttenpAppointment[]
-
-  @@map("Users")
+enum MaritalStatus {
+  SINGLE   @map("S")
+  MARRIED  @map("C")
+  DIVORCED @map("D")
+  WIDOWED  @map("V")
 }
 
-model Colaborator {
-  idUser          Int             @id
-  typeColaborator ColaboratorType
-
-  idSubject Int?
-  section   String?
-  subject   Subject? @relation(fields: [idSubject, section], references: [idSubject, section])
-
-  user User @relation(fields: [idUser], references: [idUser])
-
-  @@map("Colaborators")
+enum ProcessType {
+  IN_PROGRESS @map("T") // Tramite
+  ADVICE      @map("A") // Asesoria
+  MEDIATION   @map("CM") // Conciliacion y mediacion
+  DRAFTING    @map("R") // Redaccion
 }
 
-model Teacher {
-  idUser  Int     @id
-  isAdmin Boolean @default(false)
-
-  user User @relation(fields: [idUser], references: [idUser])
-
-  subjects Subject[]
-
-  @@map("Teachers")
+enum CaseBeneficiaryType {
+  DIRECT   @map("D")
+  INDIRECT @map("I")
 }
 
-model Subject {
-  idSubject Int // RNC
-  section   String
-  name      String
-
-  idTeacher Int
-  teacher   Teacher @relation(fields: [idTeacher], references: [idUser])
-
-  colaborators Colaborator[]
-
-  @@id([idSubject, section])
+enum AppointmentStatus {
+  CANCELLED @map("C")
+  SCHEDULED @map("P") // Planificada
+  COMPLETED @map("R") // Realizada
 }
 
-model CaseStatus {
-  idCaseStatus Int            @default(autoincrement())
-  idUser       Int
-  idCase       Int
-  statusCase   CaseStatusType
-
-  User User @relation(fields: [idUser], references: [idUser])
-  //Case Case @relation(fields: [idCase], references: [idCase])
-
-  createdAt DateTime @default(now())
-
-  @@id([idCaseStatus, idUser, idCase])
-  @@map("CaseStatuses")
+enum CaseStatusEnum {
+  OPEN        @map("A") // Abierto
+  IN_PROGRESS @map("T") // En Tramite
+  PAUSED      @map("P") // En Pausa
+  CLOSED      @map("C") // Cerrado
 }
 
-model Beneficiary {
-  idBeneficiary Int        @id // Cedula
-  firstName     String
-  lastName      String
-  idType        IDType
-  birthDate     DateTime
-  gender        GenderType
+// Tables
 
-  idParish Int
+model HousingCharacteristic {
+  idCharacteristic Int     @id @default(autoincrement())
+  name             String  @unique @db.VarChar(63)
+  isActive         Boolean @default(true)
 
-  parish Parish @relation(fields: [idParish], references: [idParish])
-
-  cases IsBeneficiaryOf[]
-
-  @@map("Beneficiaries")
+  details CharacteristicDetail[]
 }
 
-model Applicant {
-  idApplicant              Int                    @id // Cedula de identidad
-  firstName                String
-  lastName                 String
-  email                    String
-  phoneCell                String
-  phoneHome                String
-  maritalStatus            String
-  concubinage              Boolean
-  isWorking                Boolean
-  workCondition            WorkConditionType?
-  isLookingJob             Boolean
-  activityCondition        ActivityConditionType?
-  isHouseHoldHead          Boolean
-  educationLevel           Int // De 0 a 14
-  educationMonths          Int
-  educationLevelHousehold  Int? // De 0 a 14
-  educationMonthsHousehold Int?
+model EducationLevel {
+  idLevel  Int     @id @default(autoincrement())
+  name     String  @unique @db.VarChar(63)
+  isActive Boolean @default(true)
 
-  // Vivienda
-  typeResidence   String?
-  roomsAmount     Int?
-  bathroomsAmount Int?
-  roofMaterial    RoofMaterialType?
-  wallMaterial    WallMaterialType?
-  floorMaterial   FloorMaterialType?
-
-  // Servicios
-  waterService      WaterServiceType?
-  wastewaterService WastewaterType?
-  wasteCollection   WasteCollectionType?
-
-  // Falta lo de artefactos domesticos que no se 
-  // si son respuestas SI o no o por que ahora es multivaluado
-
-  idFamilyHouse Int
-  familyHouse   FamilyHouse @relation(fields: [idFamilyHouse], references: [idFamilyHouse])
-
-  cases Case[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("Applicants")
+  headApplicants Applicant[] @relation("HeadEducationLevel")
+  applicants     Applicant[] @relation("ApplicantEducationLevel")
 }
 
-model Parish {
-  idParish Int    @id @default(autoincrement())
-  name     String
-
-  idMunicipality Int
-  municipality   Municipality @relation(fields: [idMunicipality], references: [idMunicipality])
-
-  beneficiaries Beneficiary[]
-  nucleus       Nucleus[]
-
-  @@map("Parishes")
-}
-
-model Municipality {
-  idMunicipality Int    @id @default(autoincrement())
-  name           String
-
-  idRegion Int
-  region   Region   @relation(fields: [idRegion], references: [id])
-  parishes Parish[]
-
-  @@map("Municipalities")
-}
-
-model Region {
-  id   Int    @id @default(autoincrement())
-  name String
+model State {
+  idState Int    @id @default(autoincrement())
+  name    String @unique @db.VarChar(63)
 
   municipalities Municipality[]
-
-  @@map("Regions")
 }
 
-model FamilyHouse {
-  idFamilyHouse          Int   @id @default(autoincrement())
-  memberWorkingCount     Int
-  membersNonWorkingCount Int
-  childrens7to12Count    Int
-  childrensStudentCount  Int
-  monthlyIncome          Float
+model WorkCondition {
+  idCondition Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(63)
+  isActive    Boolean @default(true)
 
   applicants Applicant[]
-
-  @@map("FamilyHouses")
 }
 
-model Case {
-  idCase       Int     @id @default(autoincrement())
-  description  String
-  observations String?
-  tramitType   Int // entre 0 y 85
+model ActivityCondition {
+  idActivity Int     @id @default(autoincrement())
+  name       String  @unique @db.VarChar(63)
+  isActive   Boolean @default(true)
 
-  idLegalArea Int
-  idCourt     Int?
-  idApplicant Int
-  idNucleus   Int
-
-  legalArea LegalArea @relation(fields: [idLegalArea], references: [idLegalArea])
-  court     Court?    @relation(fields: [idCourt], references: [idCourt])
-  applicant Applicant @relation(fields: [idApplicant], references: [idApplicant])
-  nucleus   Nucleus   @relation(fields: [idNucleus], references: [idNucleus])
-
-  assignments   CaseAssignment[]
-  actions       CaseAction[]
-  beneficiaries IsBeneficiaryOf[]
-  suportDocs    SuportDocument[]
-  appointments  Appointment[]
-
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  semester           Semester? @relation(fields: [semesterIdSemester], references: [idSemester])
-  semesterIdSemester Int?
-
-  @@map("Cases")
-}
-
-model SuportDocument {
-  idCase           Int
-  idSuportDocument Int    @default(autoincrement())
-  typeDocument     String
-  description      String
-
-  case Case @relation(fields: [idCase], references: [idCase])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@id([idCase, idSuportDocument])
-  @@map("SuportDocuments")
-}
-
-model Nucleus {
-  idNucleus Int    @id @default(autoincrement())
-  name      String
-
-  idParish Int
-  parish   Parish @relation(fields: [idParish], references: [idParish])
-
-  cases Case[]
-
-  @@map("Nucleus")
-}
-
-model Appointment {
-  idCase            Int
-  date              DateTime
-  statusAppointment AppointmentStatus @default(SCHEDULED)
-  observations      String?
-
-  case Case @relation(fields: [idCase], references: [idCase])
-
-  idUser             Int
-  user               User                @relation(fields: [idUser], references: [idUser])
-  attenpAppointments AttenpAppointment[]
-
-  @@id([idCase, date])
-  @@map("Appointments")
-}
-
-model LegalArea {
-  idLegalArea   Int           @id @default(autoincrement())
-  typeLegalArea LegalAreaType
-  description   String
-  subject       String // No se que es materia en Ambito Legal
-
-  cases Case[]
-
-  @@map("LegalAreas")
-}
-
-model CaseAssignment {
-  idUser     Int
-  idCase     Int
-  idSemester Int
-  startDate  DateTime  @default(now())
-  endDate    DateTime?
-
-  user     User     @relation(fields: [idUser], references: [idUser])
-  case     Case     @relation(fields: [idCase], references: [idCase])
-  semester Semester @relation(fields: [idSemester], references: [idSemester])
-
-  @@id([idUser, idCase, idSemester])
-  @@map("CaseAssignments")
-}
-
-model Semester {
-  idSemester Int      @id @default(autoincrement())
-  term       String // Ej: "2023-15", "2023-30"
-  startDate  DateTime
-  endDate    DateTime
-
-  caseAssignments CaseAssignment[]
-  cases           Case[]
-
-  @@map("Semesters")
+  applicants Applicant[]
 }
 
 model Court {
-  idCourt   Int    @id @default(autoincrement())
-  typeCourt String
-  name      String
+  idCourt  Int     @id @default(autoincrement())
+  subject  String  @db.VarChar(63) // "materia"
+  isActive Boolean @default(true)
 
-  cases        Case[]
-  recordCourts RecordCourt[]
-
-  @@map("Courts")
+  cases Case[]
 }
 
-model RecordCourt {
-  idRecordCourt Int     @id @default(autoincrement())
-  caseNumber    String
-  year          Int
-  observations  String?
+model Semester {
+  term      String   @id @db.VarChar(10)
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
 
-  idCourt Int
-  court   Court @relation(fields: [idCourt], references: [idCourt])
-
-  documents DocumentRecordCourt[]
-
-  createdAt DateTime @default(now())
-
-  @@map("RecordCourts")
+  teachers Teacher[]
+  students Student[]
+  cases    Case[]
 }
 
-model DocumentRecordCourt {
-  // Falta Complementar mejor esta tabla Falta Info
-  idRecordCourt         Int
-  idDocumentRecordCourt Int    @default(autoincrement())
-  typeDocument          String
+model Subject {
+  idSubject Int     @id @default(autoincrement())
+  name      String  @unique @db.VarChar(63)
+  isActive  Boolean @default(true)
 
-  recordCourt RecordCourt @relation(fields: [idRecordCourt], references: [idRecordCourt])
+  categories SubjectCategory[]
+}
 
-  createdAt DateTime @default(now())
+model User {
+  identityCard String   @id @db.VarChar(20)
+  name         String   @db.VarChar(63)
+  gender       Gender?
+  email        String   @unique @db.VarChar(35)
+  password     String   @db.VarChar(60)
+  isActive     Boolean  @default(true)
+  type         UserType
 
-  @@id([idRecordCourt, idDocumentRecordCourt])
-  @@map("DocumentRecordCourts")
+  coordinator Coordinator?
+  // Implicit relations from subclasses
+  teachers    Teacher[]
+  students    Student[]
+
+  caseActions  CaseAction[]
+  appointments Appointment[]
+  caseStatuses CaseStatus[]
+}
+
+model Coordinator {
+  identityCard String @id @db.VarChar(20)
+
+  user User @relation(fields: [identityCard], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model CharacteristicDetail {
+  idCharacteristic Int
+  detailNumber     Int
+  option           String  @db.VarChar(63)
+  isActive         Boolean @default(true)
+
+  characteristic HousingCharacteristic @relation(fields: [idCharacteristic], references: [idCharacteristic], onDelete: Restrict, onUpdate: Cascade)
+  housingDetails HousingDetail[]
+
+  @@id([idCharacteristic, detailNumber])
+  @@unique([idCharacteristic, option])
+}
+
+model Municipality {
+  idState            Int
+  municipalityNumber Int
+  name               String @db.VarChar(63)
+
+  state    State    @relation(fields: [idState], references: [idState], onDelete: Restrict, onUpdate: Cascade)
+  parishes Parish[]
+
+  @@id([idState, municipalityNumber])
+  @@unique([idState, name])
+}
+
+model Parish {
+  idState            Int
+  municipalityNumber Int
+  parishNumber       Int
+  name               String @db.VarChar(63)
+
+  municipality  Municipality  @relation(fields: [idState, municipalityNumber], references: [idState, municipalityNumber], onDelete: Restrict, onUpdate: Cascade)
+  nuclei        Nucleus[]
+  beneficiaries Beneficiary[]
+
+  @@id([idState, municipalityNumber, parishNumber])
+  @@unique([idState, municipalityNumber, name])
+}
+
+model Nucleus {
+  idNucleus Int     @id @default(autoincrement())
+  name      String  @unique @db.VarChar(63)
+  isActive  Boolean @default(true)
+
+  idState            Int
+  municipalityNumber Int
+  parishNumber       Int
+
+  parish Parish @relation(fields: [idState, municipalityNumber, parishNumber], references: [idState, municipalityNumber, parishNumber], onDelete: Restrict, onUpdate: Cascade)
+  cases  Case[]
+}
+
+model SubjectCategory {
+  idSubject      Int
+  categoryNumber Int
+  name           String  @db.VarChar(63)
+  isActive       Boolean @default(true)
+
+  subject    Subject     @relation(fields: [idSubject], references: [idSubject], onDelete: Restrict, onUpdate: Cascade)
+  legalAreas LegalArea[]
+
+  @@id([idSubject, categoryNumber])
+  @@unique([idSubject, name])
+}
+
+model LegalArea {
+  idLegalArea Int     @id @default(autoincrement())
+  name        String  @db.VarChar(63)
+  isActive    Boolean @default(true)
+
+  idSubject      Int
+  categoryNumber Int
+
+  subjectCategory SubjectCategory @relation(fields: [idSubject, categoryNumber], references: [idSubject, categoryNumber], onDelete: Restrict, onUpdate: Cascade)
+  cases           Case[]
+
+  @@unique([idSubject, categoryNumber, name])
+}
+
+model Teacher {
+  identityCard String      @db.VarChar(20)
+  term         String      @db.VarChar(10)
+  type         TeacherType
+
+  user     User     @relation(fields: [identityCard], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
+  semester Semester @relation(fields: [term], references: [term], onDelete: Restrict, onUpdate: Cascade)
+
+  cases Case[]
+
+  @@id([identityCard, term])
+}
+
+model Student {
+  identityCard String      @db.VarChar(20)
+  term         String      @db.VarChar(10)
+  nrc          String?     @db.VarChar(12)
+  type         StudentType
+
+  user     User     @relation(fields: [identityCard], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
+  semester Semester @relation(fields: [term], references: [term], onDelete: Restrict, onUpdate: Cascade)
+
+  assignedCases AssignedStudent[]
+
+  @@id([identityCard, term])
+}
+
+model Beneficiary {
+  identityCard String          @id @db.VarChar(20)
+  gender       Gender
+  birthDate    DateTime        @db.Date
+  name         String          @db.VarChar(63)
+  idType       IdType
+  hasId        Boolean
+  type         BeneficiaryType
+
+  idState            Int?
+  municipalityNumber Int?
+  parishNumber       Int?
+
+  parish            Parish?           @relation(fields: [idState, municipalityNumber, parishNumber], references: [idState, municipalityNumber, parishNumber], onDelete: Restrict, onUpdate: Cascade)
+  applicant         Applicant?
+  caseBeneficiaries CaseBeneficiary[]
+}
+
+model Applicant {
+  identityCard      String         @id @db.VarChar(20)
+  email             String?        @db.VarChar(35)
+  cellPhone         String?        @db.VarChar(20)
+  homePhone         String?        @db.VarChar(20)
+  maritalStatus     MaritalStatus?
+  isConcubine       Boolean?
+  createdAt         DateTime       @default(now())
+  isHeadOfHousehold Boolean?
+
+  headEducationLevelId      Int?
+  headStudyTime             String? @db.VarChar(35)
+  applicantEducationLevelId Int?
+  applicantStudyTime        String? @db.VarChar(35)
+
+  workConditionId     Int?
+  activityConditionId Int?
+
+  beneficiary Beneficiary @relation(fields: [identityCard], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
+
+  headEducationLevel      EducationLevel? @relation("HeadEducationLevel", fields: [headEducationLevelId], references: [idLevel], onDelete: Restrict, onUpdate: Cascade)
+  applicantEducationLevel EducationLevel? @relation("ApplicantEducationLevel", fields: [applicantEducationLevelId], references: [idLevel], onDelete: Restrict, onUpdate: Cascade)
+
+  workCondition     WorkCondition?     @relation(fields: [workConditionId], references: [idCondition], onDelete: Restrict, onUpdate: Cascade)
+  activityCondition ActivityCondition? @relation(fields: [activityConditionId], references: [idActivity], onDelete: Restrict, onUpdate: Cascade)
+
+  housing    Housing?
+  familyHome FamilyHome?
+  cases      Case[]
+}
+
+model Housing {
+  applicantId   String @id @db.VarChar(20)
+  bathroomCount Int?
+  bedroomCount  Int?
+
+  applicant Applicant       @relation(fields: [applicantId], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
+  details   HousingDetail[]
+}
+
+model HousingDetail {
+  idCharacteristic Int
+  detailNumber     Int
+  applicantId      String @db.VarChar(20)
+
+  characteristicDetail CharacteristicDetail @relation(fields: [idCharacteristic, detailNumber], references: [idCharacteristic, detailNumber], onDelete: Restrict, onUpdate: Cascade)
+  housing              Housing              @relation(fields: [applicantId], references: [applicantId], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([idCharacteristic, detailNumber, applicantId])
+}
+
+model FamilyHome {
+  applicantId          String   @id @db.VarChar(20)
+  memberCount          Int?
+  workingMemberCount   Int?
+  children7to12Count   Int?
+  studentChildrenCount Int?
+  monthlyIncome        Decimal? @db.Decimal(12, 2)
+
+  applicant Applicant @relation(fields: [applicantId], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Case {
+  idCase         Int         @id @default(autoincrement())
+  problemSummary String
+  createdAt      DateTime    @default(now())
+  processType    ProcessType
+
+  applicantId String @db.VarChar(20)
+  idNucleus   Int
+  term        String @db.VarChar(10)
+  idLegalArea Int
+  teacherId   String @db.VarChar(20)
+  teacherTerm String @db.VarChar(10)
+  idCourt     Int?
+
+  applicant Applicant @relation(fields: [applicantId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
+  nucleus   Nucleus   @relation(fields: [idNucleus], references: [idNucleus], onDelete: Restrict, onUpdate: Cascade)
+  semester  Semester  @relation(fields: [term], references: [term], onDelete: Restrict, onUpdate: Cascade)
+  legalArea LegalArea @relation(fields: [idLegalArea], references: [idLegalArea], onDelete: Restrict, onUpdate: Cascade)
+  teacher   Teacher   @relation(fields: [teacherId, teacherTerm], references: [identityCard, term], onDelete: Restrict, onUpdate: Cascade)
+  court     Court?    @relation(fields: [idCourt], references: [idCourt], onDelete: Restrict, onUpdate: Cascade)
+
+  beneficiaries    CaseBeneficiary[]
+  supports         SupportDocument[]
+  actions          CaseAction[]
+  appointments     Appointment[]
+  statuses         CaseStatus[]
+  assignedStudents AssignedStudent[]
+}
+
+model CaseBeneficiary {
+  idCase        Int
+  beneficiaryId String              @db.VarChar(20)
+  relationship  String              @db.VarChar(200)
+  type          CaseBeneficiaryType
+  description   String              @db.VarChar(200)
+
+  case        Case        @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([idCase, beneficiaryId])
+}
+
+model SupportDocument {
+  idCase         Int
+  supportNumber  Int
+  title          String   @db.VarChar(200)
+  description    String
+  submissionDate DateTime
+  fileUrl        String?
+
+  case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([idCase, supportNumber])
 }
 
 model CaseAction {
   idCase       Int
-  idCaseAction Int    @default(autoincrement())
-  title        String
+  actionNumber Int
   description  String
+  notes        String?
+  userId       String   @db.VarChar(20)
+  registryDate DateTime
 
-  case Case @relation(fields: [idCase], references: [idCase])
+  case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation(fields: [userId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
 
-  idUser Int?
-
-  user User? @relation(fields: [idUser], references: [idUser])
-
-  createdAt      DateTime        @default(now())
-  executeActions ExecuteAction[]
-
-  @@id([idCaseAction, idCase])
-  @@map("CaseActions")
+  @@id([idCase, actionNumber])
 }
 
-model ExecuteAction {
-  idUser       Int
-  idCaseAction Int
+model Appointment {
+  idCase            Int
+  appointmentNumber Int
+  plannedDate       DateTime
+  executionDate     DateTime?
+  status            AppointmentStatus
+  guidance          String?
+  userId            String            @db.VarChar(20)
+  registryDate      DateTime
+
+  case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation(fields: [userId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([idCase, appointmentNumber])
+}
+
+model CaseStatus {
   idCase       Int
-  dateExecuted DateTime
+  statusNumber Int
+  status       CaseStatusEnum
+  reason       String?
+  userId       String         @db.VarChar(20)
+  registryDate DateTime
 
-  user   User       @relation(fields: [idUser], references: [idUser])
-  action CaseAction @relation(fields: [idCaseAction, idCase], references: [idCaseAction, idCase])
+  case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation(fields: [userId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
 
-  @@id([idUser, idCaseAction])
-  @@map("ExecuteActions")
+  @@id([idCase, statusNumber])
 }
 
-model IsBeneficiaryOf {
-  idBeneficiary   Int
-  idCase          Int
-  description     String
-  typeBeneficiary BeneficiaryType
-  relationship    String
+model AssignedStudent {
+  idCase    Int
+  studentId String @db.VarChar(20)
+  term      String @db.VarChar(10)
 
-  beneficiary Beneficiary @relation(fields: [idBeneficiary], references: [idBeneficiary])
-  case        Case        @relation(fields: [idCase], references: [idCase])
+  case    Case    @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+  student Student @relation(fields: [studentId, term], references: [identityCard, term], onDelete: Restrict, onUpdate: Cascade)
 
-  @@id([idBeneficiary, idCase])
-  @@map("IsBeneficiaryOf")
-}
-
-model AttenpAppointment {
-  idUser Int
-  idCase Int
-  date   DateTime
-
-  user        User        @relation(fields: [idUser], references: [idUser])
-  appointment Appointment @relation(fields: [idCase, date], references: [idCase, date])
-
-  @@id([idUser, idCase, date])
-  @@map("AttendAppointments")
+  @@id([idCase, studentId, term])
 }
