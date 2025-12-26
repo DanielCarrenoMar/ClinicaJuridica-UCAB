@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient } from './generated/client.js'; 
+import { PrismaClient } from './generated/client.js';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -13,7 +13,7 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const cedulaABorrar = 10111222; // Cédula de Andrés Pérez
+  const cedulaABorrar = "10111222"; // Cédula de Andrés Pérez
 
   try {
     await prisma.$connect();
@@ -21,10 +21,10 @@ async function main() {
 
     // --- 1. MOSTRAR ESTADO INICIAL ---
     console.log('1️⃣  LISTA INICIAL (Antes de borrar):');
-    const usuariosAntes = await prisma.user.findMany({ orderBy: { idUser: 'asc' } });
+    const usuariosAntes = await prisma.user.findMany({ orderBy: { identityCard: 'asc' } });
     console.table(usuariosAntes.map(u => ({
-      'Cédula': u.idUser,
-      'Nombre': u.firstName,
+      'Cédula': u.identityCard,
+      'Nombre': u.name,
       'Email': u.email
     })));
 
@@ -32,10 +32,10 @@ async function main() {
 
     // --- 2. ELIMINAR AL USUARIO ---
     console.log(`🗑️  Borrando usuario con cédula: ${cedulaABorrar}...`);
-    
+
     try {
       await prisma.user.delete({
-        where: { idUser: cedulaABorrar }
+        where: { identityCard: cedulaABorrar }
       });
       console.log('✅ Registro eliminado permanentemente de PostgreSQL.\n');
     } catch (e) {
@@ -44,12 +44,12 @@ async function main() {
 
     // --- 3. MOSTRAR TABLA FINAL ---
     console.log('2️⃣  LISTA FINAL (Después de borrar):');
-    const usuariosDespues = await prisma.user.findMany({ orderBy: { idUser: 'asc' } });
-    
+    const usuariosDespues = await prisma.user.findMany({ orderBy: { identityCard: 'asc' } });
+
     if (usuariosDespues.length > 0) {
       console.table(usuariosDespues.map(u => ({
-        'Cédula': u.idUser,
-        'Nombre': u.firstName,
+        'Cédula': u.identityCard,
+        'Nombre': u.name,
         'Email': u.email
       })));
       console.log(`📊 Ahora quedan ${usuariosDespues.length} usuarios en la base de datos.`);

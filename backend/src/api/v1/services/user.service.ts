@@ -1,299 +1,131 @@
 import prisma from '../../../config/database.js';
-import { GenderType } from '../../../../prisma/generated/client.js';
 
 class UserService {
-  // Obtener todos los usuarios
+  // Mapeo interno para convertir cualquier entrada (E, P, C o nombres largos) 
+  // a los nombres de símbolos que Prisma espera en su API.
+  private normalizeType(type: string): any {
+    if (!type) return undefined;
+    const t = type.toUpperCase();
+    if (t === 'STUDENT' || t === 'E') return 'STUDENT';
+    if (t === 'TEACHER' || t === 'P') return 'TEACHER';
+    if (t === 'COORDINATOR' || t === 'C') return 'COORDINATOR';
+    return t;
+  }
+
+  private normalizeGender(gender: string): any {
+    if (!gender) return undefined;
+    const g = gender.toUpperCase();
+    if (g === 'M') return 'M';
+    if (g === 'F') return 'F';
+    return g;
+  }
+
   async getAllUsers() {
     try {
-      // Verificar si prisma está configurado correctamente
-      if (!prisma || !prisma.user) {
-        throw new Error('Prisma no está configurado correctamente');
-      }
-
       const users = await prisma.user.findMany({
-        orderBy: { idUser: 'asc' },
-        include: {
-          colaborator: true,
-          teacher: true
-        }
+        orderBy: { identityCard: 'asc' },
+        include: { teachers: true, students: true, coordinator: true }
       });
-      
-      return {
-        success: true,
-        data: users,
-        count: users.length
-      };
+      return { success: true, data: users, count: users.length };
     } catch (error: any) {
-      console.error('Error al obtener usuarios:', error);
-      return {
-        success: false,
-        message: 'Error al obtener usuarios de la base de datos',
-        error: error.message
-      };
+      return { success: false, message: 'Error al obtener usuarios', error: error.message };
     }
   }
 
-  // Obtener un usuario por su Cédula (idUser)
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     try {
-      if (!prisma || !prisma.user) {
-        throw new Error('Prisma no está configurado correctamente');
-      }
-
       const user = await prisma.user.findUnique({
-        where: { idUser: id },
-        include: {
-          colaborator: true,
-          teacher: true
-        }
+        where: { identityCard: id },
+        include: { teachers: true, students: true, coordinator: true }
       });
-
-      if (!user) {
-        return { 
-          success: false, 
-          message: 'Usuario no encontrado' 
-        };
-      }
-
+      if (!user) return { success: false, message: 'Usuario no encontrado' };
       return { success: true, data: user };
     } catch (error: any) {
-      console.error('Error al obtener usuario:', error);
-      return {
-        success: false,
-        message: 'Error al obtener usuario de la base de datos',
-        error: error.message
-      };
+      return { success: false, message: 'Error al buscar usuario', error: error.message };
     }
   }
 
-  // Crear un nuevo usuario
   async createUser(data: any) {
     try {
-      if (!prisma || !prisma.user) {
-        throw new Error('Prisma no está configurado correctamente');
-      }
+      if (!prisma?.user) throw new Error('Prisma no está configurado');
 
-      // Validar que no exista un usuario con el mismo idUser o email
       const existingUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { idUser: data.idUser },
-            { email: data.email }
-          ]
-        }
+        where: { OR: [{ identityCard: data.identityCard }, { email: data.email }] }
       });
 
       if (existingUser) {
         return {
           success: false,
-          message: existingUser.idUser === data.idUser 
-            ? 'Ya existe un usuario con esta cédula' 
+          message: existingUser.identityCard === data.identityCard
+            ? 'Ya existe un usuario con esta cédula'
             : 'Ya existe un usuario con este email'
         };
       }
 
       const newUser = await prisma.user.create({
         data: {
-          idUser: data.idUser,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          gender: data.gender,
-          email: data.email,
-          password: data.password || null,
-          isActive: data.isActive ?? true
-        }
-      });
-
-      return {
-        success: true,
-        data: newUser,
-        message: 'Usuario creado exitosamente'
-      };
-    } catch (error: any) {
-      console.error('Error al crear usuario:', error);
-      
-      // Manejar errores específicos de Prisma
-      if (error.code === 'P2002') {
-        return {
-          success: false,
-          message: 'Ya existe un usuario con esta cédula o email'
-        };
-      }
-
-      return {
-        success: false,
-        message: 'Error al crear usuario en la base de datos',
-        error: error.message
-      };
-    }
-  }
-
-  // Actualizar usuario
-  async updateUser(id: number, data: any) {
-    try {
-      if (!prisma || !prisma.user) {
-        throw new Error('Prisma no está configurado correctamente');
-      }
-
-      // Verificar que el usuario exista
-      const existingUser = await prisma.user.findUnique({
-        where: { idUser: id }
-      });
-
-      if (!existingUser) {
-        return {
-          success: false,
-          message: 'Usuario no encontrado'
-        };
-      }
-
-      // Si se está actualizando el email, verificar que no esté en uso por otro usuario
-      if (data.email && data.email !== existingUser.email) {
-        const emailExists = await prisma.user.findUnique({
-          where: { email: data.email }
-        });
-
-        if (emailExists) {
-          return {
-            success: false,
-            message: 'El email ya está en uso por otro usuario'
-          };
-        }
-      }
-
-      const updatedUser = await prisma.user.update({
-        where: { idUser: id },
-        data: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          gender: data.gender,
+          identityCard: data.identityCard,
+          name: data.name,
           email: data.email,
           password: data.password,
-          isActive: data.isActive
+          isActive: data.isActive ?? true,
+          type: this.normalizeType(data.type),
+          gender: this.normalizeGender(data.gender)
         }
       });
 
-      return { 
-        success: true, 
-        data: updatedUser,
-        message: 'Usuario actualizado exitosamente'
-      };
+      return { success: true, data: newUser, message: 'Usuario creado exitosamente' };
     } catch (error: any) {
-      console.error('Error al actualizar usuario:', error);
-      
-      if (error.code === 'P2025') {
-        return {
-          success: false,
-          message: 'Usuario no encontrado'
-        };
-      }
-
-      return {
-        success: false,
-        message: 'Error al actualizar usuario en la base de datos',
-        error: error.message
-      };
+      console.error('Error en createUser:', error);
+      return { success: false, message: 'Error al crear usuario', error: error.message };
     }
   }
 
-  // Eliminar usuario
-  async deleteUser(id: number) {
+  async updateUser(id: string, data: any) {
     try {
-      if (!prisma || !prisma.user) {
-        throw new Error('Prisma no está configurado correctamente');
-      }
+      const updateData: any = { ...data };
 
-      // Verificar que el usuario exista
-      const existingUser = await prisma.user.findUnique({
-        where: { idUser: id }
+      if (data.type) updateData.type = this.normalizeType(data.type);
+      if (data.gender) updateData.gender = this.normalizeGender(data.gender);
+
+      const updatedUser = await prisma.user.update({
+        where: { identityCard: id },
+        data: updateData
       });
 
-      if (!existingUser) {
-        return {
-          success: false,
-          message: 'Usuario no encontrado'
-        };
-      }
-
-      await prisma.user.delete({ 
-        where: { idUser: id } 
-      });
-
-      return { 
-        success: true, 
-        message: 'Usuario eliminado exitosamente' 
-      };
+      return { success: true, data: updatedUser, message: 'Usuario actualizado' };
     } catch (error: any) {
-      console.error('Error al eliminar usuario:', error);
-      
-      if (error.code === 'P2025') {
-        return {
-          success: false,
-          message: 'Usuario no encontrado'
-        };
-      }
-
-      return {
-        success: false,
-        message: 'Error al eliminar usuario de la base de datos',
-        error: error.message
-      };
+      return { success: false, message: 'Error al actualizar', error: error.message };
     }
   }
 
-  // Seed: Poblar la base de datos con usuarios de prueba
+  async deleteUser(id: string) {
+    try {
+      await prisma.user.delete({ where: { identityCard: id } });
+      return { success: true, message: 'Usuario eliminado' };
+    } catch (error: any) {
+      return { success: false, message: 'Error al eliminar', error: error.message };
+    }
+  }
+
   async seedInitialUsers() {
     try {
-      if (!prisma || !prisma.user) {
-        throw new Error('Prisma no está configurado correctamente');
-      }
-
       const testUsers = [
-        { 
-          idUser: 20111222, 
-          firstName: "Carlos", 
-          lastName: "Abogado", 
-          email: "carlos@test.com", 
-          gender: GenderType.M 
-        },
-        { 
-          idUser: 20333444, 
-          firstName: "Maria", 
-          lastName: "Docente", 
-          email: "maria@test.com", 
-          gender: GenderType.F 
-        },
-        { 
-          idUser: 20555666, 
-          firstName: "Juan", 
-          lastName: "Estudiante", 
-          email: "juan@test.com", 
-          gender: GenderType.M 
-        }
+        { identityCard: "20111222", name: "Carlos Abogado", email: "carlos@test.com", password: "password123", gender: "M", type: "TEACHER" },
+        { identityCard: "20333444", name: "Maria Docente", email: "maria@test.com", password: "password123", gender: "F", type: "TEACHER" },
+        { identityCard: "20555666", name: "Juan Estudiante", email: "juan@test.com", password: "password123", gender: "M", type: "STUDENT" }
       ];
 
-      const createdUsers = [];
       for (const u of testUsers) {
-        const user = await prisma.user.upsert({
-          where: { idUser: u.idUser },
+        await prisma.user.upsert({
+          where: { identityCard: u.identityCard },
           update: {},
-          create: u
+          create: u as any
         });
-        createdUsers.push(user);
       }
-
-      return { 
-        success: true, 
-        message: `${createdUsers.length} usuarios de prueba insertados/actualizados exitosamente`,
-        data: createdUsers
-      };
+      return { success: true, message: 'Seed completado' };
     } catch (error: any) {
-      console.error('Error en el seed:', error);
-      return { 
-        success: false, 
-        message: "Error al ejecutar el seed de usuarios",
-        error: error.message 
-      };
+      return { success: false, error: error.message };
     }
   }
 }

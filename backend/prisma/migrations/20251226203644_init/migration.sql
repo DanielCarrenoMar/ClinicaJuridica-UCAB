@@ -1,44 +1,3 @@
-/*
-  Warnings:
-
-  - The values [SCHEDULED,COMPLETED,CANCELED] on the enum `AppointmentStatus` will be removed. If these variants are still used in the database, this will fail.
-  - The values [DIRECT,INDIRECT] on the enum `BeneficiaryType` will be removed. If these variants are still used in the database, this will fail.
-  - You are about to drop the column `idParish` on the `Nucleus` table. All the data in the column will be lost.
-  - You are about to alter the column `name` on the `Nucleus` table. The data in that column could be lost. The data in that column will be cast from `Text` to `VarChar(63)`.
-  - The primary key for the `Subject` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `idTeacher` on the `Subject` table. All the data in the column will be lost.
-  - You are about to drop the column `section` on the `Subject` table. All the data in the column will be lost.
-  - You are about to alter the column `name` on the `Subject` table. The data in that column could be lost. The data in that column will be cast from `Text` to `VarChar(63)`.
-  - You are about to drop the `Applicants` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Appointments` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `AttendAppointments` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Beneficiaries` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `CaseActions` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `CaseAssignments` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `CaseStatuses` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Cases` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Colaborators` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Courts` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `DocumentRecordCourts` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `ExecuteActions` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `FamilyHouses` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `IsBeneficiaryOf` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `LegalAreas` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Municipalities` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Parishes` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `RecordCourts` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Regions` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Semesters` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `SuportDocuments` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Teachers` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Users` table. If the table is not empty, all the data it contains will be lost.
-  - A unique constraint covering the columns `[name]` on the table `Nucleus` will be added. If there are existing duplicate values, this will fail.
-  - A unique constraint covering the columns `[name]` on the table `Subject` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `idState` to the `Nucleus` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `municipalityNumber` to the `Nucleus` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `parishNumber` to the `Nucleus` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('M', 'F');
 
@@ -55,6 +14,9 @@ CREATE TYPE "StudentType" AS ENUM ('R', 'V', 'E', 'S');
 CREATE TYPE "IdType" AS ENUM ('V', 'E', 'J');
 
 -- CreateEnum
+CREATE TYPE "BeneficiaryType" AS ENUM ('B', 'S');
+
+-- CreateEnum
 CREATE TYPE "MaritalStatus" AS ENUM ('S', 'C', 'D', 'V');
 
 -- CreateEnum
@@ -64,246 +26,10 @@ CREATE TYPE "ProcessType" AS ENUM ('T', 'A', 'CM', 'R');
 CREATE TYPE "CaseBeneficiaryType" AS ENUM ('D', 'I');
 
 -- CreateEnum
+CREATE TYPE "AppointmentStatus" AS ENUM ('C', 'P', 'R');
+
+-- CreateEnum
 CREATE TYPE "CaseStatusEnum" AS ENUM ('A', 'T', 'P', 'C');
-
--- AlterEnum
-BEGIN;
-CREATE TYPE "AppointmentStatus_new" AS ENUM ('C', 'P', 'R');
-ALTER TABLE "public"."Appointments" ALTER COLUMN "statusAppointment" DROP DEFAULT;
-ALTER TABLE "Appointment" ALTER COLUMN "status" TYPE "AppointmentStatus_new" USING ("status"::text::"AppointmentStatus_new");
-ALTER TYPE "AppointmentStatus" RENAME TO "AppointmentStatus_old";
-ALTER TYPE "AppointmentStatus_new" RENAME TO "AppointmentStatus";
-DROP TYPE "public"."AppointmentStatus_old";
-COMMIT;
-
--- AlterEnum
-BEGIN;
-CREATE TYPE "BeneficiaryType_new" AS ENUM ('B', 'S');
-ALTER TABLE "Beneficiary" ALTER COLUMN "type" TYPE "BeneficiaryType_new" USING ("type"::text::"BeneficiaryType_new");
-ALTER TYPE "BeneficiaryType" RENAME TO "BeneficiaryType_old";
-ALTER TYPE "BeneficiaryType_new" RENAME TO "BeneficiaryType";
-DROP TYPE "public"."BeneficiaryType_old";
-COMMIT;
-
--- DropForeignKey
-ALTER TABLE "Applicants" DROP CONSTRAINT "Applicants_idFamilyHouse_fkey";
-
--- DropForeignKey
-ALTER TABLE "Appointments" DROP CONSTRAINT "Appointments_idCase_fkey";
-
--- DropForeignKey
-ALTER TABLE "Appointments" DROP CONSTRAINT "Appointments_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "AttendAppointments" DROP CONSTRAINT "AttendAppointments_idCase_date_fkey";
-
--- DropForeignKey
-ALTER TABLE "AttendAppointments" DROP CONSTRAINT "AttendAppointments_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "Beneficiaries" DROP CONSTRAINT "Beneficiaries_idParish_fkey";
-
--- DropForeignKey
-ALTER TABLE "CaseActions" DROP CONSTRAINT "CaseActions_idCase_fkey";
-
--- DropForeignKey
-ALTER TABLE "CaseActions" DROP CONSTRAINT "CaseActions_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "CaseAssignments" DROP CONSTRAINT "CaseAssignments_idCase_fkey";
-
--- DropForeignKey
-ALTER TABLE "CaseAssignments" DROP CONSTRAINT "CaseAssignments_idSemester_fkey";
-
--- DropForeignKey
-ALTER TABLE "CaseAssignments" DROP CONSTRAINT "CaseAssignments_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "CaseStatuses" DROP CONSTRAINT "CaseStatuses_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "Cases" DROP CONSTRAINT "Cases_idApplicant_fkey";
-
--- DropForeignKey
-ALTER TABLE "Cases" DROP CONSTRAINT "Cases_idCourt_fkey";
-
--- DropForeignKey
-ALTER TABLE "Cases" DROP CONSTRAINT "Cases_idLegalArea_fkey";
-
--- DropForeignKey
-ALTER TABLE "Cases" DROP CONSTRAINT "Cases_idNucleus_fkey";
-
--- DropForeignKey
-ALTER TABLE "Cases" DROP CONSTRAINT "Cases_semesterIdSemester_fkey";
-
--- DropForeignKey
-ALTER TABLE "Colaborators" DROP CONSTRAINT "Colaborators_idSubject_section_fkey";
-
--- DropForeignKey
-ALTER TABLE "Colaborators" DROP CONSTRAINT "Colaborators_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "DocumentRecordCourts" DROP CONSTRAINT "DocumentRecordCourts_idRecordCourt_fkey";
-
--- DropForeignKey
-ALTER TABLE "ExecuteActions" DROP CONSTRAINT "ExecuteActions_idCaseAction_idCase_fkey";
-
--- DropForeignKey
-ALTER TABLE "ExecuteActions" DROP CONSTRAINT "ExecuteActions_idUser_fkey";
-
--- DropForeignKey
-ALTER TABLE "IsBeneficiaryOf" DROP CONSTRAINT "IsBeneficiaryOf_idBeneficiary_fkey";
-
--- DropForeignKey
-ALTER TABLE "IsBeneficiaryOf" DROP CONSTRAINT "IsBeneficiaryOf_idCase_fkey";
-
--- DropForeignKey
-ALTER TABLE "Municipalities" DROP CONSTRAINT "Municipalities_idRegion_fkey";
-
--- DropForeignKey
-ALTER TABLE "Nucleus" DROP CONSTRAINT "Nucleus_idParish_fkey";
-
--- DropForeignKey
-ALTER TABLE "Parishes" DROP CONSTRAINT "Parishes_idMunicipality_fkey";
-
--- DropForeignKey
-ALTER TABLE "RecordCourts" DROP CONSTRAINT "RecordCourts_idCourt_fkey";
-
--- DropForeignKey
-ALTER TABLE "Subject" DROP CONSTRAINT "Subject_idTeacher_fkey";
-
--- DropForeignKey
-ALTER TABLE "SuportDocuments" DROP CONSTRAINT "SuportDocuments_idCase_fkey";
-
--- DropForeignKey
-ALTER TABLE "Teachers" DROP CONSTRAINT "Teachers_idUser_fkey";
-
--- AlterTable
-ALTER TABLE "Nucleus" DROP COLUMN "idParish",
-ADD COLUMN     "idState" INTEGER NOT NULL,
-ADD COLUMN     "isActive" BOOLEAN NOT NULL DEFAULT true,
-ADD COLUMN     "municipalityNumber" INTEGER NOT NULL,
-ADD COLUMN     "parishNumber" INTEGER NOT NULL,
-ALTER COLUMN "name" SET DATA TYPE VARCHAR(63);
-
--- AlterTable
-CREATE SEQUENCE subject_idsubject_seq;
-ALTER TABLE "Subject" DROP CONSTRAINT "Subject_pkey",
-DROP COLUMN "idTeacher",
-DROP COLUMN "section",
-ADD COLUMN     "isActive" BOOLEAN NOT NULL DEFAULT true,
-ALTER COLUMN "idSubject" SET DEFAULT nextval('subject_idsubject_seq'),
-ALTER COLUMN "name" SET DATA TYPE VARCHAR(63),
-ADD CONSTRAINT "Subject_pkey" PRIMARY KEY ("idSubject");
-ALTER SEQUENCE subject_idsubject_seq OWNED BY "Subject"."idSubject";
-
--- DropTable
-DROP TABLE "Applicants";
-
--- DropTable
-DROP TABLE "Appointments";
-
--- DropTable
-DROP TABLE "AttendAppointments";
-
--- DropTable
-DROP TABLE "Beneficiaries";
-
--- DropTable
-DROP TABLE "CaseActions";
-
--- DropTable
-DROP TABLE "CaseAssignments";
-
--- DropTable
-DROP TABLE "CaseStatuses";
-
--- DropTable
-DROP TABLE "Cases";
-
--- DropTable
-DROP TABLE "Colaborators";
-
--- DropTable
-DROP TABLE "Courts";
-
--- DropTable
-DROP TABLE "DocumentRecordCourts";
-
--- DropTable
-DROP TABLE "ExecuteActions";
-
--- DropTable
-DROP TABLE "FamilyHouses";
-
--- DropTable
-DROP TABLE "IsBeneficiaryOf";
-
--- DropTable
-DROP TABLE "LegalAreas";
-
--- DropTable
-DROP TABLE "Municipalities";
-
--- DropTable
-DROP TABLE "Parishes";
-
--- DropTable
-DROP TABLE "RecordCourts";
-
--- DropTable
-DROP TABLE "Regions";
-
--- DropTable
-DROP TABLE "Semesters";
-
--- DropTable
-DROP TABLE "SuportDocuments";
-
--- DropTable
-DROP TABLE "Teachers";
-
--- DropTable
-DROP TABLE "Users";
-
--- DropEnum
-DROP TYPE "ActivityConditionType";
-
--- DropEnum
-DROP TYPE "CaseStatusType";
-
--- DropEnum
-DROP TYPE "ColaboratorType";
-
--- DropEnum
-DROP TYPE "FloorMaterialType";
-
--- DropEnum
-DROP TYPE "GenderType";
-
--- DropEnum
-DROP TYPE "IDType";
-
--- DropEnum
-DROP TYPE "LegalAreaType";
-
--- DropEnum
-DROP TYPE "RoofMaterialType";
-
--- DropEnum
-DROP TYPE "WallMaterialType";
-
--- DropEnum
-DROP TYPE "WasteCollectionType";
-
--- DropEnum
-DROP TYPE "WastewaterType";
-
--- DropEnum
-DROP TYPE "WaterServiceType";
-
--- DropEnum
-DROP TYPE "WorkConditionType";
 
 -- CreateTable
 CREATE TABLE "HousingCharacteristic" (
@@ -368,6 +94,15 @@ CREATE TABLE "Semester" (
 );
 
 -- CreateTable
+CREATE TABLE "Subject" (
+    "idSubject" SERIAL NOT NULL,
+    "name" VARCHAR(63) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "Subject_pkey" PRIMARY KEY ("idSubject")
+);
+
+-- CreateTable
 CREATE TABLE "User" (
     "identityCard" VARCHAR(20) NOT NULL,
     "name" VARCHAR(63) NOT NULL,
@@ -414,6 +149,18 @@ CREATE TABLE "Parish" (
     "name" VARCHAR(63) NOT NULL,
 
     CONSTRAINT "Parish_pkey" PRIMARY KEY ("idState","municipalityNumber","parishNumber")
+);
+
+-- CreateTable
+CREATE TABLE "Nucleus" (
+    "idNucleus" SERIAL NOT NULL,
+    "name" VARCHAR(63) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "idState" INTEGER NOT NULL,
+    "municipalityNumber" INTEGER NOT NULL,
+    "parishNumber" INTEGER NOT NULL,
+
+    CONSTRAINT "Nucleus_pkey" PRIMARY KEY ("idNucleus")
 );
 
 -- CreateTable
@@ -625,6 +372,9 @@ CREATE UNIQUE INDEX "WorkCondition_name_key" ON "WorkCondition"("name");
 CREATE UNIQUE INDEX "ActivityCondition_name_key" ON "ActivityCondition"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Subject_name_key" ON "Subject"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
@@ -637,16 +387,13 @@ CREATE UNIQUE INDEX "Municipality_idState_name_key" ON "Municipality"("idState",
 CREATE UNIQUE INDEX "Parish_idState_municipalityNumber_name_key" ON "Parish"("idState", "municipalityNumber", "name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Nucleus_name_key" ON "Nucleus"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "SubjectCategory_idSubject_name_key" ON "SubjectCategory"("idSubject", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "LegalArea_idSubject_categoryNumber_name_key" ON "LegalArea"("idSubject", "categoryNumber", "name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Nucleus_name_key" ON "Nucleus"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Subject_name_key" ON "Subject"("name");
 
 -- AddForeignKey
 ALTER TABLE "Coordinator" ADD CONSTRAINT "Coordinator_identityCard_fkey" FOREIGN KEY ("identityCard") REFERENCES "User"("identityCard") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -24,16 +24,15 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    const idUser = parseInt(id);
 
-    if (isNaN(idUser)) {
+    if (!id || id.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: 'ID inválido. Debe ser un número.'
+        message: 'ID inválido. Debe ser una cédula válida.'
       });
     }
 
-    const result = await userService.getUserById(idUser);
+    const result = await userService.getUserById(id);
     
     if (!result.success) {
       return res.status(404).json(result);
@@ -55,10 +54,10 @@ export const createUser = async (req: Request, res: Response) => {
     const userData = req.body;
 
     // Validaciones básicas
-    if (!userData.idUser || !userData.firstName || !userData.lastName || !userData.email || !userData.gender) {
+    if (!userData.identityCard || !userData.name || !userData.email || !userData.type) {
       return res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: idUser, firstName, lastName, email, gender'
+        message: 'Faltan campos requeridos: identityCard, name, email, type'
       });
     }
 
@@ -82,17 +81,16 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    const idUser = parseInt(id);
     const userData = req.body;
 
-    if (isNaN(idUser)) {
+    if (!id || id.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: 'ID inválido. Debe ser un número.'
+        message: 'ID inválido. Debe ser una cédula válida.'
       });
     }
 
-    const result = await userService.updateUser(idUser, userData);
+    const result = await userService.updateUser(id, userData);
     
     if (!result.success) {
       return res.status(400).json(result);
@@ -112,16 +110,15 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    const idUser = parseInt(id);
 
-    if (isNaN(idUser)) {
+    if (!id || id.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: 'ID inválido. Debe ser un número.'
+        message: 'ID inválido. Debe ser una cédula válida.'
       });
     }
 
-    const result = await userService.deleteUser(idUser);
+    const result = await userService.deleteUser(id);
     
     if (!result.success) {
       return res.status(400).json(result);
