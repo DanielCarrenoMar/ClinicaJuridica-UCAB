@@ -8,7 +8,9 @@
     "dev": "tsx src/index.ts",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test:user-flow": "tsx test-user-flow.ts",
+    "test:user-http": "tsx test-user-http.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,15 +19,23 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "pg": "^8.16.3",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.5",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.3",
     "@types/pg": "^8.15.6",
+    "nodemon": "^3.1.11",
     "prisma": "^7.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  }, 
+  "prisma": {
+    "seed": "node --loader tsx prisma/seed.ts"
   }
 }
