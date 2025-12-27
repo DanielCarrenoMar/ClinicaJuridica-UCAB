@@ -1,4 +1,4 @@
-import type { idNacionality } from "#domain/mtypes.ts";
+import type { PersonID, IdNacionality } from "#domain/mtypes.ts";
 
 export interface CaseActionModel {
     idCase: number;
@@ -6,8 +6,8 @@ export interface CaseActionModel {
     actionNumber: number;
     description: string;
     notes: string | null;
-    userId: number;
-    userNacionality: idNacionality;
+    userId: PersonID;
+    userNacionality: IdNacionality;
     userName: string;
     registryDate: Date;
 }
