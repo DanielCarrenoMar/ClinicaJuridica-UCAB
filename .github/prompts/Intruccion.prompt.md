@@ -1,12 +1,24 @@
 ---
 agent: agent
 ---
-- Se usa typescript.
-- Para los estilos se usa TailwindCss.
-- Se usan los imports {} from.
-- Implementa las clases de tailwind usando las variables contenidas en el idex.css.
-- Sin comentarios innecesarios.
-- Las funciones se definen con function nombreFuncion() {}.
-- En las medidas de tailwind usa las clases predefinidas, no uses medidas personalizadas.
-- Se usan todos los nombres de variables en ingles y camelCase.
-- El texto que vera el usuario debe estar en español. Incluidos los links de rutas.
+# Reglas de Desarrollo y Estilo
+
+## TypeScript y Código
+- **Lenguaje**: Utiliza TypeScript estrictamente.
+- **Importaciones**: 
+  - Usa `import type` para importar tipos e interfaces.
+  - Prefiere las importaciones nombradas (`import { ... } from ...`).
+- **Funciones**: Define las funciones usando la sintaxis de declaración: `function nombreFuncion() {}`.
+- **Naming**: 
+  - Variables y funciones en **inglés** y **camelCase**.
+  - Componentes en **PascalCase**.
+- **Comentarios**: Evita comentarios obvios o innecesarios. El código debe ser autoexplicativo.
+
+## Estilos (Tailwind CSS)
+- **Framework**: Usa Tailwind CSS.
+- **Variables**: Implementa los estilos utilizando las variables CSS definidas en `index.css` (ej. `bg-[var(--surface)]`).
+- **Consistencia**: Usa las clases de utilidad predefinidas de Tailwind siempre que sea posible. Evita valores arbitrarios (ej. `w-[123px]`) a menos que correspondan a tokens de diseño específicos.
+
+## Localización
+- **Idioma**: Todo el texto visible para el usuario debe estar en **español**.
+- **Rutas**: Los segmentos de URL y links deben estar en español (ej. `/inicio`, `/casos`).
