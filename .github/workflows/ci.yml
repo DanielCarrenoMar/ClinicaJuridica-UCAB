@@ -10,6 +10,25 @@ jobs:
   backend:
     name: Backend CI
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: ci_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://ci_user:ci_password@localhost:5432/ci_db?schema=public
+
     defaults:
       run:
         working-directory: ./backend
@@ -31,6 +50,10 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+
+    # 3. Sincronizamos el esquema de Prisma con la BD temporal
+    - name: Push Schema to DB
+      run: pnpm prisma db push
 
     # Prisma suele requerir generar el cliente antes del build
     - name: Generate Prisma Client
