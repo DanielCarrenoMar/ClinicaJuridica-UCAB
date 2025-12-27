@@ -1,8 +1,6 @@
-import prisma from '../../../config/database.js';
+import prisma from "../../../config/database.js";
 
 class UserService {
-  // Mapeo interno para convertir cualquier entrada (E, P, C o nombres largos) 
-  // a los nombres de símbolos que Prisma espera en su API.
   private normalizeType(type: string): any {
     if (!type) return undefined;
     const t = type.toUpperCase();
@@ -47,8 +45,6 @@ class UserService {
 
   async createUser(data: any) {
     try {
-      if (!prisma?.user) throw new Error('Prisma no está configurado');
-
       const existingUser = await prisma.user.findFirst({
         where: { OR: [{ identityCard: data.identityCard }, { email: data.email }] }
       });
@@ -76,7 +72,6 @@ class UserService {
 
       return { success: true, data: newUser, message: 'Usuario creado exitosamente' };
     } catch (error: any) {
-      console.error('Error en createUser:', error);
       return { success: false, message: 'Error al crear usuario', error: error.message };
     }
   }
@@ -84,7 +79,6 @@ class UserService {
   async updateUser(id: string, data: any) {
     try {
       const updateData: any = { ...data };
-
       if (data.type) updateData.type = this.normalizeType(data.type);
       if (data.gender) updateData.gender = this.normalizeGender(data.gender);
 

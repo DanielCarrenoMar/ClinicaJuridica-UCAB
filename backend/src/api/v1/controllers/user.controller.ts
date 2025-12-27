@@ -1,154 +1,107 @@
 import type { Request, Response } from 'express';
 import userService from '../services/user.service.js';
 
-// Obtener todos los usuarios
-export const getAllUsers = async (req: Request, res: Response) => {
+export async function getAllUsers(req: Request, res: Response): Promise<void> {
   try {
     const result = await userService.getAllUsers();
-    
-    if (!result.success) {
-      return res.status(400).json(result);
-    }
-
-    res.json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Obtener un usuario por ID (Cédula)
-export const getUserById = async (req: Request, res: Response) => {
+export async function getUserById(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params as { id: string };
+    const { id } = req.params;
 
     if (!id || id.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: 'ID inválido. Debe ser una cédula válida.'
-      });
+      res.status(400).json({ success: false, message: 'ID inválido (Cédula requerida)' });
+      return;
     }
 
     const result = await userService.getUserById(id);
     
     if (!result.success) {
-      return res.status(404).json(result);
+      res.status(404).json(result);
+      return;
     }
 
-    res.json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Crear un nuevo usuario
-export const createUser = async (req: Request, res: Response) => {
+export async function createUser(req: Request, res: Response): Promise<void> {
   try {
     const userData = req.body;
 
-    // Validaciones básicas
-    if (!userData.identityCard || !userData.name || !userData.email || !userData.type) {
-      return res.status(400).json({
+    if (!userData.identityCard || !userData.name || !userData.email || !userData.userType) {
+      res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: identityCard, name, email, type'
+        message: 'Faltan campos requeridos: identityCard, name, email, userType'
       });
+      return;
     }
 
     const result = await userService.createUser(userData);
     
     if (!result.success) {
-      return res.status(400).json(result);
+      res.status(400).json(result);
+      return;
     }
 
     res.status(201).json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Actualizar un usuario
-export const updateUser = async (req: Request, res: Response) => {
+export async function updateUser(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params as { id: string };
-    const userData = req.body;
+    const { id } = req.params;
 
-    if (!id || id.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: 'ID inválido. Debe ser una cédula válida.'
-      });
+    if (!id) {
+      res.status(400).json({ success: false, message: 'ID requerido' });
+      return;
     }
 
-    const result = await userService.updateUser(id, userData);
+    const result = await userService.updateUser(id, req.body);
     
     if (!result.success) {
-      return res.status(400).json(result);
+      res.status(400).json(result);
+      return;
     }
 
-    res.json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Eliminar un usuario
-export const deleteUser = async (req: Request, res: Response) => {
+export async function deleteUser(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params as { id: string };
+    const { id } = req.params;
 
-    if (!id || id.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: 'ID inválido. Debe ser una cédula válida.'
-      });
+    if (!id) {
+      res.status(400).json({ success: false, message: 'ID requerido' });
+      return;
     }
 
     const result = await userService.deleteUser(id);
     
     if (!result.success) {
-      return res.status(400).json(result);
+      res.status(400).json(result);
+      return;
     }
 
-    res.json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
-
-// Seed: Poblar la base de datos con usuarios de prueba
-export const seedUsers = async (req: Request, res: Response) => {
-  try {
-    const result = await userService.seedInitialUsers();
-    
-    if (!result.success) {
-      return res.status(400).json(result);
-    }
-
-    res.status(201).json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
-  }
-};
+}

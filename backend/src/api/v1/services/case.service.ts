@@ -1,117 +1,102 @@
-// Versión simplificada con any para evitar errores de tipos
-import prisma from '../../../config/database.js';
+import prisma from "../../../config/database.js";
 
 class CaseService {
-  // Obtener todos los casos
   async getAllCases() {
     try {
-      // @ts-ignore - Ignorar errores de tipo por ahora
       const cases = await prisma.case.findMany({
-        orderBy: {
-          createdAt: 'desc'
-        }
+        include: {
+          applicant: { include: { beneficiary: true } },
+          legalArea: true,
+          nucleus: true,
+          actions: true 
+        },
+        orderBy: { idCase: 'desc' }
       });
       
-      return {
-        success: true,
-        data: cases || [],
-        count: cases?.length || 0
-      };
+      return { success: true, data: cases, count: cases.length };
     } catch (error: any) {
-      console.log('📦 Modo desarrollo: usando datos mock');
-      return {
-        success: true,
-        data: [
-          {
-            idCase: 1,
-            description: "Caso de prueba 1 - Clínica Jurídica UCAB",
-            observations: "Caso de ejemplo para desarrollo",
-            tramitType: 10,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-        ],
-        count: 1,
-        message: 'Modo desarrollo activo'
-      };
+      return { success: false, message: 'Error al obtener casos', error: error.message };
     }
   }
 
-  // Obtener un caso por ID
-  async getCaseById(id: number) {
+  async getCaseById(idCase: number) {
     try {
-      // @ts-ignore - Ignorar errores de tipo por ahora
       const caseData = await prisma.case.findUnique({
-        where: { idCase: id }
-      });
-
-      if (!caseData) {
-        return {
-          success: false,
-          message: 'Caso no encontrado'
-        };
-      }
-
-      return {
-        success: true,
-        data: caseData
-      };
-    } catch (error: any) {
-      console.log('📦 Modo desarrollo: retornando caso mock');
-      if (id === 1) {
-        return {
-          success: true,
-          data: {
-            idCase: 1,
-            description: "Caso de prueba 1 - Clínica Jurídica UCAB",
-            observations: "Caso de ejemplo para desarrollo",
-            tramitType: 10,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+        where: { idCase },
+        include: {
+          applicant: { include: { beneficiary: true } },
+          legalArea: true,
+          nucleus: true,
+          actions: { 
+            orderBy: { actionNumber: 'desc' }
+          },
+          supports: true, 
+          appointments: true, 
+          statuses: true, 
+          assignedStudents: { 
+            include: {
+              student: { include: { user: true } }
+            }
           }
-        };
-      }
-      return {
-        success: false,
-        message: 'Caso no encontrado'
-      };
-    }
-  }
-
-  // Crear un nuevo caso
-  async createCase(data: any) {
-    try {
-      // @ts-ignore - Ignorar errores de tipo por ahora
-      const newCase = await prisma.case.create({
-        data: {
-          description: data.description,
-          observations: data.observations || '',
-          tramitType: data.tramitType || 0,
-          idLegalArea: data.idLegalArea || 1,
-          idCourt: data.idCourt,
-          idApplicant: data.idApplicant || 1,
-          idNucleus: data.idNucleus || 1,
-          semesterIdSemester: data.semesterIdSemester
         }
       });
 
-      return {
-        success: true,
-        data: newCase,
-        message: 'Caso creado exitosamente'
-      };
+      if (!caseData) return { success: false, message: 'Caso no encontrado' };
+
+      return { success: true, data: caseData };
     } catch (error: any) {
-      console.log('📦 Modo desarrollo: creando caso mock');
-      return {
-        success: true,
+      return { success: false, message: 'Error al buscar el caso', error: error.message };
+    }
+  }
+
+  async createCase(data: any) {
+    try {
+      const newCase = await prisma.case.create({
         data: {
-          idCase: Math.floor(Math.random() * 1000) + 100,
-          ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          problemSummary: data.problemSummary,
+          processType: data.processType,
+          applicantId: data.applicantId,
+          idNucleus: data.idNucleus,
+          term: data.term,
+          idLegalArea: data.idLegalArea,
+          teacherId: data.teacherId,
+          teacherTerm: data.teacherTerm 
+        }
+      });
+
+      return { success: true, data: newCase, message: 'Caso creado exitosamente' };
+    } catch (error: any) {
+      return { success: false, message: 'Error al crear el caso', error: error.message };
+    }
+  }
+
+  async searchCases(searchTerm: string) {
+    try {
+      const cases = await prisma.case.findMany({
+        where: {
+          OR: [
+            { problemSummary: { contains: searchTerm, mode: 'insensitive' } },
+            { applicantId: { contains: searchTerm, mode: 'insensitive' } }
+          ]
         },
-        message: 'Caso creado (modo desarrollo)'
-      };
+        include: {
+          applicant: { include: { beneficiary: true } }
+        }
+      });
+      return { success: true, data: cases };
+    } catch (error: any) {
+      return { success: false, message: 'Error en la búsqueda', error: error.message };
+    }
+  }
+
+  async deleteCase(idCase: number) {
+    try {
+      await prisma.case.delete({
+        where: { idCase }
+      });
+      return { success: true, message: 'Caso eliminado exitosamente' };
+    } catch (error: any) {
+      return { success: false, message: 'Error al eliminar el caso', error: error.message };
     }
   }
 }

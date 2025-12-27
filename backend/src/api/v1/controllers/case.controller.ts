@@ -1,77 +1,108 @@
-// Importar tipos correctamente
 import type { Request, Response } from 'express';
 import caseService from '../services/case.service.js';
 
-// Obtener todos los casos
-export const getAllCases = async (req: Request, res: Response) => {
+export async function getAllCases(req: Request, res: Response): Promise<void> {
   try {
+    // El controlador pide al servicio los datos
     const result = await caseService.getAllCases();
-    
-    if (!result.success) {
-      return res.status(400).json(result);
-    }
-
-    res.json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor'
-    });
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Obtener un caso por ID
-export const getCaseById = async (req: Request, res: Response) => {
+export async function getCaseById(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params as { id: string };
+    const { id } = req.params;
     const caseId = parseInt(id);
 
     if (isNaN(caseId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'ID inválido'
-      });
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
     }
 
+    // El controlador depende del servicio para buscar la data
     const result = await caseService.getCaseById(caseId);
     
     if (!result.success) {
-      return res.status(404).json(result);
+      res.status(404).json(result);
+      return;
     }
 
-    res.json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor'
-    });
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, message: 'Error interno del servidor', error: errorMessage });
   }
-};
+}
 
-// Crear un nuevo caso
-export const createCase = async (req: Request, res: Response) => {
+export async function createCase(req: Request, res: Response): Promise<void> {
   try {
     const caseData = req.body;
 
-    // Validaciones básicas
-    if (!caseData.description || !caseData.idLegalArea || !caseData.idApplicant) {
-      return res.status(400).json({
+    // Validación de entrada antes de llamar al servicio
+    if (
+      !caseData.problemSummary || 
+      !caseData.processType || 
+      !caseData.applicantId || 
+      !caseData.idLegalArea ||
+      !caseData.teacherId ||
+      !caseData.term
+    ) {
+      res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: description, idLegalArea, idApplicant'
+        message: 'Faltan campos obligatorios para el expediente'
       });
+      return;
     }
 
+    // El controlador envía la data limpia al servicio
     const result = await caseService.createCase(caseData);
     
     if (!result.success) {
-      return res.status(400).json(result);
+      res.status(400).json(result);
+      return;
     }
 
     res.status(201).json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor'
-    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
+
+export async function searchCases(req: Request, res: Response): Promise<void> {
+  try {
+    const { q } = req.query;
+    
+    if (!q || typeof q !== 'string') {
+      res.status(400).json({ success: false, message: 'Término de búsqueda requerido' });
+      return;
+    }
+
+    const result = await caseService.searchCases(q);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function deleteCase(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const result = await caseService.deleteCase(caseId);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
