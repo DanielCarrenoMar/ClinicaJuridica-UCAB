@@ -1,0 +1,1 @@
+export type idNacionality = "V" | "E" | "J";

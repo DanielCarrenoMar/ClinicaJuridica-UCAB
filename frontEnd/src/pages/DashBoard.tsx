@@ -4,86 +4,42 @@ import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
 import AccionCard from "#components/ActionCard.tsx";
 import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
+import type { CaseActionModel } from "#domain/models/caseAction.ts";
 
-const mockActions = [
+const mockActions: CaseActionModel[] = [
     {
-        name: "Alejandro Vielma",
-        id: "GY_24_24_123",
-        date: "01/01/2025",
+        userName: "Alejandro Vielma",
+        caseCompoundKey: "GY_24_24_123",
+        registryDate: new Date("01/01/2025"),
+        actionNumber: 1,
+        idCase: 1,
+        notes: null,
+        userId: 3112312,
+        userNacionality: "V",
         description: "Actualización de expediente: Incorporación de boleta de notificación."
     },
     {
-        name: "Pedro Carvajal",
-        id: "GY_24_24_124",
-        date: "02/01/2025",
+        userName: "Pedro Carvajal",
+        caseCompoundKey: "GY_24_24_124",
+        registryDate: new Date("01/01/2025"),
+        actionNumber: 2,
+        idCase: 2,
+        notes: null,
+        userId: 31512340,
+        userNacionality: "V",
         description: "Envío de reporte mensual de avances estratégicos."
     },
     {
-        name: "Daniel Carreño",
-        id: "GY_24_24_125",
-        date: "03/01/2025",
+        userName: "Daniel Carreño",
+        caseCompoundKey: "GY_24_24_125",
+        registryDate: new Date("01/01/2025"),
+        actionNumber: 3,
+        idCase: 3,
+        notes: null,
+        userId: 31522270,
+        userNacionality: "V",
         description: "Redacción de recurso de apelación."
     },
-    {
-        name: "Alejandro Vielma",
-        id: "GY_24_24_123",
-        date: "01/01/2025",
-        description: "Actualización de expediente: Incorporación de boleta de notificación."
-    },
-    {
-        name: "Pedro Carvajal",
-        id: "GY_24_24_124",
-        date: "02/01/2025",
-        description: "Envío de reporte mensual de avances estratégicos."
-    },
-    {
-        name: "Daniel Carreño",
-        id: "GY_24_24_125",
-        date: "03/01/2025",
-        description: "Redacción de recurso de apelación."
-    },
-    {
-        name: "Alejandro Vielma",
-        id: "GY_24_24_123",
-        date: "01/01/2025",
-        description: "Actualización de expediente: Incorporación de boleta de notificación."
-    },
-    {
-        name: "Pedro Carvajal",
-        id: "GY_24_24_124",
-        date: "02/01/2025",
-        description: "Envío de reporte mensual de avances estratégicos."
-    },
-    {
-        name: "Daniel Carreño",
-        id: "GY_24_24_125",
-        date: "03/01/2025",
-        description: "Redacción de recurso de apelación."
-    },
-    {
-        name: "Alejandro Vielma",
-        id: "GY_24_24_123",
-        date: "01/01/2025",
-        description: "Actualización de expediente: Incorporación de boleta de notificación."
-    },
-    {
-        name: "Pedro Carvajal",
-        id: "GY_24_24_124",
-        date: "02/01/2025",
-        description: "Envío de reporte mensual de avances estratégicos."
-    },
-    {
-        name: "Daniel Carreño",
-        id: "GY_24_24_125",
-        date: "03/01/2025",
-        description: "Redacción de recurso de apelación."
-    },
-    {
-        name: "Emilio Falconi",
-        id: "GY_24_24_126",
-        date: "04/01/2025",
-        description: "Aprobación de estrategia de defensa técnica."
-    }
 ];
 
 function DashBoard() {
@@ -123,10 +79,7 @@ function DashBoard() {
                             {mockActions.map((action, index) => (
                                 <AccionCard 
                                     key={index}
-                                    name={action.name}
-                                    id={action.id}
-                                    date={action.date}
-                                    description={action.description}
+                                    caseAction={action}
                                 />
                             ))}
                         </div>
