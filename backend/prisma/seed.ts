@@ -4,6 +4,9 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
 
 const connectionString = `${process.env.DATABASE_URL}`;
+if (!connectionString) {
+  throw new Error('DATABASE_URL no está configurado');
+}
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
@@ -12,7 +15,6 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log('🌱 Starting seeding...');
 
-    // Creacion Caracteristicas Vivienda junto con sus opciones 
     console.log("Seeding housing characteristics and options");
     const characteristicsData = [
         {
@@ -78,9 +80,6 @@ async function main() {
         }
     }
 
-    /*
-        Creacion del nivel educativo
-    */
     const educationLevelData = [
         {
             name: 'Sin nivel',
@@ -157,9 +156,6 @@ async function main() {
         console.log('Education level synced:', level.name);
     }
 
-    /**
-     * Creacion de la condicion en el trabajo
-     */
     const workConditionData = [
         {
             name: 'Patrono',
@@ -190,10 +186,7 @@ async function main() {
         });
         console.log('Work condition synced:', condition.name);
     }
-
-    /**
-     * Creacion de la condicion de actividad
-     */
+    
     const activityConditionData = [
         {
             name: 'Ama de casa',
