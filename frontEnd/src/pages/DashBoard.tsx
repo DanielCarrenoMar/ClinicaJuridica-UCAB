@@ -5,6 +5,7 @@ import AccionCard from "#components/ActionCard.tsx";
 import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
 import type { CaseActionModel } from "#domain/models/caseAction.ts";
+import TextInput from "#components/TextInput.tsx";
 
 const mockActions: CaseActionModel[] = [
     {
@@ -14,7 +15,7 @@ const mockActions: CaseActionModel[] = [
         actionNumber: 1,
         idCase: 1,
         notes: null,
-        userId: 3112312,
+        userId: "3112312",
         userNacionality: "V",
         description: "Actualización de expediente: Incorporación de boleta de notificación."
     },
@@ -25,7 +26,7 @@ const mockActions: CaseActionModel[] = [
         actionNumber: 2,
         idCase: 2,
         notes: null,
-        userId: 31512340,
+        userId: "31512340",
         userNacionality: "V",
         description: "Envío de reporte mensual de avances estratégicos."
     },
@@ -36,7 +37,7 @@ const mockActions: CaseActionModel[] = [
         actionNumber: 3,
         idCase: 3,
         notes: null,
-        userId: 31522270,
+        userId: "31522270",
         userNacionality: "V",
         description: "Redacción de recurso de apelación."
     },
