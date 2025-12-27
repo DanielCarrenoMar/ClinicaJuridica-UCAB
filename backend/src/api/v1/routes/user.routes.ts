@@ -18,7 +18,4 @@ router.put('/:id', userController.updateUser);
 // DELETE /api/v1/users/:id - Eliminar un usuario
 router.delete('/:id', userController.deleteUser);
 
-// POST /api/v1/users/seed - Poblar la base de datos con usuarios de prueba
-router.post('/seed', userController.seedUsers);
-
 export default router;

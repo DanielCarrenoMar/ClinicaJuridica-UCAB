@@ -1,191 +1,106 @@
 import type { Request, Response } from 'express';
 import applicantService from '../services/applicant.service.js';
 
-export const getAllApplicants = async (req: Request, res: Response): Promise<void> => {
+export async function getAllApplicants(req: Request, res: Response): Promise<void> {
   try {
     const result = await applicantService.getAllApplicants();
-    if (result && result.data) {
-      res.json(result.data);
-    } else {
-      res.json(result); 
-    }
+    res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ error: errorMessage });
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Obtener un solicitante por ID
-export const getApplicantById = async (req: Request, res: Response): Promise<void> => {
+export async function getApplicantById(req: Request, res: Response): Promise<void> {
   try {
-    const id = req.params.id;
+    const id = req.params.id; // La cédula es un String en tu esquema
     
     if (!id) {
-      res.status(400).json({
-        success: false,
-        message: 'ID no proporcionado'
-      });
+      res.status(400).json({ success: false, message: 'Cédula no proporcionada' });
       return;
     }
+
+    const result = await applicantService.getApplicantById(id);
     
-    const applicantId = parseInt(id);
-
-    if (isNaN(applicantId)) {
-      res.status(400).json({
-        success: false,
-        message: 'ID debe ser un número'
-      });
+    if (!result) {
+      res.status(404).json({ success: false, message: 'Solicitante no encontrado' });
       return;
     }
 
-    const result = await applicantService.getApplicantById(applicantId);
-    
-    if (!result.success) {
-      res.status(404).json(result);
-      return;
-    }
-
-    res.json(result);
+    res.status(200).json({ success: true, data: result });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ success: false, message: 'Error interno del servidor', error: errorMessage });
   }
-};
+}
 
-// Buscar solicitantes
-export const searchApplicants = async (req: Request, res: Response): Promise<void> => {
+export async function searchApplicants(req: Request, res: Response): Promise<void> {
   try {
     const { q } = req.query;
     
     if (!q || typeof q !== 'string') {
-      res.status(400).json({
-        success: false,
-        message: 'Término de búsqueda requerido'
-      });
+      res.status(400).json({ success: false, message: 'Término de búsqueda requerido' });
       return;
     }
 
     const result = await applicantService.searchApplicants(q);
-    res.json(result);
+    res.status(200).json({ success: true, data: result });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Crear un nuevo solicitante
-export const createApplicant = async (req: Request, res: Response): Promise<void> => {
+export async function createApplicant(req: Request, res: Response): Promise<void> {
   try {
     const applicantData = req.body;
 
-    // Validación que ya tenías
-    if (!applicantData.firstName || !applicantData.lastName || !applicantData.email) {
+    // Validación según los nombres de tu esquema (identityCard, name)
+    if (!applicantData.identityCard || !applicantData.name || !applicantData.email) {
       res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: firstName, lastName, email'
+        message: 'Faltan campos requeridos: cédula, nombre o correo'
       });
       return;
     }
 
     const result = await applicantService.createApplicant(applicantData);
-    
-    if (!result.success) {
-      res.status(400).json(result);
-      return;
-    }
-
-    // Devolvemos el dato creado para que el front lo vea
-    res.status(201).json(result.data || result);
+    res.status(201).json({ success: true, data: result });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Actualizar un solicitante
-export const updateApplicant = async (req: Request, res: Response): Promise<void> => {
+export async function updateApplicant(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
-    const applicantId = parseInt(id);
-    
-    if (isNaN(applicantId)) {
-      res.status(400).json({
-        success: false,
-        message: 'ID inválido'
-      });
-      return;
-    }
-
-    const applicantData = req.body;
-    const result = await applicantService.updateApplicant(applicantId, applicantData);
-    
-    res.json(result);
+    const result = await applicantService.updateApplicant(id, req.body);
+    res.status(200).json({ success: true, data: result });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Eliminar un solicitante
-export const deleteApplicant = async (req: Request, res: Response): Promise<void> => {
+export async function deleteApplicant(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
-    const applicantId = parseInt(id);
-    
-    if (isNaN(applicantId)) {
-      res.status(400).json({
-        success: false,
-        message: 'ID inválido'
-      });
-      return;
-    }
-
-    const result = await applicantService.deleteApplicant(applicantId);
-    res.json(result);
+    await applicantService.deleteApplicant(id);
+    res.status(200).json({ success: true, message: 'Solicitante eliminado' });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
 
-// Obtener casos de un solicitante
-export const getApplicantCases = async (req: Request, res: Response): Promise<void> => {
+export async function getApplicantCases(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
-    const applicantId = parseInt(id);
-    
-    if (isNaN(applicantId)) {
-      res.status(400).json({
-        success: false,
-        message: 'ID inválido'
-      });
-      return;
-    }
-
-    const result = await applicantService.getApplicantCases(applicantId);
-    res.json(result);
+    const result = await applicantService.getApplicantCases(id);
+    res.status(200).json({ success: true, data: result });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: errorMessage
-    });
+    res.status(500).json({ success: false, error: errorMessage });
   }
-};
+}
