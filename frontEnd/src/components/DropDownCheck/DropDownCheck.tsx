@@ -62,16 +62,16 @@ export default function DropDownCheck({ label, children, selectedValues, onSelec
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-surface/70 border border-black border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:surface transition-colors"
+          className="bg-surface/70 border border-onSurface border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:surface transition-colors"
         >
-          <p className="font-['Poppins'] text-[13px] text-black text-nowrap">
+          <p className="font-['Poppins'] text-[13px] text-onSurface text-nowrap">
             {label}
           </p>
           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {isOpen && (
-          <div className="absolute left-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10 overflow-hidden">
+          <div className="absolute left-0 mt-2 w-56 origin-top-right rounded-md bg-surface border border-onSurface focus:outline-none z-10 overflow-hidden">
             <div className="py-1 max-h-60 overflow-y-auto" role="none">
               {children}
             </div>

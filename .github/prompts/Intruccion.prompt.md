@@ -15,7 +15,7 @@ agent: agent
 - **Comentarios**: Evita comentarios obvios o innecesarios. El código debe ser autoexplicativo.
 
 ## Estilos (Tailwind CSS)
-- **Framework**: Usa Tailwind CSS.
+- **Framework**: Usa Tailwind CSS V4.
 - **Variables**: Implementa los estilos utilizando las variables CSS definidas en `index.css` (ej. `bg-[var(--surface)]`).
 - **Consistencia**: Usa las clases de utilidad predefinidas de Tailwind siempre que sea posible. Evita valores arbitrarios (ej. `w-[123px]`) a menos que correspondan a tokens de diseño específicos.
 
