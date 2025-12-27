@@ -37,7 +37,7 @@ function SearchCases() {
                 <p>{courtFilters.join(', ')}</p>
                 <p>{termFilters.join(', ')}</p>
             </span>
-            <div className="mb-3 ms-3">
+            <div className="mb-3">
                 <h3 className="text-body-large">
                     Filtros
                 </h3>
