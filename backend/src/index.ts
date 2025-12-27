@@ -1,13 +1,12 @@
-import { PrismaClient } from './generated/client.js';
+import { PrismaClient } from '../prisma/generated/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import express from 'express';
 import cors from 'cors'
 
 import apiRoutes from './api/v1/routes/index.js';
-import userService from './api/v1/services/user.service.js';
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
@@ -24,6 +23,10 @@ app.use((req, res, next) => {
 
 app.use('/api/v1', apiRoutes);
 
-app.listen(port, async () => {
+const server = app.listen(port, async () => {
   console.log(`🚀 Servidor en http://localhost:${port}`);
+});
+
+server.on('error', (error) => {
+  console.error('❌ Error al iniciar el servidor:', error);
 });
