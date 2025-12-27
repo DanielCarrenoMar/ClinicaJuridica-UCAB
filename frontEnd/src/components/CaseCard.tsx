@@ -28,16 +28,16 @@ export default function CaseCard({ caseData }: CaseCardProps) {
 
     return (
         <div className="bg-surface/70 flex flex-col gap-1 h-28 overflow-hidden relative rounded-3xl w-full max-w-5xl">
-            <header className={`flex align-middle items-center justify-between relative ${config.color} px-4 py-2.5`}>
-                <h4 className="font-medium text-body-medium text-surface">
+            <header className={`flex text-surface justify-between relative ${config.color} px-4 pt-2.5 pb-2`}>
+                <h4 className="text-body-medium ">
                     {compoundKey}
                 </h4>
-                <h5 className="font-normal text-body-small text-surface">
+                <h5 className="text-body-small">
                     {formattedDate}
                 </h5>
             </header>
 
-            <div className="flex gap-2.5 h-14 items-start relative text-body-small w-full px-4 py-2.5">
+            <div className="flex gap-2.5 items-start relative text-body-small w-full px-4 py-2">
                 <div className="flex flex-col gap-1 justify-center min-w-40">
                     <span className="flex gap-1 items-center">
                         <User/>
