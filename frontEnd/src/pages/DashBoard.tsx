@@ -90,7 +90,7 @@ function DashBoard() {
                     </Box>
                     <Box className="col-span-2 h-fit flex flex-col">
                         <h2 className="text-label-small text-onSurface mb-4">Estado de Casos</h2>
-                        <div className="flex-1 flex items-start">
+                        <div className="flex-1 flex mx-4 max-w-72">
                             <CasesDonutChart />
                         </div>
                     </Box>
