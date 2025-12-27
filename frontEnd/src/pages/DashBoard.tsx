@@ -6,6 +6,7 @@ import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
 import type { CaseActionModel } from "#domain/models/caseAction.ts";
 import TextInput from "#components/TextInput.tsx";
+import { useNavigate } from "react-router";
 
 const mockActions: CaseActionModel[] = [
     {
@@ -44,11 +45,13 @@ const mockActions: CaseActionModel[] = [
 ];
 
 function DashBoard() {
+    const navigate = useNavigate()
+
     return (
         <LateralMenuLayer locationId='home'>
             <div className="flex flex-col gap-3 h-full">
                 <section className="flex">
-                    <Button className="h-14 w-96">
+                    <Button className="h-14 w-96" onClick={() => navigate('/crearCaso')}>
                         Nuevo Caso
                     </Button>
                 </section>
