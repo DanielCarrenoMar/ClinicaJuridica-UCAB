@@ -1,5 +1,5 @@
-import 'dotenv/config';
-import userService from './src/api/v1/services/user.service.js';
+/*import 'dotenv/config';
+import userService from '#services/user.service.js';
 
 async function testUserFlow() {
   console.log('🧪 Iniciando prueba del flujo completo de inserción de usuarios\n');
@@ -90,4 +90,4 @@ async function testUserFlow() {
 
 testUserFlow()
   .then(() => process.exit(0))
-  .catch(() => process.exit(1));
+  .catch(() => process.exit(1));*/

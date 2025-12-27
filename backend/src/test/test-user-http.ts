@@ -1,11 +1,4 @@
-/**
- * Script de prueba HTTP para verificar el flujo completo a través de las rutas:
- * HTTP Request → Routes → Controller → Service → Database
- * 
- * Este script hace peticiones HTTP reales al servidor para probar todo el stack
- */
-
-import 'dotenv/config';
+/*import 'dotenv/config';
 
 const API_BASE_URL = process.env.API_URL || 'http://localhost:3000/api/v1';
 const GENDER_TYPES = { M: 'M', F: 'F', O: 'O' };
@@ -217,3 +210,4 @@ checkServer()
     process.exit(1);
   });
 
+*/

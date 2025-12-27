@@ -4,6 +4,11 @@
   "description": "",
   "type": "module",
   "main": "dist/index.js",
+  "imports": {
+    "#services/*": "./src/api/v1/services/*",
+    "#controllers/*": "./src/api/v1/controllers/*",
+    "#routes/*": "./src/api/v1/routes/*"
+  },
   "scripts": {
     "dev": "tsx src/index.ts",
     "generate": "prisma generate",
