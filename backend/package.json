@@ -7,7 +7,8 @@
   "imports": {
     "#services/*": "./src/api/v1/services/*",
     "#controllers/*": "./src/api/v1/controllers/*",
-    "#routes/*": "./src/api/v1/routes/*"
+    "#routes/*": "./src/api/v1/routes/*",
+    "#src/*": "./src/*"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
