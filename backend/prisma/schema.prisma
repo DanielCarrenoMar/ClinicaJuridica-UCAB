@@ -144,7 +144,7 @@ model Subject {
 }
 
 model User {
-  identityCard Int      @id
+  identityCard String   @id @db.VarChar(20)
   name         String   @db.VarChar(63)
   gender       Gender?
   email        String   @unique @db.VarChar(35)
@@ -163,7 +163,7 @@ model User {
 }
 
 model Coordinator {
-  identityCard Int @id
+  identityCard String @id @db.VarChar(20)
 
   user User @relation(fields: [identityCard], references: [identityCard], onDelete: Cascade, onUpdate: Cascade)
 }
@@ -248,7 +248,7 @@ model LegalArea {
 }
 
 model Teacher {
-  identityCard Int
+  identityCard String      @db.VarChar(20)
   term         String      @db.VarChar(10)
   type         TeacherType
 
@@ -261,7 +261,7 @@ model Teacher {
 }
 
 model Student {
-  identityCard Int
+  identityCard String      @db.VarChar(20)
   term         String      @db.VarChar(10)
   nrc          String?     @db.VarChar(12)
   type         StudentType
@@ -275,7 +275,7 @@ model Student {
 }
 
 model Beneficiary {
-  identityCard Int             @id
+  identityCard String          @id @db.VarChar(20)
   gender       Gender
   birthDate    DateTime        @db.Date
   name         String          @db.VarChar(63)
@@ -293,7 +293,7 @@ model Beneficiary {
 }
 
 model Applicant {
-  identityCard      Int            @id
+  identityCard      String         @id @db.VarChar(20)
   email             String?        @db.VarChar(35)
   cellPhone         String?        @db.VarChar(20)
   homePhone         String?        @db.VarChar(20)
@@ -324,7 +324,7 @@ model Applicant {
 }
 
 model Housing {
-  applicantId   Int  @id
+  applicantId   String @id @db.VarChar(20)
   bathroomCount Int?
   bedroomCount  Int?
 
@@ -335,7 +335,7 @@ model Housing {
 model HousingDetail {
   idCharacteristic Int
   detailNumber     Int
-  applicantId      Int
+  applicantId      String @db.VarChar(20)
 
   characteristicDetail CharacteristicDetail @relation(fields: [idCharacteristic, detailNumber], references: [idCharacteristic, detailNumber], onDelete: Restrict, onUpdate: Cascade)
   housing              Housing              @relation(fields: [applicantId], references: [applicantId], onDelete: Cascade, onUpdate: Cascade)
@@ -344,7 +344,7 @@ model HousingDetail {
 }
 
 model FamilyHome {
-  applicantId          Int      @id
+  applicantId          String   @id @db.VarChar(20)
   memberCount          Int?
   workingMemberCount   Int?
   children7to12Count   Int?
@@ -360,11 +360,11 @@ model Case {
   createdAt      DateTime    @default(now())
   processType    ProcessType
 
-  applicantId Int
+  applicantId String @db.VarChar(20)
   idNucleus   Int
   term        String @db.VarChar(10)
   idLegalArea Int
-  teacherId   Int
+  teacherId   String @db.VarChar(20)
   teacherTerm String @db.VarChar(10)
   idCourt     Int?
 
@@ -385,7 +385,7 @@ model Case {
 
 model CaseBeneficiary {
   idCase        Int
-  beneficiaryId Int
+  beneficiaryId String              @db.VarChar(20)
   relationship  String              @db.VarChar(200)
   type          CaseBeneficiaryType
   description   String              @db.VarChar(200)
@@ -414,7 +414,7 @@ model CaseAction {
   actionNumber Int
   description  String
   notes        String?
-  userId       Int
+  userId       String   @db.VarChar(20)
   registryDate DateTime
 
   case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
@@ -430,7 +430,7 @@ model Appointment {
   executionDate     DateTime?
   status            AppointmentStatus
   guidance          String?
-  userId            Int
+  userId            String            @db.VarChar(20)
   registryDate      DateTime
 
   case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
@@ -444,7 +444,7 @@ model CaseStatus {
   statusNumber Int
   status       CaseStatusEnum
   reason       String?
-  userId       Int
+  userId       String         @db.VarChar(20)
   registryDate DateTime
 
   case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
@@ -455,7 +455,7 @@ model CaseStatus {
 
 model AssignedStudent {
   idCase    Int
-  studentId Int
+  studentId String @db.VarChar(20)
   term      String @db.VarChar(10)
 
   case    Case    @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
