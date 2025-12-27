@@ -1,5 +1,5 @@
 import type { CaseModel } from "#domain/models/case.ts";
-import type { CaseStatus } from "#domain/models/CaseStatus.ts";
+import type { CaseStatus } from "#domain/models/caseStatus.ts";
 import { Book, ScaleBalanced, User } from "flowbite-react-icons/solid";
 
 interface CaseCardProps {
