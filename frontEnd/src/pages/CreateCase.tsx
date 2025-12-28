@@ -7,15 +7,16 @@ import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
 import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
-import type { CaseModel } from "#domain/models/case.ts";
 import type { CaseDAO } from "#database/daos/CaseDAO.ts";
-import type { AppointmentDAO } from "#database/daos/AppointmentDAO.ts";
+import { defaultApplicantModel, type ApplicantModel } from "#domain/models/applicant.ts";
 
 export type CaseOutletContext = {
     caseDAO: CaseDAO;
     setCaseDAO: Dispatch<SetStateAction<CaseDAO>>;
-    appointmentDAO: AppointmentDAO;
-    setAppointmentDAO: Dispatch<SetStateAction<AppointmentDAO>>;
+    updateCaseDAO: (updatedFields: Partial<CaseDAO>) => void;
+    applicantModel: ApplicantModel;
+    setApplicantModel: Dispatch<SetStateAction<ApplicantModel>>;
+    updateApplicantModel: (updatedFields: Partial<ApplicantModel>) => void;
 };
 
 export function useCaseOutletContext() {
@@ -26,8 +27,22 @@ function CreateCase() {
     const navigate = useNavigate();
     const locatetion = useLocation();
     const [caseDAO, setCaseDAO] = useState<CaseDAO>();
-    const [appointmentDAO, setAppointmentDAO] = useState<AppointmentDAO>();
+    const [applicantModel, setApplicantModel] = useState<ApplicantModel>(defaultApplicantModel);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
+    function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
+        setCaseDAO((prev) => ({
+            ...prev,
+            ...updatedFields,
+        } as CaseDAO));
+    }
+
+    function updateApplicantModel(updatedFields: Partial<ApplicantModel>) {
+        setApplicantModel((prev) => ({
+            ...prev,
+            ...updatedFields,
+        } as ApplicantModel));
+    }
 
     const isApplicantStep = locatetion.pathname.includes("solicitante");
 
@@ -56,7 +71,7 @@ function CreateCase() {
                     </div>
                 </header>
                 <div className="px-4 pb-6">
-                    {/*<Outlet context={{ caseDAO, setCaseDAO, appointmentDAO, setAppointmentDAO }} />*/}
+                    <Outlet context={{ caseDAO, setCaseDAO, updateCaseDAO, applicantModel, setApplicantModel, updateApplicantModel }} />
                 </div>
                 <ConfirmDialog
                     open={showCancelConfirm}
