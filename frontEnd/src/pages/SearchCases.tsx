@@ -13,8 +13,7 @@ function SearchCases() {
     const caseTypeFilters = searchParams.getAll('caseType');
     const courtFilters = searchParams.getAll('court');
     const termFilters = searchParams.getAll('term');
-    const { cases } = useCase();
-    console.log(cases);
+    const { cases, loading } = useCase();
 
     const getFilterValues = (key: string) => {
         const param = searchParams.get(key);
@@ -89,68 +88,18 @@ function SearchCases() {
                 </span>
             </div>
             <ul className="flex flex-col gap-3">
-                <li>
-                    <CaseCard caseData={{
-                        compoundKey: "CASE-12345",
-                        applicantId: "1",
-                        id: 12345,
-                        idLegalArea: 2,
-                        idNucleus: 3,
-                        processType: "IN_PROGRESS",
-                        teacherId: "4",
-                        teacherName: "Dr. Gómez",
-                        teacherTerm: "2023-1",
-                        term: "2023-1",
-                        idCourt: 5,
-                        createAt: new Date(),
-                        applicantName: "Juan Pérez",
-                        legalAreaName: "Derecho Civil",
-                        problemSummary: "Disputa contractual entre dos partes.",
-                        CasesStatus: "CLOSED",
-                        lastAction: {
-                            idCase: 12345,
-                            caseCompoundKey: "CASE-12345",
-                            userNacionality: "V",
-                            userName: "María López",
-                            actionNumber: 1,
-                            description: "Revisión inicial del caso.",
-                            notes: null,
-                            userId: "user-001",
-                            registryDate: new Date(),
-                        },
-                    }} />
-                </li>
-                <li>
-                    <CaseCard caseData={{
-                        compoundKey: "CASE-12345",
-                        applicantId: "1",
-                        id: 12345,
-                        idLegalArea: 2,
-                        idNucleus: 3,
-                        processType: "IN_PROGRESS",
-                        teacherId: "4",
-                        teacherName: "Dr. Gómez",
-                        teacherTerm: "2023-1",
-                        term: "2023-1",
-                        idCourt: 5,
-                        createAt: new Date(),
-                        applicantName: "Juan Pérez",
-                        legalAreaName: "Derecho Civil",
-                        problemSummary: "Disputa contractual entre dos partes.",
-                        CasesStatus: "OPEN",
-                        lastAction: {
-                            idCase: 12345,
-                            caseCompoundKey: "CASE-12345",
-                            userNacionality: "V",
-                            userName: "María López",
-                            actionNumber: 1,
-                            description: "Revisión inicial del caso.",
-                            notes: null,
-                            userId: "user-001",
-                            registryDate: new Date(),
-                        },
-                    }} />
-                </li>
+                {
+                    loading && (
+                        <li>Cargando casos...</li>
+                    )
+                }
+                {
+                    !loading && cases.map(caseData => (
+                        <li key={caseData.compoundKey}>
+                            <CaseCard caseData={caseData} />
+                        </li>
+                    ))
+                }
             </ul>
         </LateralMenuLayer>
     );
