@@ -13,3 +13,17 @@ export interface CaseDAO {
   teacherTerm: string;
   idCourt?: number;
 }
+
+export const defaultCaseDAO: CaseDAO = {
+  idCase: 0,
+  problemSummary: "",
+  createdAt: new Date(),
+  processType: "A",
+  applicantId: "",
+  idNucleus: 0,
+  term: "",
+  idLegalArea: 0,
+  teacherId: "",
+  teacherTerm: "",
+  idCourt: undefined,
+};

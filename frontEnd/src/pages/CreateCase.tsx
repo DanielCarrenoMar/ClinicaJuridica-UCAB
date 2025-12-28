@@ -7,7 +7,7 @@ import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
 import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
-import type { CaseDAO } from "#database/daos/CaseDAO.ts";
+import { defaultCaseDAO, type CaseDAO } from "#database/daos/CaseDAO.ts";
 import { defaultApplicantModel, type ApplicantModel } from "#domain/models/applicant.ts";
 
 export type CaseOutletContext = {
@@ -26,7 +26,7 @@ export function useCaseOutletContext() {
 function CreateCase() {
     const navigate = useNavigate();
     const locatetion = useLocation();
-    const [caseDAO, setCaseDAO] = useState<CaseDAO>();
+    const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
     const [applicantModel, setApplicantModel] = useState<ApplicantModel>(defaultApplicantModel);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
@@ -52,7 +52,7 @@ function CreateCase() {
                 <header className="bg-surface/70 flex items-center justify-between px-4 h-16">
                     <div className="flex items-center gap-2.5">
                         <UserEditS className="size-8!" />
-                        <h1 className="text-label-medium">Crear caso</h1>
+                        <h1 className="text-label-medium">{isApplicantStep ? "Solicitante" : "Caso"}</h1>
                     </div>
                     <div className="flex items-end gap-2.5">
                         {isApplicantStep ? (

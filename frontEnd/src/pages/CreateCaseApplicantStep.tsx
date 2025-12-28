@@ -8,7 +8,7 @@ import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { SexType, IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
 
 function CreateCaseApplicantStep() {
-    const { applicantModel, updateApplicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
+    const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const [activeStep, setActiveStep] = useState("identificacion");
 
     return (
