@@ -4,6 +4,7 @@ export type CaseStatus = "OPEN" | "IN_PROGRESS" | "PAUSED" | "CLOSED";
 
 export interface CaseStatusModel {
     idCase: number;
+    caseCompoundKey: string;
     statusNumber: number;
     status: CaseStatus;
     reason: string | null;
