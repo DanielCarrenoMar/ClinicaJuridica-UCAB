@@ -2,6 +2,7 @@ import express from 'express';
 import caseRoutes from './case.routes.js';
 import applicantRoutes from './applicant.routes.js';
 import userRoutes from './user.routes.js';
+import { config } from 'dotenv';
 
 const router = express.Router();
 
@@ -14,7 +15,8 @@ router.get('/test', (req, res) => {
       casos: '/cases',
       solicitantes: '/applicants',  
       beneficiarios: '/beneficiaries (próximamente)',
-      estadisticas: '/stats (próximamente)'
+      estadisticas: '/stats (próximamente)',
+      config: '/config'
     }
   });
 });
@@ -27,5 +29,8 @@ router.use('/applicants', applicantRoutes);
 
 // Usar rutas de usuarios
 router.use('/users', userRoutes);
+
+//Usar rutas de config
+router.use('/config', config);
 
 export default router;
