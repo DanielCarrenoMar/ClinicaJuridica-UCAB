@@ -58,7 +58,7 @@ export function getCaseRepository(): CaseRepository {
 
     return {
         findAllCases: async () => {
-            const response = (await fetch(API_URL));
+            const response = await fetch(API_URL);
             const caseDAO: CaseDAO[] = (await response.json()).data;
             return caseDAO.map(daoToCaseModel);
         },
