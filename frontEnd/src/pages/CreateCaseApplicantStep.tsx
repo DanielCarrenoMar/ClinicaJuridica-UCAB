@@ -10,7 +10,7 @@ import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { SexType, IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
 
 function CreateCaseApplicantStep() {
-    const { applicantModel, updateApplicantModel } = useCaseOutletContext();
+    const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const [activeStep, setActiveStep] = useState("identificacion");
 
     const identificationInputs = (
@@ -18,16 +18,16 @@ function CreateCaseApplicantStep() {
             <div className="col-span-5">
                 <TitleTextInput
                     label="Cedula"
-                    value={applicantModel.beneficiary.identityCard}
-                    onChange={(text) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, identityCard: text } }); }}
+                    value={applicantModel.identityCard}
+                    onChange={(text) => { updateApplicantModel({ identityCard: text }); }}
                     placeholder="V-12345678"
                 />
             </div>
             <div className="col-span-7">
                 <TitleTextInput
                     label="Nombres y Apellidos"
-                    value={applicantModel.beneficiary.name}
-                    onChange={(text) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, name: text } }); }}
+                    value={applicantModel.fullName}
+                    onChange={(text) => { updateApplicantModel({ fullName: text }); }}
                     placeholder="Juan Perez"
                 />
             </div>
@@ -35,16 +35,16 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3">
                 <TitleTextInput
                     label="Fecha Nacimiento"
-                    value={applicantModel.beneficiary.birthDate.toLocaleDateString()}
-                    onChange={(text) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, birthDate: new Date(text) } }); }}
+                    value={applicantModel.birthDate.toLocaleDateString()}
+                    onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
                     placeholder="DD/MM/AAAA"
                 />
             </div>
             <div className="col-span-2">
                 <TitleDropdown
                     label="Sexo"
-                    selectedValue={applicantModel.beneficiary.gender || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, gender: value as SexType } }); }}
+                    selectedValue={applicantModel.gender || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as SexType }); }}
                 >
                     <DropDownOption value="M">Masculino</DropDownOption>
                     <DropDownOption value="F">Femenino</DropDownOption>
@@ -53,8 +53,8 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3">
                 <TitleDropdown
                     label="Nacionalidad"
-                    selectedValue={applicantModel.beneficiary.idType || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, idType: value as IdNacionality } }); }}
+                    selectedValue={applicantModel.idNationality || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ idNationality: value as IdNacionality }); }}
                 >
                     <DropDownOption value="V">Venezolana</DropDownOption>
                     <DropDownOption value="E">Extranjera</DropDownOption>
@@ -158,24 +158,24 @@ function CreateCaseApplicantStep() {
             <div className="col-span-4">
                 <TitleTextInput
                     label="Estado"
-                    value={applicantModel.beneficiary.stateName ?? ""}
-                    onChange={(text) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, stateName: text } }); }}
+                    value={applicantModel.stateName ?? ""}
+                    onChange={(text) => { updateApplicantModel({ stateName: text }); }}
                     placeholder="Bolivar"
                 />
             </div>
             <div className="col-span-4">
                 <TitleTextInput
                     label="Municipio"
-                    value={applicantModel.beneficiary.municipalityName ?? ""}
-                    onChange={(text) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, municipalityName: text } }); }}
+                    value={applicantModel.municipalityName ?? ""}
+                    onChange={(text) => { updateApplicantModel({ municipalityName: text }); }}
                     placeholder="Caroni"
                 />
             </div>
             <div className="col-span-4">
                 <TitleTextInput
                     label="Parroquia"
-                    value={applicantModel.beneficiary.parishName ?? ""}
-                    onChange={(text) => { updateApplicantModel({ beneficiary: { ...applicantModel.beneficiary, parishName: text } }); }}
+                    value={applicantModel.parishName ?? ""}
+                    onChange={(text) => { updateApplicantModel({ parishName: text }); }}
                     placeholder="Unare"
                 />
             </div>

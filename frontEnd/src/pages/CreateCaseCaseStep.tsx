@@ -4,7 +4,7 @@ import TitleTextInput from "#components/TitleTextInput.tsx";
 import { useCaseOutletContext } from "./CreateCase.tsx";
 
 function CreateCaseCaseStep() {
-    const { applicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
+    const { applicantModel, caseDAO, updateCaseDAO} = useCaseOutletContext();
 
     return (
         <div className="grid grid-cols-12 gap-x-6 gap-y-6">
@@ -90,7 +90,7 @@ function CreateCaseCaseStep() {
             </div>
             <div className="col-span-12 text-body-medium text-onSurface/80">
                 <p>
-                    Solicitante seleccionado: <span className="font-semibold">{applicantModel.beneficiary.name || "Pendiente"}</span>
+                    Solicitante seleccionado: <span className="font-semibold">{applicantModel.fullName || "Pendiente"}</span>
                 </p>
             </div>
         </div>

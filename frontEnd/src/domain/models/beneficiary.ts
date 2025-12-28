@@ -6,8 +6,8 @@ export interface BeneficiaryModel {
     identityCard: PersonID;
     gender: SexType;
     birthDate: Date;
-    name: string;
-    idType: IdNacionality;
+    fullName: string;
+    idNationality: IdNacionality;
     hasId: boolean;
     type: BeneficiaryType;
     idState?: number;
