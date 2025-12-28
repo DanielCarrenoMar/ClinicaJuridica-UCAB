@@ -1,5 +1,6 @@
 import type { ApplicantModel } from "./models/applicant"
 import type { BeneficiaryModel } from "./models/beneficiary";
+import type { CaseModel } from "./models/case";
 
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
@@ -19,4 +20,12 @@ export interface ApplicantRepository {
     update(id: string, data: Partial<ApplicantModel>): Promise<ApplicantModel>;
 
     delete(id: string): Promise<void>;
+}
+
+export interface CaseRepository {
+    findAllCases(): Promise<CaseModel[]>;
+    findCaseById(id: string): Promise<CaseModel | null>;
+    createCase(data: CaseModel): Promise<CaseModel>;
+    updateCase(id: string, data: Partial<CaseModel>): Promise<CaseModel>;
+    deleteCase(id: string): Promise<void>;
 }

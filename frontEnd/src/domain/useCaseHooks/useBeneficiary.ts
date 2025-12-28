@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import type { Beneficiary } from '../models/beneficiary';
-import { getBeneficiaryRepository } from '#database/databaseRepositories';
+import type { BeneficiaryModel } from '../models/beneficiary';
+import { getBeneficiaryRepository } from '../../data/database/databaseRepositories';
 
 export function useBeneficiary() {
-    const {createBeneficiary, deleteBeneficiary, findAllBeneficiaries, updateBeneficiary} = getBeneficiaryRepository();
-    const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+    const { createBeneficiary, deleteBeneficiary, findAllBeneficiaries, updateBeneficiary } = getBeneficiaryRepository();
+    const [beneficiaries, setBeneficiaries] = useState<BeneficiaryModel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -25,7 +25,7 @@ export function useBeneficiary() {
         }
     };
 
-    const addBeneficiary = async (beneficiary: Beneficiary) => {
+    const addBeneficiary = async (beneficiary: BeneficiaryModel) => {
         try {
             const newBeneficiary = await createBeneficiary(beneficiary);
             setBeneficiaries(prev => [...prev, newBeneficiary]);
@@ -35,10 +35,10 @@ export function useBeneficiary() {
         }
     };
 
-    const editBeneficiary = async (id: string, data: Partial<Beneficiary>) => {
+    const editBeneficiary = async (id: string, data: Partial<BeneficiaryModel>) => {
         try {
             const updatedBeneficiary = await updateBeneficiary(id, data);
-            setBeneficiaries(prev => prev.map(b => b.idBeneficiary === id ? updatedBeneficiary : b));
+            setBeneficiaries(prev => prev.map(b => b.identityCard === id ? updatedBeneficiary : b));
         } catch (err) {
             setError(err as Error);
             throw err;
@@ -48,16 +48,16 @@ export function useBeneficiary() {
     const removeBeneficiary = async (id: string) => {
         try {
             await deleteBeneficiary(id);
-            setBeneficiaries(prev => prev.filter(b => b.idBeneficiary !== id));
+            setBeneficiaries(prev => prev.filter(b => b.identityCard !== id));
         } catch (err) {
             setError(err as Error);
             throw err;
         }
     };
 
-    return { 
-        beneficiaries, 
-        loading, 
+    return {
+        beneficiaries,
+        loading,
         error,
         refresh: loadBeneficiaries,
         addBeneficiary,
