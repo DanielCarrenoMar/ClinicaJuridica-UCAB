@@ -1,3 +1,5 @@
+import type { CaseDAO } from "#database/daos/CaseDAO.ts";
+import type { ProcessTypeDAO } from "#database/daos/typesDAO.ts";
 import type { PersonID } from "#domain/mtypes.ts";
 import type { CaseActionModel } from "./caseAction";
 import type { CaseStatus } from "./caseStatus";
@@ -23,7 +25,42 @@ export interface CaseModel {
     teacherId: PersonID;
     teacherName: string;
     teacherTerm: string;
-    idCourt: number | null;
+    idCourt?: number;
     CasesStatus: CaseStatus;
-    lastAction: CaseActionModel | null;
+    lastAction?: CaseActionModel;
+}
+
+function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
+    switch (processTypeDAO) {
+        case "A":
+            return "ADVICE";
+        case "CM":
+            return "MEDIATION";
+        case "R":
+            return "DRAFTING";
+        case "T":
+            return "IN_PROGRESS";
+    }
+}
+
+export function daoToCaseModel(dao: CaseDAO): CaseModel {
+    return {
+        id: dao.idCase,
+        compoundKey: "proceso",
+        processType: processTypeDAOToModel(dao.processType),
+        problemSummary: dao.problemSummary,
+        createAt: new Date(dao.createdAt),
+        applicantId: dao.applicantId,
+        applicantName: "proceso",
+        idNucleus: dao.idNucleus,
+        term: dao.term,
+        idLegalArea: dao.idLegalArea,
+        legalAreaName: "proceso",
+        teacherId: dao.teacherId,
+        teacherName: "proceso",
+        teacherTerm: dao.teacherTerm,
+        idCourt: dao.idCourt,
+        CasesStatus: null as any,
+        lastAction: null as any,
+    }
 }

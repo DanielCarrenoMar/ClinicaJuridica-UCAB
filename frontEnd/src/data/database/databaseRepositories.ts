@@ -1,4 +1,6 @@
+import { daoToCaseModel } from "#domain/models/case.ts";
 import type { ApplicantRepository, BeneficiaryRepository, CaseRepository } from "../../domain/repositories";
+import type { CaseDAO } from "./daos/CaseDAO";
 
 export function getBeneficiaryRepository(): BeneficiaryRepository {
     const API_URL = "http://localhost:3000/api/v1/applicants";
@@ -56,8 +58,9 @@ export function getCaseRepository(): CaseRepository {
 
     return {
         findAllCases: async () => {
-            const response = await fetch(API_URL);
-            return await response.json();
+            const response = (await fetch(API_URL));
+            const caseDAO: CaseDAO[] = (await response.json()).data;
+            return caseDAO.map(daoToCaseModel);
         },
         findCaseById: async (id) => {
             const response = await fetch(`${API_URL}/${id}`);

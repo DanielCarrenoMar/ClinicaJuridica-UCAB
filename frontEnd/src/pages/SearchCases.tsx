@@ -4,6 +4,7 @@ import DropDownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.t
 import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
 import { useSearchParams } from "react-router";
 import { useCallback } from "react";
+import { useCase } from "#domain/useCaseHooks/useCase.ts";
 
 function SearchCases() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -12,6 +13,8 @@ function SearchCases() {
     const caseTypeFilters = searchParams.getAll('caseType');
     const courtFilters = searchParams.getAll('court');
     const termFilters = searchParams.getAll('term');
+    const { cases } = useCase();
+    console.log(cases);
 
     const getFilterValues = (key: string) => {
         const param = searchParams.get(key);
