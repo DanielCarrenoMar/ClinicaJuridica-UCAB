@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { BeneficiaryModel } from '../models/beneficiary';
-import { getBeneficiaryRepository } from '../../data/database/databaseRepositories';
+import { getBeneficiaryRepository } from '#database/repositoryImp/BeneficiaryRepositoryImp.ts';
 
 export function useBeneficiary() {
     const { createBeneficiary, deleteBeneficiary, findAllBeneficiaries, updateBeneficiary } = getBeneficiaryRepository();

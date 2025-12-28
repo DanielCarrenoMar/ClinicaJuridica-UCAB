@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { CaseModel } from '../models/case';
-import { getCaseRepository } from '../../data/database/databaseRepositories';
+import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
 
 export function useCase() {
     const { createCase, deleteCase, findAllCases, updateCase } = getCaseRepository();
