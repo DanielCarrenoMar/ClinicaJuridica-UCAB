@@ -5,6 +5,7 @@ import { Close, ChevronRight, UserEdit } from "flowbite-react-icons/outline";
 import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
+import ConfirmDialog from "#components/ConfirmDialog.tsx";
 import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
 import type { CaseModel } from "#domain/models/case.ts";
 import type { CaseDAO } from "#database/daos/CaseDAO.ts";
@@ -26,6 +27,7 @@ function CreateCase() {
     const locatetion = useLocation();
     const [caseDAO, setCaseDAO] = useState<CaseDAO>();
     const [appointmentDAO, setAppointmentDAO] = useState<AppointmentDAO>();
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
     const isApplicantStep = locatetion.pathname.includes("solicitante");
 
@@ -40,7 +42,7 @@ function CreateCase() {
                     <div className="flex items-end gap-2.5">
                         {isApplicantStep ? (
                             <>
-                                <Button onClick={() => { navigate("/"); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
+                                <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
                                 <Button onClick={() => { navigate("/crearCaso/caso"); }} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
                             </>
                         ) : (
@@ -56,6 +58,13 @@ function CreateCase() {
                 <div className="px-4 pb-6">
                     {/*<Outlet context={{ caseDAO, setCaseDAO, appointmentDAO, setAppointmentDAO }} />*/}
                 </div>
+                <ConfirmDialog
+                    open={showCancelConfirm}
+                    title="Cancelar creación de caso"
+                    message="Se perderán los cambios no guardados. ¿Desea volver al inicio?"
+                    onConfirm={() => { setShowCancelConfirm(false); navigate("/"); }}
+                    onCancel={() => { setShowCancelConfirm(false); }}
+                />
             </Box>
         </LateralMenuLayer>
     );
