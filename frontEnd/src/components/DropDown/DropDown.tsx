@@ -62,7 +62,7 @@ export default function DropDown({ label = "Dropdown", children, selectedValue, 
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="text-body-medium text-onSurface text-nowrap bg-surface/70 border border-onSurface border-solid flex gap-1.5 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+          className="text-body-medium text-onSurface text-nowrap bg-surface border border-onSurface border-solid flex gap-1.5 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
         >
           {showTitle ? (
              <p>
@@ -78,7 +78,7 @@ export default function DropDown({ label = "Dropdown", children, selectedValue, 
         </button>
 
         {isOpen && (
-          <div className="absolute left-0 mt-2 w-48 origin-top-right rounded-xl bg-surface/70 border border-onSurface border-solid focus:outline-none z-10 overflow-hidden p-2 flex flex-col gap-1.5">
+          <div className="absolute left-0 mt-2 w-48 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none z-10 overflow-hidden p-2 flex flex-col gap-1.5">
             {children}
           </div>
         )}

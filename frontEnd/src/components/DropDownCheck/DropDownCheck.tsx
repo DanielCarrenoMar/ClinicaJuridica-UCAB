@@ -62,7 +62,7 @@ export default function DropDownCheck({ label, children, selectedValues, onSelec
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-surface/70 border border-onSurface border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:surface transition-colors"
+          className="bg-surface border border-onSurface border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:surface transition-colors"
         >
           <p className="font-['Poppins'] text-[13px] text-onSurface text-nowrap">
             {label}
