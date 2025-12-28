@@ -1,11 +1,8 @@
-import type { IdNacionality, MaritalStatus, SexType } from "#domain/mtypes.ts";
+import type { MaritalStatus } from "#domain/mtypes.ts";
+import type { BeneficiaryModel } from "./beneficiary";
+export interface ApplicantModel {
 
-export interface ApplicantModel{
-    identityCard: string;
-    gender: SexType;
-    birthDate: Date;
-    fullName: string;
-    idNationality: IdNacionality;
+    beneficiary: Omit<BeneficiaryModel, 'hasId' | 'type'>;
     email: string;
     cellPhone: string;
     homePhone: string;
@@ -20,12 +17,6 @@ export interface ApplicantModel{
     applicantStudyTime: string;
     workCondition: string;
     activityCondition: string;
-    idState?: number;
-    stateName?: string;
-    municipalityNumber?: number;
-    municipalityName?: string;
-    parishNumber?: number;
-    parishName?: string;
     neighborhood?: string;
     address?: string;
     housingCondition?: string;
@@ -41,11 +32,19 @@ export interface ApplicantModel{
 }
 
 export const defaultApplicantModel: ApplicantModel = {
-    identityCard: "",
-    gender: "M",
-    birthDate: new Date(),
-    fullName: "",
-    idNationality: "V",
+    beneficiary: {
+        identityCard: "",
+        gender: 'M',
+        birthDate: new Date(),
+        name: "",
+        idType: 'V',
+        idState: undefined,
+        stateName: "",
+        municipalityNumber: undefined,
+        municipalityName: "",
+        parishNumber: undefined,
+        parishName: ""
+    },
     email: "",
     cellPhone: "",
     homePhone: "",
@@ -60,12 +59,6 @@ export const defaultApplicantModel: ApplicantModel = {
     applicantStudyTime: "",
     workCondition: "",
     activityCondition: "",
-    idState: undefined,
-    stateName: "",
-    municipalityNumber: undefined,
-    municipalityName: "",
-    parishNumber: undefined,
-    parishName: "",
     neighborhood: "",
     address: "",
     housingCondition: "",
