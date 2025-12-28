@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Plus } from "flowbite-react-icons/outline";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'filled' | 'outlined' | 'active';
+  variant?: 'filled' | 'outlined' | 'active' | 'resalted';
   icon?: ReactNode;
 }
 
@@ -18,7 +18,8 @@ function Button ({
   const variantStyles = {
     filled: "text-onSurface border border-transparent bg-surface/70 hover:bg-surface",
     outlined: "text-onSurface border border-onSurface bg-surface/70 hover:bg-surface",
-    active: "text-surface border border-transparent bg-onSurface"
+    active: "text-surface border border-transparent bg-onSurface",
+    resalted: "text-surface border border-surface bg-success hover:bg-success/90"
   };
 
   return (
