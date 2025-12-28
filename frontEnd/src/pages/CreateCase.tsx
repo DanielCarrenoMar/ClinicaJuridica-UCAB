@@ -61,7 +61,7 @@ function CreateCase() {
                 <ConfirmDialog
                     open={showCancelConfirm}
                     title="Cancelar creación de caso"
-                    message="Se perderán los cambios no guardados. ¿Desea volver al inicio?"
+                    message="Se perderán los datos ingresados. ¿Desea volver al inicio?"
                     onConfirm={() => { setShowCancelConfirm(false); navigate("/"); }}
                     onCancel={() => { setShowCancelConfirm(false); }}
                 />
