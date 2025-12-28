@@ -14,7 +14,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
 
-    console.log('🌱 Starting seeding...');
+    console.log('🌱 Starting seeding....');
 
     console.log("Seeding housing characteristics and options");
     const characteristicsData = [
