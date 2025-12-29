@@ -48,9 +48,12 @@ function CreateCaseCaseStep() {
                     </TitleDropdown>
                 </section>
                 <section className="col-span-2">
+                    <h4 className="text-body-large mb-2">
+                            Ambito Legal
+                    </h4>
                     <span className="flex gap-4">
                         <Dropdown
-                            label="Area legal"
+                            label="Materia"
                             selectedValue={caseDAO.idLegalArea}
                             onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
                         >
@@ -60,7 +63,7 @@ function CreateCaseCaseStep() {
                             <DropdownOption value={4}>Familia</DropdownOption>
                         </Dropdown>
                         <Dropdown
-                            label="Area legal"
+                            label="Ambito"
                             selectedValue={caseDAO.idLegalArea}
                             onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
                         >

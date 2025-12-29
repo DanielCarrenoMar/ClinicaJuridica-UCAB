@@ -20,7 +20,7 @@ export default function TitleDropdown({
 }: TitleDropdownProps) {
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
-      <div className="flex items-center px-1.5 w-full">
+      <div className="flex items-center w-full">
         <h4 className="text-body-large text-onSurface">
           {label}
         </h4>
