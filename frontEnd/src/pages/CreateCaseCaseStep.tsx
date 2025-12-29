@@ -7,10 +7,17 @@ import Button from "#components/Button.tsx";
 import Dropdown from "#components/Dropdown/Dropdown.tsx";
 import { useNavigate } from "react-router";
 import { ChevronRight } from "flowbite-react-icons/outline";
+import { useEffect } from "react";
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
     const { applicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
+    
+    useEffect(() => {
+        if (!applicantModel.identityCard) {
+            navigate("/crearCaso/solicitante");
+        }
+    }, []);
 
     return (
         <>
