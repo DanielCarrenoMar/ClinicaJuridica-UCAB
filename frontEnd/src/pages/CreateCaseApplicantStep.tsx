@@ -11,16 +11,10 @@ import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { SexType, IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
+import LoadingSpinner from "#components/LoadingSpinner.tsx";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
-
-const LoadingSpinner = () => (
-    <span
-        className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
-        aria-hidden="true"
-    />
-);
 
 function CreateCaseApplicantStep() {
     const { applicantModel, updateApplicantModel} = useCaseOutletContext();
