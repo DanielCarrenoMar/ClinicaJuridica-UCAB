@@ -6,7 +6,7 @@ import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
-import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
+
 import { defaultCaseDAO, type CaseDAO } from "#database/daos/CaseDAO.ts";
 import { defaultApplicantModel, type ApplicantModel } from "#domain/models/applicant.ts";
 
@@ -29,6 +29,7 @@ function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
     const [applicantModel, setApplicantModel] = useState<ApplicantModel>(defaultApplicantModel);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [isApplicantStep] = useState(!locatetion.pathname.includes("solicitante"));
 
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
@@ -44,10 +45,8 @@ function CreateCase() {
         } as ApplicantModel));
     }
 
-    const isApplicantStep = locatetion.pathname.includes("solicitante");
-
     return (
-        <LateralMenuLayer locationId="createCase">
+        
             <Box className="p-0! overflow-hidden">
                 <header className="bg-surface/70 flex items-center justify-between px-4 h-16">
                     <div className="flex items-center gap-2.5">
@@ -81,7 +80,7 @@ function CreateCase() {
                     onCancel={() => { setShowCancelConfirm(false); }}
                 />
             </Box>
-        </LateralMenuLayer>
+        
     );
 }
 export default CreateCase;

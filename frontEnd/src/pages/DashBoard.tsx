@@ -1,6 +1,6 @@
 import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
-import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
+
 import AccionCard from "#components/ActionCard.tsx";
 import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
@@ -48,7 +48,7 @@ function DashBoard() {
     const navigate = useNavigate()
 
     return (
-        <LateralMenuLayer locationId='home'>
+        
             <div className="flex flex-col gap-3 h-full">
                 <section className="flex">
                     <Button className="h-14 w-96" onClick={() => navigate('/crearCaso')}>
@@ -96,7 +96,7 @@ function DashBoard() {
                     </Box>
                 </section>
             </div>
-        </LateralMenuLayer>
+        
     );
 }
 export default DashBoard;

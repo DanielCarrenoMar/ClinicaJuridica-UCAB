@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import type { CaseModel } from "#domain/models/case.ts";
 import type { CaseStatus } from "#domain/models/caseStatus.ts";
 import { Book, ScaleBalanced, User } from "flowbite-react-icons/solid";
 
 interface CaseCardProps {
     caseData: CaseModel;
+    matches?: Record<string, Array<[number, number]>>;
 }
 
 const statusConfig: Record<CaseStatus, { color: string; label: string }> = {
@@ -13,7 +15,33 @@ const statusConfig: Record<CaseStatus, { color: string; label: string }> = {
     PAUSED: { color: "bg-onSurface", label: "En Pausa" },
 };
 
-export default function CaseCard({ caseData }: CaseCardProps) {
+function highlightText(text: string | number, indices?: Array<[number, number]>): ReactNode {
+    const value = String(text ?? "");
+    if (!indices?.length) return value;
+
+    const parts: ReactNode[] = [];
+    let lastIndex = 0;
+
+    indices.forEach(([start, end], idx) => {
+        if (start > lastIndex) {
+            parts.push(value.slice(lastIndex, start));
+        }
+        parts.push(
+            <mark key={`hl-${idx}`} className="bg-warning/40 text-onSurface font-medium">
+                {value.slice(start, end + 1)}
+            </mark>
+        );
+        lastIndex = end + 1;
+    });
+
+    if (lastIndex < value.length) {
+        parts.push(value.slice(lastIndex));
+    }
+
+    return parts;
+}
+
+export default function CaseCard({ caseData, matches }: CaseCardProps) {
     const {
         compoundKey,
         createAt,
@@ -30,7 +58,7 @@ export default function CaseCard({ caseData }: CaseCardProps) {
         <div className="bg-surface/70 flex flex-col gap-1 h-28 overflow-hidden relative rounded-3xl w-full max-w-5xl">
             <header className={`flex text-surface justify-between relative ${config.color} px-4 pt-2.5 pb-2`}>
                 <h4 className="text-body-medium ">
-                    {compoundKey}
+                    {highlightText(compoundKey, matches?.compoundKey)}
                 </h4>
                 <h5 className="text-body-small">
                     {formattedDate}
@@ -42,13 +70,13 @@ export default function CaseCard({ caseData }: CaseCardProps) {
                     <span className="flex gap-1 items-center">
                         <User/>
                         <p className="font-light truncate max-w-32">
-                            {applicantName}
+                            {highlightText(applicantName, matches?.applicantName)}
                         </p>
                     </span>
                     <span className="flex gap-1 items-center">
                         <ScaleBalanced/>
                         <p className="font-ligh truncate max-w-32">
-                            {legalAreaName}
+                            {highlightText(legalAreaName, matches?.legalAreaName)}
                         </p>
                     </span>
                 </div>
@@ -71,7 +99,7 @@ export default function CaseCard({ caseData }: CaseCardProps) {
 
                 <div className="flex-1 h-full text-right overflow-hidden text-body-small">
                     <p className=" line-clamp-3">
-                        {problemSummary}
+                        {highlightText(problemSummary, matches?.problemSummary)}
                     </p>
                 </div>
             </div>

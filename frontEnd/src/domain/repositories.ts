@@ -1,3 +1,4 @@
+import type { CaseDAO } from "#database/daos/CaseDAO.ts";
 import type { ApplicantModel } from "./models/applicant"
 import type { BeneficiaryModel } from "./models/beneficiary";
 import type { CaseModel } from "./models/case";
@@ -25,7 +26,7 @@ export interface ApplicantRepository {
 export interface CaseRepository {
     findAllCases(): Promise<CaseModel[]>;
     findCaseById(id: string): Promise<CaseModel | null>;
-    createCase(data: CaseModel): Promise<CaseModel>;
+    createCase(data: CaseDAO): Promise<CaseDAO>;
     updateCase(id: string, data: Partial<CaseModel>): Promise<CaseModel>;
     deleteCase(id: string): Promise<void>;
 }

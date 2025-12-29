@@ -1,6 +1,5 @@
 export interface NucleusDAO {
-  idNucleus: number;
-  name: string;
+  idNucleus: string;
   isActive: boolean;
   idState: number;
   municipalityNumber: number;

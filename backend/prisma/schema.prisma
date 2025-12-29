@@ -208,8 +208,7 @@ model Parish {
 }
 
 model Nucleus {
-  idNucleus Int     @id @default(autoincrement())
-  name      String  @unique @db.VarChar(63)
+  idNucleus      String  @id @db.VarChar(63)
   isActive  Boolean @default(true)
 
   idState            Int
@@ -361,7 +360,7 @@ model Case {
   processType    ProcessType
 
   applicantId String @db.VarChar(20)
-  idNucleus   Int
+  idNucleus   String @db.VarChar(63)
   term        String @db.VarChar(10)
   idLegalArea Int
   teacherId   String @db.VarChar(20)

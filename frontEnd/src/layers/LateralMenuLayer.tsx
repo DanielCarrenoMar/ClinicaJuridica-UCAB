@@ -1,51 +1,57 @@
-import { useState, type ReactNode } from "react"
+import { useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
 import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import GeneralSearch from "#components/GeneralSearch.tsx";
+import { Outlet, useLocation, useOutletContext } from "react-router";
 
-type LateralmenuPages = 'home' | 'createCase' | 'calendar' | 'actions' | 'reports' | 'users' | 'semesters' | 'nuclei' | 'config' | 'none'; 
-interface LateralMenuLayerProps {
-    locationId: LateralmenuPages;
-    alwaysShowSearch?: boolean;
-    defaultSearchText?: string;
-    children: ReactNode;
+type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
+
+export type LateralMenuContext = {
+    setDefaultSearchText: (value: string) => void
+};
+
+export function useLateralMenuContext() {
+    return useOutletContext<LateralMenuContext>();
 }
 
-function LateralMenuLayer({locationId, alwaysShowSearch = false, defaultSearchText = '', children}: LateralMenuLayerProps) {
+function LateralMenuLayer() {
+    const [defaultSearchText, setDefaultSearchText] = useState("")
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(alwaysShowSearch || defaultSearchText !== '');
+    const location = useLocation()
+    const locationId = location.pathname === '/' ? location.pathname : location.pathname.split('/')[1] as LateralmenuPages
+    const [isSearchOpen, setIsSearchOpen] = useState(defaultSearchText !== '');
     let permission = 1
 
     return (
-        <div className="flex gap-3 h-full">
+        <div className="flex gap-6 h-full">
             <LateralMenu activeItemId={locationId} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)}>
-                <LateralMenuItem id='home' label='Inicio' icon={<Home />} link='/' />
-                <LateralMenuItem id='createCase' label='Crear Caso' icon={<Plus />} link='/crearCaso' />
-                <LateralMenuItem id='calendar' label='Calendario' icon={<CalendarMonth />} link='/calendario' />
-                <LateralMenuItem id='actions' label='Historial de Accciones' icon={<Book />} link='/acciones' />
-                <LateralMenuItem id='reports' label='Generar Reportes' icon={<InfoCircle />} link='/reportes' />
+                <LateralMenuItem id='/' label='Inicio' icon={<Home />} link='/' />
+                <LateralMenuItem id='crearCaso' label='Crear Caso' icon={<Plus />} link='/crearCaso' />
+                <LateralMenuItem id='calendario' label='Calendario' icon={<CalendarMonth />} link='/calendario' />
+                <LateralMenuItem id='acciones' label='Historial de Accciones' icon={<Book />} link='/acciones' />
+                <LateralMenuItem id='reportes' label='Generar Reportes' icon={<InfoCircle />} link='/reportes' />
                 <LateralMenuTitle label='Administración' />
                 {
                     permission <= 2 && <>
-                        <LateralMenuItem id='users' label='Usuarios' icon={<UsersGroup />} link='/usuarios' />
+                        <LateralMenuItem id='usuarios' label='Usuarios' icon={<UsersGroup />} link='/usuarios' />
                     </>
                 }
                 {
                     permission <= 1 && <>
-                        <LateralMenuItem id='semesters' label='Semestres' icon={<Clock />} link='/semestres' />
-                        <LateralMenuItem id='nuclei' label='Nucleos' icon={<MapPinAlt />} link='/nucleos' />
-                        <LateralMenuItem id='config' label='Configuración' icon={<Cog />} link='/configuracion' />
+                        <LateralMenuItem id='semestres' label='Semestres' icon={<Clock />} link='/semestres' />
+                        <LateralMenuItem id='nucleos' label='Nucleos' icon={<MapPinAlt />} link='/nucleos' />
+                        <LateralMenuItem id='configuracion' label='Configuración' icon={<Cog />} link='/configuracion' />
                     </>
                 }
             </LateralMenu>
             <main className="flex-1 flex flex-col">
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
-                        <GeneralSearch 
-                            alwaysShowSearch={alwaysShowSearch} 
+                        <GeneralSearch
+                            alwaysShowSearch={locationId === 'busqueda'}
                             isOpen={isSearchOpen} 
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
@@ -63,7 +69,7 @@ function LateralMenuLayer({locationId, alwaysShowSearch = false, defaultSearchTe
                     </span>
                 </header>
                 <div className="flex-1 overflow-y-auto">
-                    {children}
+                    <Outlet context={{ setDefaultSearchText }} />
                 </div>
             </main>
         </div>
