@@ -27,9 +27,24 @@ function CreateCase() {
     const navigate = useNavigate();
     const locatetion = useLocation();
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
-    const [applicantModel, setApplicantModel] = useState<ApplicantModel>(defaultApplicantModel);
+    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>(defaultApplicantModel);
+    const [minDataToNextSteap, setMinDataToNextSteap] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const isApplicantStep = locatetion.pathname.includes("solicitante");
+
+    useEffect(() => {
+        setMinDataToNextSteap(!!(
+            applicantModel.fullName &&
+            applicantModel.fullName.trim().length > 0 &&
+            applicantModel.identityCard &&
+            applicantModel.identityCard.trim().length > 0 &&
+            applicantModel.birthDate instanceof Date &&
+            !isNaN(applicantModel.birthDate.getTime()) &&
+            applicantModel.idNationality !== undefined &&
+            applicantModel.gender !== undefined
+        ));
+        console.log("applicantModel", applicantModel);
+    }, [applicantModel]);
     
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
@@ -63,7 +78,7 @@ function CreateCase() {
                         ) : (
                             <>
                                 <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
-                                <Button onClick={() => { navigate("/crearCaso/caso"); }} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
+                                <Button onClick={() => { navigate("/crearCaso/caso"); }} disabled={!minDataToNextSteap} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
                             </>
                         )
                         }

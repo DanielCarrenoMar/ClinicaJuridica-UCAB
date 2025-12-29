@@ -31,12 +31,12 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' 
     householdIncome?: string;
 }
 
-export const defaultApplicantModel: ApplicantModel = {
+export const defaultApplicantModel: Partial<ApplicantModel> = {
     identityCard: "",
-    gender: 'M',
+    gender: undefined,
     birthDate: new Date(),
     fullName: "",
-    idNationality: 'V',
+    idNationality: undefined,
     idState: undefined,
     stateName: "",
     municipalityNumber: undefined,
@@ -48,7 +48,7 @@ export const defaultApplicantModel: ApplicantModel = {
     homePhone: "",
     maritalStatus: undefined,
     isConcubine: false,
-    createdAt: new Date(),
+    createdAt: undefined,
     isHeadOfHousehold: false,
     headEducationLevelId: undefined,
     headEducationLevel: "",
