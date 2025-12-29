@@ -1,36 +1,16 @@
-import express from 'express';
-import caseRoutes from './case.routes.js';
-import applicantRoutes from './applicant.routes.js';
+import { Router } from 'express';
 import userRoutes from './user.routes.js';
-import { config } from 'dotenv';
+import applicantRoutes from './applicant.routes.js';
+import caseRoutes from './case.routes.js';
+import catalogRoutes from './catalog.routes.js';
+import statsRoutes from './stats.routes.js';    
 
-const router = express.Router();
+const router = Router();
 
-// Ruta simple de prueba
-router.get('/test', (req, res) => {
-  res.json({ 
-    message: 'API v1 está funcionando',
-    endpoints: {
-      usuarios: '/users',
-      casos: '/cases',
-      solicitantes: '/applicants',  
-      beneficiarios: '/beneficiaries (próximamente)',
-      estadisticas: '/stats (próximamente)',
-      config: '/config'
-    }
-  });
-});
-
-// Usar rutas de casos
-router.use('/cases', caseRoutes);
-
-// Usar rutas de solicitantes
-router.use('/applicants', applicantRoutes);
-
-// Usar rutas de usuarios
 router.use('/users', userRoutes);
-
-//Usar rutas de config
-router.use('/config', config);
+router.use('/applicants', applicantRoutes);
+router.use('/cases', caseRoutes);
+router.use('/catalogs', catalogRoutes); 
+router.use('/stats', statsRoutes);
 
 export default router;

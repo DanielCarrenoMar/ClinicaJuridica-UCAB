@@ -3,16 +3,26 @@ import * as configController from "../controllers/config.controller.js";
 
 const router = Router();
 
-// GET /api/v1/config/initial-data - Carga masiva de catálogos
+// Catálogos Generales
 router.get("/initial-data", configController.getAllInitialData);
-
-// GET /api/v1/config/locations - Estados, municipios y parroquias
 router.get("/locations", configController.getLocations);
-
-// GET /api/v1/config/legal-structure - Materias y áreas legales
 router.get("/legal-structure", configController.getLegalStructure);
 
-// POST /api/v1/config/semesters - Crear nuevo periodo académico
+// Periodos Académicos
+router.get("/semesters", configController.getSemesters);
 router.post("/semesters", configController.createSemester);
+
+// Eliminar Semestre (solo si no tiene casos)
+router.delete("/semesters/:term", configController.deleteSemester); 
+
+// Gestión de Tribunales
+router.get("/courts", configController.getAllCourts);
+router.post("/courts", configController.createCourt);
+router.put("/courts/:id", configController.updateCourt);
+
+// Gestión de Núcleos
+router.get("/nuclei", configController.getAllNuclei);
+router.post("/nuclei", configController.createNucleus);
+// router.put("/nuclei/:id", ...); //si se requiere editar núcleo
 
 export default router;
