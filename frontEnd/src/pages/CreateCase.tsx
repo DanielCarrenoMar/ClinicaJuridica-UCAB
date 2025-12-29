@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
 import { Close, ChevronRight, UserEdit } from "flowbite-react-icons/outline";
 import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
@@ -29,8 +29,8 @@ function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
     const [applicantModel, setApplicantModel] = useState<ApplicantModel>(defaultApplicantModel);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-    const [isApplicantStep] = useState(!locatetion.pathname.includes("solicitante"));
-
+    const isApplicantStep = locatetion.pathname.includes("solicitante");
+    
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
             ...prev,
@@ -54,15 +54,16 @@ function CreateCase() {
                         <h1 className="text-label-medium">{isApplicantStep ? "Solicitante" : "Caso"}</h1>
                     </div>
                     <div className="flex items-end gap-2.5">
-                        {isApplicantStep ? (
-                            <>
-                                <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
-                                <Button onClick={() => { navigate("/crearCaso/caso"); }} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
-                            </>
-                        ) : (
+                        {!isApplicantStep ? (
+                            
                             <>
                                 <Button onClick={() => { navigate("/crearCaso/solicitante"); }} variant="outlined" icon={<UserEdit />} className="h-10 w-28">Volver</Button>
                                 <Button onClick={() => { navigate("/crearCaso/caso"); }} variant="resalted" icon={<ChevronRight />} className="w-32">Aceptar</Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
+                                <Button onClick={() => { navigate("/crearCaso/caso"); }} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
                             </>
                         )
                         }
