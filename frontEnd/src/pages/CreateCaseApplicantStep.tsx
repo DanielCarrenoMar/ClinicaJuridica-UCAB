@@ -70,7 +70,7 @@ function CreateCaseApplicantStep() {
             clearTimeout(timeoutId);
             lookupDelayRef.current = null;
         };
-    }, [getApplicantOrBeneficiaryById]);
+    }, [sanitizedIdentityCard, getApplicantOrBeneficiaryById]);
 
     const handleIdentityCardChange = (text: string) => {
         updateApplicantModel({ identityCard: text });
@@ -162,7 +162,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-2">
                 <TitleDropdown
-                    label="Estado Civil"
+                    label="Estado Civil*"
                     selectedValue={applicantModel.maritalStatus || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatus }); }}
                 >
@@ -174,7 +174,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-2">
                 <TitleDropdown
-                    label="Concubinato"
+                    label="Concubinato*"
                     selectedValue={(applicantModel.isConcubine ?? false).toString()}
                     onSelectionChange={(value) => { updateApplicantModel({ isConcubine: value === "true" }); }}
                 >
@@ -185,7 +185,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Telefono Local"
+                    label="Telefono Local*"
                     value={applicantModel.homePhone}
                     onChange={(text) => { updateApplicantModel({ homePhone: text }); }}
                     placeholder="0212-1234567"
@@ -193,7 +193,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Telefono Celular"
+                    label="Telefono Celular*"
                     value={applicantModel.cellPhone}
                     onChange={(text) => { updateApplicantModel({ cellPhone: text }); }}
                     placeholder="0414-1234567"
@@ -201,7 +201,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-6">
                 <TitleTextInput
-                    label="Correo Electronico"
+                    label="Correo Electronico*"
                     value={applicantModel.email}
                     onChange={(text) => { updateApplicantModel({ email: text }); }}
                     placeholder="ejemplo@correo.com"
@@ -210,7 +210,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-4">
                 <TitleTextInput
-                    label="Periodo Educativo"
+                    label="Periodo Educativo*"
                     value={applicantModel.applicantStudyTime}
                     onChange={(text) => { updateApplicantModel({ applicantStudyTime: text }); }}
                     placeholder="2024-2025"
@@ -218,7 +218,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleDropdown
-                    label="Nivel de educacion"
+                    label="Nivel de educacion*"
                     selectedValue={applicantModel.applicantEducationLevel || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as string }); }}
                 >
@@ -230,7 +230,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleDropdown
-                    label="Condicion de Trabajo"
+                    label="Condicion de Trabajo*"
                     selectedValue={applicantModel.workCondition || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ workCondition: value as string }); }}
                 >
@@ -241,7 +241,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleDropdown
-                    label="Condicion de Actividad"
+                    label="Condicion de Actividad*"
                     selectedValue={applicantModel.activityCondition || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ activityCondition: value as string }); }}
                 >
@@ -256,7 +256,7 @@ function CreateCaseApplicantStep() {
         <>
             <div className="col-span-4">
                 <TitleTextInput
-                    label="Estado"
+                    label="Estado*"
                     value={applicantModel.stateName ?? ""}
                     onChange={(text) => { updateApplicantModel({ stateName: text }); }}
                     placeholder="Bolivar"
@@ -264,7 +264,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleTextInput
-                    label="Municipio"
+                    label="Municipio*"
                     value={applicantModel.municipalityName ?? ""}
                     onChange={(text) => { updateApplicantModel({ municipalityName: text }); }}
                     placeholder="Caroni"
@@ -272,7 +272,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleTextInput
-                    label="Parroquia"
+                    label="Parroquia*"
                     value={applicantModel.parishName ?? ""}
                     onChange={(text) => { updateApplicantModel({ parishName: text }); }}
                     placeholder="Unare"
@@ -280,7 +280,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-6">
                 <TitleTextInput
-                    label="Sector/Barrio"
+                    label="Sector/Barrio*"
                     value={applicantModel.neighborhood ?? ""}
                     onChange={(text) => { updateApplicantModel({ neighborhood: text }); }}
                     placeholder="Urb. Los Olivos"
@@ -288,7 +288,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-6">
                 <TitleTextInput
-                    label="Direccion"
+                    label="Direccion*"
                     value={applicantModel.address ?? ""}
                     onChange={(text) => { updateApplicantModel({ address: text }); }}
                     placeholder="Calle 1, casa 2"
@@ -297,7 +297,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-4">
                 <TitleDropdown
-                    label="Condicion de vivienda"
+                    label="Condicion de vivienda*"
                     selectedValue={applicantModel.housingCondition || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ housingCondition: value as string }); }}
                 >
@@ -310,7 +310,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleDropdown
-                    label="Tipo de vivienda"
+                    label="Tipo de vivienda*"
                     selectedValue={applicantModel.housingType || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ housingType: value as string }); }}
                 >
@@ -322,7 +322,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-4">
                 <TitleDropdown
-                    label="Regimen de tenencia"
+                    label="Regimen de tenencia*"
                     selectedValue={applicantModel.tenureType || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ tenureType: value as string }); }}
                 >
@@ -335,7 +335,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-6">
                 <DropdownCheck
-                    label="Servicios basicos"
+                    label="Servicios basicos*"
                     selectedValues={applicantModel.servicesAvailable ?? []}
                     onSelectionChange={(values) => { updateApplicantModel({ servicesAvailable: values as string[] }); }}
                 >
@@ -355,7 +355,7 @@ function CreateCaseApplicantStep() {
         <>
             <div className="col-span-3">
                 <TitleDropdown
-                    label="Jefe de hogar"
+                    label="Jefe de hogar*"
                     selectedValue={(applicantModel.isHeadOfHousehold ?? false).toString()}
                     onSelectionChange={(value) => { updateApplicantModel({ isHeadOfHousehold: value === "true" }); }}
                 >
@@ -365,7 +365,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-3">
                 <TitleDropdown
-                    label="Nivel educativo jefe"
+                    label="Nivel educativo jefe*"
                     selectedValue={applicantModel.headEducationLevel || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ headEducationLevel: value as string }); }}
                 >
@@ -377,7 +377,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Periodo educativo jefe"
+                    label="Periodo educativo jefe*"
                     value={applicantModel.headStudyTime ?? ""}
                     onChange={(text) => { updateApplicantModel({ headStudyTime: text }); }}
                     placeholder="2024-2025"
@@ -385,7 +385,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Integrantes del hogar"
+                    label="Integrantes del hogar*"
                     value={applicantModel.householdSize?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -397,7 +397,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Ninos en el hogar"
+                    label="Ninos en el hogar*"
                     value={applicantModel.minorsCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -408,7 +408,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Adultos mayores"
+                    label="Adultos mayores*"
                     value={applicantModel.seniorsCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -417,32 +417,9 @@ function CreateCaseApplicantStep() {
                     placeholder="0"
                 />
             </div>
-            <div className="col-span-3">
-                <TitleTextInput
-                    label="Personas con discapacidad"
-                    value={applicantModel.disabledCount?.toString() ?? ""}
-                    onChange={(text) => {
-                        const num = Number(text);
-                        updateApplicantModel({ disabledCount: Number.isNaN(num) ? undefined : num });
-                    }}
-                    placeholder="0"
-                />
-            </div>
-            <div className="col-span-3">
-                <TitleTextInput
-                    label="Personas embarazadas"
-                    value={applicantModel.pregnantCount?.toString() ?? ""}
-                    onChange={(text) => {
-                        const num = Number(text);
-                        updateApplicantModel({ pregnantCount: Number.isNaN(num) ? undefined : num });
-                    }}
-                    placeholder="0"
-                />
-            </div>
-
             <div className="col-span-4">
                 <TitleTextInput
-                    label="Ingreso mensual del hogar"
+                    label="Ingreso mensual del hogar*"
                     value={applicantModel.householdIncome ?? ""}
                     onChange={(text) => { updateApplicantModel({ householdIncome: text }); }}
                     placeholder="$300"
@@ -492,7 +469,7 @@ function CreateCaseApplicantStep() {
                                 </div>
                         </div>
                         <div className="flex flex-col">
-                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); setLastIdentityCard(applicantModel.identityCard); }}/>
+                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); }}/>
                         </div>
                     </div>
                 </div>

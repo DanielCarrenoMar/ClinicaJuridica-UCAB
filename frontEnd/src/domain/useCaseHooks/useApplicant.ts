@@ -9,6 +9,7 @@ export function useGetApplicantById() {
     const getApplicantById = async (id: string): Promise<ApplicantModel | null> => {
         setLoading(true);
         try {
+            if (id !== "12345678") return null;
             return {
                 identityCard: "12345678",
                 gender: 'M',
