@@ -46,18 +46,14 @@ function CreateCaseApplicantStep() {
     }, []);
 
     useEffect(() => {
-        if (!sanitizedIdentityCard || sanitizedIdentityCard.length < 5) {
+        if (!sanitizedIdentityCard || sanitizedIdentityCard.length < 5 || sanitizedIdentityCard === lastIdentityCard) {
             setFoundApplicant(null);
             setShowAutoFillToast(false);
             return;
         }
 
-        let isCancelled = false;
         const timeoutId = setTimeout(async () => {
             const applicant = await getApplicantOrBeneficiaryById(sanitizedIdentityCard);
-            if (isCancelled) {
-                return;
-            }
 
             if (applicant) {
                 setFoundApplicant(applicant);
@@ -71,15 +67,12 @@ function CreateCaseApplicantStep() {
         lookupDelayRef.current = timeoutId;
 
         return () => {
-            isCancelled = true;
             clearTimeout(timeoutId);
             lookupDelayRef.current = null;
         };
-    }, [sanitizedIdentityCard, getApplicantOrBeneficiaryById]);
+    }, [getApplicantOrBeneficiaryById]);
 
     const handleIdentityCardChange = (text: string) => {
-        if (text === lastIdentityCard) return;
-
         updateApplicantModel({ identityCard: text });
         setFoundApplicant(null);
         setShowAutoFillToast(false);
@@ -499,7 +492,7 @@ function CreateCaseApplicantStep() {
                                 </div>
                         </div>
                         <div className="flex flex-col">
-                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); }}/>
+                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); setLastIdentityCard(applicantModel.identityCard); }}/>
                         </div>
                     </div>
                 </div>
