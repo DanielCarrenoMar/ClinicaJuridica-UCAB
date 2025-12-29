@@ -29,6 +29,7 @@ function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
     const [applicantModel, setApplicantModel] = useState<ApplicantModel>(defaultApplicantModel);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [isApplicantStep] = useState(!locatetion.pathname.includes("solicitante"));
 
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
@@ -43,8 +44,6 @@ function CreateCase() {
             ...updatedFields,
         } as ApplicantModel));
     }
-
-    const isApplicantStep = locatetion.pathname.includes("solicitante");
 
     return (
         <LateralMenuLayer locationId="createCase">
