@@ -6,7 +6,7 @@ export interface CaseDAO {
   createdAt: Date;
   processType: ProcessTypeDAO;
   applicantId: string;
-  idNucleus: number;
+  idNucleus: string;
   term: string;
   idLegalArea: number;
   teacherId: string;
@@ -20,7 +20,7 @@ export const defaultCaseDAO: CaseDAO = {
   createdAt: new Date(),
   processType: "A",
   applicantId: "",
-  idNucleus: 0,
+  idNucleus: "",
   term: "",
   idLegalArea: 0,
   teacherId: "",

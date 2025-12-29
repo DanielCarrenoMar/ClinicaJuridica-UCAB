@@ -1,5 +1,9 @@
+import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
+import type { BeneficiaryDAO } from "#database/daos/BeneficiaryDAO.ts";
 import type { CaseDAO } from "#database/daos/CaseDAO.ts";
+import type { LegalAreaDAO } from "#database/daos/LegalAreaDAO.ts";
 import type { ProcessTypeDAO } from "#database/daos/typesDAO.ts";
+import type { UserDAO } from "#database/daos/UserDAO.ts";
 import type { PersonID } from "#domain/mtypes.ts";
 import type { CaseActionModel } from "./caseAction";
 import type { CaseStatus } from "./caseStatus";
@@ -18,7 +22,7 @@ export interface CaseModel {
     createAt: Date;
     applicantId: PersonID;
     applicantName: string;
-    idNucleus: number;
+    idNucleus: string;
     term: string;
     idLegalArea: number;
     legalAreaName: string;
@@ -43,23 +47,23 @@ function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
     }
 }
 
-export function daoToCaseModel(dao: CaseDAO): CaseModel {
+export function daoToCaseModel(caseD: CaseDAO, teacherD: UserDAO): CaseModel {
     return {
-        id: dao.idCase,
-        compoundKey: "proceso",
-        processType: processTypeDAOToModel(dao.processType),
-        problemSummary: dao.problemSummary,
-        createAt: new Date(dao.createdAt),
-        applicantId: dao.applicantId,
-        applicantName: "proceso",
-        idNucleus: dao.idNucleus,
-        term: dao.term,
-        idLegalArea: dao.idLegalArea,
-        legalAreaName: "proceso",
-        teacherId: dao.teacherId,
-        teacherName: "proceso",
-        teacherTerm: dao.teacherTerm,
-        idCourt: dao.idCourt,
+        id: caseD.idCase,
+        compoundKey: caseD.idNucleus + "_" + caseD.term + "_" + caseD.idCase,
+        processType: processTypeDAOToModel(caseD.processType),
+        problemSummary: caseD.problemSummary,
+        createAt: new Date(caseD.createdAt),
+        applicantId: caseD.applicantId,
+        applicantName: "a",//applicantD.name,
+        idNucleus: caseD.idNucleus,
+        term: caseD.term,
+        idLegalArea: caseD.idLegalArea,
+        legalAreaName: "a",//legalAreaD.name,
+        teacherId: caseD.teacherId,
+        teacherName: teacherD.name,
+        teacherTerm: caseD.teacherTerm,
+        idCourt: caseD.idCourt,
         CasesStatus: null as any,
         lastAction: null as any,
     }
