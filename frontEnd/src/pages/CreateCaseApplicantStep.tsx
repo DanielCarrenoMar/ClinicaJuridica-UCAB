@@ -6,9 +6,10 @@ import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
 import Button from "#components/Button.tsx";
-import { CaretDown, CheckCircle, Close, Home, Users } from "flowbite-react-icons/outline";
+import { CaretDown, Close, Home, Users } from "flowbite-react-icons/outline";
+import { CheckCircle, InfoCircle } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
-import type { SexType, IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
+import type { SexType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
@@ -23,10 +24,11 @@ function CreateCaseApplicantStep() {
     const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
     const [showAutoFillToast, setShowAutoFillToast] = useState(false);
     const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
+    const [lastIdentityCard, setLastIdentityCard] = useState<PersonID>("");
     const lookupDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const autoFillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const sanitizedIdentityCard = applicantModel.identityCard?.trim() ?? "";
+    const sanitizedIdentityCard = applicantModel.identityCard.trim();
     const shouldShowAutoFillToast = showAutoFillToast && Boolean(foundApplicant);
     const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.fullName ?? "el registro existente";
     const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
@@ -76,6 +78,8 @@ function CreateCaseApplicantStep() {
     }, [sanitizedIdentityCard, getApplicantOrBeneficiaryById]);
 
     const handleIdentityCardChange = (text: string) => {
+        if (text === lastIdentityCard) return;
+
         updateApplicantModel({ identityCard: text });
         setFoundApplicant(null);
         setShowAutoFillToast(false);
@@ -111,6 +115,8 @@ function CreateCaseApplicantStep() {
             setIsApplyingAutoFill(false);
             setShowAutoFillToast(false);
         }, AUTOFILL_SPINNER_MS);
+
+        setLastIdentityCard(sanitizedIdentityCard);
     };
 
     const identificationInputs = (
@@ -469,45 +475,31 @@ function CreateCaseApplicantStep() {
                 </div>
             </section>
             {shouldShowAutoFillToast && (
-                <div className="fixed top-24 right-6 z-40 w-[360px]">
-                    <div className="rounded-2xl bg-surface px-5 py-4 shadow-2xl ring-1 ring-onSurface/10" role="status">
-                        <div className="flex items-start gap-3">
-                            <div className="text-success">
-                                <CheckCircle className="h-6 w-6" />
-                            </div>
-                            <div className="flex-1">
-                                <div className="flex items-start justify-between gap-2">
-                                    <div>
-                                        <p className="font-semibold text-label-medium">Cédula encontrada</p>
-                                        <p className="text-body-small text-onSurface/70">
-                                            Encontramos datos previos de {toastApplicantName}. Autocompleta el formulario o sigue editando manualmente.
-                                        </p>
+                <div className="fixed top-24 right-6 z-40">
+                    <div className="rounded-xl gap-3 bg-surface px-5 py-4 shadow-2xl ring-1 ring-onSurface/10 flex" role="status">
+                        <div className="flex flex-col py-2 items-start gap-2">
+                                <header className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <InfoCircle/>
+                                        <h3 className="text-label-small">Cédula encontrada</h3>
                                     </div>
-                                    <button
-                                        type="button"
-                                        className="text-onSurface/60 transition-colors hover:text-onSurface"
-                                        onClick={() => { setShowAutoFillToast(false); }}
-                                        aria-label="Cerrar notificación"
-                                    >
-                                        <Close className="h-4 w-4" />
-                                    </button>
-                                </div>
-                                <div className="mt-3 flex items-center gap-3">
+                                </header>
+                                <p className="mx-2 text-body-small text-onSurface/70">Se encontro el registro de <strong className="text-body-large">{toastApplicantName}</strong></p>
+                                <div className="mt-3 flex w-full items-center gap-3">
                                     <Button
                                         type="button"
                                         variant="resalted"
                                         onClick={handleAutoFill}
                                         disabled={isAutoFillDisabled}
                                         icon={showAutoFillSpinner ? <LoadingSpinner /> : <CheckCircle className="h-4 w-4" />}
-                                        className="h-10 px-4"
+                                        className="flex-1"
                                     >
                                         Autocompletar
                                     </Button>
-                                    <span className="text-xs text-onSurface/60">
-                                        Revisarás los datos antes de guardar.
-                                    </span>
                                 </div>
-                            </div>
+                        </div>
+                        <div className="flex flex-col">
+                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); }}/>
                         </div>
                     </div>
                 </div>
