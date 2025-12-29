@@ -5,10 +5,14 @@ import DropDownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.t
 import { useSearchParams } from "react-router";
 import { useCallback } from "react";
 import { useGetCases } from "#domain/useCaseHooks/useCase.ts";
+import { useLateralMenuContext } from "#layers/LateralMenuLayer.tsx";
 
 function SearchCases() {
     const [searchParams, setSearchParams] = useSearchParams();
     const searchText = searchParams.get('q') || '';
+    const {setDefaultSearchText} = useLateralMenuContext()
+    setDefaultSearchText(searchText)
+
     const statusFilters = searchParams.getAll('status');
     const caseTypeFilters = searchParams.getAll('caseType');
     const courtFilters = searchParams.getAll('court');

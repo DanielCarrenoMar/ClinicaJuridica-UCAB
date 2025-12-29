@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react"
+import { useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
 import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
@@ -7,26 +7,22 @@ import Button from "#components/Button.tsx";
 import GeneralSearch from "#components/GeneralSearch.tsx";
 import { Outlet, useLocation, useOutletContext } from "react-router";
 
-type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion'; 
+type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
 
 export type LateralMenuContext = {
-    alwaysShowSearch: boolean
-    setAlwaysShowSearch: (value: boolean) => void
-    defaultSearchText: string
     setDefaultSearchText: (value: string) => void
 };
 
-export function LateralMenuContextOutletContext() {
+export function useLateralMenuContext() {
     return useOutletContext<LateralMenuContext>();
 }
 
 function LateralMenuLayer() {
-    const [alwaysShowSearch, setAlwaysShowSearch] = useState(false)
     const [defaultSearchText, setDefaultSearchText] = useState("")
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(alwaysShowSearch || defaultSearchText !== '');
     const location = useLocation()
     const locationId = location.pathname === '/' ? location.pathname : location.pathname.split('/')[1] as LateralmenuPages
+    const [isSearchOpen, setIsSearchOpen] = useState(defaultSearchText !== '');
     let permission = 1
 
     return (
@@ -54,8 +50,8 @@ function LateralMenuLayer() {
             <main className="flex-1 flex flex-col">
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
-                        <GeneralSearch 
-                            alwaysShowSearch={alwaysShowSearch} 
+                        <GeneralSearch
+                            alwaysShowSearch={locationId === 'busqueda'}
                             isOpen={isSearchOpen} 
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
@@ -73,7 +69,7 @@ function LateralMenuLayer() {
                     </span>
                 </header>
                 <div className="flex-1 overflow-y-auto">
-                    <Outlet context={{ alwaysShowSearch, setAlwaysShowSearch, defaultSearchText, setDefaultSearchText }} />
+                    <Outlet context={{ setDefaultSearchText }} />
                 </div>
             </main>
         </div>
