@@ -34,7 +34,6 @@ export function useGetCases() {
     };
 }
 
-// Hook para crear un caso
 export function useCreateCase() {
     const { createCase } = getCaseRepository();
     const [loading, setLoading] = useState(false);
@@ -61,7 +60,6 @@ export function useCreateCase() {
     };
 }
 
-// Hook para editar un caso
 export function useUpdateCase() {
     const { updateCase } = getCaseRepository();
     const [loading, setLoading] = useState(false);
@@ -88,7 +86,6 @@ export function useUpdateCase() {
     };
 }
 
-// Hook para eliminar un caso
 export function useDeleteCase() {
     const { deleteCase } = getCaseRepository();
     const [loading, setLoading] = useState(false);
