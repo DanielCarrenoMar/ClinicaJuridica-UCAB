@@ -21,8 +21,9 @@ const AUTOFILL_SPINNER_MS = 420;
 
 function CreateCaseApplicantStep() {
     const navigate = useNavigate();
-    const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
+    const { applicantModel, updateApplicantModel} = useCaseOutletContext();
+    const [identityCardInput, setIdentityCardInput] = useState(applicantModel.identityCard);
 
     const [activeSection, setActiveSection] = useState("identificacion");
 
@@ -57,7 +58,7 @@ function CreateCaseApplicantStep() {
             applicantModel.idNationality !== undefined &&
             applicantModel.gender !== undefined
         ));
-    }, [applicantModel]);
+    }, [applicantModel, foundApplicant, loadingApplicantOrBeneficiary]);
 
     useEffect(() => {
         return () => {
@@ -95,9 +96,10 @@ function CreateCaseApplicantStep() {
             clearTimeout(timeoutId);
             lookupDelayRef.current = null;
         };
-    }, [sanitizedIdentityCard, getApplicantOrBeneficiaryById]);
+    }, [identityCardInput]);
 
     const handleIdentityCardChange = (text: string) => {
+        setIdentityCardInput(text);
         updateApplicantModel({ identityCard: text });
         setFoundApplicant(null);
         setShowAutoFillToast(false);
