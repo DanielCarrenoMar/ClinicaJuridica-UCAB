@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { CaseModel } from '../models/case';
 import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
+import type { CaseDAO } from '#database/daos/CaseDAO.ts';
 
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
@@ -39,7 +40,7 @@ export function useCreateCase() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const addCase = async (caseData: CaseModel) => {
+    const addCase = async (caseData: CaseDAO) => {
         setLoading(true);
         try {
             const newCase = await createCase(caseData);

@@ -1,7 +1,7 @@
 import CaseCard from "#components/CaseCard.tsx";
 import DropDownCheck from "#components/DropDownCheck/DropDownCheck.tsx";
 import DropDownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.tsx";
-import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
+
 import { useSearchParams } from "react-router";
 import { useCallback } from "react";
 import { useGetCases } from "#domain/useCaseHooks/useCase.ts";
@@ -31,7 +31,7 @@ function SearchCases() {
     }, [searchParams, setSearchParams]);
 
     return (
-        <LateralMenuLayer locationId='none' alwaysShowSearch={true} defaultSearchText={searchText}>
+        <>
             <span className="flex text-body-small gap-4">
                 <div>{searchText}</div>
                 <p>{statusFilters.join(', ')}</p>
@@ -105,7 +105,7 @@ function SearchCases() {
                     ))
                 }
             </ul>
-        </LateralMenuLayer>
+        </>
     );
 }
 export default SearchCases;

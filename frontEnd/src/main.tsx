@@ -13,24 +13,27 @@ import Semesters from '#pages/Semesters.tsx';
 import Nuclei from '#pages/Nuclei.tsx';
 import Config from '#pages/Config.tsx';
 import SearchCases from '#pages/SearchCases.tsx';
+import LateralMenuLayer from '#layers/LateralMenuLayer.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<DashBoard />} />
-      <Route path="/crearCaso/*" element={<CreateCase />}>
-        <Route index element={<Navigate to="solicitante" replace />} />
-        <Route path="solicitante" element={<CreateCaseApplicantStep />} />
-        <Route path="caso" element={<CreateCaseCaseStep />} />
+      <Route element={<LateralMenuLayer/>}>
+        <Route index element={<DashBoard />} />
+        <Route path="/crearCaso/*" element={<CreateCase />}>
+          <Route index element={<Navigate to="solicitante" replace />} />
+          <Route path="solicitante" element={<CreateCaseApplicantStep />} />
+          <Route path="caso" element={<CreateCaseCaseStep />} />
+        </Route>
+        <Route path="/calendario" element={<Calendar />} />
+        <Route path="/acciones" element={<ActionsHistory />} />
+        <Route path="/reportes" element={<Reports />} />
+        <Route path="/usuarios" element={<Users />} />
+        <Route path="/semestres" element={<Semesters />} />
+        <Route path="/nucleos" element={<Nuclei />} />
+        <Route path="/configuracion" element={<Config />} />
+        <Route path="/busqueda" element={<SearchCases />} />
       </Route>
-      <Route path="/calendario" element={<Calendar />} />
-      <Route path="/acciones" element={<ActionsHistory />} />
-      <Route path="/reportes" element={<Reports />} />
-      <Route path="/usuarios" element={<Users />} />
-      <Route path="/semestres" element={<Semesters />} />
-      <Route path="/nucleos" element={<Nuclei />} />
-      <Route path="/configuracion" element={<Config />} />
-      <Route path="/busqueda" element={<SearchCases />} />
     </Routes>
   </BrowserRouter>
 )

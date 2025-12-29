@@ -6,7 +6,7 @@ import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
-import LateralMenuLayer from "#layers/LateralMenuLayer.tsx";
+
 import { defaultCaseDAO, type CaseDAO } from "#database/daos/CaseDAO.ts";
 import { defaultApplicantModel, type ApplicantModel } from "#domain/models/applicant.ts";
 
@@ -46,7 +46,7 @@ function CreateCase() {
     }
 
     return (
-        <LateralMenuLayer locationId="createCase">
+        
             <Box className="p-0! overflow-hidden">
                 <header className="bg-surface/70 flex items-center justify-between px-4 h-16">
                     <div className="flex items-center gap-2.5">
@@ -80,7 +80,7 @@ function CreateCase() {
                     onCancel={() => { setShowCancelConfirm(false); }}
                 />
             </Box>
-        </LateralMenuLayer>
+        
     );
 }
 export default CreateCase;
