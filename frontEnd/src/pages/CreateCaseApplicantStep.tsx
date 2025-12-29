@@ -21,9 +21,10 @@ const AUTOFILL_SPINNER_MS = 420;
 
 function CreateCaseApplicantStep() {
     const navigate = useNavigate();
-    const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
+    const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary} = useGetApplicantOrBeneficiaryById();
     const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const [identityCardInput, setIdentityCardInput] = useState(applicantModel.identityCard);
+    const [isVerifyingIdentityCard, setIsVerifyingIdentityCard] = useState(false);
 
     const [activeSection, setActiveSection] = useState("identificacion");
 
@@ -47,7 +48,7 @@ function CreateCaseApplicantStep() {
 
     useEffect(() => {
         setHaveMinDataToNextStep(!!(
-            !loadingApplicantOrBeneficiary &&
+            isVerifyingIdentityCard &&
             !showAutoFillToast &&
             applicantModel.fullName &&
             applicantModel.fullName.trim().length > 0 &&
@@ -58,20 +59,7 @@ function CreateCaseApplicantStep() {
             applicantModel.idNationality !== undefined &&
             applicantModel.gender !== undefined
         ));
-        console.log({
-            loadingApplicantOrBeneficiary: !loadingApplicantOrBeneficiary,
-            showAutoFillToast: !showAutoFillToast,
-            fullName: applicantModel.fullName,
-            fullNameValid: applicantModel.fullName?.trim().length > 0,
-            identityCard: applicantModel.identityCard,
-            identityCardValid: applicantModel.identityCard?.trim().length > 0,
-            birthDateValid: applicantModel.birthDate instanceof Date && !isNaN(applicantModel.birthDate.getTime()),
-            idNationalityValid: applicantModel.idNationality !== undefined,
-            genderValid: applicantModel.gender !== undefined,
-        });
-    }, [applicantModel, showAutoFillToast, loadingApplicantOrBeneficiary, isApplyingAutoFill]);
-
-    useEffect(() => { console.log("minData",haveMinDataToNextStep) }, [haveMinDataToNextStep])
+    }, [applicantModel, showAutoFillToast, isVerifyingIdentityCard, isApplyingAutoFill]);
 
     useEffect(() => {
         return () => {
@@ -93,6 +81,7 @@ function CreateCaseApplicantStep() {
 
         const timeoutId = setTimeout(async () => {
             const applicant = await getApplicantOrBeneficiaryById(sanitizedIdentityCard);
+            setIsVerifyingIdentityCard(true);
 
             if (applicant) {
                 setFoundApplicant(applicant);
@@ -112,6 +101,7 @@ function CreateCaseApplicantStep() {
     }, [identityCardInput]);
 
     const handleIdentityCardChange = (text: string) => {
+        setIsVerifyingIdentityCard(false)
         setIdentityCardInput(text);
         updateApplicantModel({ identityCard: text });
         setFoundApplicant(null);
