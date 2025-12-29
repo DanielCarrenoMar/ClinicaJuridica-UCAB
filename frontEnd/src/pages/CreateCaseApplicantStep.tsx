@@ -6,24 +6,29 @@ import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
 import Button from "#components/Button.tsx";
-import { CaretDown, Close, Home, Users } from "flowbite-react-icons/outline";
-import { CheckCircle, InfoCircle } from "flowbite-react-icons/solid";
+import { CaretDown, ChevronRight, Close, Home, Users } from "flowbite-react-icons/outline";
+import { CheckCircle, InfoCircle, UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { SexType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
+import ConfirmDialog from "#components/ConfirmDialog.tsx";
+import { useNavigate } from "react-router";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
 
 function CreateCaseApplicantStep() {
+    const navigate = useNavigate();
     const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const [activeStep, setActiveStep] = useState("identificacion");
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
     const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
     const [showAutoFillToast, setShowAutoFillToast] = useState(false);
     const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
+    const [minDataToNextSteap, setMinDataToNextSteap] = useState(false);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [lastIdentityCard, setLastIdentityCard] = useState<PersonID>("");
     const lookupDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const autoFillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -33,6 +38,19 @@ function CreateCaseApplicantStep() {
     const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.fullName ?? "el registro existente";
     const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
     const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
+
+    useEffect(() => {
+        setMinDataToNextSteap(!!(
+            applicantModel.fullName &&
+            applicantModel.fullName.trim().length > 0 &&
+            applicantModel.identityCard &&
+            applicantModel.identityCard.trim().length > 0 &&
+            applicantModel.birthDate instanceof Date &&
+            !isNaN(applicantModel.birthDate.getTime()) &&
+            applicantModel.idNationality !== undefined &&
+            applicantModel.gender !== undefined
+        ));
+    }, [applicantModel]);
 
     useEffect(() => {
         return () => {
@@ -430,6 +448,16 @@ function CreateCaseApplicantStep() {
 
     return (
         <>
+            <header className="bg-surface/70 flex items-center justify-between px-4 h-16">
+                <div className="flex items-center gap-2.5">
+                    <UserEditS className="size-8!" />
+                    <h1 className="text-label-medium">Solicitante</h1>
+                </div>
+                <div className="flex items-end gap-2.5">
+                    <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
+                    <Button onClick={() => { navigate("/crearCaso/caso"); }} disabled={!minDataToNextSteap} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
+                </div>
+            </header>
             <section className="flex py-2">
                 <Tabs selectedId={activeStep} onChange={setActiveStep}>
                     <Tabs.Item id="identificacion" label="Identificación" icon={<CaretDown />} />
@@ -437,13 +465,20 @@ function CreateCaseApplicantStep() {
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
                 </Tabs>
             </section>
-            <section className="relative">
-                <div className="relative grid grid-cols-12 gap-x-6 gap-y-6">
+            <section className="px-4 pb-6">
+                <div className="grid grid-cols-12 gap-x-6 gap-y-6">
                     {activeStep === "identificacion" && identificationInputs}
                     {activeStep === "vivienda" && viviendaInputs}
                     {activeStep === "familia" && familiaInputs}
                 </div>
             </section>
+            <ConfirmDialog
+                open={showCancelConfirm}
+                title="Cancelar creación de caso"
+                message="Se perderán los datos ingresados. ¿Desea volver al inicio?"
+                onConfirm={() => { setShowCancelConfirm(false); navigate("/"); }}
+                onCancel={() => { setShowCancelConfirm(false); }}
+            />
             {shouldShowAutoFillToast && (
                 <div className="fixed top-24 right-6 z-40">
                     <div className="rounded-xl gap-3 bg-surface px-5 py-4 shadow-2xl ring-1 ring-onSurface/10 flex" role="status">
@@ -467,9 +502,6 @@ function CreateCaseApplicantStep() {
                                         Autocompletar
                                     </Button>
                                 </div>
-                        </div>
-                        <div className="flex flex-col">
-                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); }}/>
                         </div>
                     </div>
                 </div>
