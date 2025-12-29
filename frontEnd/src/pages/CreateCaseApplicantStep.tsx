@@ -41,6 +41,8 @@ function CreateCaseApplicantStep() {
 
     useEffect(() => {
         setMinDataToNextSteap(!!(
+            !loadingApplicantOrBeneficiary &&
+            !foundApplicant &&
             applicantModel.fullName &&
             applicantModel.fullName.trim().length > 0 &&
             applicantModel.identityCard &&
