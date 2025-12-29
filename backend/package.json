@@ -16,7 +16,8 @@
     "migrate": "prisma migrate dev",
     "build": "tsc -p tsconfig.json",
     "seed": "tsx prisma/seed.ts",
-    "testData": "tsx prisma/testData.ts"
+    "testData": "tsx prisma/testData.ts",
+    "init": "pnpm i && pnpx prisma db push --forcer-reset && pnpm run seed && pnpm run generate"
   },
   "keywords": [],
   "author": "",
