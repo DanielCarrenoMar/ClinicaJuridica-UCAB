@@ -2,6 +2,31 @@ import { useState, useEffect } from 'react';
 import type { BeneficiaryModel } from '../models/beneficiary';
 import { getBeneficiaryRepository } from '#database/repositoryImp/BeneficiaryRepositoryImp.ts';
 
+export function useGetBeneficiaryById() {
+    const { findAllBeneficiaries } = getBeneficiaryRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const getBeneficiaryById = async (id: string): Promise<BeneficiaryModel | null> => {
+        setLoading(true);
+        try {
+            const beneficiaries = await findAllBeneficiaries();
+            return beneficiaries.find(b => b.identityCard === id) || null;
+        } catch (err) {
+            setError(err as Error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return {
+        getBeneficiaryById,
+        loading,
+        error
+    };
+}
+
 export function useBeneficiary() {
     const { createBeneficiary, deleteBeneficiary, findAllBeneficiaries, updateBeneficiary } = getBeneficiaryRepository();
     const [beneficiaries, setBeneficiaries] = useState<BeneficiaryModel[]>([]);

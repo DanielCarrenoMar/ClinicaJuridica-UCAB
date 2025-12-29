@@ -1,17 +1,124 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
 import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
-import { CaretDown, Home, Users } from "flowbite-react-icons/outline";
+import Button from "#components/Button.tsx";
+import { CaretDown, CheckCircle, Close, Home, Users } from "flowbite-react-icons/outline";
 import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { SexType, IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
+import type { ApplicantModel } from "#domain/models/applicant.ts";
+import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
+
+const LOOKUP_DEBOUNCE_MS = 600;
+const AUTOFILL_SPINNER_MS = 420;
+
+const LoadingSpinner = () => (
+    <span
+        className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+        aria-hidden="true"
+    />
+);
 
 function CreateCaseApplicantStep() {
     const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const [activeStep, setActiveStep] = useState("identificacion");
+    const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
+    const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
+    const [showAutoFillToast, setShowAutoFillToast] = useState(false);
+    const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
+    const lookupDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const autoFillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const sanitizedIdentityCard = applicantModel.identityCard?.trim() ?? "";
+    const shouldHighlightForm = Boolean(foundApplicant);
+    const shouldShowAutoFillToast = showAutoFillToast && Boolean(foundApplicant);
+    const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.name ?? "el registro existente";
+    const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
+    const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
+
+    useEffect(() => {
+        return () => {
+            if (lookupDelayRef.current) {
+                clearTimeout(lookupDelayRef.current);
+            }
+            if (autoFillTimeoutRef.current) {
+                clearTimeout(autoFillTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!sanitizedIdentityCard || sanitizedIdentityCard.length < 5) {
+            setFoundApplicant(null);
+            setShowAutoFillToast(false);
+            return;
+        }
+
+        let isCancelled = false;
+        const timeoutId = setTimeout(async () => {
+            const applicant = await getApplicantOrBeneficiaryById(sanitizedIdentityCard);
+            if (isCancelled) {
+                return;
+            }
+
+            if (applicant) {
+                setFoundApplicant(applicant);
+                setShowAutoFillToast(true);
+            } else {
+                setFoundApplicant(null);
+                setShowAutoFillToast(false);
+            }
+        }, LOOKUP_DEBOUNCE_MS);
+
+        lookupDelayRef.current = timeoutId;
+
+        return () => {
+            isCancelled = true;
+            clearTimeout(timeoutId);
+            lookupDelayRef.current = null;
+        };
+    }, [sanitizedIdentityCard, getApplicantOrBeneficiaryById]);
+
+    const handleIdentityCardChange = (text: string) => {
+        updateApplicantModel({ identityCard: text });
+        setFoundApplicant(null);
+        setShowAutoFillToast(false);
+
+        if (lookupDelayRef.current) {
+            clearTimeout(lookupDelayRef.current);
+            lookupDelayRef.current = null;
+        }
+    };
+
+    const handleAutoFill = () => {
+        if (!foundApplicant || isApplyingAutoFill) {
+            return;
+        }
+
+        const normalizedBirthDate = foundApplicant.birthDate instanceof Date
+            ? foundApplicant.birthDate
+            : new Date(foundApplicant.birthDate);
+        const normalizedServices = foundApplicant.servicesAvailable ? [...foundApplicant.servicesAvailable] : undefined;
+
+        updateApplicantModel({
+            ...foundApplicant,
+            identityCard: sanitizedIdentityCard,
+            birthDate: normalizedBirthDate,
+            servicesAvailable: normalizedServices,
+        });
+
+        setIsApplyingAutoFill(true);
+        if (autoFillTimeoutRef.current) {
+            clearTimeout(autoFillTimeoutRef.current);
+        }
+        autoFillTimeoutRef.current = setTimeout(() => {
+            setIsApplyingAutoFill(false);
+            setShowAutoFillToast(false);
+        }, AUTOFILL_SPINNER_MS);
+    };
 
     const identificationInputs = (
         <>
@@ -19,7 +126,7 @@ function CreateCaseApplicantStep() {
                 <TitleTextInput
                     label="Cedula"
                     value={applicantModel.identityCard}
-                    onChange={(text) => { updateApplicantModel({ identityCard: text }); }}
+                    onChange={handleIdentityCardChange}
                     placeholder="V-12345678"
                 />
             </div>
@@ -361,11 +468,63 @@ function CreateCaseApplicantStep() {
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
                 </Tabs>
             </section>
-            <section className="grid grid-cols-12 gap-x-6 gap-y-6">
-                {activeStep === "identificacion" && identificationInputs}
-                {activeStep === "vivienda" && viviendaInputs}
-                {activeStep === "familia" && familiaInputs}
+            <section className="relative">
+                {shouldHighlightForm && (
+                    <div
+                        className="pointer-events-none absolute inset-0 rounded-3xl border-2 border-success/60 bg-success/5 shadow-[0_15px_35px_rgba(16,185,129,0.35)]"
+                        aria-hidden="true"
+                    />
+                )}
+                <div className="relative z-[1] grid grid-cols-12 gap-x-6 gap-y-6">
+                    {activeStep === "identificacion" && identificationInputs}
+                    {activeStep === "vivienda" && viviendaInputs}
+                    {activeStep === "familia" && familiaInputs}
+                </div>
             </section>
+            {shouldShowAutoFillToast && (
+                <div className="fixed top-24 right-6 z-40 w-[360px]">
+                    <div className="rounded-2xl bg-surface px-5 py-4 shadow-2xl ring-1 ring-onSurface/10" role="status">
+                        <div className="flex items-start gap-3">
+                            <div className="text-success">
+                                <CheckCircle className="h-6 w-6" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div>
+                                        <p className="font-semibold text-label-medium">Cédula encontrada</p>
+                                        <p className="text-body-small text-onSurface/70">
+                                            Encontramos datos previos de {toastApplicantName}. Autocompleta el formulario o sigue editando manualmente.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="text-onSurface/60 transition-colors hover:text-onSurface"
+                                        onClick={() => { setShowAutoFillToast(false); }}
+                                        aria-label="Cerrar notificación"
+                                    >
+                                        <Close className="h-4 w-4" />
+                                    </button>
+                                </div>
+                                <div className="mt-3 flex items-center gap-3">
+                                    <Button
+                                        type="button"
+                                        variant="resalted"
+                                        onClick={handleAutoFill}
+                                        disabled={isAutoFillDisabled}
+                                        icon={showAutoFillSpinner ? <LoadingSpinner /> : <CheckCircle className="h-4 w-4" />}
+                                        className="h-10 px-4"
+                                    >
+                                        Autocompletar
+                                    </Button>
+                                    <span className="text-xs text-onSurface/60">
+                                        Revisarás los datos antes de guardar.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
