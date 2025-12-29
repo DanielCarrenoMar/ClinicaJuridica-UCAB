@@ -99,7 +99,7 @@ async function main() {
     });
 
     const nucleus = await prisma.nucleus.upsert({
-        where: { name: 'Núcleo Centro' },
+        where: { idNucleus: 'GUAYANA' },
         update: {
             idState: state.idState,
             municipalityNumber: municipality.municipalityNumber,
@@ -107,7 +107,7 @@ async function main() {
             isActive: true
         },
         create: {
-            name: 'Núcleo Centro',
+            idNucleus: 'GUAYANA',
             isActive: true,
             idState: state.idState,
             municipalityNumber: municipality.municipalityNumber,

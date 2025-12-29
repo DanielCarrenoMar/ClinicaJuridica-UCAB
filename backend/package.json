@@ -15,7 +15,8 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
     "build": "tsc -p tsconfig.json",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "testData": "tsx prisma/testData.ts"
   },
   "keywords": [],
   "author": "",
