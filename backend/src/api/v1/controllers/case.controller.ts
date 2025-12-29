@@ -1,10 +1,14 @@
 import type { Request, Response } from 'express';
 import caseService from '../services/case.service.js';
 
-export async function getAllCases(req: Request, res: Response): Promise<void> {
+export async function getAll(req: Request, res: Response): Promise<void> {
   try {
-    // El controlador pide al servicio los datos
-    const result = await caseService.getAllCases();
+    const { q } = req.query;
+
+    const result = q && typeof q === 'string'
+      ? await caseService.searchCases(q)
+      : await caseService.getAllCases();
+
     res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -12,7 +16,7 @@ export async function getAllCases(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function getCaseById(req: Request, res: Response): Promise<void> {
+export async function getById(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     const caseId = parseInt(id);
@@ -22,7 +26,6 @@ export async function getCaseById(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // El controlador depende del servicio para buscar la data
     const result = await caseService.getCaseById(caseId);
     
     if (!result.success) {
@@ -37,17 +40,15 @@ export async function getCaseById(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function createCase(req: Request, res: Response): Promise<void> {
+export async function create(req: Request, res: Response): Promise<void> {
   try {
     const caseData = req.body;
 
-    // Validación de entrada antes de llamar al servicio
     if (
       !caseData.problemSummary || 
       !caseData.processType || 
       !caseData.applicantId || 
       !caseData.idLegalArea ||
-      !caseData.teacherId ||
       !caseData.term
     ) {
       res.status(400).json({
@@ -57,7 +58,6 @@ export async function createCase(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // El controlador envía la data limpia al servicio
     const result = await caseService.createCase(caseData);
     
     if (!result.success) {
@@ -72,16 +72,23 @@ export async function createCase(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function searchCases(req: Request, res: Response): Promise<void> {
+export async function update(req: Request, res: Response): Promise<void> {
   try {
-    const { q } = req.query;
-    
-    if (!q || typeof q !== 'string') {
-      res.status(400).json({ success: false, message: 'Término de búsqueda requerido' });
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
       return;
     }
 
-    const result = await caseService.searchCases(q);
+    const result = await caseService.updateCase(caseId, req.body);
+    
+    if (!result.success) {
+      res.status(404).json(result);
+      return;
+    }
+
     res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -91,7 +98,7 @@ export async function searchCases(req: Request, res: Response): Promise<void> {
 
 export async function deleteCase(req: Request, res: Response): Promise<void> {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const caseId = parseInt(id);
 
     if (isNaN(caseId)) {
@@ -105,4 +112,96 @@ export async function deleteCase(req: Request, res: Response): Promise<void> {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: errorMessage });
   }
+}
+
+export async function changeStatus(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    const { description, date } = req.body;
+
+    if (isNaN(caseId) || !description) {
+      res.status(400).json({ success: false, message: 'ID o descripción faltante' });
+      return;
+    }
+
+    const result = await caseService.changeCaseStatus(caseId, description, date);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getTimeline(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const result = await caseService.getCaseTimeline(caseId);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function assignStudent(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    const { studentId } = req.body;
+
+    if (isNaN(caseId) || !studentId) {
+      res.status(400).json({ success: false, message: 'Datos incompletos para la asignación' });
+      return;
+    }
+
+    const result = await caseService.assignStudentToCase(caseId, studentId);
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getStudentHistory(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const result = await caseService.getAssignedStudents(caseId);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function addAction(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Agregar Acción' no implementada aún" });
+}
+
+export async function scheduleAppointment(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Agendar Cita' no implementada aún" });
+}
+
+export async function updateAppointmentStatus(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Actualizar Cita' no implementada aún" });
+}
+
+export async function getDocuments(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Ver Documentos' no implementada aún" });
+}
+
+export async function addDocument(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Subir Documento' no implementada aún" });
+}
+
+export async function deleteDocument(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Eliminar Documento' no implementada aún" });
 }
