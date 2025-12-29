@@ -1,10 +1,11 @@
 import type { MaritalStatus } from "#domain/mtypes.ts";
 import type { BeneficiaryModel } from "./beneficiary";
 
-export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'> {
-    email: string;
-    cellPhone: string;
-    homePhone: string;
+export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' | 'identityCard'> {
+    identityCard: string;
+    email?: string;
+    cellPhone?: string;
+    homePhone?: string;
     maritalStatus?: MaritalStatus;
     isConcubine?: boolean;
     createdAt: Date;
@@ -12,10 +13,10 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'>
     headEducationLevelId?: number;
     headEducationLevel?: string;
     headStudyTime?: string;
-    applicantEducationLevel: string;
-    applicantStudyTime: string;
-    workCondition: string;
-    activityCondition: string;
+    applicantEducationLevel?: string;
+    applicantStudyTime?: string;
+    workCondition?: string;
+    activityCondition?: string;
     neighborhood?: string;
     address?: string;
     housingCondition?: string;
@@ -34,8 +35,8 @@ export const defaultApplicantModel: ApplicantModel = {
     identityCard: "",
     gender: 'M',
     birthDate: new Date(),
-    name: "",
-    idType: 'V',
+    fullName: "",
+    idNationality: 'V',
     idState: undefined,
     stateName: "",
     municipalityNumber: undefined,

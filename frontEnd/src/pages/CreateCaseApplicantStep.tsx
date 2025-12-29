@@ -1,17 +1,116 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
 import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
-import { CaretDown, Home, Users } from "flowbite-react-icons/outline";
+import Button from "#components/Button.tsx";
+import { CaretDown, Close, Home, Users } from "flowbite-react-icons/outline";
+import { CheckCircle, InfoCircle } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
-import type { SexType, IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
+import type { SexType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
+import type { ApplicantModel } from "#domain/models/applicant.ts";
+import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
+import LoadingSpinner from "#components/LoadingSpinner.tsx";
+
+const LOOKUP_DEBOUNCE_MS = 600;
+const AUTOFILL_SPINNER_MS = 420;
 
 function CreateCaseApplicantStep() {
     const { applicantModel, updateApplicantModel} = useCaseOutletContext();
     const [activeStep, setActiveStep] = useState("identificacion");
+    const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
+    const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
+    const [showAutoFillToast, setShowAutoFillToast] = useState(false);
+    const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
+    const [lastIdentityCard, setLastIdentityCard] = useState<PersonID>("");
+    const lookupDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const autoFillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const sanitizedIdentityCard = applicantModel.identityCard.trim();
+    const shouldShowAutoFillToast = showAutoFillToast && Boolean(foundApplicant);
+    const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.fullName ?? "el registro existente";
+    const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
+    const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
+
+    useEffect(() => {
+        return () => {
+            if (lookupDelayRef.current) {
+                clearTimeout(lookupDelayRef.current);
+            }
+            if (autoFillTimeoutRef.current) {
+                clearTimeout(autoFillTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!sanitizedIdentityCard || sanitizedIdentityCard.length < 5 || sanitizedIdentityCard === lastIdentityCard) {
+            setFoundApplicant(null);
+            setShowAutoFillToast(false);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            const applicant = await getApplicantOrBeneficiaryById(sanitizedIdentityCard);
+
+            if (applicant) {
+                setFoundApplicant(applicant);
+                setShowAutoFillToast(true);
+            } else {
+                setFoundApplicant(null);
+                setShowAutoFillToast(false);
+            }
+        }, LOOKUP_DEBOUNCE_MS);
+
+        lookupDelayRef.current = timeoutId;
+
+        return () => {
+            clearTimeout(timeoutId);
+            lookupDelayRef.current = null;
+        };
+    }, [getApplicantOrBeneficiaryById]);
+
+    const handleIdentityCardChange = (text: string) => {
+        updateApplicantModel({ identityCard: text });
+        setFoundApplicant(null);
+        setShowAutoFillToast(false);
+
+        if (lookupDelayRef.current) {
+            clearTimeout(lookupDelayRef.current);
+            lookupDelayRef.current = null;
+        }
+    };
+
+    const handleAutoFill = () => {
+        if (!foundApplicant || isApplyingAutoFill) {
+            return;
+        }
+
+        const normalizedBirthDate = foundApplicant.birthDate instanceof Date
+            ? foundApplicant.birthDate
+            : new Date(foundApplicant.birthDate);
+        const normalizedServices = foundApplicant.servicesAvailable ? [...foundApplicant.servicesAvailable] : undefined;
+
+        updateApplicantModel({
+            ...foundApplicant,
+            identityCard: sanitizedIdentityCard,
+            birthDate: normalizedBirthDate,
+            servicesAvailable: normalizedServices,
+        });
+
+        setIsApplyingAutoFill(true);
+        if (autoFillTimeoutRef.current) {
+            clearTimeout(autoFillTimeoutRef.current);
+        }
+        autoFillTimeoutRef.current = setTimeout(() => {
+            setIsApplyingAutoFill(false);
+            setShowAutoFillToast(false);
+        }, AUTOFILL_SPINNER_MS);
+
+        setLastIdentityCard(sanitizedIdentityCard);
+    };
 
     const identificationInputs = (
         <>
@@ -19,7 +118,7 @@ function CreateCaseApplicantStep() {
                 <TitleTextInput
                     label="Cedula"
                     value={applicantModel.identityCard}
-                    onChange={(text) => { updateApplicantModel({ identityCard: text }); }}
+                    onChange={handleIdentityCardChange}
                     placeholder="V-12345678"
                 />
             </div>
@@ -361,11 +460,43 @@ function CreateCaseApplicantStep() {
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
                 </Tabs>
             </section>
-            <section className="grid grid-cols-12 gap-x-6 gap-y-6">
-                {activeStep === "identificacion" && identificationInputs}
-                {activeStep === "vivienda" && viviendaInputs}
-                {activeStep === "familia" && familiaInputs}
+            <section className="relative">
+                <div className="relative grid grid-cols-12 gap-x-6 gap-y-6">
+                    {activeStep === "identificacion" && identificationInputs}
+                    {activeStep === "vivienda" && viviendaInputs}
+                    {activeStep === "familia" && familiaInputs}
+                </div>
             </section>
+            {shouldShowAutoFillToast && (
+                <div className="fixed top-24 right-6 z-40">
+                    <div className="rounded-xl gap-3 bg-surface px-5 py-4 shadow-2xl ring-1 ring-onSurface/10 flex" role="status">
+                        <div className="flex flex-col py-2 items-start gap-2">
+                                <header className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <InfoCircle/>
+                                        <h3 className="text-label-small">Cédula encontrada</h3>
+                                    </div>
+                                </header>
+                                <p className="mx-2 text-body-small text-onSurface/70">Se encontro el registro de <strong className="text-body-large">{toastApplicantName}</strong></p>
+                                <div className="mt-3 flex w-full items-center gap-3">
+                                    <Button
+                                        type="button"
+                                        variant="resalted"
+                                        onClick={handleAutoFill}
+                                        disabled={isAutoFillDisabled}
+                                        icon={showAutoFillSpinner ? <LoadingSpinner /> : <CheckCircle className="h-4 w-4" />}
+                                        className="flex-1"
+                                    >
+                                        Autocompletar
+                                    </Button>
+                                </div>
+                        </div>
+                        <div className="flex flex-col">
+                            <Button variant="outlined" icon={<Close/>} onClick={() => { setShowAutoFillToast(false); setLastIdentityCard(applicantModel.identityCard); }}/>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
