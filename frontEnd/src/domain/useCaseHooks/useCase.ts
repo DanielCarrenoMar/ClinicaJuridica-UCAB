@@ -1,18 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { CaseModel } from '../models/case';
 import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
 
-export function useCase() {
-    const { createCase, deleteCase, findAllCases, updateCase } = getCaseRepository();
+export function useGetCases() {
+    const { findAllCases } = getCaseRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    useEffect(() => {
-        loadCases();
-    }, []);
-
-    const loadCases = async () => {
+    const loadCases = useCallback(async () => {
         setLoading(true);
         try {
             const data = await findAllCases();
@@ -23,45 +19,96 @@ export function useCase() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const addCase = async (caseData: CaseModel) => {
-        try {
-            const newCase = await createCase(caseData);
-            setCases(prev => [...prev, newCase]);
-        } catch (err) {
-            setError(err as Error);
-            throw err;
-        }
-    };
-
-    const editCase = async (id: string, data: Partial<CaseModel>) => {
-        try {
-            const updatedCase = await updateCase(id, data);
-            setCases(prev => prev.map(c => c.id.toString() === id ? updatedCase : c));
-        } catch (err) {
-            setError(err as Error);
-            throw err;
-        }
-    };
-
-    const removeCase = async (id: string) => {
-        try {
-            await deleteCase(id);
-            setCases(prev => prev.filter(c => c.id.toString() !== id));
-        } catch (err) {
-            setError(err as Error);
-            throw err;
-        }
-    };
+    useEffect(() => {
+        loadCases();
+    }, [loadCases]);
 
     return {
         cases,
         loading,
         error,
-        refresh: loadCases,
+        refresh: loadCases
+    };
+}
+
+// Hook para crear un caso
+export function useCreateCase() {
+    const { createCase } = getCaseRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const addCase = async (caseData: CaseModel) => {
+        setLoading(true);
+        try {
+            const newCase = await createCase(caseData);
+            setError(null);
+            return newCase;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
         addCase,
+        loading,
+        error
+    };
+}
+
+// Hook para editar un caso
+export function useUpdateCase() {
+    const { updateCase } = getCaseRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const editCase = async (id: string, data: Partial<CaseModel>) => {
+        setLoading(true);
+        try {
+            const updatedCase = await updateCase(id, data);
+            setError(null);
+            return updatedCase;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
         editCase,
-        removeCase
+        loading,
+        error
+    };
+}
+
+// Hook para eliminar un caso
+export function useDeleteCase() {
+    const { deleteCase } = getCaseRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const removeCase = async (id: string) => {
+        setLoading(true);
+        try {
+            await deleteCase(id);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        removeCase,
+        loading,
+        error
     };
 }
