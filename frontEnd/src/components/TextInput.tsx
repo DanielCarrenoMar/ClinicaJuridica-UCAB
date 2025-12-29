@@ -27,7 +27,7 @@ export default function TextInput({
         defaultValue={defaultText}
         onChange={handleChange}
         placeholder={placeholder}
-        className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small text-onSurface placeholder:text-onSurface/40 focus:border-onSurface transition-color"
+        className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40"
       />
     </div>
   );
