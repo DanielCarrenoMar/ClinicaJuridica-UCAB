@@ -27,9 +27,8 @@ function CreateCaseApplicantStep() {
     const autoFillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const sanitizedIdentityCard = applicantModel.identityCard?.trim() ?? "";
-    const shouldHighlightForm = Boolean(foundApplicant);
     const shouldShowAutoFillToast = showAutoFillToast && Boolean(foundApplicant);
-    const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.name ?? "el registro existente";
+    const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.fullName ?? "el registro existente";
     const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
     const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
 
@@ -463,13 +462,7 @@ function CreateCaseApplicantStep() {
                 </Tabs>
             </section>
             <section className="relative">
-                {shouldHighlightForm && (
-                    <div
-                        className="pointer-events-none absolute inset-0 rounded-3xl border-2 border-success/60 bg-success/5 shadow-[0_15px_35px_rgba(16,185,129,0.35)]"
-                        aria-hidden="true"
-                    />
-                )}
-                <div className="relative z-[1] grid grid-cols-12 gap-x-6 gap-y-6">
+                <div className="relative grid grid-cols-12 gap-x-6 gap-y-6">
                     {activeStep === "identificacion" && identificationInputs}
                     {activeStep === "vivienda" && viviendaInputs}
                     {activeStep === "familia" && familiaInputs}
