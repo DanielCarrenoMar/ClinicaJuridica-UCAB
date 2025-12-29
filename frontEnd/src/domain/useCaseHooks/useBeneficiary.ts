@@ -3,15 +3,14 @@ import type { BeneficiaryModel } from '../models/beneficiary';
 import { getBeneficiaryRepository } from '#database/repositoryImp/BeneficiaryRepositoryImp.ts';
 
 export function useGetBeneficiaryById() {
-    const { findAllBeneficiaries } = getBeneficiaryRepository();
+    //const { findAllBeneficiaries } = getBeneficiaryRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
     const getBeneficiaryById = async (id: string): Promise<BeneficiaryModel | null> => {
         setLoading(true);
         try {
-            const beneficiaries = await findAllBeneficiaries();
-            return beneficiaries.find(b => b.identityCard === id) || null;
+            return null
         } catch (err) {
             setError(err as Error);
             return null;
