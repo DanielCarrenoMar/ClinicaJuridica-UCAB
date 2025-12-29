@@ -1,15 +1,14 @@
 import type { ReactNode } from 'react';
 import { useDropDownContext } from './DropDown';
-import { Plus } from 'flowbite-react-icons/outline';
 
-interface DropDownOptionProps {
+interface DropdownOptionProps {
   value: string | number;
   children: string; // Enforcing string children for label display in parent
   icon?: ReactNode;
   circleIcon?: boolean;
 }
 
-export default function DropDownOption({ value, children, icon, circleIcon = false }: DropDownOptionProps) {
+export default function DropdownOption({ value, children, icon, circleIcon = false }: DropdownOptionProps) {
   const { selectedValue, selectOption } = useDropDownContext();
   const isSelected = selectedValue === value;
 

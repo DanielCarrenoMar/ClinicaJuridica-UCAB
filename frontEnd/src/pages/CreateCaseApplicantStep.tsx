@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DropDownOption from "#components/DropDown/DropDownOption.tsx";
+import DropdownOption from "#components/DropDown/DropDownOption.tsx";
 import DropDownCheck from "#components/DropDownCheck/DropDownCheck.tsx";
 import DropDownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.tsx";
 import Tabs from "#components/Tabs.tsx";
@@ -46,8 +46,8 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.gender || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ gender: value as SexType }); }}
                 >
-                    <DropDownOption value="M">Masculino</DropDownOption>
-                    <DropDownOption value="F">Femenino</DropDownOption>
+                    <DropdownOption value="M">Masculino</DropdownOption>
+                    <DropdownOption value="F">Femenino</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
@@ -56,9 +56,9 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.idNationality || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ idNationality: value as IdNacionality }); }}
                 >
-                    <DropDownOption value="V">Venezolana</DropDownOption>
-                    <DropDownOption value="E">Extranjera</DropDownOption>
-                    <DropDownOption value="J">Juridica</DropDownOption>
+                    <DropdownOption value="V">Venezolana</DropdownOption>
+                    <DropdownOption value="E">Extranjera</DropdownOption>
+                    <DropdownOption value="J">Juridica</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-2">
@@ -67,10 +67,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.maritalStatus || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatus }); }}
                 >
-                    <DropDownOption value="single">Soltero/a</DropDownOption>
-                    <DropDownOption value="married">Casado/a</DropDownOption>
-                    <DropDownOption value="divorced">Divorciado/a</DropDownOption>
-                    <DropDownOption value="widowed">Viudo/a</DropDownOption>
+                    <DropdownOption value="single">Soltero/a</DropdownOption>
+                    <DropdownOption value="married">Casado/a</DropdownOption>
+                    <DropdownOption value="divorced">Divorciado/a</DropdownOption>
+                    <DropdownOption value="widowed">Viudo/a</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-2">
@@ -79,8 +79,8 @@ function CreateCaseApplicantStep() {
                     selectedValue={(applicantModel.isConcubine ?? false).toString()}
                     onSelectionChange={(value) => { updateApplicantModel({ isConcubine: value === "true" }); }}
                 >
-                    <DropDownOption value="true">Si</DropDownOption>
-                    <DropDownOption value="false">No</DropDownOption>
+                    <DropdownOption value="true">Si</DropdownOption>
+                    <DropdownOption value="false">No</DropdownOption>
                 </TitleDropdown>
             </div>
 
@@ -123,10 +123,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.applicantEducationLevel || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as string }); }}
                 >
-                    <DropDownOption value="PRIMARIA">Primaria</DropDownOption> {/*Hay que hacer una peticion para traer los tipos de la BD*/}
-                    <DropDownOption value="SECUNDARIA">Secundaria</DropDownOption>
-                    <DropDownOption value="UNIVERSITARIA">Universitaria</DropDownOption>
-                    <DropDownOption value="POSTGRADO">Postgrado</DropDownOption>
+                    <DropdownOption value="PRIMARIA">Primaria</DropdownOption> {/*Hay que hacer una peticion para traer los tipos de la BD*/}
+                    <DropdownOption value="SECUNDARIA">Secundaria</DropdownOption>
+                    <DropdownOption value="UNIVERSITARIA">Universitaria</DropdownOption>
+                    <DropdownOption value="POSTGRADO">Postgrado</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -135,9 +135,9 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.workCondition || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ workCondition: value as string }); }}
                 >
-                    <DropDownOption value="EMPLEADO">Empleado</DropDownOption>
-                    <DropDownOption value="DESEMPLEADO">Desempleado</DropDownOption>
-                    <DropDownOption value="INDEPENDIENTE">Independiente</DropDownOption>
+                    <DropdownOption value="EMPLEADO">Empleado</DropdownOption>
+                    <DropdownOption value="DESEMPLEADO">Desempleado</DropdownOption>
+                    <DropdownOption value="INDEPENDIENTE">Independiente</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -146,8 +146,8 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.activityCondition || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ activityCondition: value as string }); }}
                 >
-                    <DropDownOption value="ACTIVO">Activo</DropDownOption>
-                    <DropDownOption value="INACTIVO">Inactivo</DropDownOption>
+                    <DropdownOption value="ACTIVO">Activo</DropdownOption>
+                    <DropdownOption value="INACTIVO">Inactivo</DropdownOption>
                 </TitleDropdown>
             </div>
         </>
@@ -202,11 +202,11 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.housingCondition || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ housingCondition: value as string }); }}
                 >
-                    <DropDownOption value="PROPIA">Propia</DropDownOption>
-                    <DropDownOption value="ALQUILADA">Alquilada</DropDownOption>
-                    <DropDownOption value="PRESTADA">Prestada</DropDownOption>
-                    <DropDownOption value="INVADIDA">Invadida</DropDownOption>
-                    <DropDownOption value="OTRA">Otra</DropDownOption>
+                    <DropdownOption value="PROPIA">Propia</DropdownOption>
+                    <DropdownOption value="ALQUILADA">Alquilada</DropdownOption>
+                    <DropdownOption value="PRESTADA">Prestada</DropdownOption>
+                    <DropdownOption value="INVADIDA">Invadida</DropdownOption>
+                    <DropdownOption value="OTRA">Otra</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -215,10 +215,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.housingType || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ housingType: value as string }); }}
                 >
-                    <DropDownOption value="CASA">Casa</DropDownOption>
-                    <DropDownOption value="APARTAMENTO">Apartamento</DropDownOption>
-                    <DropDownOption value="ANEXO">Anexo</DropDownOption>
-                    <DropDownOption value="RANCHO">Rancho</DropDownOption>
+                    <DropdownOption value="CASA">Casa</DropdownOption>
+                    <DropdownOption value="APARTAMENTO">Apartamento</DropdownOption>
+                    <DropdownOption value="ANEXO">Anexo</DropdownOption>
+                    <DropdownOption value="RANCHO">Rancho</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -227,10 +227,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.tenureType || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ tenureType: value as string }); }}
                 >
-                    <DropDownOption value="PROPIETARIO">Propietario</DropDownOption>
-                    <DropDownOption value="ALQUILER">Alquiler</DropDownOption>
-                    <DropDownOption value="CEDIDA">Cedida/Prestada</DropDownOption>
-                    <DropDownOption value="POSESION">Posesion</DropDownOption>
+                    <DropdownOption value="PROPIETARIO">Propietario</DropdownOption>
+                    <DropdownOption value="ALQUILER">Alquiler</DropdownOption>
+                    <DropdownOption value="CEDIDA">Cedida/Prestada</DropdownOption>
+                    <DropdownOption value="POSESION">Posesion</DropdownOption>
                 </TitleDropdown>
             </div>
 
@@ -260,8 +260,8 @@ function CreateCaseApplicantStep() {
                     selectedValue={(applicantModel.isHeadOfHousehold ?? false).toString()}
                     onSelectionChange={(value) => { updateApplicantModel({ isHeadOfHousehold: value === "true" }); }}
                 >
-                    <DropDownOption value="true">Si</DropDownOption>
-                    <DropDownOption value="false">No</DropDownOption>
+                    <DropdownOption value="true">Si</DropdownOption>
+                    <DropdownOption value="false">No</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
@@ -270,10 +270,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.headEducationLevel || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ headEducationLevel: value as string }); }}
                 >
-                    <DropDownOption value="PRIMARIA">Primaria</DropDownOption>
-                    <DropDownOption value="SECUNDARIA">Secundaria</DropDownOption>
-                    <DropDownOption value="UNIVERSITARIA">Universitaria</DropDownOption>
-                    <DropDownOption value="POSTGRADO">Postgrado</DropDownOption>
+                    <DropdownOption value="PRIMARIA">Primaria</DropdownOption>
+                    <DropdownOption value="SECUNDARIA">Secundaria</DropdownOption>
+                    <DropdownOption value="UNIVERSITARIA">Universitaria</DropdownOption>
+                    <DropdownOption value="POSTGRADO">Postgrado</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">

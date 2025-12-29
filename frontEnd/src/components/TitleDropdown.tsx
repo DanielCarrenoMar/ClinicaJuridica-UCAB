@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import DropDown from './DropDown/DropDown';
+import Dropdown from './DropDown/DropDown';
 
 interface TitleDropdownProps {
   label: string;
@@ -26,14 +26,14 @@ export default function TitleDropdown({
         </h4>
       </div>
       <div className="w-full">
-        <DropDown 
+        <Dropdown 
             label={dropdownLabel} 
             selectedValue={selectedValue} 
             onSelectionChange={onSelectionChange}
             showTitle={!selectedValue}
         >
             {children}
-        </DropDown>
+        </Dropdown>
       </div>
     </div>
   );
