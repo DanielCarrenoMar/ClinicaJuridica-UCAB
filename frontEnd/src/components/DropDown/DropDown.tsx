@@ -2,22 +2,22 @@ import { createContext, useContext, useState, useRef, useEffect, type ReactNode 
 import { ChevronDown } from 'flowbite-react-icons/outline';
 
 // Context definition
-interface DropDownContextType {
+interface DropdownContextType {
   selectedValue: string | number | null;
   selectOption: (value: string | number, label: string) => void;
 }
 
-const DropDownContext = createContext<DropDownContextType | undefined>(undefined);
+const DropdownContext = createContext<DropdownContextType | undefined>(undefined);
 
-export const useDropDownContext = () => {
-  const context = useContext(DropDownContext);
+export const useDropdownContext = () => {
+  const context = useContext(DropdownContext);
   if (!context) {
-    throw new Error('useDropDownContext must be used within a DropDown');
+    throw new Error('useDropdownContext must be used within a Dropdown');
   }
   return context;
 };
 
-interface DropDownProps {
+interface DropdownProps {
   label?: string;
   children: ReactNode;
   selectedValue?: string | number | null; // Controlled
@@ -25,7 +25,7 @@ interface DropDownProps {
   showTitle?: boolean;
 }
 
-export default function DropDown({ label = "Dropdown", children, selectedValue, onSelectionChange, showTitle = false }: DropDownProps) {
+export default function Dropdown({ label = "Dropdown", children, selectedValue, onSelectionChange, showTitle = false }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValue, setInternalSelectedValue] = useState<string | number | null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string>(label);
@@ -57,7 +57,7 @@ export default function DropDown({ label = "Dropdown", children, selectedValue, 
   }, [dropdownRef]);
 
   return (
-    <DropDownContext.Provider value={{ selectedValue: currentSelectedValue, selectOption }}>
+    <DropdownContext.Provider value={{ selectedValue: currentSelectedValue, selectOption }}>
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           type="button"
@@ -83,6 +83,6 @@ export default function DropDown({ label = "Dropdown", children, selectedValue, 
           </div>
         )}
       </div>
-    </DropDownContext.Provider>
+    </DropdownContext.Provider>
   );
 }

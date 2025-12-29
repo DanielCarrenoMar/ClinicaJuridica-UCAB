@@ -1,98 +1,114 @@
-import DropDownOption from "#components/DropDown/DropDownOption.tsx";
+import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
-import TitleTextInput from "#components/TitleTextInput.tsx";
+import { User } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
+import TextInput from "#components/TextInput.tsx";
+import Button from "#components/Button.tsx";
+import Dropdown from "#components/Dropdown/Dropdown.tsx";
 
 function CreateCaseCaseStep() {
     const { applicantModel, caseDAO, updateCaseDAO} = useCaseOutletContext();
 
     return (
-        <div className="grid grid-cols-12 gap-x-6 gap-y-6">
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Tipo de proceso"
-                    selectedValue={caseDAO.processType}
-                    onSelectionChange={(value) => { updateCaseDAO({ processType: value as any }); }}
-                >
-                    <DropDownOption value="T">Trámite</DropDownOption>
-                    <DropDownOption value="A">Asesoría</DropDownOption>
-                    <DropDownOption value="CM">Conciliación/Mediación</DropDownOption>
-                    <DropDownOption value="R">Redacción</DropDownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-6">
-                <TitleDropdown
-                    label="Area legal"
-                    selectedValue={caseDAO.idLegalArea}
-                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
-                >
-                    <DropDownOption value={1}>Civil</DropDownOption>
-                    <DropDownOption value={2}>Penal</DropDownOption>
-                    <DropDownOption value={3}>Laboral</DropDownOption>
-                    <DropDownOption value={4}>Familia</DropDownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="Núcleo"
-                    value={caseDAO.idNucleus?.toString() ?? ""}
-                    onChange={(text) => { const num = Number(text); updateCaseDAO({ idNucleus: Number.isNaN(num) ? 0 : num }); }}
-                    placeholder="Id de núcleo"
-                />
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="Término"
-                    value={caseDAO.term}
-                    onChange={(text) => { updateCaseDAO({ term: text }); }}
-                    placeholder="2024-2025"
-                />
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="ID solicitante"
-                    value={caseDAO.applicantId}
-                    onChange={(text) => { updateCaseDAO({ applicantId: text }); }}
-                    placeholder="Documento del solicitante"
-                />
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="ID profesor"
-                    value={caseDAO.teacherId}
-                    onChange={(text) => { updateCaseDAO({ teacherId: text }); }}
-                    placeholder="Documento del profesor"
-                />
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="Periodo profesor"
-                    value={caseDAO.teacherTerm}
-                    onChange={(text) => { updateCaseDAO({ teacherTerm: text }); }}
-                    placeholder="2024-2025"
-                />
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="Tribunal (opcional)"
-                    value={caseDAO.idCourt?.toString() ?? ""}
-                    onChange={(text) => { const num = Number(text); updateCaseDAO({ idCourt: Number.isNaN(num) ? undefined : num }); }}
-                    placeholder="Id tribunal"
-                />
-            </div>
-            <div className="col-span-12">
-                <TitleTextInput
-                    label="Descripcion breve"
-                    value={caseDAO.problemSummary}
-                    onChange={(text) => { updateCaseDAO({ problemSummary: text }); }}
-                    placeholder="Detalle rapido del caso"
-                />
-            </div>
-            <div className="col-span-12 text-body-medium text-onSurface/80">
-                <p>
-                    Solicitante seleccionado: <span className="font-semibold">{applicantModel.fullName || "Pendiente"}</span>
-                </p>
-            </div>
+        <div className="p-4 flex flex-col gap-4">
+            <article className="grid grid-cols-4 grid-rows-4 gap-y-4">
+                <section className="col-span-2">
+                    <h3 className="text-label-small mb-2">
+                        Solicitante
+                    </h3>
+                    <span className="flex items-center gap-2">
+                        <User/>
+                        <p className="text-body-small">
+                            <strong className="text-body-medium">{applicantModel.fullName} </strong>
+                            {`${applicantModel.idNationality}-${applicantModel.identityCard}`}
+                        </p>
+                    </span>
+                </section>
+                <section className="col-span-2 row-span-2 flex flex-col">
+                    <header className="flex justify-between items-center w-full mb-2">
+                        <h3 className="text-label-small mb-2">
+                            Beneficiarios
+                        </h3>
+                        <Button variant="outlined" className="h-10">Añadir</Button>
+                    </header>
+                    <div className="bg-surface rounded-xl border border-onSurface flex-1">
+
+                    </div>
+                </section>
+                <section className="col-span-2">
+                    <TitleDropdown
+                        label="Tipo de tramite"
+                        selectedValue={caseDAO.processType}
+                        onSelectionChange={(value) => { updateCaseDAO({ processType: value as any }); }}
+                    >
+                        <DropdownOption value="T">Trámite</DropdownOption>
+                        <DropdownOption value="A">Asesoría</DropdownOption>
+                        <DropdownOption value="CM">Conciliación/Mediación</DropdownOption>
+                        <DropdownOption value="R">Redacción</DropdownOption>
+                    </TitleDropdown>
+                </section>
+                <section className="col-span-2">
+                    <h4 className="text-body-large mb-2">
+                            Ambito Legal
+                    </h4>
+                    <span className="flex gap-4">
+                        <Dropdown
+                            label="Materia"
+                            selectedValue={caseDAO.idLegalArea}
+                            onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
+                        >
+                            <DropdownOption value={1}>Civil</DropdownOption>
+                            <DropdownOption value={2}>Penal</DropdownOption>
+                            <DropdownOption value={3}>Laboral</DropdownOption>
+                            <DropdownOption value={4}>Familia</DropdownOption>
+                        </Dropdown>
+                        <Dropdown
+                            label="Ambito"
+                            selectedValue={caseDAO.idLegalArea}
+                            onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
+                        >
+                            <DropdownOption value={1}>Civil</DropdownOption>
+                            <DropdownOption value={2}>Penal</DropdownOption>
+                            <DropdownOption value={3}>Laboral</DropdownOption>
+                            <DropdownOption value={4}>Familia</DropdownOption>
+                        </Dropdown>
+                    </span>
+                </section>
+                <section className="col-span-2 row-span-2 flex flex-col">
+                    <header className="flex justify-between items-center w-full mb-2">
+                        <h3 className="text-label-small mb-2">
+                            Recaudos consignados
+                        </h3>
+                        <Button variant="outlined" className="h-10">Añadir</Button>
+                    </header>
+                    <div className="bg-surface rounded-xl border border-onSurface flex-1">
+
+                    </div>
+                </section>
+                <section className="col-span-2">
+                    <TitleDropdown
+                        label="Nucleo"
+                        selectedValue={caseDAO.idNucleus}
+                        onSelectionChange={(value) => { updateCaseDAO({ idNucleus: value as string }) }}
+                    >
+                        <DropdownOption value="GUAYANA">GUAYANA</DropdownOption>
+                    </TitleDropdown>
+                </section>
+            </article>
+            <article>
+                    <header className="flex justify-between items-center w-full">
+                        <h3 className="text-label-small mb-2">
+                            Sintesis del problema
+                        </h3>
+                    </header>
+                    
+                    <TextInput
+                        defaultText={caseDAO.problemSummary}
+                        onChangeText={(text) => { updateCaseDAO({ problemSummary: text }); }}
+                        multiline={true}
+                        placeholder="Detalle rapido del caso"
+                    />
+            </article>
         </div>
     );
 }

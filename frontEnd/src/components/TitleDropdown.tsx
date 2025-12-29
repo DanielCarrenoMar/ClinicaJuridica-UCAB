@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import DropDown from './DropDown/DropDown';
+import Dropdown from './Dropdown/Dropdown';
 
 interface TitleDropdownProps {
   label: string;
@@ -20,20 +20,20 @@ export default function TitleDropdown({
 }: TitleDropdownProps) {
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
-      <div className="flex items-center px-1.5 w-full">
-        <p className="text-body-large text-onSurface">
+      <div className="flex items-center w-full">
+        <h4 className="text-body-large text-onSurface">
           {label}
-        </p>
+        </h4>
       </div>
       <div className="w-full">
-        <DropDown 
+        <Dropdown 
             label={dropdownLabel} 
             selectedValue={selectedValue} 
             onSelectionChange={onSelectionChange}
             showTitle={!selectedValue}
         >
             {children}
-        </DropDown>
+        </Dropdown>
       </div>
     </div>
   );
