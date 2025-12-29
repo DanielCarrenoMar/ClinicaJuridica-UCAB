@@ -1,7 +1,8 @@
 import type { MaritalStatus } from "#domain/mtypes.ts";
 import type { BeneficiaryModel } from "./beneficiary";
 
-export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'> {
+export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' | 'identityCard'> {
+    identityCard: string;
     email?: string;
     cellPhone?: string;
     homePhone?: string;
@@ -34,8 +35,8 @@ export const defaultApplicantModel: ApplicantModel = {
     identityCard: "",
     gender: 'M',
     birthDate: new Date(),
-    name: "",
-    idType: 'V',
+    fullName: "",
+    idNationality: 'V',
     idState: undefined,
     stateName: "",
     municipalityNumber: undefined,
