@@ -22,14 +22,19 @@ const AUTOFILL_SPINNER_MS = 420;
 function CreateCaseApplicantStep() {
     const navigate = useNavigate();
     const { applicantModel, updateApplicantModel} = useCaseOutletContext();
-    const [activeStep, setActiveStep] = useState("identificacion");
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
-    const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
+
+    const [activeSection, setActiveSection] = useState("identificacion");
+
     const [showAutoFillToast, setShowAutoFillToast] = useState(false);
-    const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
-    const [minDataToNextSteap, setMinDataToNextSteap] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
+    const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
+    const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
     const [lastIdentityCard, setLastIdentityCard] = useState<PersonID>("");
+
+    const [haveMinDataToNextStep, setHaveMinDataToNextStep] = useState(false);
+
     const lookupDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const autoFillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -40,7 +45,7 @@ function CreateCaseApplicantStep() {
     const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
 
     useEffect(() => {
-        setMinDataToNextSteap(!!(
+        setHaveMinDataToNextStep(!!(
             !loadingApplicantOrBeneficiary &&
             !foundApplicant &&
             applicantModel.fullName &&
@@ -457,11 +462,11 @@ function CreateCaseApplicantStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
-                    <Button onClick={() => { navigate("/crearCaso/caso"); }} disabled={!minDataToNextSteap} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
+                    <Button onClick={() => { navigate("/crearCaso/caso"); }} disabled={!haveMinDataToNextStep} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
                 </div>
             </header>
             <section className="flex py-2">
-                <Tabs selectedId={activeStep} onChange={setActiveStep}>
+                <Tabs selectedId={activeSection} onChange={setActiveSection}>
                     <Tabs.Item id="identificacion" label="Identificación" icon={<CaretDown />} />
                     <Tabs.Item id="vivienda" label="Vivienda y Servicios" icon={<Home />} />
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
@@ -469,9 +474,9 @@ function CreateCaseApplicantStep() {
             </section>
             <section className="px-4 pb-6">
                 <div className="grid grid-cols-12 gap-x-6 gap-y-6">
-                    {activeStep === "identificacion" && identificationInputs}
-                    {activeStep === "vivienda" && viviendaInputs}
-                    {activeStep === "familia" && familiaInputs}
+                    {activeSection === "identificacion" && identificationInputs}
+                    {activeSection === "vivienda" && viviendaInputs}
+                    {activeSection === "familia" && familiaInputs}
                 </div>
             </section>
             <ConfirmDialog
