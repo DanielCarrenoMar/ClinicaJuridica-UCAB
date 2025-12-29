@@ -9,10 +9,10 @@ interface DropdownContextType {
 
 const DropdownContext = createContext<DropdownContextType | undefined>(undefined);
 
-export const useDropDownContext = () => {
+export const useDropdownContext = () => {
   const context = useContext(DropdownContext);
   if (!context) {
-    throw new Error('useDropDownContext must be used within a DropDown');
+    throw new Error('useDropdownContext must be used within a Dropdown');
   }
   return context;
 };

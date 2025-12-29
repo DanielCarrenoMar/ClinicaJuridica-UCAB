@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
-import { useDropDownContext } from './DropDownCheck';
+import { useDropdownContext } from './DropdownCheck';
 
-interface DropDownOptionCheckProps {
+interface DropdownOptionCheckProps {
   value: string | number;
   children: ReactNode;
 }
 
-export default function DropDownOptionCheck({ value, children }: DropDownOptionCheckProps) {
-  const { selectedValues, toggleOption } = useDropDownContext();
+export default function DropdownOptionCheck({ value, children }: DropdownOptionCheckProps) {
+  const { selectedValues, toggleOption } = useDropdownContext();
   const isSelected = selectedValues.includes(value);
 
   return (

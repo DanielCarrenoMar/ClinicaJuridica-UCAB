@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useDropDownContext } from './DropDown';
+import { useDropdownContext } from './Dropdown';
 
 interface DropdownOptionProps {
   value: string | number;
@@ -9,7 +9,7 @@ interface DropdownOptionProps {
 }
 
 export default function DropdownOption({ value, children, icon, circleIcon = false }: DropdownOptionProps) {
-  const { selectedValue, selectOption } = useDropDownContext();
+  const { selectedValue, selectOption } = useDropdownContext();
   const isSelected = selectedValue === value;
 
   return (

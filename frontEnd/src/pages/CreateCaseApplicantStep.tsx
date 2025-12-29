@@ -1,7 +1,7 @@
 import { useState } from "react";
-import DropdownOption from "#components/DropDown/DropDownOption.tsx";
-import DropDownCheck from "#components/DropDownCheck/DropDownCheck.tsx";
-import DropDownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.tsx";
+import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
+import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
+import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
@@ -235,19 +235,19 @@ function CreateCaseApplicantStep() {
             </div>
 
             <div className="col-span-6">
-                <DropDownCheck
+                <DropdownCheck
                     label="Servicios basicos"
                     selectedValues={applicantModel.servicesAvailable ?? []}
                     onSelectionChange={(values) => { updateApplicantModel({ servicesAvailable: values as string[] }); }}
                 >
-                    <DropDownOptionCheck value="AGUA">Agua</DropDownOptionCheck>
-                    <DropDownOptionCheck value="ELECTRICIDAD">Electricidad</DropDownOptionCheck>
-                    <DropDownOptionCheck value="GAS">Gas</DropDownOptionCheck>
-                    <DropDownOptionCheck value="ASEO">Aseo</DropDownOptionCheck>
-                    <DropDownOptionCheck value="INTERNET">Internet</DropDownOptionCheck>
-                    <DropDownOptionCheck value="TELEFONO">Telefono</DropDownOptionCheck>
-                    <DropDownOptionCheck value="CLOACAS">Cloacas</DropDownOptionCheck>
-                </DropDownCheck>
+                    <DropdownOptionCheck value="AGUA">Agua</DropdownOptionCheck>
+                    <DropdownOptionCheck value="ELECTRICIDAD">Electricidad</DropdownOptionCheck>
+                    <DropdownOptionCheck value="GAS">Gas</DropdownOptionCheck>
+                    <DropdownOptionCheck value="ASEO">Aseo</DropdownOptionCheck>
+                    <DropdownOptionCheck value="INTERNET">Internet</DropdownOptionCheck>
+                    <DropdownOptionCheck value="TELEFONO">Telefono</DropdownOptionCheck>
+                    <DropdownOptionCheck value="CLOACAS">Cloacas</DropdownOptionCheck>
+                </DropdownCheck>
             </div>
         </>
     );

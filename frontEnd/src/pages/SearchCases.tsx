@@ -1,6 +1,6 @@
 import CaseCard from "#components/CaseCard.tsx";
-import DropDownCheck from "#components/DropDownCheck/DropDownCheck.tsx";
-import DropDownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.tsx";
+import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
+import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Fuse from "fuse.js";
 import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router";
@@ -90,43 +90,43 @@ function SearchCases() {
                 <span>
                     <ul className="flex gap-3">
                         <li>
-                            <DropDownCheck 
+                            <DropdownCheck 
                                 label="Estatus" 
                                 selectedValues={getFilterValues('status')}
                                 onSelectionChange={(values) => handleFilterChange('status', values)}
                             >
-                            <DropDownOptionCheck value="OPEN">Abierto</DropDownOptionCheck>
-                            <DropDownOptionCheck value="IN_PROGRESS">En Trámite</DropDownOptionCheck>
-                            <DropDownOptionCheck value="CLOSED">Cerrado</DropDownOptionCheck>
-                            <DropDownOptionCheck value="PAUSED">En Pausa</DropDownOptionCheck>
-                            </DropDownCheck>
+                            <DropdownOptionCheck value="OPEN">Abierto</DropdownOptionCheck>
+                            <DropdownOptionCheck value="IN_PROGRESS">En Trámite</DropdownOptionCheck>
+                            <DropdownOptionCheck value="CLOSED">Cerrado</DropdownOptionCheck>
+                            <DropdownOptionCheck value="PAUSED">En Pausa</DropdownOptionCheck>
+                            </DropdownCheck>
                         </li>
                         <li>
-                            <DropDownCheck 
+                            <DropdownCheck 
                                 label="Tipo de Caso" 
                                 selectedValues={getFilterValues('caseType')}
                                 onSelectionChange={(values) => handleFilterChange('caseType', values)}
                             >
-                                <DropDownOptionCheck value="PENAL">Penal</DropDownOptionCheck>
-                            </DropDownCheck>
+                                <DropdownOptionCheck value="PENAL">Penal</DropdownOptionCheck>
+                            </DropdownCheck>
                         </li>
                         <li>
-                            <DropDownCheck 
+                            <DropdownCheck 
                                 label="Tribunal" 
                                 selectedValues={getFilterValues('court')}
                                 onSelectionChange={(values) => handleFilterChange('court', values)}
                             >
-                                <DropDownOptionCheck value="TRIBUNAL_1">Tribunal 1</DropDownOptionCheck>
-                            </DropDownCheck>
+                                <DropdownOptionCheck value="TRIBUNAL_1">Tribunal 1</DropdownOptionCheck>
+                            </DropdownCheck>
                         </li>
                         <li>
-                            <DropDownCheck 
+                            <DropdownCheck 
                                 label="Periodo Academico" 
                                 selectedValues={getFilterValues('term')}
                                 onSelectionChange={(values) => handleFilterChange('term', values)}
                             >
-                                <DropDownOptionCheck value="2025-15">2025-15</DropDownOptionCheck>
-                            </DropDownCheck>
+                                <DropdownOptionCheck value="2025-15">2025-15</DropdownOptionCheck>
+                            </DropdownCheck>
                         </li>
                     </ul>
                 </span>

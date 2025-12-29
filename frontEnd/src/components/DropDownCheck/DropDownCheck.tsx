@@ -2,29 +2,29 @@ import { createContext, useContext, useState, useRef, useEffect, type ReactNode 
 import { ChevronDown } from 'flowbite-react-icons/outline';
 
 // Context definition
-interface DropDownContextType {
+interface DropdownContextType {
   selectedValues: (string | number)[];
   toggleOption: (value: string | number) => void;
 }
 
-const DropDownContext = createContext<DropDownContextType | undefined>(undefined);
+const DropdownContext = createContext<DropdownContextType | undefined>(undefined);
 
-export const useDropDownContext = () => {
-  const context = useContext(DropDownContext);
+export const useDropdownContext = () => {
+  const context = useContext(DropdownContext);
   if (!context) {
-    throw new Error('useDropDownContext must be used within a DropDownCheck');
+    throw new Error('useDropdownContext must be used within a DropdownCheck');
   }
   return context;
 };
 
-interface DropDownCheckProps {
+interface DropdownCheckProps {
   label: string;
   children: ReactNode;
   selectedValues?: (string | number)[]; // Controlled
   onSelectionChange?: (values: (string | number)[]) => void;
 }
 
-export default function DropDownCheck({ label, children, selectedValues, onSelectionChange }: DropDownCheckProps) {
+export default function DropdownCheck({ label, children, selectedValues, onSelectionChange }: DropdownCheckProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValues, setInternalSelectedValues] = useState<(string | number)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -57,7 +57,7 @@ export default function DropDownCheck({ label, children, selectedValues, onSelec
   }, [dropdownRef]);
 
   return (
-    <DropDownContext.Provider value={{ selectedValues: currentSelectedValues, toggleOption }}>
+    <DropdownContext.Provider value={{ selectedValues: currentSelectedValues, toggleOption }}>
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           type="button"
@@ -78,6 +78,6 @@ export default function DropDownCheck({ label, children, selectedValues, onSelec
           </div>
         )}
       </div>
-    </DropDownContext.Provider>
+    </DropdownContext.Provider>
   );
 }

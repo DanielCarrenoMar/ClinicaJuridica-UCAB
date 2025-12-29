@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import Dropdown from './DropDown/DropDown';
+import Dropdown from './Dropdown/Dropdown';
 
 interface TitleDropdownProps {
   label: string;

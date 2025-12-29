@@ -1,10 +1,10 @@
-import DropdownOption from "#components/DropDown/DropDownOption.tsx";
+import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import { User } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
 import TextInput from "#components/TextInput.tsx";
 import Button from "#components/Button.tsx";
-import Dropdown from "#components/DropDown/DropDown.tsx";
+import Dropdown from "#components/Dropdown/Dropdown.tsx";
 
 function CreateCaseCaseStep() {
     const { applicantModel, caseDAO, updateCaseDAO} = useCaseOutletContext();
