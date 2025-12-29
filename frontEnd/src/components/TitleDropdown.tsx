@@ -21,9 +21,9 @@ export default function TitleDropdown({
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
       <div className="flex items-center px-1.5 w-full">
-        <p className="text-body-large text-onSurface">
+        <h4 className="text-body-large text-onSurface">
           {label}
-        </p>
+        </h4>
       </div>
       <div className="w-full">
         <DropDown 
