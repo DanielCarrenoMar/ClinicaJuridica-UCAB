@@ -1,4 +1,5 @@
 import type { ApplicantModel } from "#domain/models/applicant.ts";
+import { useState } from "react";
 
 export function useGetApplicantById() {
     //const { findAllBeneficiaries } = getApp();
@@ -12,18 +13,18 @@ export function useGetApplicantById() {
                 identityCard: "12345678",
                 gender: 'M',
                 birthDate: new Date('1990-01-01'),
-                name: "John Doe",
-                idType: 'V',
+                fullName: "John Doe",
+                idNationality: "V",
                 idState: undefined,
                 stateName: "Some State",
                 municipalityNumber: undefined,
                 municipalityName: "Some Municipality",
                 parishNumber: undefined,
                 parishName: "Some Parish",
-                email: "
+                email: "",
                 cellPhone: "123-456-7890",
                 homePhone: "098-765-4321",
-                maritalStatus: 'S',
+                maritalStatus: 'married',
                 isConcubine: false,
                 createdAt: new Date(),
                 isHeadOfHousehold: false,
