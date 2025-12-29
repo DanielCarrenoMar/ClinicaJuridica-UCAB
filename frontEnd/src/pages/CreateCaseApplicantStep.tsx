@@ -48,7 +48,7 @@ function CreateCaseApplicantStep() {
     useEffect(() => {
         setHaveMinDataToNextStep(!!(
             !loadingApplicantOrBeneficiary &&
-            !foundApplicant &&
+            !showAutoFillToast &&
             applicantModel.fullName &&
             applicantModel.fullName.trim().length > 0 &&
             applicantModel.identityCard &&
@@ -58,7 +58,20 @@ function CreateCaseApplicantStep() {
             applicantModel.idNationality !== undefined &&
             applicantModel.gender !== undefined
         ));
-    }, [applicantModel, foundApplicant, loadingApplicantOrBeneficiary]);
+        console.log({
+            loadingApplicantOrBeneficiary: !loadingApplicantOrBeneficiary,
+            showAutoFillToast: !showAutoFillToast,
+            fullName: applicantModel.fullName,
+            fullNameValid: applicantModel.fullName?.trim().length > 0,
+            identityCard: applicantModel.identityCard,
+            identityCardValid: applicantModel.identityCard?.trim().length > 0,
+            birthDateValid: applicantModel.birthDate instanceof Date && !isNaN(applicantModel.birthDate.getTime()),
+            idNationalityValid: applicantModel.idNationality !== undefined,
+            genderValid: applicantModel.gender !== undefined,
+        });
+    }, [applicantModel, showAutoFillToast, loadingApplicantOrBeneficiary, isApplyingAutoFill]);
+
+    useEffect(() => { console.log("minData",haveMinDataToNextStep) }, [haveMinDataToNextStep])
 
     useEffect(() => {
         return () => {
