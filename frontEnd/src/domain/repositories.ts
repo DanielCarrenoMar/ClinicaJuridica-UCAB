@@ -12,15 +12,11 @@ export interface BeneficiaryRepository {
 }
 
 export interface ApplicantRepository {
-    findAll(): Promise<ApplicantModel[]>;
-
-    findById(id: string): Promise<ApplicantModel | null>;
-
-    create(data: Omit<ApplicantModel, 'id'>): Promise<ApplicantModel>;
-
-    update(id: string, data: Partial<ApplicantModel>): Promise<ApplicantModel>;
-
-    delete(id: string): Promise<void>;
+    findAllApplicants(): Promise<ApplicantModel[]>;
+    findApplicantById(id: string): Promise<ApplicantModel | null>;
+    createApplicant(data: ApplicantModel): Promise<ApplicantModel>;
+    updateApplicant(id: string, data: Partial<ApplicantModel>): Promise<ApplicantModel>;
+    deleteApplicant(id: string): Promise<void>;
 }
 
 export interface CaseRepository {

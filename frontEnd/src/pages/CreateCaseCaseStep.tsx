@@ -1,4 +1,4 @@
-import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
+import DropdownOption from "#components/DropDown/DropDownOption.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import { User, UserEdit } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
@@ -12,7 +12,7 @@ import { useEffect } from "react";
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
     const { applicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
-    
+
     useEffect(() => {
         if (!applicantModel.identityCard) {
             navigate("/crearCaso/solicitante");

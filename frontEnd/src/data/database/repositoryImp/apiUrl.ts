@@ -1,3 +1,11 @@
 export const CASE_URL = "http://localhost:3000/api/v1/cases";
 export const APPLICANT_URL = "http://localhost:3000/api/v1/applicants";
 export const USER_URL = "http://localhost:3000/api/v1/users";
+export const STATE_URL = "http://localhost:3000/api/v1/catalogs/states";
+export const MUNICIPALITY_URL = "http://localhost:3000/api/v1/catalogs/municipalities";
+export const PARISH_URL = "http://localhost:3000/api/v1/catalogs/parishes";
+export const EDUCATION_LEVEL_URL = "http://localhost:3000/api/v1/catalogs/education-levels";
+export const WORK_CONDITION_URL = "http://localhost:3000/api/v1/catalogs/work-conditions";
+export const ACTIVITY_CONDITION_URL = "http://localhost:3000/api/v1/catalogs/activity-conditions";
+export const FAMILY_HOME_URL = "http://localhost:3000/api/v1/family-homes";
+export const HOUSING_URL = "http://localhost:3000/api/v1/housings"; 

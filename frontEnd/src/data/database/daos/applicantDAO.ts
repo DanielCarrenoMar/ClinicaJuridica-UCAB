@@ -1,7 +1,6 @@
 import type { MaritalStatusDAO } from "./typesDAO.ts";
-
-export interface ApplicantDAO {
-	identityCard: string;
+import type { BeneficiaryDAO } from "./BeneficiaryDAO.ts";
+export interface ApplicantDAO extends BeneficiaryDAO {
 	email?: string;
 	cellPhone?: string;
 	homePhone?: string;

@@ -2,7 +2,7 @@ import { PrismaClient } from '#src/generated/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import express from 'express';
-import cors from 'cors'
+import cors from 'cors';
 
 import apiRoutes from './api/v1/routes/index.js';
 
