@@ -75,12 +75,12 @@ function maritalStatusDAOToModel(dao: MaritalStatusDAO): MaritalStatus {
     }
 }
 
-export function daoToApplicantModel(applicantD: ApplicantDAO, familyHomeD: FamilyHomeDAO, housingD: HousingDAO , headEducationLevelD?: EducationLevelDAO, applicantEducationLevelD?: EducationLevelDAO, workConditionD?: WorkConditionDAO, activityConditionD?: ActivityConditionDAO, stateD?: StateDAO, municipalityD?: MunicipalityDAO, parishD?: ParishDAO): ApplicantModel {
+export function daoToApplicantModel(applicantD: ApplicantDAO, familyHomeD: FamilyHomeDAO, housingD: HousingDAO, headEducationLevelD?: EducationLevelDAO, applicantEducationLevelD?: EducationLevelDAO, workConditionD?: WorkConditionDAO, activityConditionD?: ActivityConditionDAO, stateD?: StateDAO, municipalityD?: MunicipalityDAO, parishD?: ParishDAO): ApplicantModel {
     return {
         identityCard: applicantD.identityCard,
         gender: applicantD.gender,
         birthDate: applicantD.birthDate,
-        fullName: applicantD.name,
+        fullName: applicantD.fullName,
         idNationality: applicantD.idNacionality,
         idState: applicantD.idState,
         stateName: stateD?.name,
