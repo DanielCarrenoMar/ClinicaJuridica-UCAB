@@ -9,6 +9,7 @@ type ProcessType =
 
 export interface CaseModel {
     idCase: number;
+    compoundKey: string;
     problemSummary: string;
     createdAt: Date;
     processType: ProcessType;
@@ -44,6 +45,7 @@ export function daoToCaseModel(dao:CaseInfoDAO): CaseModel {
     const {processType ,...rest} = dao
     return {
         processType: processTypeDAOToModel(processType),
+        compoundKey: dao.idNucleus + "_" + dao.term + "_" + dao.idCase,
         ...rest,
     }
 }
