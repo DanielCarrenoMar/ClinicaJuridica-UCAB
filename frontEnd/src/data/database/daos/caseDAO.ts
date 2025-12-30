@@ -6,12 +6,16 @@ export interface CaseDAO {
   createdAt: Date;
   processType: ProcessTypeDAO;
   applicantId: string;
+  applicantName: string;
   idNucleus: string;
   term: string;
   idLegalArea: number;
+  legalAreaName: string;
   teacherId: string;
   teacherTerm: string;
+  teacherName: string;
   idCourt?: number;
+  courtName?: string;
 }
 
 export const defaultCaseDAO: CaseDAO = {

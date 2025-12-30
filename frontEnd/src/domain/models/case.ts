@@ -15,7 +15,7 @@ type ProcessType =
 
 export interface CaseModel {
     id: number;
-    compoundKey: string; // GUAYANA_24_15_01 por ejemplo
+    compoundKey: string;
     processType: ProcessType;
     problemSummary: string;
     createAt: Date;
