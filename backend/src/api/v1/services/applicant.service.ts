@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { Prisma__ApplicantClient } from '#src/generated/models.js';
 import prisma from '../../../config/database.js';
 
 class ApplicantService {
@@ -9,32 +8,63 @@ class ApplicantService {
       const applicants = await prisma.$queryRaw`
         SELECT 
           a.*, 
-          b.name as "beneficiaryName", 
-          b.gender, 
-          b."birthDate"
+          b.name, b.gender, b."birthDate", b."idType", b.type as "beneficiaryType",
+          h."bathroomCount", h."bedroomCount",
+          f."memberCount", f."monthlyIncome"
         FROM "Applicant" a
         INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+        LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+        LEFT JOIN "FamilyHome" f ON a."identityCard" = f."applicantId"
         ORDER BY a."createdAt" DESC
       `;
 
       return { success: true, data: applicants, count: applicants.length };
     } catch (error) {
-      return { success: false, message: 'Error DB', error: error.message };
+      return { success: false, error: error.message };
     }
   }
 
   async getApplicantById(id: string) {
     try {
-      const applicantRows = await prisma.$queryRaw`
-        SELECT *
-        FROM "Applicant"
-        WHERE "identityCard" = ${id}
+      const result = await prisma.$queryRaw`
+        SELECT 
+          a.*,
+          b.name, b.gender, b."birthDate", b."idType", b."hasId", b.type as "beneficiaryType",
+          b."idState", b."municipalityNumber", b."parishNumber",
+          h."bathroomCount", h."bedroomCount", h."housingTypeId", h."housingConditionId", h."roofMaterialId", h."floorMaterialId",
+          f."memberCount", f."workingMemberCount", f."children7to12Count", f."studentChildrenCount", f."monthlyIncome"
+        FROM "Applicant" a
+        INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+        LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+        LEFT JOIN "FamilyHome" f ON a."identityCard" = f."applicantId"
+        WHERE a."identityCard" = ${id}
       `;
-      const applicant = applicantRows[0] as Prisma__ApplicantClient<any, never>;
 
-      if (!applicant) return { success: false, message: 'No encontrado' }
+      if (!Array.isArray(result) || result.length === 0) {
+        return { success: false, message: 'No encontrado' };
+      }
 
-      return { success: true, data: applicant };
+      const row = result[0];
+      const data = {
+        ...row,
+        housing: row.housingTypeId !== null ? {
+          housingTypeId: row.housingTypeId,
+          housingConditionId: row.housingConditionId,
+          roofMaterialId: row.roofMaterialId,
+          floorMaterialId: row.floorMaterialId,
+          bathroomCount: row.bathroomCount,
+          bedroomCount: row.bedroomCount
+        } : null,
+        familyHome: row.memberCount !== null ? {
+          memberCount: row.memberCount,
+          monthlyIncome: row.monthlyIncome,
+          workingMemberCount: row.workingMemberCount,
+          children7to12Count: row.children7to12Count,
+          studentChildrenCount: row.studentChildrenCount
+        } : null
+      };
+
+      return { success: true, data };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -43,10 +73,10 @@ class ApplicantService {
   async createApplicant(data: any) {
     try {
       return await prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`
+        await tx.$executeRaw`
           INSERT INTO "Beneficiary" 
-          ("identityCard", "name", "gender", "birthDate", "idType", "idState", "municipalityNumber", "parishNumber")
-          VALUES (${data.identityCard}, ${data.name}, ${data.gender}, ${new Date(data.birthDate)}, ${data.idType}, ${data.idState}, ${data.municipalityNumber}, ${data.parishNumber})
+          ("identityCard", "name", "gender", "birthDate", "idType", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
+          VALUES (${data.identityCard}, ${data.name}, ${data.gender}, CAST(${data.birthDate} AS DATE), ${data.idType}, ${data.hasId}, ${data.type}, ${data.idState}, ${data.municipalityNumber}, ${data.parishNumber})
         `;
 
         const newApplicant = await tx.$queryRaw`
@@ -67,6 +97,35 @@ class ApplicantService {
     try {
       await prisma.$executeRaw`DELETE FROM "Beneficiary" WHERE "identityCard" = ${id}`;
       return { success: true, message: 'Eliminado correctamente' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async updateApplicant(id: string, data: any) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        if (data.name || data.gender) {
+          await tx.$executeRaw`
+              UPDATE "Beneficiary" 
+              SET "name" = COALESCE(${data.name}, "name"), 
+                  "gender" = COALESCE(${data.gender}, "gender") 
+              WHERE "identityCard" = ${id}
+            `;
+        }
+
+        const updatedApp = await tx.$queryRaw`
+            UPDATE "Applicant" SET 
+              "email" = COALESCE(${data.email}, "email"), 
+              "cellPhone" = COALESCE(${data.cellPhone}, "cellPhone"), 
+              "homePhone" = COALESCE(${data.homePhone}, "homePhone"), 
+              "maritalStatus" = COALESCE(${data.maritalStatus}, "maritalStatus")
+            WHERE "identityCard" = ${id}
+            RETURNING *
+          `;
+
+        return { success: true, data: updatedApp[0] };
+      });
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -115,42 +174,13 @@ class ApplicantService {
     }
   }
 
-  async updateApplicant(id: string, data: any) {
-    try {
-      return await prisma.$transaction(async (tx) => {
-        if (data.name || data.gender) {
-          await tx.$executeRaw`
-              UPDATE "Beneficiary" 
-              SET "name" = COALESCE(${data.name}, "name"), 
-                  "gender" = COALESCE(${data.gender}, "gender") 
-              WHERE "identityCard" = ${id}
-            `;
-        }
-
-        const updatedApp = await tx.$queryRaw`
-            UPDATE "Applicant" SET 
-              "email" = ${data.email}, 
-              "cellPhone" = ${data.cellPhone}, 
-              "homePhone" = ${data.homePhone}, 
-              "maritalStatus" = ${data.maritalStatus}
-            WHERE "identityCard" = ${id}
-            RETURNING *
-          `;
-
-        return { success: true, data: updatedApp[0] };
-      });
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }
-
   async getApplicantCases(id: string) {
     try {
       const cases = await prisma.$queryRaw`
-         SELECT c.*, s.description as status
+         SELECT c.*
          FROM "Case" c
-         LEFT JOIN "CaseStatus" s ON c."idCase" = s."idCase"
-         WHERE c."idApplicant" = ${id}
+         WHERE c."applicantId" = ${id}
+         ORDER BY c."createdAt" DESC
        `;
       return { success: true, data: cases };
     } catch (e) {
