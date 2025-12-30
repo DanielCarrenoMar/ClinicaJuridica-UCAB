@@ -5,4 +5,6 @@ export interface CaseInfoDAO extends CaseDAO {
   legalAreaName: string;
   teacherName: string;
   courtName?: string;
+  lastActionDate?: Date;
+  lastActionDescription?: string;
 }
