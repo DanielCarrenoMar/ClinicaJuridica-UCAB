@@ -27,7 +27,7 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'>
     headEducationLevelName?: string;
 	workConditionName?: string;
 	activityConditionName?: string;
-	servicesAvailable?: string[];
+	servicesIdAvailable?: number[];
 }
 
 function maritalStatusDAOToModel(dao: MaritalStatusDAO): MaritalStatus {

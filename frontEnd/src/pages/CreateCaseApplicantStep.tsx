@@ -121,13 +121,13 @@ function CreateCaseApplicantStep() {
         const normalizedBirthDate = foundApplicant.birthDate instanceof Date
             ? foundApplicant.birthDate
             : new Date(foundApplicant.birthDate);
-        const normalizedServices = foundApplicant.servicesAvailable ? [...foundApplicant.servicesAvailable] : undefined;
+        const normalizedServices = foundApplicant.servicesIdAvailable ? [...foundApplicant.servicesIdAvailable] : undefined;
 
         updateApplicantModel({
             ...foundApplicant,
             identityCard: sanitizedIdentityCard,
             birthDate: normalizedBirthDate,
-            servicesAvailable: normalizedServices,
+            servicesIdAvailable: normalizedServices,
         });
 
         setIsApplyingAutoFill(true);
@@ -311,16 +311,16 @@ function CreateCaseApplicantStep() {
             <div className="col-span-6">
                 <DropdownCheck
                     label="Servicios basicos*"
-                    selectedValues={applicantModel.servicesAvailable ?? []}
-                    onSelectionChange={(values) => { updateApplicantModel({ servicesAvailable: values as string[] }); }}
+                    selectedValues={applicantModel.servicesIdAvailable ?? []}
+                    onSelectionChange={(values) => { updateApplicantModel({ servicesIdAvailable: values as number[] }); }}
                 >
-                    <DropdownOptionCheck value="AGUA">Agua</DropdownOptionCheck>
-                    <DropdownOptionCheck value="ELECTRICIDAD">Electricidad</DropdownOptionCheck>
-                    <DropdownOptionCheck value="GAS">Gas</DropdownOptionCheck>
-                    <DropdownOptionCheck value="ASEO">Aseo</DropdownOptionCheck>
-                    <DropdownOptionCheck value="INTERNET">Internet</DropdownOptionCheck>
-                    <DropdownOptionCheck value="TELEFONO">Telefono</DropdownOptionCheck>
-                    <DropdownOptionCheck value="CLOACAS">Cloacas</DropdownOptionCheck>
+                    <DropdownOptionCheck value={1}>Agua</DropdownOptionCheck>
+                    <DropdownOptionCheck value={2}>Electricidad</DropdownOptionCheck>
+                    <DropdownOptionCheck value={3}>Gas</DropdownOptionCheck>
+                    <DropdownOptionCheck value={4}>Aseo</DropdownOptionCheck>
+                    <DropdownOptionCheck value={5}>Internet</DropdownOptionCheck>
+                    <DropdownOptionCheck value={6}>Telefono</DropdownOptionCheck>
+                    <DropdownOptionCheck value={7}>Cloacas</DropdownOptionCheck>
                 </DropdownCheck>
             </div>
         </>

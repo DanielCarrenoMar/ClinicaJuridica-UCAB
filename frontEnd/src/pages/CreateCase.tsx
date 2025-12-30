@@ -5,7 +5,7 @@ import Box from "#components/Box.tsx";
 
 
 import { defaultCaseDAO, type CaseDAO } from "#database/daos/caseDAO.ts";
-import { defaultApplicantModel, type ApplicantModel } from "#domain/models/applicant.ts";
+import type { ApplicantModel } from "#domain/models/applicant.ts";
 
 export type CaseOutletContext = {
     caseDAO: CaseDAO;
@@ -22,7 +22,7 @@ export function useCaseOutletContext() {
 
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
-    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>(defaultApplicantModel);
+    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>();
     
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
