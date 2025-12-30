@@ -1,6 +1,6 @@
+import type { ApplicantInfoDAO } from "#database/daos/applicantInfoDAO.ts";
 import { daoToApplicantModel } from "#domain/models/applicant.ts";
 import type { ApplicantRepository } from "../../../domain/repositories";
-import type { ApplicantDAO } from "../daos/applicantDAO";
 import {
     APPLICANT_URL,
 } from "./apiUrl";
@@ -11,7 +11,7 @@ export function getApplicantRepository(): ApplicantRepository {
             const response = await fetch(`${APPLICANT_URL}/${id}`);
             if (!response.ok) return null;
             const applicantData = await response.json();
-            const applicantDao: ApplicantDAO = applicantData.data;
+            const applicantDao: ApplicantInfoDAO = applicantData.data;
 
             return daoToApplicantModel(applicantDao);
         },

@@ -1,3 +1,5 @@
+import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
+import { daoToBeneficiaryModel } from "#domain/models/beneficiary.ts";
 import type { BeneficiaryRepository } from "../../../domain/repositories";
 
 export function getBeneficiaryRepository(): BeneficiaryRepository {
@@ -10,7 +12,10 @@ export function getBeneficiaryRepository(): BeneficiaryRepository {
         },
         findBeneficiaryById: async (id) => {
             const response = await fetch(`${API_URL}/${id}`);
-            return await response.json();
+            if (!response.ok) return null;
+            const beneficiaryData = await response.json();
+            const beneficiaryDao: BeneficiaryInfoDAO = beneficiaryData.data;
+            return daoToBeneficiaryModel(beneficiaryDao);
         },
         createBeneficiary: async (data) => {
             const response = await fetch(API_URL, {

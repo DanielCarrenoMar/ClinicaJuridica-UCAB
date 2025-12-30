@@ -164,7 +164,7 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3">
                 <TitleTextInput
                     label="Fecha Nacimiento"
-                    value={applicantModel.birthDate.toLocaleDateString()}
+                    value={applicantModel.birthDate?.toLocaleDateString()}
                     onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
                     placeholder="DD/MM/AAAA"
                 />

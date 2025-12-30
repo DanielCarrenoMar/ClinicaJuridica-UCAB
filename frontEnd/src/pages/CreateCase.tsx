@@ -22,7 +22,7 @@ export function useCaseOutletContext() {
 
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
-    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>();
+    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({identityCard: ''} as ApplicantModel);
     
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
