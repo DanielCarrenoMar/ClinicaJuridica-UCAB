@@ -1,4 +1,4 @@
-import { Router } from 'express';
+/*import { Router } from 'express';
 import * as statsController from '../controllers/stats.controller.js';
 
 const router = Router();
@@ -13,4 +13,4 @@ router.get('/cases/by-period', statsController.getQuantityByPeriod);
 router.get('/beneficiaries/count', statsController.getBeneficiaryTypeCount);
 router.get('/beneficiaries/by-parish', statsController.getBeneficiariesByParish);
 
-export default router;
+export default router;*/

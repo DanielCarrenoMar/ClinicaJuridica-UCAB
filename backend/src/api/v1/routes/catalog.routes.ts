@@ -1,4 +1,4 @@
-import { Router } from 'express';
+/*import { Router } from 'express';
 import * as catalogController from '../controllers/catalog.controller.js';
 
 const router = Router();
@@ -12,4 +12,4 @@ router.get('/social-parameters', catalogController.getSocialParameters);
 // Estructura Legal
 router.get('/legal-areas', catalogController.getLegalStructure); 
 
-export default router;
+export default router;*/
