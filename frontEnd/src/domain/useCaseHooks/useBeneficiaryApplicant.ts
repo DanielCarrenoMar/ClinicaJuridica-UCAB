@@ -8,7 +8,7 @@ import type { ApplicantModel } from "#domain/models/applicant.ts";
  */
 export function useGetApplicantOrBeneficiaryById() {
     const {getApplicantById} = useGetApplicantById();
-    const {getBeneficiaryById} = useGetBeneficiaryById();
+    const {getBeneficiaryById, error: beneficiaryError} = useGetBeneficiaryById();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -22,6 +22,9 @@ export function useGetApplicantOrBeneficiaryById() {
             }
             
             const beneficiary = await getBeneficiaryById(id);
+            if (beneficiaryError) {
+                throw beneficiaryError;
+            }
             if (beneficiary){
                 const { type, hasId, ...rest } = beneficiary
                 applicant = {createdAt: new Date(), ...rest}
