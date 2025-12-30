@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import caseService from '../services/case.service.js';
 
-export async function getAll(req: Request, res: Response): Promise<void> {
+export async function getAllCases(req: Request, res: Response): Promise<void> {
   try {
     const { q } = req.query;
 
@@ -16,7 +16,7 @@ export async function getAll(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function getById(req: Request, res: Response): Promise<void> {
+export async function getCaseById(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     const caseId = parseInt(id);
@@ -40,7 +40,7 @@ export async function getById(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function create(req: Request, res: Response): Promise<void> {
+export async function createCase(req: Request, res: Response): Promise<void> {
   try {
     const caseData = req.body;
 
