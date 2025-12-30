@@ -1,7 +1,7 @@
 import type { UserDAO } from "#database/daos/UserDAO.ts";
 import { daoToCaseModel } from "#domain/models/case.ts";
 import type { CaseRepository } from "../../../domain/repositories";
-import type { CaseDAO } from "../daos/CaseDAO";
+import type { CaseDAO } from "../daos/caseDAO";
 import type { ApplicantDAO } from "../daos/applicantDAO";
 import type { LegalAreaDAO } from "../daos/LegalAreaDAO";
 import { CASE_URL, USER_URL } from "./apiUrl";

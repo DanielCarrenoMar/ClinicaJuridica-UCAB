@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { CaseModel } from '../models/case';
 import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
-import type { CaseDAO } from '#database/daos/CaseDAO.ts';
+import type { CaseDAO } from '#database/daos/caseDAO.ts';
 
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();

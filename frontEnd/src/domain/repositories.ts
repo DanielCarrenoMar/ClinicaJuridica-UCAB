@@ -1,4 +1,4 @@
-import type { CaseDAO } from "#database/daos/CaseDAO.ts";
+import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import type { ApplicantModel } from "./models/applicant"
 import type { BeneficiaryModel } from "./models/beneficiary";
 import type { CaseModel } from "./models/case";

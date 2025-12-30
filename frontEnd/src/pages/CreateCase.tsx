@@ -4,7 +4,7 @@ import { Outlet, useOutletContext } from "react-router";
 import Box from "#components/Box.tsx";
 
 
-import { defaultCaseDAO, type CaseDAO } from "#database/daos/CaseDAO.ts";
+import { defaultCaseDAO, type CaseDAO } from "#database/daos/caseDAO.ts";
 import { defaultApplicantModel, type ApplicantModel } from "#domain/models/applicant.ts";
 
 export type CaseOutletContext = {

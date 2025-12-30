@@ -1,4 +1,4 @@
-import type { CaseDAO } from "#database/daos/CaseDAO.ts";
+import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import type { LegalAreaDAO } from "#database/daos/LegalAreaDAO.ts";
 import type { ProcessTypeDAO } from "#database/daos/typesDAO.ts";
 import type { UserDAO } from "#database/daos/UserDAO.ts";
