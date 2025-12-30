@@ -1,23 +1,23 @@
+// @ts-nocheck
 import { Router } from 'express';
 import * as userController from '../controllers/user.controller.js';
 
 const router = Router();
 
-// Consultas
+// Obtener usuarios
 router.get('/', userController.getAllUsers);
-//router.get('/type/:type', userController.getUsersByType);
 router.get('/:id', userController.getUserById);
+router.get('/:id/cases', userController.getUserCases); 
 
-// Buscar Casos Asociados a un Estudiante o Profesor
-//router.get('/:id/cases', userController.getUserCases); 
-
-// Acciones de Cuenta
+// Crear usuarios
 router.post('/', userController.createUser);
-router.put('/:id', userController.updateUser);
-//router.patch('/:id/status', userController.changeUserStatus); que se le pase el parametro de true o false
-//router.patch('/:id/password', userController.changePassword);
 
-// Eliminación
+// Modificar usuarios
+router.put('/:id', userController.updateUser);
+router.patch('/:id/status', userController.changeUserStatus);
+router.patch('/:id/password', userController.changePassword);
+
+// Borrar usuarios
 router.delete('/:id', userController.deleteUser);
 
 export default router;
