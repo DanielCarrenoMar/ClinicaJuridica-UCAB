@@ -1,17 +1,9 @@
 import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
-import type { ParishDAO } from "#database/daos/ParishDAO.ts";
+import type { MaritalStatusDAO } from "#database/daos/typesDAO.ts";
 import type { MaritalStatus } from "#domain/mtypes.ts";
 import type { BeneficiaryModel } from "./beneficiary";
-import type { StateDAO } from "#database/daos/StateDAO.ts";
-import type { MunicipalityDAO } from "#database/daos/MunicipalityDAO.ts";
-import type { MaritalStatusDAO } from "#database/daos/typesDAO.ts";
-import type { EducationLevelDAO } from "#database/daos/EducationLevelDAO.ts";
-import type { WorkConditionDAO } from "#database/daos/WorkConditionDAO.ts";
-import type { ActivityConditionDAO } from "#database/daos/ActivityConditionDAO.ts";
-import type { FamilyHomeDAO } from "#database/daos/FamilyHomeDAO.ts";
-import type { HousingDAO } from "#database/daos/HousingDAO.ts";
-export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' | 'identityCard'> {
-    identityCard: string;
+
+export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'> {
     email?: string;
     cellPhone?: string;
     homePhone?: string;

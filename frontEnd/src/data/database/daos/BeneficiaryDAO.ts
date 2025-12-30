@@ -5,10 +5,13 @@ export interface BeneficiaryDAO {
   gender: GenderDAO;
   birthDate: Date;
   name: string;
-  idNacionality: NationalityTypeDAO;
+  idType: NationalityTypeDAO;
   hasId: boolean;
   type: BeneficiaryTypeDAO;
   idState?: number;
+  stateName?: string;
   municipalityNumber?: number;
+  municipalityName?: string;
   parishNumber?: number;
+  parishName?: string;
 }

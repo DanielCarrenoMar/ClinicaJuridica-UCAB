@@ -1,8 +1,7 @@
 import type { MaritalStatusDAO } from "./typesDAO.ts";
 import type { BeneficiaryDAO } from "./BeneficiaryDAO.ts";
 
-export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type' | 'identityCard'> {
-	identityCard: string;
+export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type'> {
 	email?: string;
 	cellPhone?: string;
 	homePhone?: string;
@@ -11,9 +10,17 @@ export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type' | 'i
 	createdAt: Date;
 	isHeadOfHousehold?: boolean;
 	headEducationLevelId?: number;
+	headEducationLevel?: string;
 	headStudyTime?: string;
-	applicantEducationLevelId?: number;
+	applicantEducationLevel?: string;
 	applicantStudyTime?: string;
-	workConditionId?: number;
-	activityConditionId?: number;
+	workCondition?: string;
+	activityCondition?: string;
+	memberCount?: number;
+	workingMemberCount?: number;
+	children7to12Count?: number;
+	studentChildrenCount?: number;
+	monthlyIncome?: string;
+	bathroomCount?: number;
+	bedroomCount?: number;
 }
