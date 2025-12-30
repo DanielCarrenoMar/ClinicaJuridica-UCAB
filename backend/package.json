@@ -17,7 +17,7 @@
     "build": "tsc -p tsconfig.json",
     "seed": "tsx prisma/seed.ts",
     "testData": "tsx prisma/testData.ts",
-    "init": "pnpm i && pnpx prisma db push --forcer-reset && pnpm run seed && pnpm run generate"
+    "startConfig": "pnpm i && pnpm prisma db push --force-reset && pnpm run generate && pnpm run seed"
   },
   "keywords": [],
   "author": "",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
-    "@prisma/client": "^7.1.0",
+    "@prisma/client": "^7.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
