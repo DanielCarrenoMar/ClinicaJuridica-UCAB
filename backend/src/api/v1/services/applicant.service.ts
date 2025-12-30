@@ -26,45 +26,65 @@ class ApplicantService {
 
   async getApplicantById(id: string) {
     try {
-      const result = await prisma.$queryRaw`
-        SELECT 
-          a.*,
-          b.name, b.gender, b."birthDate", b."idNacionality",
-          b."idState", b."municipalityNumber", b."parishNumber",
-          h."bathroomCount", h."bedroomCount", h."housingTypeId", h."housingConditionId", h."roofMaterialId", h."floorMaterialId",
-          f."memberCount", f."workingMemberCount", f."children7to12Count", f."studentChildrenCount", f."monthlyIncome"
+      const applicantRows = await prisma.$queryRaw`
+        SELECT
+          a."identityCard",
+          a."email",
+          a."cellPhone",
+          a."homePhone",
+          a."maritalStatus",
+          a."isConcubine",
+          a."createdAt",
+          a."isHeadOfHousehold",
+          a."headEducationLevelId",
+          a."headStudyTime",
+          a."applicantEducationLevelId",
+          a."applicantStudyTime",
+          a."workConditionId",
+          a."activityConditionId",
+          b."fullName",
+          b."gender",
+          b."birthDate",
+          b."idNacionality",
+          b."idState",
+          b."municipalityNumber",
+          b."parishNumber",
+          s."name" AS "stateName",
+          m."name" AS "municipalityName",
+          p."name" AS "parishName",
+          fh."memberCount",
+          fh."workingMemberCount",
+          fh."children7to12Count",
+          fh."studentChildrenCount",
+          fh."monthlyIncome",
+          h."bathroomCount",
+          h."bedroomCount",
+          hel."name" AS "headEducationLevelName",
+          ael."name" AS "applicantEducationLevel",
+          wc."name" AS "workConditionName",
+          ac."name" AS "activityConditionName"
         FROM "Applicant" a
         INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-        LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
-        LEFT JOIN "FamilyHome" f ON a."identityCard" = f."applicantId"
+        LEFT JOIN "FamilyHome" fh ON fh."applicantId" = a."identityCard"
+        LEFT JOIN "Housing" h ON h."applicantId" = a."identityCard"
+        LEFT JOIN "EducationLevel" hel ON a."headEducationLevelId" = hel."idLevel"
+        LEFT JOIN "EducationLevel" ael ON a."applicantEducationLevelId" = ael."idLevel"
+        LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+        LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
+        LEFT JOIN "State" s ON b."idState" = s."idState"
+        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
         WHERE a."identityCard" = ${id}
+        LIMIT 1
       `;
 
-      if (!Array.isArray(result) || result.length === 0) {
-        return { success: false, message: 'No encontrado' };
+      const applicant = Array.isArray(applicantRows) && applicantRows.length > 0 ? applicantRows[0] : null;
+
+      if (!applicant) {
+        return { success: false, message: 'Solicitante no encontrado' };
       }
 
-      const row = result[0];
-      const data = {
-        ...row,
-        housing: row.housingTypeId !== null ? {
-          housingTypeId: row.housingTypeId,
-          housingConditionId: row.housingConditionId,
-          roofMaterialId: row.roofMaterialId,
-          floorMaterialId: row.floorMaterialId,
-          bathroomCount: row.bathroomCount,
-          bedroomCount: row.bedroomCount
-        } : null,
-        familyHome: row.memberCount !== null ? {
-          memberCount: row.memberCount,
-          monthlyIncome: row.monthlyIncome,
-          workingMemberCount: row.workingMemberCount,
-          children7to12Count: row.children7to12Count,
-          studentChildrenCount: row.studentChildrenCount
-        } : null
-      };
-
-      return { success: true, data };
+      return { success: true, data: applicant };
     } catch (error) {
       return { success: false, error: error.message };
     }
