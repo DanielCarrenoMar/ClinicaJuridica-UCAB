@@ -3,11 +3,11 @@ import applicantService from '../services/applicant.service.js';
 
 export async function getAll(req: Request, res: Response): Promise<void> {
   try {
-    const { q } = req.query;
-    const result = q && typeof q === 'string'
-      ? await applicantService.searchApplicants(q)
-      : await applicantService.getAllApplicants();
-
+    const result = await applicantService.getAllApplicants();
+    if (result.error) {
+      res.status(500).json({ success: false, error: result.error });
+      return;
+    }
     res.status(200).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';

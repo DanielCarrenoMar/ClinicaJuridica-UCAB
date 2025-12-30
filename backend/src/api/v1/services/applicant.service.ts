@@ -72,25 +72,6 @@ class ApplicantService {
     }
   }
 
-  async searchApplicants(term: string) {
-    try {
-      const searchTerm = `%${term}%`;
-      const applicants = await prisma.$queryRaw`
-        SELECT a.*, b.name 
-        FROM "Applicant" a
-        JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-        WHERE 
-          a."identityCard" ILIKE ${searchTerm} OR 
-          a."email" ILIKE ${searchTerm} OR
-          b."name" ILIKE ${searchTerm}
-        LIMIT 20
-      `;
-      return { success: true, data: applicants };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }
-
   async updateHousing(id: string, data: any) {
     try {
       const result = await prisma.$queryRaw`
