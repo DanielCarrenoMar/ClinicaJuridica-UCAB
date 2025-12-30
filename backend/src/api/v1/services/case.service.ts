@@ -254,6 +254,32 @@ class CaseService {
       return { success: false, error: error.message };
     }
   }
+
+  async getActionsFromCaseId (idCase: number){
+    try {
+        const actions = await prisma.$queryRaw`
+          SELECT a.*
+          WHERE a."idCase" = ${idCase} 
+        `;
+      return {succes: true, data: actions};
+    } catch (error) {
+      return {succes: false, error: error.message};
+    }
+  }
+
+  async getBeneficiariesFromCaseId (idCase: number){
+    try {
+        const beneficiaries = await prisma.$queryRaw`
+          SELECT c.*, b.*
+          FROM "CaseBeneficiary" c
+          JOIN "Beneficiary" b ON c."beneficiaryId" = b."identityCard"
+          WHERE c."idCase" = ${idCase}
+        `;
+      return {succes: true, data: actions};
+    } catch (error) {
+      return {succes: false, error: error.message};
+    }
+  }
 }
 
 export default new CaseService();

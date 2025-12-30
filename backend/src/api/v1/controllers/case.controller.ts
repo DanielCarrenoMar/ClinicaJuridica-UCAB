@@ -72,7 +72,7 @@ export async function createCase(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function update(req: Request, res: Response): Promise<void> {
+export async function updateCase(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     const caseId = parseInt(id);
@@ -175,6 +175,21 @@ export async function getStudentHistory(req: Request, res: Response): Promise<vo
     }
 
     const result = await caseService.getAssignedStudents(caseId);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getActionsFromCaseId(req: Request, res: Response): Promise<void> {
+  try{
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)){
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+    const result = await caseService.getActionsFromCaseId(caseId);
     res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';

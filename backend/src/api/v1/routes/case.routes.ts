@@ -7,9 +7,12 @@ const router = Router();
 router.get('/', caseController.getAllCases); 
 router.post('/', caseController.createCase);
 router.get('/:id', caseController.getCaseById);
+router.put('/:id', caseController.updateCase);
+router.delete('/:id', caseController.deleteCase);
 
 // Historial
 router.post('/:id/actions', caseController.addAction);
+router.get('/:id/actions/', caseController.getActionsFromCaseId);
 router.patch('/:id/status', caseController.changeStatus);
 router.get('/:id/timeline', caseController.getTimeline);
 
@@ -25,5 +28,6 @@ router.delete('/:id/documents/:docId', caseController.deleteDocument);
 // Asignación Académica y Profesores
 router.post('/:id/assign-student', caseController.assignStudent);
 router.get('/:id/student-history', caseController.getStudentHistory);
+
 
 export default router;

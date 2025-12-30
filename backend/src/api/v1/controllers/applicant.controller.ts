@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import applicantService from '../services/applicant.service.js';
 
-export async function getAll(req: Request, res: Response): Promise<void> {
+export async function getAllApplicant(req: Request, res: Response): Promise<void> {
   try {
     const result = await applicantService.getAllApplicants();
     if (result.error) {
@@ -15,7 +15,7 @@ export async function getAll(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function getById(req: Request, res: Response): Promise<void> {
+export async function getApplicantById(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
     const result = await applicantService.getApplicantById(id);
@@ -34,7 +34,7 @@ export async function getById(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function create(req: Request, res: Response): Promise<void> {
+export async function createApplicant(req: Request, res: Response): Promise<void> {
   try {
     const data = req.body;
     if (!data.identityCard || !data.name || !data.email) {
@@ -60,7 +60,7 @@ export async function updateGeneralInfo(req: Request, res: Response): Promise<vo
   }
 }
 
-export async function deleteApplicant(req: Request, res: Response): Promise<void> {
+export async function deleteApplicantbyId(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;
     const result = await applicantService.deleteApplicant(id);
