@@ -33,8 +33,6 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' 
     monthlyIncome?: string;
     bathroomCount?: number;
     bedroomCount?: number;
-
-
 }
 
 export const defaultApplicantModel: Partial<ApplicantModel> = {
