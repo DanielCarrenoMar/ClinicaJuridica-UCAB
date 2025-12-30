@@ -1,43 +1,104 @@
 // @ts-nocheck
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import userService from '../services/user.service.js';
 
-export const getAllUsers = async (req: Request, res: Response) => {
-  const result = await userService.getAllUsers();
-  res.status(result.success ? 200 : 500).json(result);
-};
+export async function getAllUsers(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await userService.getAllUsers();
+    if (result.error) {
+      res.status(500).json({ success: false, error: result.error });
+      return;
+    }
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const getUserById = async (req: Request, res: Response) => {
-  const result = await userService.getUserById(req.params.id);
-  res.status(result.success ? 200 : 404).json(result);
-};
+export async function getUserById(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const result = await userService.getUserById(id);
+    if (!result.success) {
+      res.status(404).json(result);
+      return;
+    }
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const createUser = async (req: Request, res: Response) => {
-  const result = await userService.createUser(req.body);
-  res.status(result.success ? 201 : 400).json(result);
-};
+export async function createUser(req: Request, res: Response): Promise<void> {
+  try {
+    const data = req.body;
+    if (!data.identityCard || !data.email || !data.password) {
+      res.status(400).json({ success: false, message: 'Faltan campos requeridos' });
+      return;
+    }
+    const result = await userService.createUser(data);
+    res.status(result.success ? 201 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const updateUser = async (req: Request, res: Response) => {
-  const result = await userService.updateUser(req.params.id, req.body);
-  res.status(result.success ? 200 : 400).json(result);
-};
+export async function updateUser(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const result = await userService.updateUser(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const changeUserStatus = async (req: Request, res: Response) => {
-  const result = await userService.updateUser(req.params.id, { isActive: req.body.isActive });
-  res.status(result.success ? 200 : 400).json(result);
-};
+export async function changeUserStatus(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const { isActive } = req.body;
+    const result = await userService.updateUser(id, { isActive });
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const changePassword = async (req: Request, res: Response) => {
-  const result = await userService.updateUser(req.params.id, { password: req.body.password });
-  res.status(result.success ? 200 : 400).json(result);
-};
+export async function changePassword(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const { password } = req.body;
+    const result = await userService.updateUser(id, { password });
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const getUserCases = async (req: Request, res: Response) => {
-  const result = await userService.getUserCases(req.params.id);
-  res.status(result.success ? 200 : 400).json(result);
-};
+export async function getUserCases(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const result = await userService.getUserCases(id);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
 
-export const deleteUser = async (req: Request, res: Response) => {
-  const result = await userService.deleteUser(req.params.id);
-  res.status(result.success ? 200 : 400).json(result);
-};
+export async function deleteUser(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const result = await userService.deleteUser(id);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
