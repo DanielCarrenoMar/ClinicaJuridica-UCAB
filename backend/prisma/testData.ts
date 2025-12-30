@@ -1,4 +1,4 @@
-import { PrismaClient, UserType, Gender, TeacherType, StudentType, BeneficiaryType, IdType, MaritalStatus, ProcessType, CaseStatusEnum, CaseBeneficiaryType } from '../src/generated/client.js';
+import { PrismaClient, Gender } from '../src/generated/client.js';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
@@ -132,7 +132,7 @@ async function main() {
     const teacherUser = await prisma.user.upsert({
         where: { identityCard: '16000001' },
         update: {
-            name: 'Mariana Díaz',
+            fullName: 'Mariana Díaz',
             gender: Gender.F,
             email: 'mariana.diaz@ucab.edu',
             password: 'seeded-teacher',
@@ -141,7 +141,7 @@ async function main() {
         },
         create: {
             identityCard: '16000001',
-            name: 'Mariana Díaz',
+            fullName: 'Mariana Díaz',
             gender: Gender.F,
             email: 'mariana.diaz@ucab.edu',
             password: 'seeded-teacher',
@@ -168,7 +168,7 @@ async function main() {
     const studentUser = await prisma.user.upsert({
         where: { identityCard: '27000001' },
         update: {
-            name: 'Luis Gómez',
+            fullName: 'Luis Gómez',
             gender: Gender.M,
             email: 'luis.gomez@ucab.edu',
             password: 'seeded-student',
@@ -177,7 +177,7 @@ async function main() {
         },
         create: {
             identityCard: '27000001',
-            name: 'Luis Gómez',
+            fullName: 'Luis Gómez',
             gender: Gender.M,
             email: 'luis.gomez@ucab.edu',
             password: 'seeded-student',
@@ -227,8 +227,8 @@ async function main() {
             identityCard: '80010001',
             gender: Gender.F,
             birthDate: new Date('1989-04-12'),
-            name: 'Laura Campos',
-            idType: 'VENEZUELAN' as any,
+            fullName: 'Laura Campos',
+            idNacionality: 'VENEZUELAN' as any,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,
@@ -273,8 +273,8 @@ async function main() {
         update: {
             gender: Gender.M,
             birthDate: new Date('1984-07-30'),
-            name: 'Carlos Fuentes',
-            idType: 'VENEZUELAN' as any,
+            fullName: 'Carlos Fuentes',
+            idNacionality: 'VENEZUELAN' as any,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,
@@ -285,8 +285,8 @@ async function main() {
             identityCard: '80010002',
             gender: Gender.M,
             birthDate: new Date('1984-07-30'),
-            name: 'Carlos Fuentes',
-            idType: 'VENEZUELAN' as any,
+            fullName: 'Carlos Fuentes',
+            idNacionality: 'VENEZUELAN' as any,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,
