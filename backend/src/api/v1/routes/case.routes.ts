@@ -4,9 +4,9 @@ import * as caseController from '../controllers/case.controller.js';
 const router = Router();
 
 // Operaciones Principales
-/*router.get('/', caseController.getAllCases); 
+router.get('/', caseController.getAllCases); 
 router.post('/', caseController.createCase);
-router.get('/:id', caseController.getCaseById);*/
+router.get('/:id', caseController.getCaseById);
 
 // Historial
 router.post('/:id/actions', caseController.addAction);
