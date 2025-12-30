@@ -1,4 +1,4 @@
-export interface TypeCaseAmountDAO {
+export interface StatusCaseAmountDAO {
     proccessAmount: number;
     adviceAmount: number;
     mediationAmount: number;
