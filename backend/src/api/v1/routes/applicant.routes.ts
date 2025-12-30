@@ -5,6 +5,7 @@ const router = Router();
 
 // CRUD Principal
 router.get('/', applicantController.getAll);
+router.get('/:id', applicantController.getById);
 router.post('/', applicantController.create); 
 router.put('/:id', applicantController.updateGeneralInfo);
 router.delete('/:id', applicantController.deleteApplicant);

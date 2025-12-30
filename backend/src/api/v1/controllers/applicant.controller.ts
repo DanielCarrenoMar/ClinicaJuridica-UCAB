@@ -15,6 +15,25 @@ export async function getAll(req: Request, res: Response): Promise<void> {
   }
 }
 
+export async function getById(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    const result = await applicantService.getApplicantById(id);
+    if (result.error) {
+      res.status(500).json({ success: false, error: result.error });
+      return;
+    }
+    if (!result.success || !result.data) {
+      res.status(404).json({ success: false, message: 'Solicitante no encontrado' });
+      return;
+    }
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
+
 export async function create(req: Request, res: Response): Promise<void> {
   try {
     const data = req.body;

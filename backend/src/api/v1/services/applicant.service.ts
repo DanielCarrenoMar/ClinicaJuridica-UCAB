@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { Prisma__ApplicantClient } from '#src/generated/models.js';
 import prisma from '../../../config/database.js';
 
 class ApplicantService {
@@ -24,74 +25,16 @@ class ApplicantService {
 
   async getApplicantById(id: string) {
     try {
-      // Main query with ALL JOINs to get complete applicant data
-      const applicantData = await prisma.$queryRaw`
-        SELECT 
-          a.*,
-          b.name,
-          b.gender,
-          b."birthDate",
-          b."idType" as "idNacionality",
-          b."hasId",
-          b.type as "beneficiaryType",
-          b."idState",
-          b."municipalityNumber",
-          b."parishNumber",
-          -- State data
-          st.name as "stateName",
-          -- Municipality data
-          m.name as "municipalityName",
-          -- Parish data
-          p.name as "parishName",
-          -- Head Education Level
-          headEdu."idLevel" as "headEducationLevelId",
-          headEdu.name as "headEducationLevelName",
-          headEdu."isActive" as "headEducationLevelActive",
-          -- Applicant Education Level
-          appEdu."idLevel" as "applicantEducationLevelId",
-          appEdu.name as "applicantEducationLevelName",
-          appEdu."isActive" as "applicantEducationLevelActive",
-          -- Work Condition
-          wc."idCondition" as "workConditionId",
-          wc.name as "workConditionName",
-          wc."isActive" as "workConditionActive",
-          -- Activity Condition
-          ac."idActivity" as "activityConditionId",
-          ac.name as "activityConditionName",
-          ac."isActive" as "activityConditionActive"
-        FROM "Applicant" a
-        JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-        LEFT JOIN "State" st ON b."idState" = st."idState"
-        LEFT JOIN "Municipality" m ON b."municipalityNumber" = m."municipalityNumber" AND m."stateId" = b."idState"
-        LEFT JOIN "Parish" p ON b."parishNumber" = p."parishNumber" AND p."municipalityNumber" = b."municipalityNumber"
-        LEFT JOIN "EducationLevel" headEdu ON a."headEducationLevelId" = headEdu."idLevel"
-        LEFT JOIN "EducationLevel" appEdu ON a."applicantEducationLevelId" = appEdu."idLevel"
-        LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
-        LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
-        WHERE a."identityCard" = ${id}
+      const applicantRows = await prisma.$queryRaw`
+        SELECT *
+        FROM "Applicant"
+        WHERE "identityCard" = ${id}
       `;
+      const applicant = applicantRows[0] as Prisma__ApplicantClient<any, never>;
 
-      // Fetch Housing data separately
-      const housingData = await prisma.$queryRaw`
-        SELECT * FROM "Housing" WHERE "applicantId" = ${id}
-      `;
+      if (!applicant) return { success: false, message: 'No encontrado' }
 
-      // Fetch FamilyHome data separately
-      const familyHomeData = await prisma.$queryRaw`
-        SELECT * FROM "FamilyHome" WHERE "applicantId" = ${id}
-      `;
-
-      const applicant = Array.isArray(applicantData) ? applicantData[0] : null;
-
-      if (!applicant) return { success: false, message: 'No encontrado' };
-
-      const data = {
-        ...applicant,
-        housing: Array.isArray(housingData) ? housingData[0] : null,
-        familyHome: Array.isArray(familyHomeData) ? familyHomeData[0] : null
-      };
-
-      return { success: true, data };
+      return { success: true, data: applicant };
     } catch (error) {
       return { success: false, error: error.message };
     }
