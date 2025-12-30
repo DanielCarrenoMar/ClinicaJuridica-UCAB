@@ -8,7 +8,7 @@ class ApplicantService {
       const applicants = await prisma.$queryRaw`
         SELECT 
           a.*, 
-          b.name, b.gender, b."birthDate", b."idType", b.type as "beneficiaryType",
+          b.name, b.gender, b."birthDate", b."idNacionality",
           h."bathroomCount", h."bedroomCount",
           f."memberCount", f."monthlyIncome"
         FROM "Applicant" a
@@ -29,7 +29,7 @@ class ApplicantService {
       const result = await prisma.$queryRaw`
         SELECT 
           a.*,
-          b.name, b.gender, b."birthDate", b."idType", b."hasId", b.type as "beneficiaryType",
+          b.name, b.gender, b."birthDate", b."idNacionality",
           b."idState", b."municipalityNumber", b."parishNumber",
           h."bathroomCount", h."bedroomCount", h."housingTypeId", h."housingConditionId", h."roofMaterialId", h."floorMaterialId",
           f."memberCount", f."workingMemberCount", f."children7to12Count", f."studentChildrenCount", f."monthlyIncome"
@@ -75,7 +75,7 @@ class ApplicantService {
       return await prisma.$transaction(async (tx) => {
         await tx.$executeRaw`
           INSERT INTO "Beneficiary" 
-          ("identityCard", "name", "gender", "birthDate", "idType", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
+          ("identityCard", "name", "gender", "birthDate", "idNacionality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
           VALUES (${data.identityCard}, ${data.name}, ${data.gender}, CAST(${data.birthDate} AS DATE), ${data.idType}, ${data.hasId}, ${data.type}, ${data.idState}, ${data.municipalityNumber}, ${data.parishNumber})
         `;
 

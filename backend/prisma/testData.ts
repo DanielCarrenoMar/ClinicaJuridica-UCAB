@@ -215,8 +215,8 @@ async function main() {
         update: {
             gender: Gender.F,
             birthDate: new Date('1989-04-12'),
-            name: 'Laura Campos',
-            idType: 'VENEZUELAN' as any,
+            fullName: 'Laura Campos',
+            idNacionality: 'VENEZUELAN' as any,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,

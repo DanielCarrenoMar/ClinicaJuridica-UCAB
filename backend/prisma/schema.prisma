@@ -32,7 +32,7 @@ enum StudentType {
   SERVICE   @map("S")
 }
 
-enum IdType {
+enum idNacionality {
   VENEZUELAN @map("V")
   FOREIGNER  @map("E")
   LEGAL      @map("J")
@@ -145,7 +145,7 @@ model Subject {
 
 model User {
   identityCard String   @id @db.VarChar(20)
-  name         String   @db.VarChar(63)
+  fullName     String   @db.VarChar(63)
   gender       Gender?
   email        String   @unique @db.VarChar(35)
   password     String   @db.VarChar(60)
@@ -208,7 +208,7 @@ model Parish {
 }
 
 model Nucleus {
-  idNucleus      String  @id @db.VarChar(63)
+  idNucleus String  @id @db.VarChar(63)
   isActive  Boolean @default(true)
 
   idState            Int
@@ -274,13 +274,13 @@ model Student {
 }
 
 model Beneficiary {
-  identityCard String          @id @db.VarChar(20)
-  gender       Gender
-  birthDate    DateTime        @db.Date
-  name         String          @db.VarChar(63)
-  idType       IdType
-  hasId        Boolean
-  type         BeneficiaryType
+  identityCard  String          @id @db.VarChar(20)
+  gender        Gender
+  birthDate     DateTime        @db.Date
+  fullName      String          @db.VarChar(63)
+  idNacionality idNacionality
+  hasId         Boolean
+  type          BeneficiaryType
 
   idState            Int?
   municipalityNumber Int?
