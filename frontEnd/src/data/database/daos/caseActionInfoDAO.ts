@@ -1,4 +1,4 @@
-import type { CaseActionDAO } from "./CaseActionDAO";
+import type { CaseActionDAO } from "./caseActionDAO";
 
 export interface CaseActionInfoDAO extends CaseActionDAO {
   userName: string;
