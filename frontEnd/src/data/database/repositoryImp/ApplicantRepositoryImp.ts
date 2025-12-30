@@ -1,3 +1,4 @@
+import { daoToApplicantModel } from "#domain/models/applicant.ts";
 import type { ApplicantRepository } from "../../../domain/repositories";
 import type { ApplicantDAO } from "../daos/applicantDAO";
 import {
@@ -12,7 +13,7 @@ export function getApplicantRepository(): ApplicantRepository {
             const applicantData = await response.json();
             const applicantDao: ApplicantDAO = applicantData.data;
 
-            return await fetchDaosToApplicantModel(applicantDao);
+            return daoToApplicantModel(applicantDao);
         },
 
         createApplicant: async (data) => {
