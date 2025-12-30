@@ -2,7 +2,7 @@ import type { GenderDAO, UserTypeDAO } from "./typesDAO"
 
 export interface UserDAO {
     identityCard: string;
-    name: string;
+    fullname: string;
     gender?: GenderDAO;
     email: string;
     password: string;

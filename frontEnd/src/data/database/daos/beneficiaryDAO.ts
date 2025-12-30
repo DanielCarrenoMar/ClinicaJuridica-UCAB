@@ -4,8 +4,8 @@ export interface BeneficiaryDAO {
   identityCard: string;
   gender: GenderDAO;
   birthDate: Date;
-  name: string;
-  idType: NationalityTypeDAO;
+  fullname: string;
+  idNacionality: NationalityTypeDAO;
   hasId: boolean;
   type: BeneficiaryTypeDAO;
   idState?: number;
