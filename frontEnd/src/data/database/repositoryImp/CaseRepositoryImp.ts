@@ -2,6 +2,8 @@ import type { UserDAO } from "#database/daos/UserDAO.ts";
 import { daoToCaseModel } from "#domain/models/case.ts";
 import type { CaseRepository } from "../../../domain/repositories";
 import type { CaseDAO } from "../daos/CaseDAO";
+import type { ApplicantDAO } from "../daos/applicantDAO";
+import type { LegalAreaDAO } from "../daos/LegalAreaDAO";
 import { CASE_URL, USER_URL } from "./apiUrl";
 
 export function getCaseRepository(): CaseRepository {
@@ -11,16 +13,22 @@ export function getCaseRepository(): CaseRepository {
             const casesData = await responseCase.json();
             const caseDAOs: CaseDAO[] = casesData.data;
 
-            const casesWithTeachers = await Promise.all(
+            const casesWithAllData = await Promise.all(
                 caseDAOs.map(async (caseDao) => {
-                    const responseUser = await fetch(`${USER_URL}/${caseDao.teacherId}`); 
+                    const responseUser = await fetch(`${USER_URL}/${caseDao.teacherId}`);
                     const userData = await responseUser.json();
-                    const userDaoTeacher:UserDAO = userData.data;
-                    return daoToCaseModel(caseDao, userDaoTeacher);
+                    const userDaoTeacher: UserDAO = userData.data;
+                    const applicantResponse = await fetch(`${USER_URL}/${caseDao.applicantId}`);
+                    const applicantData = await applicantResponse.json();
+                    const applicantDao: ApplicantDAO = applicantData.data;
+                    const legalAreaResponse = await fetch(`${USER_URL}/${caseDao.idLegalArea}`);
+                    const legalAreaData = await legalAreaResponse.json();
+                    const legalAreaDao: LegalAreaDAO = legalAreaData.data;
+                    return daoToCaseModel(caseDao, userDaoTeacher, applicantDao, legalAreaDao);
                 })
             );
 
-            return casesWithTeachers;
+            return casesWithAllData;
         },
         findCaseById: async (id) => {
             const response = await fetch(`${CASE_URL}/${id}`);

@@ -1,14 +1,13 @@
-import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
-import type { BeneficiaryDAO } from "#database/daos/BeneficiaryDAO.ts";
 import type { CaseDAO } from "#database/daos/CaseDAO.ts";
 import type { LegalAreaDAO } from "#database/daos/LegalAreaDAO.ts";
 import type { ProcessTypeDAO } from "#database/daos/typesDAO.ts";
 import type { UserDAO } from "#database/daos/UserDAO.ts";
+import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
 import type { PersonID } from "#domain/mtypes.ts";
 import type { CaseActionModel } from "./caseAction";
 import type { CaseStatus } from "./caseStatus";
 
-type ProcessType = 
+type ProcessType =
     "IN_PROGRESS" |  // Tramite
     "ADVICE" |  // Asesoria
     "MEDIATION" |  // Conciliacion y mediacion
@@ -47,7 +46,7 @@ function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
     }
 }
 
-export function daoToCaseModel(caseD: CaseDAO, teacherD: UserDAO): CaseModel {
+export function daoToCaseModel(caseD: CaseDAO, teacherD: UserDAO, applicantD: ApplicantDAO, legalAreaD: LegalAreaDAO): CaseModel {
     return {
         id: caseD.idCase,
         compoundKey: caseD.idNucleus + "_" + caseD.term + "_" + caseD.idCase,
@@ -55,11 +54,11 @@ export function daoToCaseModel(caseD: CaseDAO, teacherD: UserDAO): CaseModel {
         problemSummary: caseD.problemSummary,
         createAt: new Date(caseD.createdAt),
         applicantId: caseD.applicantId,
-        applicantName: "a",//applicantD.name,
+        applicantName: applicantD.name,
         idNucleus: caseD.idNucleus,
         term: caseD.term,
         idLegalArea: caseD.idLegalArea,
-        legalAreaName: "a",//legalAreaD.name,
+        legalAreaName: legalAreaD.name,
         teacherId: caseD.teacherId,
         teacherName: teacherD.name,
         teacherTerm: caseD.teacherTerm,

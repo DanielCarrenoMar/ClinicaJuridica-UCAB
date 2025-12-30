@@ -1,6 +1,15 @@
+import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
+import type { ParishDAO } from "#database/daos/ParishDAO.ts";
 import type { MaritalStatus } from "#domain/mtypes.ts";
 import type { BeneficiaryModel } from "./beneficiary";
-
+import type { StateDAO } from "#database/daos/StateDAO.ts";
+import type { MunicipalityDAO } from "#database/daos/MunicipalityDAO.ts";
+import type { MaritalStatusDAO } from "#database/daos/typesDAO.ts";
+import type { EducationLevelDAO } from "#database/daos/EducationLevelDAO.ts";
+import type { WorkConditionDAO } from "#database/daos/WorkConditionDAO.ts";
+import type { ActivityConditionDAO } from "#database/daos/ActivityConditionDAO.ts";
+import type { FamilyHomeDAO } from "#database/daos/FamilyHomeDAO.ts";
+import type { HousingDAO } from "#database/daos/HousingDAO.ts";
 export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' | 'identityCard'> {
     identityCard: string;
     email?: string;
@@ -17,18 +26,15 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type' 
     applicantStudyTime?: string;
     workCondition?: string;
     activityCondition?: string;
-    neighborhood?: string;
-    address?: string;
-    housingCondition?: string;
-    housingType?: string;
-    tenureType?: string;
-    servicesAvailable?: string[];
-    householdSize?: number;
-    minorsCount?: number;
-    seniorsCount?: number;
-    disabledCount?: number;
-    pregnantCount?: number;
-    householdIncome?: string;
+    memberCount?: number;
+    workingMemberCount?: number;
+    children7to12Count?: number;
+    studentChildrenCount?: number;
+    monthlyIncome?: string;
+    bathroomCount?: number;
+    bedroomCount?: number;
+
+
 }
 
 export const defaultApplicantModel: Partial<ApplicantModel> = {
@@ -57,16 +63,62 @@ export const defaultApplicantModel: Partial<ApplicantModel> = {
     applicantStudyTime: "",
     workCondition: "",
     activityCondition: "",
-    neighborhood: "",
-    address: "",
-    housingCondition: "",
-    housingType: "",
-    tenureType: "",
-    servicesAvailable: [],
-    householdSize: undefined,
-    minorsCount: undefined,
-    seniorsCount: undefined,
-    disabledCount: undefined,
-    pregnantCount: undefined,
-    householdIncome: "",
+    memberCount: undefined,
+    workingMemberCount: undefined,
+    children7to12Count: undefined,
+    studentChildrenCount: undefined,
+    monthlyIncome: "",
+    bathroomCount: undefined,
+    bedroomCount: undefined
 };
+
+function maritalStatusDAOToModel(dao: MaritalStatusDAO): MaritalStatus {
+    switch (dao) {
+        case "S":
+            return "single";
+        case "C":
+            return "married";
+        case "D":
+            return "divorced";
+        case "V":
+            return "widowed";
+    }
+}
+
+export function daoToApplicantModel(applicantD: ApplicantDAO, stateD: StateDAO, municipalityD: MunicipalityDAO, parishD: ParishDAO, headEducationLevelD: EducationLevelDAO, applicantEducationLevelD: EducationLevelDAO, workConditionD: WorkConditionDAO, activityConditionD: ActivityConditionDAO, familyHomeD: FamilyHomeDAO, housingD: HousingDAO): ApplicantModel {
+    return {
+        identityCard: applicantD.identityCard,
+        gender: applicantD.gender,
+        birthDate: applicantD.birthDate,
+        fullName: applicantD.name,
+        idNationality: applicantD.idNacionality,
+        idState: applicantD.idState,
+        stateName: stateD.name,
+        municipalityNumber: applicantD.municipalityNumber,
+        municipalityName: municipalityD.name,
+        parishNumber: applicantD.parishNumber,
+        parishName: parishD.name,
+        email: applicantD.email,
+        cellPhone: applicantD.cellPhone,
+        homePhone: applicantD.homePhone,
+        maritalStatus: applicantD.maritalStatus ? maritalStatusDAOToModel(applicantD.maritalStatus) : undefined,
+        isConcubine: applicantD.isConcubine,
+        createdAt: applicantD.createdAt,
+        isHeadOfHousehold: applicantD.isHeadOfHousehold,
+        headEducationLevelId: applicantD.headEducationLevelId,
+        headEducationLevel: headEducationLevelD.name,
+        headStudyTime: applicantD.headStudyTime,
+        applicantEducationLevel: applicantEducationLevelD.name,
+        applicantStudyTime: applicantD.applicantStudyTime,
+        workCondition: workConditionD.name,
+        activityCondition: activityConditionD.name,
+        memberCount: familyHomeD.memberCount,
+        workingMemberCount: familyHomeD.workingMemberCount,
+        children7to12Count: familyHomeD.children7to12Count,
+        studentChildrenCount: familyHomeD.studentChildrenCount,
+        monthlyIncome: familyHomeD.monthlyIncome,
+        bathroomCount: housingD.bathroomCount,
+        bedroomCount: housingD.bedroomCount,
+    }
+
+}
