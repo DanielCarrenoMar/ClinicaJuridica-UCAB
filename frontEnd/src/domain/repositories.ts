@@ -12,7 +12,6 @@ export interface BeneficiaryRepository {
 }
 
 export interface ApplicantRepository {
-    findAllApplicants(): Promise<ApplicantModel[]>;
     findApplicantById(id: string): Promise<ApplicantModel | null>;
     createApplicant(data: ApplicantModel): Promise<ApplicantModel>;
     updateApplicant(id: string, data: Partial<ApplicantModel>): Promise<ApplicantModel>;

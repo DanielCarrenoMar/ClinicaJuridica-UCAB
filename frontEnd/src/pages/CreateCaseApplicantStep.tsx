@@ -9,7 +9,7 @@ import Button from "#components/Button.tsx";
 import { CaretDown, ChevronRight, Close, Home, Users } from "flowbite-react-icons/outline";
 import { CheckCircle, InfoCircle, UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
-import type { SexType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
+import type { GenderType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
@@ -173,7 +173,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Sexo"
                     selectedValue={applicantModel.gender || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as SexType }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderType }); }}
                 >
                     <DropdownOption value="M">Masculino</DropdownOption>
                     <DropdownOption value="F">Femenino</DropdownOption>
