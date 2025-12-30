@@ -114,7 +114,7 @@ export async function deleteCase(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function changeStatus(req: Request, res: Response): Promise<void> {
+/*export async function changeStatus(req: Request, res: Response): Promise<void> {
   try {
     const caseId = parseInt(req.params.id);
     const { description, date } = req.body;
@@ -180,16 +180,16 @@ export async function getStudentHistory(req: Request, res: Response): Promise<vo
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: errorMessage });
   }
-}
+}*/
 
-export async function getActionsFromCaseId(req: Request, res: Response): Promise<void> {
+export async function getActionsInfoFromCaseId(req: Request, res: Response): Promise<void> {
   try{
     const caseId = parseInt(req.params.id);
     if (isNaN(caseId)){
       res.status(400).json({ success: false, message: 'ID inválido' });
       return;
     }
-    const result = await caseService.getActionsFromCaseId(caseId);
+    const result = await caseService.getActionsInfoFromCaseId(caseId);
     res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';

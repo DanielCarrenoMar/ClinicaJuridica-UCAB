@@ -1,4 +1,4 @@
-import type { BeneficiaryDAO } from "./BeneficiaryDAO.ts";
+import type { BeneficiaryDAO } from "./beneficiaryDAO.ts";
 
 export interface BeneficiaryInfoDAO extends BeneficiaryDAO {
   stateName?: string;

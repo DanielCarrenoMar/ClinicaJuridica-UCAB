@@ -12,9 +12,9 @@ router.delete('/:id', caseController.deleteCase);
 
 // Historial
 router.post('/:id/actions', caseController.addAction);
-router.get('/:id/actions/', caseController.getActionsFromCaseId);
-router.patch('/:id/status', caseController.changeStatus);
-router.get('/:id/timeline', caseController.getTimeline);
+router.get('/:id/actions/', caseController.getActionsInfoFromCaseId);
+//router.patch('/:id/status', caseController.changeStatus);
+//outer.get('/:id/timeline', caseController.getTimeline);
 
 // Gestión de Citas
 router.post('/:id/appointments', caseController.scheduleAppointment);
@@ -26,8 +26,8 @@ router.post('/:id/documents', caseController.addDocument);
 router.delete('/:id/documents/:docId', caseController.deleteDocument);
 
 // Asignación Académica y Profesores
-router.post('/:id/assign-student', caseController.assignStudent);
-router.get('/:id/student-history', caseController.getStudentHistory);
+//router.post('/:id/assign-student', caseController.assignStudent);
+//router.get('/:id/student-history', caseController.getStudentHistory);
 
 
 export default router;
