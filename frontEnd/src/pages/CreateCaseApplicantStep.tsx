@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import DropdownOption from "#components/DropDown/DropDownOption.tsx";
-import DropdownCheck from "#components/DropDownCheck/DropDownCheck.tsx";
-import DropdownOptionCheck from "#components/DropDownCheck/DropDownOptionCheck.tsx";
+import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
+import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
+import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
@@ -261,22 +261,22 @@ function CreateCaseApplicantStep() {
             <div className="col-span-4">
                 <TitleDropdown
                     label="Condicion de Trabajo*"
-                    selectedValue={applicantModel.workCondition || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ workCondition: value as string }); }}
+                    selectedValue={applicantModel.workConditionId || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number }); }}
                 >
-                    <DropdownOption value="EMPLEADO">Empleado</DropdownOption>
-                    <DropdownOption value="DESEMPLEADO">Desempleado</DropdownOption>
-                    <DropdownOption value="INDEPENDIENTE">Independiente</DropdownOption>
+                    <DropdownOption value={1}>Empleado</DropdownOption>
+                    <DropdownOption value={2}>Desempleado</DropdownOption>
+                    <DropdownOption value={3}>Independiente</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
                 <TitleDropdown
                     label="Condicion de Actividad*"
-                    selectedValue={applicantModel.activityCondition || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ activityCondition: value as string }); }}
+                    selectedValue={applicantModel.activityConditionId || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number }); }}
                 >
-                    <DropdownOption value="ACTIVO">Activo</DropdownOption>
-                    <DropdownOption value="INACTIVO">Inactivo</DropdownOption>
+                    <DropdownOption value={1}>Activo</DropdownOption>
+                    <DropdownOption value={2}>Inactivo</DropdownOption>
                 </TitleDropdown>
             </div>
         </>
@@ -308,61 +308,6 @@ function CreateCaseApplicantStep() {
                     placeholder="Unare"
                 />
             </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="Sector/Barrio*"
-                    value={applicantModel.neighborhood ?? ""}
-                    onChange={(text) => { updateApplicantModel({ neighborhood: text }); }}
-                    placeholder="Urb. Los Olivos"
-                />
-            </div>
-            <div className="col-span-6">
-                <TitleTextInput
-                    label="Direccion*"
-                    value={applicantModel.address ?? ""}
-                    onChange={(text) => { updateApplicantModel({ address: text }); }}
-                    placeholder="Calle 1, casa 2"
-                />
-            </div>
-
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Condicion de vivienda*"
-                    selectedValue={applicantModel.housingCondition || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ housingCondition: value as string }); }}
-                >
-                    <DropdownOption value="PROPIA">Propia</DropdownOption>
-                    <DropdownOption value="ALQUILADA">Alquilada</DropdownOption>
-                    <DropdownOption value="PRESTADA">Prestada</DropdownOption>
-                    <DropdownOption value="INVADIDA">Invadida</DropdownOption>
-                    <DropdownOption value="OTRA">Otra</DropdownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Tipo de vivienda*"
-                    selectedValue={applicantModel.housingType || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ housingType: value as string }); }}
-                >
-                    <DropdownOption value="CASA">Casa</DropdownOption>
-                    <DropdownOption value="APARTAMENTO">Apartamento</DropdownOption>
-                    <DropdownOption value="ANEXO">Anexo</DropdownOption>
-                    <DropdownOption value="RANCHO">Rancho</DropdownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Regimen de tenencia*"
-                    selectedValue={applicantModel.tenureType || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ tenureType: value as string }); }}
-                >
-                    <DropdownOption value="PROPIETARIO">Propietario</DropdownOption>
-                    <DropdownOption value="ALQUILER">Alquiler</DropdownOption>
-                    <DropdownOption value="CEDIDA">Cedida/Prestada</DropdownOption>
-                    <DropdownOption value="POSESION">Posesion</DropdownOption>
-                </TitleDropdown>
-            </div>
-
             <div className="col-span-6">
                 <DropdownCheck
                     label="Servicios basicos*"
@@ -396,13 +341,13 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3">
                 <TitleDropdown
                     label="Nivel educativo jefe*"
-                    selectedValue={applicantModel.headEducationLevel || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ headEducationLevel: value as string }); }}
+                    selectedValue={applicantModel.headEducationLevelId || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
                 >
-                    <DropdownOption value="PRIMARIA">Primaria</DropdownOption>
-                    <DropdownOption value="SECUNDARIA">Secundaria</DropdownOption>
-                    <DropdownOption value="UNIVERSITARIA">Universitaria</DropdownOption>
-                    <DropdownOption value="POSTGRADO">Postgrado</DropdownOption>
+                    <DropdownOption value={1}>Primaria</DropdownOption>
+                    <DropdownOption value={2}>Secundaria</DropdownOption>
+                    <DropdownOption value={3}>Universitaria</DropdownOption>
+                    <DropdownOption value={4}>Postgrado</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
@@ -415,11 +360,11 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Integrantes del hogar*"
-                    value={applicantModel.householdSize?.toString() ?? ""}
+                    label="Integrantes del hogar que trabajan*"
+                    value={applicantModel.workingMemberCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
-                        updateApplicantModel({ householdSize: Number.isNaN(num) ? undefined : num });
+                        updateApplicantModel({ workingMemberCount: Number.isNaN(num) ? undefined : num });
                     }}
                     placeholder="4"
                 />
@@ -427,31 +372,20 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Ninos en el hogar*"
-                    value={applicantModel.minorsCount?.toString() ?? ""}
+                    label="Ninos entre 7 y 12 añosen el hogar*"
+                    value={applicantModel.children7to12Count?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
-                        updateApplicantModel({ minorsCount: Number.isNaN(num) ? undefined : num });
+                        updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
                     }}
                     placeholder="1"
-                />
-            </div>
-            <div className="col-span-3">
-                <TitleTextInput
-                    label="Adultos mayores*"
-                    value={applicantModel.seniorsCount?.toString() ?? ""}
-                    onChange={(text) => {
-                        const num = Number(text);
-                        updateApplicantModel({ seniorsCount: Number.isNaN(num) ? undefined : num });
-                    }}
-                    placeholder="0"
                 />
             </div>
             <div className="col-span-4">
                 <TitleTextInput
                     label="Ingreso mensual del hogar*"
-                    value={applicantModel.householdIncome ?? ""}
-                    onChange={(text) => { updateApplicantModel({ householdIncome: text }); }}
+                    value={applicantModel.monthlyIncome ?? ""}
+                    onChange={(text) => { updateApplicantModel({ monthlyIncome: text }); }}
                     placeholder="$300"
                 />
             </div>
