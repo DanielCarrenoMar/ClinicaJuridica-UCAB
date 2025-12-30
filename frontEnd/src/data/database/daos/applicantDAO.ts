@@ -1,4 +1,4 @@
-import type { BeneficiaryDAO } from "./BeneficiaryDAO.ts";
+import type { BeneficiaryDAO } from "./beneficiaryDAO.ts";
 import type { MaritalStatusDAO } from "./typesDAO.ts";
 
 export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type'> {
