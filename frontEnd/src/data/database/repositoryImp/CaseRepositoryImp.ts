@@ -10,13 +10,7 @@ export function getCaseRepository(): CaseRepository {
             const casesData = await responseCase.json();
             const caseDAOs: CaseInfoDAO[] = casesData.data;
 
-            const casesWithAllData = await Promise.all(
-                caseDAOs.map(async (caseDao) => {
-                    return daoToCaseModel(caseDao);
-                })
-            );
-
-            return casesWithAllData;
+            return caseDAOs.map(daoToCaseModel);
         },
         findCaseById: async (id) => {
             const responseCase = await fetch(`${CASE_URL}/${id}`);
