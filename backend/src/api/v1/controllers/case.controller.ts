@@ -213,3 +213,76 @@ export async function addDocument(req: Request, res: Response): Promise<void> {
 export async function deleteDocument(req: Request, res: Response): Promise<void> {
   res.status(501).json({ success: false, message: "Funcionalidad 'Eliminar Documento' no implementada aún" });
 }
+
+// ==================== LOS 3 ENDPOINTS QUE NECESITAS ====================
+
+// createStatusForCaseId <= CaseStatusDAO
+export async function createStatusForCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const data = req.body;
+
+    // Validación de campos obligatorios
+    if (!data.status || !data.userId) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Los campos "status" y "userId" son obligatorios' 
+      });
+      return;
+    }
+
+    // Validar que el status sea válido
+    const validStatuses = ['A', 'T', 'P', 'C']; // Abierto, En Trámite, En Pausa, Cerrado
+    if (!validStatuses.includes(data.status)) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Status inválido. Valores permitidos: A, T, P, C' 
+      });
+      return;
+    }
+
+    const result = await caseService.createStatusForCaseId(caseId, data);
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+// getStudentsFromCaseId -> StudentDAO
+export async function getStudentsFromCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const result = await caseService.getStudentsFromCaseId(caseId);
+    
+    if (!result.success) {
+      res.status(404).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}

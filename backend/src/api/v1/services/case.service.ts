@@ -246,6 +246,7 @@ class CaseService {
       return { success: false, error: error.message };
     }
   }
+  
   async getBeneficiariesFromCaseId(idCase) {
     try {
       const beneficiaries = await prisma.$queryRaw`
@@ -325,7 +326,72 @@ class CaseService {
       return { success: false, error: error.message };
     }
   }
+
+  // ==================== LOS 3 ENDPOINTS QUE NECESITAS ====================
+  
+  // getStudentsFromCaseId -> StudentDAO
+  async getStudentsFromCaseId(caseId) {
+    try {
+      const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
+      
+      const students = await prisma.$queryRaw`
+        SELECT 
+          s."identityCard" as "studentId",
+          s."term",
+          s."nrc",
+          s."type",
+          u."fullName" as "studentName",
+          u."email" as "studentEmail"
+        FROM "AssignedStudent" asg
+        JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
+        JOIN "User" u ON s."identityCard" = u."identityCard"
+        WHERE asg."idCase" = ${id}
+        ORDER BY u."fullName"
+      `;
+
+      return { success: true, data: students };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  // createStatusForCaseId <= CaseStatusDAO
+  async createStatusForCaseId(caseId, data) {
+    try {
+      const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
+      
+      // Verificar que el caso existe
+      const caseExists = await prisma.$queryRaw`
+        SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
+      `;
+      
+      if (!Array.isArray(caseExists) || caseExists.length === 0) {
+        return { success: false, message: 'Caso no encontrado' };
+      }
+
+      // Validar campos obligatorios
+      if (!data.status || !data.userId) {
+        return { success: false, message: 'status y userId son obligatorios' };
+      }
+
+      // Obtener el próximo número de estado
+      const lastStatus = await prisma.$queryRaw`
+        SELECT MAX("statusNumber") as max FROM "CaseStatus" WHERE "idCase" = ${id}
+      `;
+      const nextNumber = (Number(lastStatus[0]?.max) || 0) + 1;
+
+      // Insertar el nuevo estado
+      const newStatus = await prisma.$queryRaw`
+        INSERT INTO "CaseStatus" ("idCase", "statusNumber", "status", "reason", "userId", "registryDate")
+        VALUES (${id}, ${nextNumber}, ${data.status}, ${data.reason || null}, ${data.userId}, NOW())
+        RETURNING *
+      `;
+
+      return { success: true, data: newStatus[0] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 export default new CaseService();
-
