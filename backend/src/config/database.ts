@@ -1,22 +1,23 @@
-﻿// src/config/database.ts - Exportación CORRECTA
-import { PrismaClient } from '../generated/client.js';
+import 'dotenv/config';
+import { PrismaClient } from '#src/generated/client.js';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-// Configuración para Prisma 7+
-const prisma = new PrismaClient({
-  accelerateUrl: process.env.PRISMA_ACCELERATE_URL || 'http://localhost:3000'
-});
+const connectionString = process.env.DATABASE_URL;
 
-export async function connectDatabase() {
-  try {
-    console.log('🔗 Conectando a la base de datos...');
-    await prisma.$connect();
-    console.log('✅ Base de datos conectada exitosamente');
-    return prisma;
-  } catch (error) {
-    console.error('❌ Error:', error instanceof Error ? error.message : String(error));
-    return prisma;
-  }
+if (!connectionString) {
+  throw new Error('DATABASE_URL no está configurado en las variables de entorno. Por favor, configura DATABASE_URL en tu archivo .env');
 }
 
-// Export NAMED export (no default)
-export { prisma };
+let prisma: PrismaClient;
+
+try {
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  prisma = new PrismaClient({ adapter });
+} catch (error) {
+  console.error('❌ Error al configurar Prisma:', error);
+  throw error;
+}
+
+export default prisma;

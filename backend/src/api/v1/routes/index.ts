@@ -1,4 +1,3 @@
-// src/api/v1/routes/index.ts
 import { Router } from 'express';
 import userRoutes from './user.routes.js';
 import applicantRoutes from './applicant.routes.js';
@@ -11,7 +10,6 @@ import healthRoutes from './health.routes.js'; // Asegúrate de crear este archi
 
 const router = Router();
 
-// Configurar rutas
 router.use('/users', userRoutes);
 router.use('/applicants', applicantRoutes);
 router.use('/cases', caseRoutes);

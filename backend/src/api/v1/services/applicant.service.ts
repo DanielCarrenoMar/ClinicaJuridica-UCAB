@@ -355,4 +355,3 @@ class ApplicantService {
 }
 
 export default new ApplicantService();
-
