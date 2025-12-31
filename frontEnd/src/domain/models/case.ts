@@ -1,5 +1,6 @@
 import type { ProcessTypeDAO } from "#database/daos/typesDAO.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
+import { caseStatusDAOEnumToModel, type CaseStatus } from "./caseStatus";
 
 type ProcessType =
     "IN_PROGRESS" |  // Tramite
@@ -12,6 +13,7 @@ export interface CaseModel {
     compoundKey: string;
     problemSummary: string;
     createdAt: Date;
+    caseStatus: CaseStatus;
     processType: ProcessType;
     applicantId: string;
     idNucleus: string;
@@ -42,10 +44,12 @@ function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
 }
 
 export function daoToCaseModel(dao:CaseInfoDAO): CaseModel {
-    const {processType ,...rest} = dao
+    const {processType, caseStatus, createdAt,...rest} = dao
     return {
         processType: processTypeDAOToModel(processType),
+        caseStatus: caseStatusDAOEnumToModel(caseStatus),
         compoundKey: dao.idNucleus + "_" + dao.term + "_" + dao.idCase,
+        createdAt: new Date(createdAt),
         ...rest,
     }
 }
