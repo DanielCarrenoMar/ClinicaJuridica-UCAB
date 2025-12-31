@@ -1,9 +1,10 @@
-import type { ProcessTypeDAO } from "./typesDAO.ts";
+import type { CaseStatusEnumDAO, ProcessTypeDAO } from "./typesDAO.ts";
 
 export interface CaseDAO {
   idCase: number;
   problemSummary: string;
-  createdAt: Date;
+  createdAt: string;
+  caseStatus: CaseStatusEnumDAO;
   processType: ProcessTypeDAO;
   applicantId: string;
   idNucleus: string;
@@ -17,7 +18,8 @@ export interface CaseDAO {
 export const defaultCaseDAO: CaseDAO = {
   idCase: 0,
   problemSummary: "",
-  createdAt: new Date(),
+  caseStatus: "A",
+  createdAt: "",
   processType: "A",
   applicantId: "",
   idNucleus: "",

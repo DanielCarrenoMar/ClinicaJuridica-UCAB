@@ -44,15 +44,17 @@ function highlightText(text: string | number, indices?: Array<[number, number]>)
 export default function CaseCard({ caseData, matches }: CaseCardProps) {
     const {
         compoundKey,
-        createAt,
+        caseStatus,
+        createdAt,
         applicantName,
         legalAreaName,
         problemSummary,
-        CasesStatus,
+        lastActionDate,
+        lastActionDescription
     } = caseData;
 
-    const config = statusConfig[CasesStatus] || statusConfig.OPEN;
-    const formattedDate = new Date(createAt).toLocaleDateString("es-ES");
+    const config = statusConfig[caseStatus] || statusConfig.OPEN;
+    const formattedDate = createdAt.toLocaleDateString("es-ES");
 
     return (
         <div className="bg-surface/70 flex flex-col gap-1 h-28 overflow-hidden relative rounded-3xl w-full max-w-5xl">
@@ -64,7 +66,6 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                     {formattedDate}
                 </h5>
             </header>
-
             <div className="flex gap-2.5 items-start relative text-body-small w-full px-4 py-2">
                 <div className="flex flex-col gap-1 justify-center min-w-40">
                     <span className="flex gap-1 items-center">
@@ -88,12 +89,12 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                         <Book/>
                         <span className="flex flex-col items-center">
                             <h5 className="align-middle">
-                                Última acción {caseData.lastAction?.registryDate ? `el ${caseData.lastAction.registryDate.toLocaleDateString("es-ES")}` : 'N/A'}
+                                Última acción {lastActionDate ? `el ${lastActionDate.toLocaleDateString("es-ES")}` : 'N/A'}
                             </h5>
                         </span>
                     </span>
                     <p className="font-lighttruncate">
-                        Sin acciones
+                        {lastActionDescription || "Sin acciones"}
                     </p>
                 </div>
 
