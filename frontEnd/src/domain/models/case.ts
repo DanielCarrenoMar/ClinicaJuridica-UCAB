@@ -1,4 +1,4 @@
-import type { ProcessTypeDAO } from "#database/daos/typesDAO.ts";
+import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import { caseStatusDAOEnumToModel, type CaseStatus } from "./caseStatus";
 

@@ -1,5 +1,5 @@
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
-import type { BeneficiaryTypeDAO } from "#database/daos/typesDAO.ts";
+import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
 import type { PersonID, GenderType, IdNacionality } from "#domain/mtypes.ts";
 
 type BeneficiaryType = "BENEFICIARY" | "APPLICANT";

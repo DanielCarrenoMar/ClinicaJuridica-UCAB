@@ -1,4 +1,4 @@
-import type { CaseStatusEnumDAO } from "#database/daos/typesDAO.ts";
+import type { CaseStatusEnumDAO } from "#database/typesDAO.ts";
 import type { PersonID } from "#domain/mtypes.ts";
 
 export type CaseStatus = "OPEN" | "IN_PROGRESS" | "PAUSED" | "CLOSED";

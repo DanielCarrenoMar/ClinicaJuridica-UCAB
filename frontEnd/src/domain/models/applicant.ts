@@ -1,5 +1,5 @@
 import type { ApplicantInfoDAO } from "#database/daos/applicantInfoDAO.ts";
-import type { MaritalStatusDAO } from "#database/daos/typesDAO.ts";
+import type { MaritalStatusDAO } from "#database/typesDAO.ts";
 import type { IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
 import type { BeneficiaryModel } from "./beneficiary";
 

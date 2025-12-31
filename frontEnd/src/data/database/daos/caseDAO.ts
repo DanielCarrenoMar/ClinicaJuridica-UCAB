@@ -1,4 +1,4 @@
-import type { ProcessTypeDAO } from "./typesDAO.ts";
+import type { ProcessTypeDAO } from "../typesDAO.ts";
 
 export interface CaseDAO {
   idCase: number;

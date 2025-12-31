@@ -1,5 +1,5 @@
 import type { CaseDAO } from "./caseDAO.ts";
-import type { CaseStatusEnumDAO } from "./typesDAO.ts";
+import type { CaseStatusEnumDAO } from "../typesDAO.ts";
 
 export interface CaseInfoDAO extends CaseDAO {
   applicantName: string;

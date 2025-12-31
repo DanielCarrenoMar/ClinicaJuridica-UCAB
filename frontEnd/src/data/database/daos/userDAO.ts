@@ -1,4 +1,4 @@
-import type { GenderDAO, UserTypeDAO } from "./typesDAO"
+import type { GenderDAO, UserTypeDAO } from "../typesDAO"
 
 export interface UserDAO {
     identityCard: string;

@@ -1,4 +1,4 @@
-import type { CaseStatusEnumDAO } from "./typesDAO.ts";
+import type { CaseStatusEnumDAO } from "../typesDAO.ts";
 
 export interface CaseStatusDAO {
   idCase: number;
