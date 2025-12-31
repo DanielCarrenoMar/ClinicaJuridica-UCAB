@@ -1,5 +1,5 @@
-// @ts-nocheck
-import prisma from "../../../config/database.js";
+﻿// @ts-nocheck
+import { prisma } from "../../../config/database.js";
 
 class UserService {
   private normalizeType(type: string): string {
@@ -81,7 +81,7 @@ class UserService {
       `;
 
       if (existing.length > 0) {
-        return { success: false, message: 'Cédula o Email ya registrado' };
+        return { success: false, message: 'CÃ©dula o Email ya registrado' };
       }
 
       const type = this.normalizeType(data.type);

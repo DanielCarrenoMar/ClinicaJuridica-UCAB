@@ -1,5 +1,5 @@
-// @ts-nocheck
-import prisma from '../../../config/database.js';
+﻿// @ts-nocheck
+import { prisma } from '../../../config/database.js';
 
 class CaseService {
   async getAllCases() {
@@ -186,7 +186,7 @@ class CaseService {
       `;
 
       if (Array.isArray(exists) && exists.length > 0) {
-        return { success: false, message: 'El estudiante ya está asignado a este caso en este periodo' };
+        return { success: false, message: 'El estudiante ya estÃ¡ asignado a este caso en este periodo' };
       }
 
       const assignment = await prisma.$queryRaw`
@@ -298,3 +298,4 @@ class CaseService {
 }
 
 export default new CaseService();
+

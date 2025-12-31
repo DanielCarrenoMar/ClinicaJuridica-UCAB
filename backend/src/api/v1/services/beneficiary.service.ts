@@ -1,5 +1,5 @@
-// @ts-nocheck
-import prisma from '../../../config/database.js';
+﻿// @ts-nocheck
+import { prisma } from '../../../config/database.js';
 
 class BeneficiaryService {
   async getAll() {
@@ -106,3 +106,4 @@ class BeneficiaryService {
 }
 
 export default new BeneficiaryService();
+

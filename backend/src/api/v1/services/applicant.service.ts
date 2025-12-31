@@ -1,5 +1,5 @@
-// @ts-nocheck
-import prisma from '../../../config/database.js';
+﻿// @ts-nocheck
+import { prisma } from '../../../config/database.js';
 
 class ApplicantService {
   async getAllApplicants() {
@@ -182,3 +182,4 @@ class ApplicantService {
 }
 
 export default new ApplicantService();
+
