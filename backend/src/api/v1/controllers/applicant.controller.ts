@@ -17,7 +17,7 @@ export async function getAllApplicant(req: Request, res: Response): Promise<void
 
 export async function getApplicantById(req: Request, res: Response): Promise<void> {
   try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     const result = await applicantService.getApplicantById(id);
     if (result.error) {
       res.status(500).json({ success: false, error: result.error });
@@ -80,39 +80,6 @@ export async function getFullProfile(req: Request, res: Response): Promise<void>
       res.status(404).json({ success: false, message: 'Solicitante no encontrado' });
       return;
     }
-    res.status(200).json(result);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: msg });
-  }
-}
-
-export async function updateHousing(req: Request, res: Response): Promise<void> {
-  try {
-    const id = req.params.id;
-    const result = await applicantService.updateHousing(id, req.body);
-    res.status(200).json(result);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: msg });
-  }
-}
-
-export async function updateFamily(req: Request, res: Response): Promise<void> {
-  try {
-    const id = req.params.id;
-    const result = await applicantService.updateFamily(id, req.body);
-    res.status(200).json(result);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: msg });
-  }
-}
-
-export async function getApplicantCases(req: Request, res: Response): Promise<void> {
-  try {
-    const id = req.params.id;
-    const result = await applicantService.getApplicantCases(id);
     res.status(200).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
