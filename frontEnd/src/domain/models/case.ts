@@ -44,11 +44,12 @@ function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
 }
 
 export function daoToCaseModel(dao:CaseInfoDAO): CaseModel {
-    const {processType, caseStatus, createdAt,...rest} = dao
+    const {processType, caseStatus, createdAt, lastActionDate,...rest} = dao
     return {
         processType: processTypeDAOToModel(processType),
         caseStatus: caseStatusDAOEnumToModel(caseStatus),
         compoundKey: dao.idNucleus + "_" + dao.term + "_" + dao.idCase,
+        lastActionDate: lastActionDate ? new Date(lastActionDate) : undefined,
         createdAt: new Date(createdAt),
         ...rest,
     }
