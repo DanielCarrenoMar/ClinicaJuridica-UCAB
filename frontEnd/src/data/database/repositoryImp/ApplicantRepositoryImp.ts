@@ -20,20 +20,26 @@ export function getApplicantRepository(): ApplicantRepository {
             const response = await fetch(APPLICANT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    ...data,
+                    idNacionality: (data as any).idNationality ?? (data as any).idNacionality,
+                })
             });
             const result = await response.json();
-            return result.data;
+            return daoToApplicantModel(result.data as ApplicantInfoDAO);
         },
 
         updateApplicant: async (id, data) => {
             const response = await fetch(`${APPLICANT_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    ...data,
+                    idNacionality: (data as any).idNationality ?? (data as any).idNacionality,
+                })
             });
             const result = await response.json();
-            return result.data;
+            return daoToApplicantModel(result.data as ApplicantInfoDAO);
         },
 
         deleteApplicant: async (id) => {

@@ -6,8 +6,11 @@ class CaseActionService {
       const actions = await prisma.$queryRaw`
         SELECT 
           a.*,
-          u."fullName" as "userName"
+          u."fullName" as "userName",
+          c."idNucleus" as "idNucleus",
+          c."term" as "term"
         FROM "CaseAction" a
+        JOIN "Case" c ON a."idCase" = c."idCase"
         JOIN "User" u ON a."userId" = u."identityCard"
         ORDER BY a."registryDate" DESC
       `;
@@ -62,8 +65,11 @@ class CaseActionService {
         const created = await tx.$queryRaw`
           SELECT 
             a.*,
-            u."fullName" as "userName"
+            u."fullName" as "userName",
+            c."idNucleus" as "idNucleus",
+            c."term" as "term"
           FROM "CaseAction" a
+          JOIN "Case" c ON a."idCase" = c."idCase"
           JOIN "User" u ON a."userId" = u."identityCard"
           WHERE a."idCase" = ${data.idCase} AND a."actionNumber" = ${nextNumber}
         `;

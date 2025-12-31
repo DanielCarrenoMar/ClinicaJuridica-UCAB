@@ -12,6 +12,7 @@ import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { GenderType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
+import { getApplicantRepository } from "#database/repositoryImp/ApplicantRepositoryImp.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
 import { useNavigate } from "react-router";
@@ -22,6 +23,7 @@ const AUTOFILL_SPINNER_MS = 420;
 function CreateCaseApplicantStep() {
     const navigate = useNavigate();
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
+    const { createApplicant } = getApplicantRepository();
     const { applicantModel, updateApplicantModel } = useCaseOutletContext();
     const [identityCardInput, setIdentityCardInput] = useState(applicantModel.identityCard);
     const [isVerifyingIdentityCard, setIsVerifyingIdentityCard] = useState(false);
@@ -30,6 +32,8 @@ function CreateCaseApplicantStep() {
 
     const [showAutoFillToast, setShowAutoFillToast] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [loadingCreateApplicant, setLoadingCreateApplicant] = useState(false);
 
     const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
     const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
@@ -140,6 +144,33 @@ function CreateCaseApplicantStep() {
         }, AUTOFILL_SPINNER_MS);
 
         setLastIdentityCard(sanitizedIdentityCard);
+    };
+
+    const handleSaveApplicant = async () => {
+        if (!applicantModel.identityCard || !applicantModel.fullName) {
+            alert('Por favor complete los campos obligatorios: Cédula y Nombre completo');
+            return;
+        }
+
+        setLoadingCreateApplicant(true);
+        
+        try {
+            const result = await createApplicant(applicantModel);
+            
+            if (result) {
+                setShowSuccessMessage(true);
+                setTimeout(() => {
+                    setShowSuccessMessage(false);
+                    navigate("/crearCaso/caso");
+                }, 2000);
+            } else {
+                alert('Error al guardar el solicitante. Por favor intente nuevamente.');
+            }
+        } catch (error) {
+            alert('Error al guardar el solicitante. Por favor intente nuevamente.');
+        } finally {
+            setLoadingCreateApplicant(false);
+        }
     };
 
     const identificationInputs = (
@@ -401,6 +432,7 @@ function CreateCaseApplicantStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { setShowCancelConfirm(true); }} variant="outlined" icon={<Close />} className="h-10 w-28">Cancelar</Button>
+                    <Button onClick={handleSaveApplicant} disabled={loadingCreateApplicant || !haveMinDataToNextStep} variant="filled" icon={loadingCreateApplicant ? <LoadingSpinner /> : undefined} className="h-10 w-32">Guardar</Button>
                     <Button onClick={() => { navigate("/crearCaso/caso"); }} disabled={!haveMinDataToNextStep} variant="outlined" icon={<ChevronRight />} className="w-32">Siguiente</Button>
                 </div>
             </header>
@@ -448,6 +480,21 @@ function CreateCaseApplicantStep() {
                                     Autocompletar
                                 </Button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        {showSuccessMessage && (
+                <div className="fixed top-24 right-6 z-40">
+                    <div className="rounded-xl gap-3 bg-green-500 px-5 py-4 shadow-2xl ring-1 ring-green-600/10 flex" role="status">
+                        <div className="flex flex-col py-2 items-start gap-2">
+                            <header className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <CheckCircle className="text-white" />
+                                    <h3 className="text-label-small text-white">Solicitante Guardado</h3>
+                                </div>
+                            </header>
+                            <p className="mx-2 text-body-small text-white">Los datos del solicitante se han guardado exitosamente en la base de datos.</p>
                         </div>
                     </div>
                 </div>
