@@ -8,4 +8,5 @@ export const EDUCATION_LEVEL_URL = "http://localhost:3000/api/v1/catalogs/educat
 export const WORK_CONDITION_URL = "http://localhost:3000/api/v1/catalogs/work-conditions";
 export const ACTIVITY_CONDITION_URL = "http://localhost:3000/api/v1/catalogs/activity-conditions";
 export const FAMILY_HOME_URL = "http://localhost:3000/api/v1/family-homes";
-export const HOUSING_URL = "http://localhost:3000/api/v1/housings"; 
+export const HOUSING_URL = "http://localhost:3000/api/v1/housings";
+export const CASE_ACTION_URL = "http://localhost:3000/api/v1/case-action";
