@@ -7,7 +7,7 @@ const router = Router();
 router.get('/', applicantController.getAllApplicant);
 router.get('/:id', applicantController.getApplicantById); //ApplicantInfoDAO
 router.post('/', applicantController.createApplicant); //ApplicantDAO
-router.put('/:id', applicantController.updateGeneralInfo); //ApplicantDAO
-router.delete('/:id', applicantController.deleteApplicantbyId);
+router.put('/:id', applicantController.updateApplicant); //ApplicantDAO
+router.delete('/:id', applicantController.deleteApplicant);
 
 export default router;
