@@ -6,11 +6,7 @@ class CaseService {
     try {
       const cases = await prisma.$queryRaw`
         SELECT 
-          c."idCase",
-          c."problemSummary",
-          c."processType",
-          c."createdAt",
-          c."term",
+          c.*,
           b."fullName" as "applicantName",
           la."name" as "legalAreaName",
           u_teacher."fullName" as "teacherName",
