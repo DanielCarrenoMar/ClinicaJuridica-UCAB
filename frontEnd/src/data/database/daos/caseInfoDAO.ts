@@ -9,4 +9,5 @@ export interface CaseInfoDAO extends CaseDAO {
   lastActionDate?: Date;
   lastActionDescription?: string;
   caseStatus: CaseStatusEnumDAO;
+  compoundKey: string;
 }

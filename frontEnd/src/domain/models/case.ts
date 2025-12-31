@@ -48,7 +48,6 @@ export function daoToCaseModel(dao:CaseInfoDAO): CaseModel {
     return {
         processType: processTypeDAOToModel(processType),
         caseStatus: caseStatusDAOEnumToModel(caseStatus),
-        compoundKey: dao.idNucleus + "_" + dao.term + "_" + dao.idCase,
         lastActionDate: lastActionDate ? new Date(lastActionDate) : undefined,
         createdAt: new Date(createdAt),
         ...rest,
