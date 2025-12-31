@@ -12,7 +12,7 @@ import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { GenderType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
-import { useCreateApplicant } from "#domain/useCaseHooks/useCreateApplicant.ts";
+import { getApplicantRepository } from "#database/repositoryImp/ApplicantRepositoryImp.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
 import { useNavigate } from "react-router";
@@ -23,7 +23,7 @@ const AUTOFILL_SPINNER_MS = 420;
 function CreateCaseApplicantStep() {
     const navigate = useNavigate();
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
-    const { createApplicant, loading: loadingCreateApplicant } = useCreateApplicant();
+    const { createApplicant } = getApplicantRepository();
     const { applicantModel, updateApplicantModel } = useCaseOutletContext();
     const [identityCardInput, setIdentityCardInput] = useState(applicantModel.identityCard);
     const [isVerifyingIdentityCard, setIsVerifyingIdentityCard] = useState(false);
@@ -33,6 +33,7 @@ function CreateCaseApplicantStep() {
     const [showAutoFillToast, setShowAutoFillToast] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [loadingCreateApplicant, setLoadingCreateApplicant] = useState(false);
 
     const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
     const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
@@ -151,16 +152,24 @@ function CreateCaseApplicantStep() {
             return;
         }
 
-        const result = await createApplicant(applicantModel);
+        setLoadingCreateApplicant(true);
         
-        if (result) {
-            setShowSuccessMessage(true);
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-                navigate("/crearCaso/caso");
-            }, 2000);
-        } else {
+        try {
+            const result = await createApplicant(applicantModel);
+            
+            if (result) {
+                setShowSuccessMessage(true);
+                setTimeout(() => {
+                    setShowSuccessMessage(false);
+                    navigate("/crearCaso/caso");
+                }, 2000);
+            } else {
+                alert('Error al guardar el solicitante. Por favor intente nuevamente.');
+            }
+        } catch (error) {
             alert('Error al guardar el solicitante. Por favor intente nuevamente.');
+        } finally {
+            setLoadingCreateApplicant(false);
         }
     };
 
