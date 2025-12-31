@@ -44,10 +44,11 @@ function maritalStatusDAOToModel(dao: MaritalStatusDAO): MaritalStatus {
 }
 
 export function daoToApplicantModel(dao: ApplicantInfoDAO): ApplicantModel {
-    const {maritalStatus, ...rest} = dao
+    const {maritalStatus, createdAt, ...rest} = dao
     return {
         idNationality: dao.idNacionality as IdNacionality,
         maritalStatus: maritalStatus ? maritalStatusDAOToModel(maritalStatus) : undefined,
+        createdAt: new Date(createdAt),
         ...rest,
     }
 
