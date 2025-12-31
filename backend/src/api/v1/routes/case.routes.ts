@@ -6,6 +6,7 @@ const router = Router();
 // Operaciones Principales
 router.get('/', caseController.getAllCases); 
 router.post('/', caseController.createCase);
+router.get('/status/amount', caseController.getStatusCaseAmount);
 router.get('/:id', caseController.getCaseById);
 router.put('/:id', caseController.updateCase);
 router.delete('/:id', caseController.deleteCase);
@@ -13,6 +14,8 @@ router.delete('/:id', caseController.deleteCase);
 // Historial
 router.post('/:id/actions', caseController.addAction);
 router.get('/:id/actions/', caseController.getActionsInfoFromCaseId);
+router.get('/:id/beneficiaries', caseController.getBeneficiariesFromCaseId);
+router.get('/:id/status', caseController.getCaseStatusFromCaseId);
 //router.patch('/:id/status', caseController.changeStatus);
 //outer.get('/:id/timeline', caseController.getTimeline);
 

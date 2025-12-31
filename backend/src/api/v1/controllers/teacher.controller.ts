@@ -1,0 +1,15 @@
+import type { Request, Response } from 'express';
+import teacherService from '../services/teacher.service.js';
+
+export async function getTeacherById(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const term = typeof req.query.term === 'string' ? req.query.term : undefined;
+
+    const result = await teacherService.getTeacherById(id, term);
+    res.status(result.success ? 200 : 404).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}

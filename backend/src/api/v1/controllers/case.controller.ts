@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import caseService from '../services/case.service.js';
+import caseActionService from '../services/caseAction.service.js';
 
 export async function getAllCases(req: Request, res: Response): Promise<void> {
   try {
@@ -114,81 +115,14 @@ export async function deleteCase(req: Request, res: Response): Promise<void> {
   }
 }
 
-/*export async function changeStatus(req: Request, res: Response): Promise<void> {
-  try {
-    const caseId = parseInt(req.params.id);
-    const { description, date } = req.body;
-
-    if (isNaN(caseId) || !description) {
-      res.status(400).json({ success: false, message: 'ID o descripción faltante' });
-      return;
-    }
-
-    const result = await caseService.changeCaseStatus(caseId, description, date);
-    res.status(200).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
-
-export async function getTimeline(req: Request, res: Response): Promise<void> {
-  try {
-    const caseId = parseInt(req.params.id);
-    if (isNaN(caseId)) {
-      res.status(400).json({ success: false, message: 'ID inválido' });
-      return;
-    }
-
-    const result = await caseService.getCaseTimeline(caseId);
-    res.status(200).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
-
-export async function assignStudent(req: Request, res: Response): Promise<void> {
-  try {
-    const caseId = parseInt(req.params.id);
-    const { studentId } = req.body;
-
-    if (isNaN(caseId) || !studentId) {
-      res.status(400).json({ success: false, message: 'Datos incompletos para la asignación' });
-      return;
-    }
-
-    const result = await caseService.assignStudentToCase(caseId, studentId);
-    res.status(201).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
-
-export async function getStudentHistory(req: Request, res: Response): Promise<void> {
-  try {
-    const caseId = parseInt(req.params.id);
-    if (isNaN(caseId)) {
-      res.status(400).json({ success: false, message: 'ID inválido' });
-      return;
-    }
-
-    const result = await caseService.getAssignedStudents(caseId);
-    res.status(200).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}*/
-
 export async function getActionsInfoFromCaseId(req: Request, res: Response): Promise<void> {
-  try{
+  try {
     const caseId = parseInt(req.params.id);
-    if (isNaN(caseId)){
+    if (isNaN(caseId)) {
       res.status(400).json({ success: false, message: 'ID inválido' });
       return;
     }
+
     const result = await caseService.getActionsInfoFromCaseId(caseId);
     res.status(200).json(result);
   } catch (error: unknown) {
@@ -198,7 +132,66 @@ export async function getActionsInfoFromCaseId(req: Request, res: Response): Pro
 }
 
 export async function addAction(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Agregar Acción' no implementada aún" });
+  try {
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const payload = {
+      ...req.body,
+      idCase: caseId
+    };
+
+    const result = await caseActionService.createCaseAction(payload);
+    res.status(result.success ? 201 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getBeneficiariesFromCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const result = await caseService.getBeneficiariesFromCaseId(caseId);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getCaseStatusFromCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const result = await caseService.getCaseStatusFromCaseId(caseId);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getStatusCaseAmount(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await caseService.getStatusCaseAmount();
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
 }
 
 export async function scheduleAppointment(req: Request, res: Response): Promise<void> {

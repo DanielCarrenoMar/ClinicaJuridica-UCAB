@@ -95,6 +95,8 @@ export async function deleteApplicant(req: Request, res: Response): Promise<void
   }
 }
 
+export const deleteApplicantById = deleteApplicant;
+
 // Nota: getFullProfile era idéntico a getApplicantById. 
 // Si no tiene lógica diferente, usa getApplicantById en la ruta.
 // Si necesitas mantenerlo separado por semántica, aquí está reutilizando la lógica:

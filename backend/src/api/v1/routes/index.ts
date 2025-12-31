@@ -4,6 +4,9 @@ import userRoutes from './user.routes.js';
 import applicantRoutes from './applicant.routes.js';
 import caseRoutes from './case.routes.js';
 import beneficiaryRoutes from './beneficiary.routes.js';
+import caseActionRoutes from './caseAction.routes.js';
+import studentRoutes from './student.routes.js';
+import teacherRoutes from './teacher.routes.js';
 import healthRoutes from './health.routes.js'; // Asegúrate de crear este archivo
 
 const router = Router();
@@ -13,7 +16,10 @@ router.use('/users', userRoutes);
 router.use('/applicants', applicantRoutes);
 router.use('/cases', caseRoutes);
 router.use('/beneficiary', beneficiaryRoutes);
-router.use('/salud', healthRoutes); // Nueva ruta de salud
+router.use('/case-actions', caseActionRoutes);
+router.use('/students', studentRoutes);
+router.use('/teachers', teacherRoutes);
+router.use('/salud', healthRoutes);
 
 // Ruta raíz de la API v1
 router.get('/', (req, res) => {

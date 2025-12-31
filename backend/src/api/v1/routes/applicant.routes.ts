@@ -8,6 +8,6 @@ router.get('/', applicantController.getAllApplicant);
 router.get('/:id', applicantController.getApplicantById); //ApplicantInfoDAO
 router.post('/', applicantController.createApplicant); //ApplicantDAO
 router.put('/:id', applicantController.updateApplicant); //ApplicantDAO
-router.delete('/:id', applicantController.deleteApplicant);
+router.delete('/:id', applicantController.deleteApplicantById);
 
 export default router;
