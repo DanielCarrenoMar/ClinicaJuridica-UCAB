@@ -20,7 +20,6 @@ class ApplicantService {
 
       const mappedApplicants = applicants.map(app => ({
         ...app,
-        // TRADUCCIÓN: Asignamos el ID de la BD a la propiedad que espera el DAO
         applicantEducationLevel: app.applicantEducationLevelId,
       } as unknown as ApplicantResponse));
 
@@ -77,7 +76,6 @@ class ApplicantService {
   async createApplicant(data: ApplicantResponse): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
-        // 1. Beneficiary
         await tx.$executeRaw`
           INSERT INTO "Beneficiary" 
           ("identityCard", "fullName", "gender", "birthDate", "idNacionality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
@@ -87,8 +85,6 @@ class ApplicantService {
             true, 'S', ${data.idState}, ${data.municipalityNumber}, ${data.parishNumber}
           )
         `;
-
-        // 2. Applicant
         await tx.$executeRaw`
           INSERT INTO "Applicant"
           (
@@ -104,8 +100,6 @@ class ApplicantService {
             ${data.applicantStudyTime}, ${data.workConditionId}, ${data.activityConditionId}
           )
         `;
-
-        // 3. FamilyHome
         await tx.$executeRaw`
           INSERT INTO "FamilyHome"
           ("applicantId", "memberCount", "workingMemberCount", "children7to12Count", "studentChildrenCount", "monthlyIncome")
@@ -116,14 +110,10 @@ class ApplicantService {
             ${data.monthlyIncome || 0}
           )
         `;
-
-        // 4. Housing
         await tx.$executeRaw`
           INSERT INTO "Housing" ("applicantId", "bathroomCount", "bedroomCount")
           VALUES (${data.identityCard}, ${data.bathroomCount || 0}, ${data.bedroomCount || 0})
         `;
-
-        // 5. Services (Solo si la tabla existe en BD física)
         if (data.servicesIdAvailable && data.servicesIdAvailable.length > 0) {
           for (const serviceId of data.servicesIdAvailable) {
             await tx.$executeRaw`
@@ -132,7 +122,6 @@ class ApplicantService {
             `;
           }
         }
-
         const result = await tx.$queryRaw<RawApplicantDB[]>`
           SELECT 
             a.*, 
@@ -168,7 +157,6 @@ class ApplicantService {
   async updateApplicant(id: number | string, data: Partial<ApplicantResponse>): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
-        // 1. Beneficiary
         await tx.$executeRaw`
           UPDATE "Beneficiary" SET 
             "fullName" = COALESCE(${data.fullName}, "fullName"), 
@@ -178,8 +166,6 @@ class ApplicantService {
             "parishNumber" = COALESCE(${data.parishNumber}, "parishNumber")
           WHERE "identityCard" = ${id}
         `;
-
-        // 2. Applicant
         await tx.$executeRaw`
           UPDATE "Applicant" SET 
             "email" = COALESCE(${data.email}, "email"), 
@@ -196,8 +182,6 @@ class ApplicantService {
             "activityConditionId" = COALESCE(${data.activityConditionId}, "activityConditionId")
           WHERE "identityCard" = ${id}
         `;
-
-        // 3. FamilyHome
         await tx.$executeRaw`
           UPDATE "FamilyHome" SET
             "memberCount" = COALESCE(${data.memberCount}, "memberCount"),
@@ -207,16 +191,12 @@ class ApplicantService {
             "monthlyIncome" = COALESCE(${data.monthlyIncome}, "monthlyIncome")
           WHERE "applicantId" = ${id}
         `;
-
-        // 4. Housing
         await tx.$executeRaw`
           UPDATE "Housing" SET
             "bathroomCount" = COALESCE(${data.bathroomCount}, "bathroomCount"),
             "bedroomCount" = COALESCE(${data.bedroomCount}, "bedroomCount")
           WHERE "applicantId" = ${id}
         `;
-
-        // 5. Services (Solo si tabla existe en BD)
         if (Array.isArray(data.servicesIdAvailable)) {
           await tx.$executeRaw`DELETE FROM "ApplicantServiceAvailability" WHERE "applicantId" = ${id}`;
           for (const serviceId of data.servicesIdAvailable) {
