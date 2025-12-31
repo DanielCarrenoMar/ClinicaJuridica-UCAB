@@ -10,13 +10,30 @@ class CaseService {
           b."fullName" as "applicantName",
           la."name" as "legalAreaName",
           u_teacher."fullName" as "teacherName",
-          co."subject" as "courtName"
+          co."subject" as "courtName",
+          cs."status" as "caseStatus",
+          ca."registryDate" as "lastActionDate",
+          ca."description" as "lastActionDescription"
 
           FROM "Case" c
           JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
           LEFT JOIN "Court" co ON c."idCourt" = co."idCourt"
+          LEFT JOIN LATERAL (
+            SELECT cs1."status"
+            FROM "CaseStatus" cs1
+            WHERE cs1."idCase" = c."idCase"
+            ORDER BY cs1."statusNumber" DESC
+            LIMIT 1
+          ) cs ON TRUE
+          LEFT JOIN LATERAL (
+            SELECT ca1."registryDate", ca1."description"
+            FROM "CaseAction" ca1
+            WHERE ca1."idCase" = c."idCase"
+            ORDER BY ca1."registryDate" DESC
+            LIMIT 1
+          ) ca ON TRUE
 
           ORDER BY c."createdAt" DESC;
       `;
@@ -34,7 +51,10 @@ class CaseService {
             b."fullName" as "applicantName",
             la."name" as "legalAreaName",
             ct."subject" as "courtName",
-            u."fullName" as "teacherName"
+            u."fullName" as "teacherName",
+            cs."status" as "caseStatus",
+            ca."registryDate" as "lastActionDate",
+            ca."description" as "lastActionDescription"
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -42,6 +62,20 @@ class CaseService {
           LEFT JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND c."teacherTerm" = t."term"
           LEFT JOIN "User" u ON t."identityCard" = u."identityCard"
           LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
+          LEFT JOIN LATERAL (
+            SELECT cs1."status"
+            FROM "CaseStatus" cs1
+            WHERE cs1."idCase" = c."idCase"
+            ORDER BY cs1."statusNumber" DESC
+            LIMIT 1
+          ) cs ON TRUE
+          LEFT JOIN LATERAL (
+            SELECT ca1."registryDate", ca1."description"
+            FROM "CaseAction" ca1
+            WHERE ca1."idCase" = c."idCase"
+            ORDER BY ca1."registryDate" DESC
+            LIMIT 1
+          ) ca ON TRUE
           WHERE c."idCase" = ${id}
         `;
 

@@ -5,7 +5,15 @@ class BeneficiaryService {
   async getAll() {
     try {
       const beneficiaries = await prisma.$queryRaw`
-        SELECT * FROM "Beneficiary"
+        SELECT
+          b.*,
+          s."name" AS "stateName",
+          m."name" AS "municipalityName",
+          p."name" AS "parishName"
+        FROM "Beneficiary" b
+        LEFT JOIN "State" s ON b."idState" = s."idState"
+        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
       `;
       return { success: true, data: beneficiaries };
     } catch (error) {
@@ -16,8 +24,16 @@ class BeneficiaryService {
   async getById(id: string) {
     try {
       const result = await prisma.$queryRaw`
-        SELECT * FROM "Beneficiary" 
-        WHERE "identityCard" = ${id}
+        SELECT
+          b.*,
+          s."name" AS "stateName",
+          m."name" AS "municipalityName",
+          p."name" AS "parishName"
+        FROM "Beneficiary" b
+        LEFT JOIN "State" s ON b."idState" = s."idState"
+        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+        WHERE b."identityCard" = ${id}
       `;
       
       if (!Array.isArray(result) || result.length === 0) {
@@ -32,15 +48,17 @@ class BeneficiaryService {
 
   async create(data: any) {
     try {
+      const fullName = data.fullName ?? data.name;
+      const idNacionality = data.idNacionality ?? data.idNationality ?? data.idType;
       const result = await prisma.$queryRaw`
         INSERT INTO "Beneficiary" (
-          "identityCard", "name", "gender", "birthDate", 
-          "idType", "hasId", "type", "idState", 
+          "identityCard", "fullName", "gender", "birthDate", 
+          "idNacionality", "hasId", "type", "idState", 
           "municipalityNumber", "parishNumber"
         )
         VALUES (
-          ${data.identityCard}, ${data.name}, ${data.gender}, CAST(${data.birthDate} AS DATE), 
-          ${data.idType}, ${data.hasId}, ${data.type}, ${data.idState}, 
+          ${data.identityCard}, ${fullName}, ${data.gender}, CAST(${data.birthDate} AS DATE), 
+          ${idNacionality}, ${data.hasId}, ${data.type}, ${data.idState}, 
           ${data.municipalityNumber}, ${data.parishNumber}
         )
         RETURNING *
@@ -53,13 +71,15 @@ class BeneficiaryService {
 
   async update(id: string, data: any) {
     try {
+      const fullName = data.fullName ?? data.name;
+      const idNacionality = data.idNacionality ?? data.idNationality ?? data.idType;
       const result = await prisma.$queryRaw`
         UPDATE "Beneficiary"
         SET 
-          "name" = COALESCE(${data.name}, "name"),
+          "fullName" = COALESCE(${fullName}, "fullName"),
           "gender" = COALESCE(${data.gender}, "gender"),
           "birthDate" = COALESCE(CAST(${data.birthDate} AS DATE), "birthDate"),
-          "idType" = COALESCE(${data.idType}, "idType"),
+          "idNacionality" = COALESCE(${idNacionality}, "idNacionality"),
           "hasId" = COALESCE(${data.hasId}, "hasId"),
           "type" = COALESCE(${data.type}, "type"),
           "idState" = COALESCE(${data.idState}, "idState"),

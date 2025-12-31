@@ -22,6 +22,7 @@ class UserService {
       const users = await prisma.$queryRaw`
         SELECT 
           u.*,
+          u."fullName" AS "fullname",
           s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
           t.term AS "teacherTerm", t.type AS "teacherType"
         FROM "User" u
@@ -40,6 +41,7 @@ class UserService {
       const result = await prisma.$queryRaw`
         SELECT 
           u.*,
+          u."fullName" AS "fullname",
           s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
           t.term AS "teacherTerm", t.type AS "teacherType"
         FROM "User" u
@@ -86,10 +88,11 @@ class UserService {
 
       const type = this.normalizeType(data.type);
       const gender = this.normalizeGender(data.gender);
+      const fullName = data.fullName ?? data.fullname ?? data.name;
 
       await prisma.$executeRaw`
-        INSERT INTO "User" ("identityCard", "name", "email", "password", "isActive", "type", "gender")
-        VALUES (${data.identityCard}, ${data.name}, ${data.email}, ${data.password}, ${data.isActive ?? true}, ${type}, ${gender})
+        INSERT INTO "User" ("identityCard", "fullName", "email", "password", "isActive", "type", "gender")
+        VALUES (${data.identityCard}, ${fullName}, ${data.email}, ${data.password}, ${data.isActive ?? true}, ${type}, ${gender})
       `;
 
       return { success: true, message: 'Creado exitosamente' };
@@ -100,9 +103,10 @@ class UserService {
 
   async updateUser(id: string, data: any) {
     try {
+      const fullName = data.fullName ?? data.fullname ?? data.name;
       await prisma.$executeRaw`
         UPDATE "User" SET
-          "name" = COALESCE(${data.name}, "name"),
+          "fullName" = COALESCE(${fullName}, "fullName"),
           "email" = COALESCE(${data.email}, "email"),
           "password" = COALESCE(${data.password}, "password"),
           "isActive" = COALESCE(${data.isActive}, "isActive"),

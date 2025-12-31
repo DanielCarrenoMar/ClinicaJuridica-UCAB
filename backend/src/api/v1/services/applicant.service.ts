@@ -2,6 +2,29 @@ import {prisma} from '../../../config/database.js';
 
 import type { ApplicantResponse, RawApplicantDB } from '../interfaces/Applicant.js';
 
+function normalizeMaritalStatus(value: any) {
+  if (!value) return null;
+  const v = String(value);
+  if (v === 'S' || v === 'C' || v === 'D' || v === 'V') return v;
+  if (v === 'single') return 'S';
+  if (v === 'married') return 'C';
+  if (v === 'divorced') return 'D';
+  if (v === 'widowed') return 'V';
+  return null;
+}
+
+function coerceNumber(value: any): number | null {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function isMissingRelationError(error: any, relationName: string): boolean {
+  const msg = error?.message ? String(error.message) : '';
+  return msg.toLowerCase().includes('does not exist') && msg.includes(relationName);
+}
+
 class ApplicantService {
   
   async getAllApplicants(): Promise<{ success: boolean; data?: ApplicantResponse[]; error?: string }> {
@@ -10,10 +33,22 @@ class ApplicantService {
         SELECT 
           a.*, 
           b."fullName", b."gender", b."birthDate", b."idNacionality", b."idState", b."municipalityNumber", b."parishNumber",
+          s."name" AS "stateName",
+          m."name" AS "municipalityName",
+          p."name" AS "parishName",
+          he."name" AS "headEducationLevelName",
+          wc."name" AS "workConditionName",
+          ac."name" AS "activityConditionName",
           fh."memberCount", fh."workingMemberCount", fh."children7to12Count", fh."studentChildrenCount", fh."monthlyIncome",
           h."bathroomCount", h."bedroomCount"
         FROM "Applicant" a
         INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+        LEFT JOIN "State" s ON b."idState" = s."idState"
+        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+        LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+        LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+        LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
         LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
         LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
         ORDER BY a."createdAt" DESC
@@ -37,11 +72,23 @@ class ApplicantService {
           a.*,
           b."fullName", b."gender", b."birthDate", b."idNacionality",
           b."idState", b."municipalityNumber", b."parishNumber",
+          s."name" AS "stateName",
+          m."name" AS "municipalityName",
+          p."name" AS "parishName",
+          he."name" AS "headEducationLevelName",
+          wc."name" AS "workConditionName",
+          ac."name" AS "activityConditionName",
           fh."memberCount", fh."workingMemberCount", fh."children7to12Count", 
           fh."studentChildrenCount", fh."monthlyIncome",
           h."bathroomCount", h."bedroomCount"
         FROM "Applicant" a
         INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+        LEFT JOIN "State" s ON b."idState" = s."idState"
+        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+        LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+        LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+        LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
         LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
         LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
         WHERE a."identityCard" = ${id}
@@ -50,12 +97,18 @@ class ApplicantService {
 
       if (!applicantRows[0]) return { success: false, message: 'No encontrado' };
 
-      // NOTA: Esto funcionará solo si la tabla existe en la BD física
-      const servicesRows = await prisma.$queryRaw<{ serviceId: number }[]>`
-        SELECT "serviceId" 
-        FROM "ApplicantServiceAvailability" 
-        WHERE "applicantId" = ${id}
-      `;
+      let servicesRows: { serviceId: number }[] = [];
+      try {
+        servicesRows = await prisma.$queryRaw<{ serviceId: number }[]>`
+          SELECT "serviceId" 
+          FROM "ApplicantServiceAvailability" 
+          WHERE "applicantId" = ${id}
+        `;
+      } catch (error: any) {
+        if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) {
+          throw error;
+        }
+      }
 
       const rawData = applicantRows[0];
       
@@ -77,6 +130,12 @@ class ApplicantService {
   async createApplicant(data: ApplicantResponse): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
+        const maritalStatus = normalizeMaritalStatus(data.maritalStatus);
+        let applicantEducationLevelId = coerceNumber(data.applicantEducationLevel);
+        if (!applicantEducationLevelId && typeof data.applicantEducationLevel === 'string') {
+          const level = await tx.educationLevel.findUnique({ where: { name: data.applicantEducationLevel } });
+          applicantEducationLevelId = level?.idLevel ?? null;
+        }
         await tx.$executeRaw`
           INSERT INTO "Beneficiary" 
           ("identityCard", "fullName", "gender", "birthDate", "idNacionality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
@@ -95,9 +154,9 @@ class ApplicantService {
           )
           VALUES (
             ${data.identityCard}, ${data.email}, ${data.cellPhone}, ${data.homePhone}, 
-            ${data.maritalStatus}, ${data.isConcubine || false}, ${data.isHeadOfHousehold || false},
+            ${maritalStatus}, ${data.isConcubine || false}, ${data.isHeadOfHousehold || false},
             ${data.headEducationLevelId}, ${data.headStudyTime}, 
-            ${data.applicantEducationLevel}, 
+            ${applicantEducationLevelId}, 
             ${data.applicantStudyTime}, ${data.workConditionId}, ${data.activityConditionId}
           )
         `;
@@ -116,21 +175,39 @@ class ApplicantService {
           VALUES (${data.identityCard}, ${data.bathroomCount || 0}, ${data.bedroomCount || 0})
         `;
         if (data.servicesIdAvailable && data.servicesIdAvailable.length > 0) {
-          for (const serviceId of data.servicesIdAvailable) {
-            await tx.$executeRaw`
-              INSERT INTO "ApplicantServiceAvailability" ("applicantId", "serviceId")
-              VALUES (${data.identityCard}, ${serviceId})
-            `;
+          try {
+            for (const serviceId of data.servicesIdAvailable) {
+              await tx.$executeRaw`
+                INSERT INTO "ApplicantServiceAvailability" ("applicantId", "serviceId")
+                VALUES (${data.identityCard}, ${serviceId})
+              `;
+            }
+          } catch (error: any) {
+            if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) {
+              throw error;
+            }
           }
         }
         const result = await tx.$queryRaw<RawApplicantDB[]>`
           SELECT 
             a.*, 
             b."fullName", b."gender", b."birthDate", b."idNacionality", b."idState", b."municipalityNumber", b."parishNumber",
+            s."name" AS "stateName",
+            m."name" AS "municipalityName",
+            p."name" AS "parishName",
+            he."name" AS "headEducationLevelName",
+            wc."name" AS "workConditionName",
+            ac."name" AS "activityConditionName",
             fh."memberCount", fh."workingMemberCount", fh."children7to12Count", fh."studentChildrenCount", fh."monthlyIncome",
             h."bathroomCount", h."bedroomCount"
           FROM "Applicant" a 
           INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+          LEFT JOIN "State" s ON b."idState" = s."idState"
+          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+          LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+          LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+          LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
           LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
           LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
           WHERE a."identityCard" = ${data.identityCard}
@@ -158,6 +235,12 @@ class ApplicantService {
   async updateApplicant(id: number | string, data: Partial<ApplicantResponse>): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
+        const maritalStatus = normalizeMaritalStatus(data.maritalStatus);
+        let applicantEducationLevelId = coerceNumber(data.applicantEducationLevel);
+        if (!applicantEducationLevelId && typeof data.applicantEducationLevel === 'string') {
+          const level = await tx.educationLevel.findUnique({ where: { name: data.applicantEducationLevel } });
+          applicantEducationLevelId = level?.idLevel ?? null;
+        }
         await tx.$executeRaw`
           UPDATE "Beneficiary" SET 
             "fullName" = COALESCE(${data.fullName}, "fullName"), 
@@ -172,12 +255,12 @@ class ApplicantService {
             "email" = COALESCE(${data.email}, "email"), 
             "cellPhone" = COALESCE(${data.cellPhone}, "cellPhone"), 
             "homePhone" = COALESCE(${data.homePhone}, "homePhone"), 
-            "maritalStatus" = COALESCE(${data.maritalStatus}, "maritalStatus"),
+            "maritalStatus" = COALESCE(${maritalStatus}, "maritalStatus"),
             "isConcubine" = COALESCE(${data.isConcubine}, "isConcubine"),
             "isHeadOfHousehold" = COALESCE(${data.isHeadOfHousehold}, "isHeadOfHousehold"),
             "headEducationLevelId" = COALESCE(${data.headEducationLevelId}, "headEducationLevelId"),
             "headStudyTime" = COALESCE(${data.headStudyTime}, "headStudyTime"),
-            "applicantEducationLevelId" = COALESCE(${data.applicantEducationLevel}, "applicantEducationLevelId"),
+            "applicantEducationLevelId" = COALESCE(${applicantEducationLevelId}, "applicantEducationLevelId"),
             "applicantStudyTime" = COALESCE(${data.applicantStudyTime}, "applicantStudyTime"),
             "workConditionId" = COALESCE(${data.workConditionId}, "workConditionId"),
             "activityConditionId" = COALESCE(${data.activityConditionId}, "activityConditionId")
@@ -199,12 +282,18 @@ class ApplicantService {
           WHERE "applicantId" = ${id}
         `;
         if (Array.isArray(data.servicesIdAvailable)) {
-          await tx.$executeRaw`DELETE FROM "ApplicantServiceAvailability" WHERE "applicantId" = ${id}`;
-          for (const serviceId of data.servicesIdAvailable) {
-            await tx.$executeRaw`
-              INSERT INTO "ApplicantServiceAvailability" ("applicantId", "serviceId")
-              VALUES (${id}, ${serviceId})
-            `;
+          try {
+            await tx.$executeRaw`DELETE FROM "ApplicantServiceAvailability" WHERE "applicantId" = ${id}`;
+            for (const serviceId of data.servicesIdAvailable) {
+              await tx.$executeRaw`
+                INSERT INTO "ApplicantServiceAvailability" ("applicantId", "serviceId")
+                VALUES (${id}, ${serviceId})
+              `;
+            }
+          } catch (error: any) {
+            if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) {
+              throw error;
+            }
           }
         }
 
@@ -213,10 +302,22 @@ class ApplicantService {
             a.*, 
             b."fullName", b."gender", b."birthDate", b."idNacionality", 
             b."idState", b."municipalityNumber", b."parishNumber",
+            s."name" AS "stateName",
+            m."name" AS "municipalityName",
+            p."name" AS "parishName",
+            he."name" AS "headEducationLevelName",
+            wc."name" AS "workConditionName",
+            ac."name" AS "activityConditionName",
             fh."memberCount", fh."workingMemberCount", fh."children7to12Count", fh."studentChildrenCount", fh."monthlyIncome",
             h."bathroomCount", h."bedroomCount"
           FROM "Applicant" a 
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+          LEFT JOIN "State" s ON b."idState" = s."idState"
+          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+          LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+          LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+          LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
           LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
           LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
           WHERE a."identityCard" = ${id}
