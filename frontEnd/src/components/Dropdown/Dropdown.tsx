@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown } from 'flowbite-react-icons/outline';
 
 // Context definition
@@ -56,6 +57,28 @@ export default function Dropdown({ label = "Dropdown", children, selectedValue, 
     };
   }, [dropdownRef]);
 
+  const getDropdownPosition = () => {
+    if (!dropdownRef.current) return { top: 0, left: 0 };
+    
+    const rect = dropdownRef.current.getBoundingClientRect();
+    return {
+      top: rect.bottom + window.scrollY + 8,
+      left: rect.left + window.scrollX
+    };
+  };
+
+  const dropdownContent = isOpen ? createPortal(
+    <div className="fixed inset-0 z-50 pointer-events-none">
+      <div 
+        className="absolute mt-2 w-48 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
+        style={getDropdownPosition()}
+      >
+        {children}
+      </div>
+    </div>,
+    document.body
+  ) : null;
+
   return (
     <DropdownContext.Provider value={{ selectedValue: currentSelectedValue, selectOption }}>
       <div className="relative inline-block text-left" ref={dropdownRef}>
@@ -77,11 +100,7 @@ export default function Dropdown({ label = "Dropdown", children, selectedValue, 
           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {isOpen && (
-          <div className="absolute left-0 mt-2 w-48 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none z-10 overflow-hidden p-2 flex flex-col gap-1.5">
-            {children}
-          </div>
-        )}
+        {dropdownContent}
       </div>
     </DropdownContext.Provider>
   );
