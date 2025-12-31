@@ -59,6 +59,16 @@ function CreateCaseApplicantStep() {
             applicantModel.idNationality !== undefined &&
             applicantModel.gender !== undefined
         ));
+        /*console.log("Have min data to next step:", {
+            "isVerifyingIdentityCard": isVerifyingIdentityCard,
+            "showAutoFillToast": showAutoFillToast,
+            "fullName": applicantModel.fullName !== undefined,
+            "fullNameTrimmed": applicantModel.fullName?.trim().length > 0,
+            "identityCard": applicantModel.identityCard !== undefined,
+            "birthDate": applicantModel.birthDate instanceof Date && !isNaN(applicantModel.birthDate.getTime()),
+            "idNationality": applicantModel.idNationality !== undefined,
+            "gender": applicantModel.gender !== undefined,
+        });*/
     }, [applicantModel, showAutoFillToast, isVerifyingIdentityCard, isApplyingAutoFill]);
 
     useEffect(() => {
