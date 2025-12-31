@@ -4,5 +4,5 @@ export interface CaseActionDAO {
   description: string;
   notes?: string;
   userId: string;
-  registryDate: Date;
+  registryDate: string;
 }
