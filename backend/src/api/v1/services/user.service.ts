@@ -1,5 +1,5 @@
 ﻿// @ts-nocheck
-import { prisma } from "../../../config/database.js";
+import prisma from '#src/config/database.js';
 
 class UserService {
   private normalizeType(type: string): string {

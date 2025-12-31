@@ -1,6 +1,6 @@
 ﻿// src/api/v1/routes/health.routes.ts
 import { Router } from 'express';
-import { prisma } from '../../../config/database.js';
+import prisma from '#src/config/database.js';
 
 const router = Router();
 

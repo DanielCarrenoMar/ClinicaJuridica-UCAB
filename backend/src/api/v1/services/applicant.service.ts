@@ -1,5 +1,4 @@
-import {prisma} from '../../../config/database.js';
-
+import prisma from '#src/config/database.js';
 import type { ApplicantResponse, RawApplicantDB } from '../interfaces/Applicant.js';
 
 function normalizeMaritalStatus(value: any) {

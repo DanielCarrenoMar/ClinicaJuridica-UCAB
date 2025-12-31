@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/database.js';
+import prisma from '#src/config/database.js';
 
 class TeacherService {
   async getTeacherById(identityCard: string, term?: string) {
