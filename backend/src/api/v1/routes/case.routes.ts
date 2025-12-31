@@ -20,8 +20,9 @@ router.get('/:id/students', caseController.getStudentsFromCaseId);       // getS
 router.post('/:id/actions', caseController.addAction);
 router.get('/:id/actions/', caseController.getActionsInfoFromCaseId);
 router.get('/:id/beneficiaries', caseController.getBeneficiariesFromCaseId);
-// router.patch('/:id/status', caseController.changeStatus);
-// router.get('/:id/timeline', caseController.getTimeline);
+router.get('/:id/status', caseController.getCaseStatusFromCaseId);
+router.patch('/:id/status', caseController.changeCaseStatus);
+//router.get('/:id/timeline', caseController.getTimeline);
 
 // Gestión de Citas
 router.post('/:id/appointments', caseController.scheduleAppointment);

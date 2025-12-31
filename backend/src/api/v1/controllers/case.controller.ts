@@ -184,6 +184,28 @@ export async function getCaseStatusFromCaseId(req: Request, res: Response): Prom
   }
 }
 
+export async function changeCaseStatus(req: Request, res: Response): Promise<void> {
+  try {
+    const caseId = parseInt(req.params.id);
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID inválido' });
+      return;
+    }
+
+    const { statusEnum, reason, userId } = req.body;
+    if (!statusEnum || !userId) {
+      res.status(400).json({ success: false, message: 'Faltan campos requeridos: statusEnum, userId' });
+      return;
+    }
+
+    const result = await caseService.changeCaseStatus(caseId, statusEnum, reason, userId);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
 export async function getStatusCaseAmount(req: Request, res: Response): Promise<void> {
   try {
     const result = await caseService.getStatusCaseAmount();
