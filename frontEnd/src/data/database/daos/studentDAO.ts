@@ -1,5 +1,5 @@
 import type { StudentTypeDAO } from "../typesDAO";
-import type { UserDAO } from "./UserDAO";
+import type { UserDAO } from "./userDAO";
 
 export interface StudentDAO extends Omit<UserDAO, 'type'> {
     term: string;
