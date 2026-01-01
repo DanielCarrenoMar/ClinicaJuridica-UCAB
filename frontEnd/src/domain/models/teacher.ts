@@ -21,7 +21,7 @@ export function daoToTeacherModel(dao: TeacherDAO): TeacherModel {
     const { type, gender, ...rest } = dao;
     return {
         type: teacherTypeDAOToModel(type),
-        gender: gender ? genderTypeDaoToModel(gender) : null,
+        gender: genderTypeDaoToModel(gender) ?? undefined,
         ...rest
 
     }

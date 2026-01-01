@@ -9,7 +9,7 @@ export interface CaseStatusModel {
     caseCompoundKey: string;
     statusNumber: number;
     status: CaseStatus;
-    reason: string | null;
+    reason?: string;
     userId: PersonID;
     userName: string;
     registryDate: Date;
@@ -29,11 +29,10 @@ export function caseStatusDAOEnumToModel(caseStatusDAO: CaseStatusEnumDAO): Case
 }
 
 export function daoToCaseStatusModel(dao: CaseStatusInfoDAO): CaseStatusModel {
-    const { status, registryDate, reason, ...rest } = dao;
+    const { status, registryDate, ...rest } = dao;
     return {
         registryDate: new Date(registryDate),
         status: caseStatusDAOEnumToModel(status),
-        reason: reason ?? null,
         ...rest
     }
 

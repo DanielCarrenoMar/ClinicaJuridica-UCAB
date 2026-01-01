@@ -25,11 +25,10 @@ export function studentTypeDAOToModel(dao: StudentTypeDAO): StudentType {
 
 
 export function daoToStudentModel(dao: StudentDAO): StudentModel {
-    const { type, gender, nrc, ...rest } = dao;
+    const { type, gender, ...rest } = dao;
     return {
         type: studentTypeDAOToModel(type),
-        gender: gender ? genderTypeDaoToModel(gender) : null,
-        nrc: nrc ?? null,
+        gender: gender ? genderTypeDaoToModel(gender) : undefined,
         ...rest
 
     }

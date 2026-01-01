@@ -5,7 +5,7 @@ type UserType = "COORDINATOR" | "TEACHER" | "STUDENT";
 export interface UserModel {
     identityCard: string;
     fullName: string;
-    gender: GenderType | null;
+    gender?: GenderType;
     email: string;
     password: string;
     isActive: boolean;
@@ -37,7 +37,7 @@ export function daoToUserModel(dao: UserDAO): UserModel {
     const { type, gender, ...rest } = dao;
     return {
         type: userTypeDaoToModel(type),
-        gender: gender ? genderTypeDaoToModel(gender) : null,
+        gender: gender ? genderTypeDaoToModel(gender) : undefined,
         ...rest
     }
 }
