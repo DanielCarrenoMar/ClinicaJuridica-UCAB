@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 import { ChevronRight } from "flowbite-react-icons/outline";
 import { useEffect } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
+import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
@@ -60,7 +61,7 @@ function CreateCaseCaseStep() {
                         <TitleDropdown
                             label="Tipo de tramite"
                             selectedValue={caseDAO.processType}
-                            onSelectionChange={(value) => { updateCaseDAO({ processType: value as any }); }}
+                            onSelectionChange={(value) => { updateCaseDAO({ processType: value as ProcessTypeDAO }); }}
                         >
                             <DropdownOption value="T">Trámite</DropdownOption>
                             <DropdownOption value="A">Asesoría</DropdownOption>
@@ -84,7 +85,7 @@ function CreateCaseCaseStep() {
                                 <span className="text-body-medium self-center w-28">Categoria</span>
                                 <Dropdown
                                     selectedValue={caseDAO.idLegalArea}
-                                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
+                                    //onSelectionChange={(value) => {  }}
                                 >
                                     <DropdownOption value={1}>Civil</DropdownOption>
                                     <DropdownOption value={2}>Penal</DropdownOption>
@@ -96,7 +97,7 @@ function CreateCaseCaseStep() {
                                 <span className="text-body-medium self-center w-28">Sub-Categoria</span>
                                 <Dropdown
                                     selectedValue={caseDAO.idLegalArea}
-                                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
+                                    //onSelectionChange={(value) => { }}
                                 >
                                     <DropdownOption value={1}>Civil</DropdownOption>
                                     <DropdownOption value={2}>Penal</DropdownOption>
@@ -110,10 +111,10 @@ function CreateCaseCaseStep() {
                                     selectedValue={caseDAO.idLegalArea}
                                     onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
                                 >
-                                    <DropdownOption value={1}>Civil</DropdownOption>
-                                    <DropdownOption value={2}>Penal</DropdownOption>
-                                    <DropdownOption value={3}>Laboral</DropdownOption>
-                                    <DropdownOption value={4}>Familia</DropdownOption>
+                                    <DropdownOption value={1}>Rectificación de Actas</DropdownOption>
+                                    <DropdownOption value={2}>Inserción de Actas</DropdownOption>
+                                    <DropdownOption value={3}>Solicitud de Naturalización</DropdownOption>
+                                    <DropdownOption value={4}>Justificativo de Soltería</DropdownOption>
                                 </Dropdown>
                             </div>
                         </span>
