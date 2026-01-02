@@ -111,7 +111,7 @@ function CreateCaseCaseStep() {
                         </h4>
                         <span className="flex flex-col gap-2">
                             <div className="flex gap-2">
-                                <span className="text-body-medium self-center w-28">Categoria</span>
+                                <span className="text-body-medium self-center w-28">Materia</span>
                                 <Dropdown
                                     selectedValue={caseDAO.idLegalArea}
                                     //onSelectionChange={(value) => {  }}
@@ -123,7 +123,7 @@ function CreateCaseCaseStep() {
                                 </Dropdown>
                             </div>
                             <div className="flex gap-2">
-                                <span className="text-body-medium self-center w-28">Sub-Categoria</span>
+                                <span className="text-body-medium self-center w-28">Categoria</span>
                                 <Dropdown
                                     selectedValue={caseDAO.idLegalArea}
                                     //onSelectionChange={(value) => { }}
