@@ -7,9 +7,10 @@ interface SearchBarProps {
     isOpen: boolean;
     onToggle: (isOpen: boolean) => void;
     defaultValue?: string;
+    placeholder?: string;
 }
 
-export default function SearchBar({ isOpen, onToggle, defaultValue = '' }: SearchBarProps) {
+export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeholder = "Buscar" }: SearchBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '' }: Searc
           ref={inputRef}
           defaultValue={defaultValue}
           type="text" 
-          placeholder="Buscar" 
+          placeholder={placeholder}
           className="w-full bg-transparent border-none outline-none text-body-small text-onSurface placeholder:text-onSurface/50 h-full "
           onKeyDown={(e) => {
             if (e.key === 'Enter') {

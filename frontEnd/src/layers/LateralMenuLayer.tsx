@@ -51,9 +51,10 @@ function LateralMenuLayer() {
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
                         <SearchBar
-                            isOpen={locationId === 'busqueda' ? true : isSearchOpen} 
+                            isOpen={locationId === 'busqueda' || locationId === '/' ? true : isSearchOpen} 
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
+                            placeholder="Buscar Caso"
                         />
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
                     </span>
