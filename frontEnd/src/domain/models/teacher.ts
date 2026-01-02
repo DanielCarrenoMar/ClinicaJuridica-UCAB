@@ -2,27 +2,28 @@ import type { UserModel } from "./user";
 import type { TeacherTypeDAO } from "#database/typesDAO.ts";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
 import { typeDaoToGenderTypeModel } from "#domain/typesModel.ts";
-
-type TeacherTypeModel = "regular" | "volunteer";
+type TeacherType = "REGULAR" | "VOLUNTEER";
 export interface TeacherModel extends Omit<UserModel, 'type'> {
     term: string;
-    type: TeacherTypeModel;
+    type: TeacherType;
 }
 
-export function typeDaoToTeacherTypeModel(dao: TeacherTypeDAO): TeacherTypeModel {
+export function teacherTypeDAOToModel(dao: TeacherTypeDAO): TeacherType {
     switch (dao) {
         case "R":
-            return "regular";
+            return "REGULAR";
         case "V":
-            return "volunteer";
+            return "VOLUNTEER";
     }
 }
 
 export function daoToTeacherModel(dao: TeacherDAO): TeacherModel {
     const { type, gender, ...rest } = dao;
     return {
-        type: typeDaoToTeacherTypeModel(type),
+        type: teacherTypeDAOToModel(type),
         gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
         ...rest
+
     }
+
 }
