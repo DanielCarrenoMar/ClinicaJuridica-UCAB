@@ -183,10 +183,10 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Sexo"
                     selectedValue={applicantModel.gender || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderType }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderType });}}
                 >
-                    <DropdownOption value="M">Masculino</DropdownOption>
-                    <DropdownOption value="F">Femenino</DropdownOption>
+                    <DropdownOption value="male">Masculino</DropdownOption>
+                    <DropdownOption value="female">Femenino</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
