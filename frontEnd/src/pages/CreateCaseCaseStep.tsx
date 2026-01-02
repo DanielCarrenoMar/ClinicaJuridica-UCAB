@@ -6,18 +6,193 @@ import Button from "#components/Button.tsx";
 import Dropdown from "#components/Dropdown/Dropdown.tsx";
 import { useNavigate } from "react-router";
 import { ChevronRight } from "flowbite-react-icons/outline";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import { useCreateCase } from "#domain/useCaseHooks/useCase.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import { useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 
+const legalAmbits = [
+    {
+        name: "Materia Civil",
+        categories: [
+            {
+                name: "Personas",
+                areas: [
+                    "Rectificación de Actas",
+                    "Inserción de Actas",
+                    "Solicitud de Naturalización",
+                    "Justificativo de Soltería",
+                    "Justificativo de Concubinato",
+                    "Invitación al país",
+                    "Justificativo de Dependencia Económica / Pobreza",
+                    "Declaración Jurada de No Poseer",
+                    "Declaración Jurada de Ingresos",
+                    "Concubinato Postmortem",
+                    "Declaración Jurada",
+                    "Justificativo de Testigos"
+                ]
+            },
+            {
+                name: "Bienes",
+                areas: [
+                    "Título Supletorio",
+                    "Compra venta bienhechuría",
+                    "Partición de comunidad ordinaria",
+                    "Propiedad Horizontal",
+                    "Cierre de Titularidad",
+                    "Aclaratoria"
+                ]
+            },
+            {
+                name: "Contratos",
+                areas: [
+                    "Arrendamiento / Comodato",
+                    "Compra - venta de bienes inmuebles",
+                    "Compra - venta bienes muebles (vehículos)",
+                    "Opción de Compra Venta",
+                    "Finiquito de compra venta",
+                    "Asociaciones / Fundaciones",
+                    "Cooperativas",
+                    "Poder",
+                    "Cosión de derechos",
+                    "Cobro de Bolívares",
+                    "Constitución y liquidación de hipoteca",
+                    "Servicios / obras"
+                ]
+            },
+            {
+                name: "Familia - Tribunales Ordinarios",
+                areas: [
+                    "Divorcio por separación de hechos (185-A)",
+                    "Separación de Cuerpos (189)",
+                    "Conversión de separación en divorcio",
+                    "Divorcio contencioso",
+                    "Partición de comunidad conyugal",
+                    "Partición de comunidad concubinaria",
+                    "Capitulaciones matrimoniales",
+                    "Divorcio Causal No Taxativa Sentencias"
+                ]
+            },
+            {
+                name: "Familia - Tribunales Protecc. Niños y Adolescentes",
+                areas: [
+                    "Divorcio por separación de hechos (185-A)",
+                    "Separación de Cuerpos (189)",
+                    "Conversión de separación en divorcio",
+                    "Divorcio contencioso",
+                    "Reconocimiento Voluntario Hijo",
+                    "Colocación familiar",
+                    "Curatela",
+                    "Medidas de proteccion (Identidad, salud, educación, otros)",
+                    "Autorización para Viajar",
+                    "Autorización para Vender",
+                    "Autorización para Trabajar",
+                    "Obligación de Manutención / Convivencia Familiar",
+                    "Rectificación de Actas",
+                    "Inserción de Actas",
+                    "Carga Familiar",
+                    "Cambio de Residencia",
+                    "Ejercicio Unilateral de Patria Potestad",
+                    "Divorcio Causal No Taxativa Sentencias",
+                    "Tutela"
+                ]
+            },
+            {
+                name: "Sucesiones",
+                areas: [
+                    "Cesión de derechos sucesorales",
+                    "Justificativo Únicos y Universales herederos",
+                    "Testamento",
+                    "Declaración Sucesoral",
+                    "Partición de comunidad hereditaria"
+                ]
+            }
+        ]
+    },
+    {
+        name: "Materia Penal",
+        categories: [
+            {
+                name: "General",
+                areas: [
+                    "Delitos Contra la Propiedad (Robo, Hurto)",
+                    "Contra las Personas (homicidio, lesiones)",
+                    "Contra las Buenas Costumbres (Violación)",
+                    "Delitos contra el Honor",
+                    "Violencia Doméstica"
+                ]
+            }
+        ]
+    },
+    {
+        name: "Materia Laboral",
+        categories: [
+            {
+                name: "General",
+                areas: [
+                    "Calificación de Despido",
+                    "Prestaciones Sociales",
+                    "Contratos de Trabajo",
+                    "Accidentes de Trabajo",
+                    "Incapacidad Laboral",
+                    "Terminación de Relación Laboral"
+                ]
+            }
+        ]
+    },
+    {
+        name: "Materia Mercantil",
+        categories: [
+            {
+                name: "General",
+                areas: [
+                    "Firma Personal",
+                    "Constitución de Compañías",
+                    "Actas de Asamblea",
+                    "Compra Venta de Fondo de Comercio / Acciones",
+                    "Letras de Cambio"
+                ]
+            }
+        ]
+    },
+    {
+        name: "Materia Administrativa",
+        categories: [
+            {
+                name: "General",
+                areas: [
+                    "Recursos Administrativos"
+                ]
+            }
+        ]
+    },
+    {
+        name: "Otros",
+        categories: [
+            {
+                name: "General",
+                areas: [
+                    "Convivencia Ciudadana",
+                    "Derechos Humanos",
+                    "Tránsito",
+                    "Otros",
+                    "Diligencias Seguimiento"
+                ]
+            }
+        ]
+    }
+]
+
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
     const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting } = useCaseOutletContext();
     const { createCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
     const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
+
+    const [subjectIndex, setSubjectIndex] = useState<number | null>(null);
+    const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
 
     function handleCreateCase(){
         let createdApplicant = applicantModel
@@ -118,37 +293,40 @@ function CreateCaseCaseStep() {
                             <div className="flex gap-2">
                                 <span className="text-body-medium self-center w-28">Materia</span>
                                 <Dropdown
-                                    selectedValue={caseDAO.idLegalArea}
-                                    //onSelectionChange={(value) => {  }}
+                                    selectedValue={subjectIndex}
+                                    onSelectionChange={(value) => {
+                                        setSubjectIndex(value as number);
+                                        setCategoryIndex(null);
+                                        updateCaseDAO({ idLegalArea: 0 });
+                                    }}
                                 >
-                                    <DropdownOption value={1}>Civil</DropdownOption>
-                                    <DropdownOption value={2}>Penal</DropdownOption>
-                                    <DropdownOption value={3}>Laboral</DropdownOption>
-                                    <DropdownOption value={4}>Familia</DropdownOption>
+                                    {legalAmbits.map((subject, index) => (
+                                        <DropdownOption key={index} value={index}>{subject.name}</DropdownOption>
+                                    ))}
                                 </Dropdown>
                             </div>
                             <div className="flex gap-2">
                                 <span className="text-body-medium self-center w-28">Categoria</span>
                                 <Dropdown
-                                    selectedValue={caseDAO.idLegalArea}
-                                    //onSelectionChange={(value) => { }}
+                                    selectedValue={categoryIndex}
+                                    onSelectionChange={(value) => { setCategoryIndex(value as number); }}
+                                    disabled={subjectIndex === null}
                                 >
-                                    <DropdownOption value={1}>Civil</DropdownOption>
-                                    <DropdownOption value={2}>Penal</DropdownOption>
-                                    <DropdownOption value={3}>Laboral</DropdownOption>
-                                    <DropdownOption value={4}>Familia</DropdownOption>
+                                    {subjectIndex !== null && legalAmbits[subjectIndex].categories.map((category, index) => (
+                                        <DropdownOption key={index} value={index}>{category.name}</DropdownOption>
+                                    ))}
                                 </Dropdown>
                             </div>
                             <div className="flex gap-2">
                                 <span className="text-body-medium self-center w-28">Área</span>
                                 <Dropdown
                                     selectedValue={caseDAO.idLegalArea}
-                                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
+                                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: (value as number)+1 }) }}
+                                    disabled={categoryIndex === null}
                                 >
-                                    <DropdownOption value={1}>Rectificación de Actas</DropdownOption>
-                                    <DropdownOption value={2}>Inserción de Actas</DropdownOption>
-                                    <DropdownOption value={3}>Solicitud de Naturalización</DropdownOption>
-                                    <DropdownOption value={4}>Justificativo de Soltería</DropdownOption>
+                                    {subjectIndex !== null && categoryIndex !== null && legalAmbits[subjectIndex].categories[categoryIndex].areas.map((area, index) => (
+                                        <DropdownOption key={index} value={index}>{area}</DropdownOption>
+                                    ))}
                                 </Dropdown>
                             </div>
                         </span>
