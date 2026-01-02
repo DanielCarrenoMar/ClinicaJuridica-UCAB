@@ -10,8 +10,7 @@ export function getCaseActionRepository(): CaseActionRepository {
 				const actionsRes = await fetch(`${CASE_ACTION_URL}`);
 
 				if (!actionsRes.ok) {
-					console.error("Error al obtener datos de las APIs");
-					return null;
+					throw new Error("El servidor respondió con un error al obtener las acciones de casos.");
 				}
 
 				const actionsData = await actionsRes.json();
@@ -21,8 +20,7 @@ export function getCaseActionRepository(): CaseActionRepository {
 				return actionsList.map(action => daoToCaseActionModel(action));
 
 			} catch (error) {
-				console.error("Error de red o parsing:", error);
-				return null;
+				throw error;
 			}
 		},
 
@@ -49,15 +47,13 @@ export function getCaseActionRepository(): CaseActionRepository {
 				});
 
 				if (!response.ok) {
-					return null; // O lanzar error
+					throw new Error("El servidor respondió con un error al crear la acción del caso.");
 				}
 
-				// Generalmente el backend devuelve el objeto creado
 				const responseData = await response.json();
 				return responseData.data;
 			} catch (error) {
-				console.error("Error al crear acción:", error);
-				return null;
+				throw error;
 			}
 		},
 	} as CaseActionRepository;
