@@ -1,3 +1,4 @@
+import type { CaseStatusInfoDAO } from "#database/daos/caseStatusInfoDAO.ts";
 import type { CaseStatusEnumDAO } from "#database/typesDAO.ts";
 import type { PersonID } from "#domain/mtypes.ts";
 
@@ -8,8 +9,9 @@ export interface CaseStatusModel {
     caseCompoundKey: string;
     statusNumber: number;
     status: CaseStatus;
-    reason: string | null;
+    reason?: string;
     userId: PersonID;
+    userName: string;
     registryDate: Date;
 }
 
@@ -24,4 +26,14 @@ export function caseStatusDAOEnumToModel(caseStatusDAO: CaseStatusEnumDAO): Case
         case "C":
             return "CLOSED";
     }
+}
+
+export function daoToCaseStatusModel(dao: CaseStatusInfoDAO): CaseStatusModel {
+    const { status, registryDate, ...rest } = dao;
+    return {
+        registryDate: new Date(registryDate),
+        status: caseStatusDAOEnumToModel(status),
+        ...rest
+    }
+
 }

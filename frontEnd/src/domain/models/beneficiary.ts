@@ -1,7 +1,7 @@
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
 import type { PersonID, GenderType, IdNacionality } from "#domain/mtypes.ts";
-
+import { genderTypeDaoToModel } from "./user";
 type BeneficiaryType = "BENEFICIARY" | "APPLICANT";
 
 export interface BeneficiaryModel {
@@ -32,10 +32,11 @@ function beneficiaryTypeDAOtoModel(type: BeneficiaryTypeDAO): BeneficiaryType {
 }
 
 export function daoToBeneficiaryModel(dao: BeneficiaryInfoDAO): BeneficiaryModel {
-    const {idNacionality, type, ...rest} = dao;
+    const { idNacionality, type, gender, ...rest } = dao;
     return {
         idNationality: idNacionality,
         type: beneficiaryTypeDAOtoModel(type),
+        gender: genderTypeDaoToModel(gender),
         ...rest
     }
 }

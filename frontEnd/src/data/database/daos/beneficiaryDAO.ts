@@ -9,9 +9,6 @@ export interface BeneficiaryDAO {
   hasId: boolean;
   type: BeneficiaryTypeDAO;
   idState?: number;
-  stateName?: string;
   municipalityNumber?: number;
-  municipalityName?: string;
   parishNumber?: number;
-  parishName?: string;
 }

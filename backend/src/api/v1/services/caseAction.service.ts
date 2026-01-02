@@ -1,5 +1,4 @@
 import prisma from '#src/config/database.js';
-
 class CaseActionService {
   async getAllCaseActions() {
     try {
