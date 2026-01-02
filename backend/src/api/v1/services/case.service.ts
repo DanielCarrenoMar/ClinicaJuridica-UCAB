@@ -109,6 +109,17 @@ class CaseService {
   async createCase(data) {
     try {
       return await prisma.$transaction(async (tx) => {
+        // Obtener el último semestre
+        const lastSemester = await tx.$queryRaw`
+          SELECT "term" FROM "Semester" ORDER BY "startDate" DESC LIMIT 1
+        `;
+        
+        if (!lastSemester || lastSemester.length === 0) {
+             throw new Error("No se encontraron semestres registrados");
+        }
+        
+        const currentTerm = lastSemester[0].term;
+
         const newCase = await tx.$queryRaw`
           INSERT INTO "Case" 
           ("problemSummary", "processType", "applicantId", "idNucleus", "term", "idLegalArea", "teacherId", "teacherTerm", "idCourt")
@@ -117,10 +128,10 @@ class CaseService {
             ${data.processType}, 
             ${data.applicantId}, 
             ${data.idNucleus}, 
-            ${data.term}, 
+            ${currentTerm}, 
             ${data.idLegalArea}, 
             ${data.teacherId}, 
-            ${data.teacherTerm || data.term}, 
+            ${data.teacherTerm || currentTerm}, 
             ${data.idCourt || null}
           )
           RETURNING *

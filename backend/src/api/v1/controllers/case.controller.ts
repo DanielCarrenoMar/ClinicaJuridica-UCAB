@@ -50,7 +50,6 @@ export async function createCase(req: Request, res: Response): Promise<void> {
     if (!caseData.processType) missingFields.push('processType');
     if (!caseData.applicantId) missingFields.push('applicantId');
     if (!caseData.idLegalArea) missingFields.push('idLegalArea');
-    if (!caseData.term) missingFields.push('term');
 
     if (missingFields.length > 0) {
       res.status(400).json({
