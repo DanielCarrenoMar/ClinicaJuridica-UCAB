@@ -310,10 +310,10 @@ class CaseService {
       return { 
         success: true, 
         data: {
-          proccessAmount: Number(data.proccessAmount || 0),
-          adviceAmount: Number(data.adviceAmount || 0),
-          mediationAmount: Number(data.mediationAmount || 0),
-          draftingAmount: Number(data.draftingAmount || 0)
+          inProgressAmount: Number(data.inProgressAmount || 0),
+          openAmount: Number(data.openAmount || 0),
+          pausedAmount: Number(data.pausedAmount || 0),
+          closedAmount: Number(data.closedAmount || 0)
         } 
       };
     } catch (error) {
