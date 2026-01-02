@@ -1,16 +1,39 @@
 import Box from "#components/Box.tsx";
 import CaseActionCard from "#components/CaseActionCard.tsx";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
-import TextInput from "#components/TextInput.tsx";
+import SearchBar from "#components/SearchBar.tsx";
 import { useGetAllCaseActions } from "#domain/useCaseHooks/useCaseActions.ts";
+import { useState, useMemo } from 'react';
+import Fuse from 'fuse.js';
 
 function ActionsHistory() {
     const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredActions = useMemo(() => {
+        if (!searchQuery) return caseActions;
+
+        const fuse = new Fuse(caseActions, {
+            keys: [
+                'userName',
+                'caseCompoundKey',
+                'description',
+                'idCase'
+            ],
+            threshold: 0.3,
+        });
+
+        return fuse.search(searchQuery).map(result => result.item);
+    }, [caseActions, searchQuery]);
 
     return (
-        <div>
-            <section>
-                
+        <div className="flex flex-col">
+            <section className="mb-4">
+                <SearchBar
+                    isOpen={true}
+                    placeholder="Buscar acción por usuario, ID de caso o descripción..."
+                    onChange={setSearchQuery}
+                />
             </section>
             <section>
                 <Box className="col-span-4 h-full flex flex-col gap-2">
@@ -41,7 +64,7 @@ function ActionsHistory() {
                             errorCaseActions && 
                             <p className="text-error text-center">Error al cargar las acciones de casos.</p>
                         }
-                        {!errorCaseActions && caseActions.map((action, index) => (
+                        {!errorCaseActions && filteredActions.map((action, index) => (
                             <CaseActionCard 
                                 key={index}
                                 caseAction={action}
