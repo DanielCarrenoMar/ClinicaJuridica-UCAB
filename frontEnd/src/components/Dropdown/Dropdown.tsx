@@ -24,9 +24,10 @@ interface DropdownProps {
   selectedValue?: string | number | null; // Controlled
   onSelectionChange?: (value: string | number) => void;
   showTitle?: boolean;
+  disabled?: boolean;
 }
 
-export default function Dropdown({ label = "Seleccionar", children, selectedValue, onSelectionChange, showTitle = false }: DropdownProps) {
+export default function Dropdown({ label = "Seleccionar", children, selectedValue, onSelectionChange, showTitle = false, disabled = false }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValue, setInternalSelectedValue] = useState<string | number | null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string>(label);
@@ -76,7 +77,7 @@ export default function Dropdown({ label = "Seleccionar", children, selectedValu
     <div className="fixed inset-0 z-50 pointer-events-none">
       <div 
         ref={contentRef}
-        className="absolute mt-2 w-48 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
+        className="absolute mt-2 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
         style={getDropdownPosition()}
       >
         {children}
@@ -90,8 +91,11 @@ export default function Dropdown({ label = "Seleccionar", children, selectedValu
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           type="button"
+          disabled={disabled}
           onClick={() => setIsOpen(!isOpen)}
-          className="text-body-medium text-onSurface text-nowrap bg-surface border border-onSurface border-solid flex gap-1.5 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+          className={`text-body-medium text-onSurface text-nowrap bg-surface border border-onSurface border-solid flex gap-1.5 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl transition-colors ${
+            disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50'
+          }`}
         >
           {showTitle ? (
              <p>
