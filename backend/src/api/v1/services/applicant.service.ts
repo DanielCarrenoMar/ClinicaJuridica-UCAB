@@ -9,8 +9,8 @@ function coerceNumber(value: any): number | null {
 }
 
 function isMissingRelationError(error: any, relationName: string): boolean {
-  const msg = error?.message ? String(error.message) : '';
-  return msg.toLowerCase().includes('does not exist') && msg.includes(relationName);
+  const msg = error?.message ? String(error.message).toLowerCase() : '';
+  return (msg.includes('does not exist') || msg.includes('no existe')) && msg.includes(relationName.toLowerCase());
 }
 
 class ApplicantService {

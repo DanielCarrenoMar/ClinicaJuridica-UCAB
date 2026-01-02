@@ -17,7 +17,7 @@
     "build": "tsc -p tsconfig.json",
     "seed": "tsx prisma/seed.ts",
     "testData": "tsx prisma/testData.ts",
-    "startConfig": "pnpm i && pnpm prisma db push --force-reset && pnpm run generate && pnpm run seed"
+    "startDB": "pnpm run generate && pnpm prisma db push --force-reset && pnpm run seed"
   },
   "keywords": [],
   "author": "",

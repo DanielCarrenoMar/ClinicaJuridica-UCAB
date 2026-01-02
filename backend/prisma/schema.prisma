@@ -363,15 +363,15 @@ model Case {
   idNucleus   String @db.VarChar(63)
   term        String @db.VarChar(10)
   idLegalArea Int
-  teacherId   String @db.VarChar(20)
-  teacherTerm String @db.VarChar(10)
+  teacherId   String? @db.VarChar(20)
+  teacherTerm String? @db.VarChar(10)
   idCourt     Int?
 
   applicant Applicant @relation(fields: [applicantId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
   nucleus   Nucleus   @relation(fields: [idNucleus], references: [idNucleus], onDelete: Restrict, onUpdate: Cascade)
   semester  Semester  @relation(fields: [term], references: [term], onDelete: Restrict, onUpdate: Cascade)
   legalArea LegalArea @relation(fields: [idLegalArea], references: [idLegalArea], onDelete: Restrict, onUpdate: Cascade)
-  teacher   Teacher   @relation(fields: [teacherId, teacherTerm], references: [identityCard, term], onDelete: Restrict, onUpdate: Cascade)
+  teacher   Teacher?   @relation(fields: [teacherId, teacherTerm], references: [identityCard, term], onDelete: Restrict, onUpdate: Cascade)
   court     Court?    @relation(fields: [idCourt], references: [idCourt], onDelete: Restrict, onUpdate: Cascade)
 
   beneficiaries    CaseBeneficiary[]

@@ -24,6 +24,11 @@ export async function getApplicantById(req: Request, res: Response): Promise<voi
 
     const result = await applicantService.getApplicantById(id);
 
+    if (result.error) {
+      res.status(500).json(result);
+      return;
+    }
+
     if (!result.success || !result.data) {
       res.status(404).json({ success: false, message: 'Solicitante no encontrado' });
       return;
