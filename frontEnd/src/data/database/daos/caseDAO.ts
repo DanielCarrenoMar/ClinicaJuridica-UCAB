@@ -5,7 +5,6 @@ export interface CaseDAO {
   processType: ProcessTypeDAO;
   applicantId: string;
   idNucleus: string;
-  term: string;
   idLegalArea: number;
   teacherId: string;
   teacherTerm: string;
@@ -17,7 +16,6 @@ export const defaultCaseDAO: CaseDAO = {
   processType: "A",
   applicantId: "",
   idNucleus: "",
-  term: "",
   idLegalArea: 0,
   teacherId: "",
   teacherTerm: "",
