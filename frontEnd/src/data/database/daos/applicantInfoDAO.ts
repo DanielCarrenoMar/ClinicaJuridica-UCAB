@@ -5,4 +5,5 @@ export interface ApplicantInfoDAO extends ApplicantDAO {
 	workConditionName?: string;
 	activityConditionName?: string;
 	servicesIdAvailable?: number[];
+	createdAt: string;
 }

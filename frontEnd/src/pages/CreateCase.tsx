@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { Outlet, useOutletContext } from "react-router";
 import Box from "#components/Box.tsx";
 
@@ -23,6 +23,13 @@ export function useCaseOutletContext() {
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
     const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({identityCard: ''} as ApplicantModel);
+
+    useEffect(() => {
+        console.log("applicantModel updated:", applicantModel);
+    }, [applicantModel]);
+    useEffect(() => {
+        console.log("caseDAO updated:", caseDAO);
+    }, [caseDAO]);
     
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({

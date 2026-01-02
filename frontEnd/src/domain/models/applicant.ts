@@ -1,6 +1,7 @@
+import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
 import type { ApplicantInfoDAO } from "#database/daos/applicantInfoDAO.ts";
 import type { MaritalStatusDAO } from "#database/typesDAO.ts";
-import type { IdNacionality, MaritalStatus } from "#domain/mtypes.ts";
+import { modelGenderToDao, type MaritalStatus } from "#domain/mtypes.ts";
 import type { BeneficiaryModel } from "./beneficiary";
 import { genderTypeDaoToModel } from "./user";
 export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'> {
@@ -42,15 +43,42 @@ function maritalStatusDAOToModel(dao: MaritalStatusDAO): MaritalStatus {
 			return "widowed";
 	}
 }
+function modelToMaritalStatusDAO(model: MaritalStatus): MaritalStatusDAO {
+	switch (model) {
+		case "single":
+			return "S";
+		case "married":
+			return "C";
+		case "divorced":
+			return "D";
+		case "widowed":
+			return "V";
+	}
+}
 
 export function daoToApplicantModel(dao: ApplicantInfoDAO): ApplicantModel {
 	const { maritalStatus, createdAt, gender, ...rest } = dao
 	return {
-		idNationality: dao.idNacionality as IdNacionality,
 		maritalStatus: maritalStatus ? maritalStatusDAOToModel(maritalStatus) : undefined,
 		createdAt: new Date(createdAt),
 		gender: genderTypeDaoToModel(gender),
 		...rest,
 	}
+}
 
+export function modelToApplicantDao(model: ApplicantModel): ApplicantDAO {
+	const {
+		maritalStatus,
+		createdAt,
+		headEducationLevelName,
+		workConditionName,
+		activityConditionName,
+		servicesIdAvailable,
+		gender,
+		...rest} = model;
+	return {
+		...rest,
+		gender: modelGenderToDao(gender),
+		maritalStatus: maritalStatus ? modelToMaritalStatusDAO(maritalStatus) : undefined
+	}
 }

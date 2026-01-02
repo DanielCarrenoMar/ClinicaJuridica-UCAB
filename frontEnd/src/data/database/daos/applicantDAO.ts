@@ -7,7 +7,6 @@ export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type'> {
 	homePhone?: string;
 	maritalStatus?: MaritalStatusDAO;
 	isConcubine?: boolean;
-	createdAt: string;
 	isHeadOfHousehold?: boolean;
 	headEducationLevelId?: number;
 	headStudyTime?: string;
