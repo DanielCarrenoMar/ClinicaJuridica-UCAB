@@ -10,13 +10,13 @@ import { useEffect } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import { useCreateCase } from "#domain/useCaseHooks/useCase.ts";
-import { useCreateApplicant } from "#domain/useCaseHooks/useCreateApplicant.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
+import { useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
     const { applicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
-    const { addCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
+    const { createCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
     const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
 
     function handleCreateCase(){
@@ -29,7 +29,7 @@ function CreateCaseCaseStep() {
                 ...caseDAO,
                 applicantId: createdApplicant.identityCard,
             };
-            addCase(caseToCreate)
+            createCase(caseToCreate)
             .then((createdCase) => {
                 if (createdCase) navigate(`/caso/${createdCase.idCase}`);
                 else throw new Error("Case creation failed. Case is null.");

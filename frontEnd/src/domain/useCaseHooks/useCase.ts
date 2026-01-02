@@ -39,7 +39,7 @@ export function useCreateCase() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const addCase = async (caseData: CaseDAO) => {
+    const createCaseData = async (caseData: CaseDAO) => {
         setLoading(true);
         try {
             const newCase = await createCase(caseData);
@@ -54,7 +54,7 @@ export function useCreateCase() {
     };
 
     return {
-        addCase,
+        createCase: createCaseData,
         loading,
         error
     };
