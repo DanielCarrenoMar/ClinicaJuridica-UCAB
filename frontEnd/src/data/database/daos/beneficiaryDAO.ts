@@ -1,7 +1,6 @@
 import type { BeneficiaryTypeDAO, GenderDAO, IdTypeDAO as NationalityTypeDAO } from "../typesDAO.ts";
 
 export interface BeneficiaryDAO {
-  identityCard: string;
   gender: GenderDAO;
   birthDate: Date;
   fullName: string;
