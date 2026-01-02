@@ -19,7 +19,7 @@ class CaseService {
           FROM "Case" c
           JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
-          JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
+          LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
           LEFT JOIN "Court" co ON c."idCourt" = co."idCourt"
           LEFT JOIN LATERAL (
             SELECT cs1."status"
