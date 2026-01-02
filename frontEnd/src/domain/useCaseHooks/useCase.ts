@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { CaseModel } from '../models/case';
 import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
 import type { CaseDAO } from '#database/daos/caseDAO.ts';
+import type { StatusCaseAmountModel } from '#domain/models/statusCaseAmount.ts';
 
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
@@ -108,5 +109,40 @@ export function useDeleteCase() {
         removeCase,
         loading,
         error
+    };
+}
+
+export function useGetStatusCaseAmounts() {
+    const { findStatusCaseAmounts } = getCaseRepository();
+    const [statusAmounts, setStatusAmounts] = useState<StatusCaseAmountModel>({
+        adviceAmount: 0,
+        draftingAmount: 0,
+        mediationAmount: 0,
+        proccessAmount: 0
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadStatusAmounts = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await findStatusCaseAmounts();
+            setStatusAmounts(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadStatusAmounts();
+    }, [loadStatusAmounts]);
+    return {
+        statusAmounts,
+        loading,
+        error,
+        refresh: loadStatusAmounts
     };
 }

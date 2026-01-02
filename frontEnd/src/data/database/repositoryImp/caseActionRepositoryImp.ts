@@ -2,6 +2,7 @@ import type { CaseActionRepository } from "#domain/repositories.ts";
 import { daoToCaseActionModel, type CaseActionModel } from "#domain/models/caseAction.ts";
 import { CASE_ACTION_URL } from "./apiUrl";
 import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
+import type { StatusCaseAmountModel } from "#domain/models/statusCaseAmount.ts";
 
 export function getCaseActionRepository(): CaseActionRepository {
 	return {
@@ -35,7 +36,6 @@ export function getCaseActionRepository(): CaseActionRepository {
 			return daoToCaseActionModel(caseActionDAO);
 		},
 
-		// 3. CREAR UNA ACCIÓN NUEVA
 		createCaseAction: async (data) => {
 			try {
 				const response = await fetch(CASE_ACTION_URL, {
@@ -56,5 +56,18 @@ export function getCaseActionRepository(): CaseActionRepository {
 				throw error;
 			}
 		},
+
+		findStatusCaseAmounts: async (): Promise<StatusCaseAmountModel> => {
+			try {
+				const response = await fetch(`${CASE_ACTION_URL}/statusAmounts`);
+				if (!response.ok) {
+					throw new Error("El servidor respondió con un error al obtener las cantidades de estados de casos.");
+				}
+				const data = await response.json();
+				return data.data as StatusCaseAmountModel;
+			} catch (error) {
+				throw error;
+			}
+		}
 	} as CaseActionRepository;
 }
