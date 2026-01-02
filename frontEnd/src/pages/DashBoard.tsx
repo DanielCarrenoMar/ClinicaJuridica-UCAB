@@ -12,7 +12,7 @@ import { useGetStatusCaseAmounts } from "#domain/useCaseHooks/useCase.ts";
 function DashBoard() {
     const navigate = useNavigate()
     const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
-    const { statusAmounts, loading: loadingStatusAmounts, error: errorStatusAmounts } = useGetStatusCaseAmounts();
+    const { statusAmounts } = useGetStatusCaseAmounts();
 
     return (
         

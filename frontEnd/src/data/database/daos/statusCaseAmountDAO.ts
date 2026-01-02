@@ -1,6 +1,6 @@
 export interface StatusCaseAmountDAO {
-    proccessAmount: number;
-    adviceAmount: number;
-    mediationAmount: number;
-    draftingAmount: number;
+    openAmount: number;
+    closedAmount: number;
+    inProgressAmount: number;
+    pausedAmount: number;
 }

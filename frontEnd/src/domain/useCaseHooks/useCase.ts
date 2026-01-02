@@ -115,10 +115,10 @@ export function useDeleteCase() {
 export function useGetStatusCaseAmounts() {
     const { findStatusCaseAmounts } = getCaseRepository();
     const [statusAmounts, setStatusAmounts] = useState<StatusCaseAmountModel>({
-        adviceAmount: 0,
-        draftingAmount: 0,
-        mediationAmount: 0,
-        proccessAmount: 0
+        closedAmount: 1,
+        inProgressAmount: 1,
+        openAmount: 1,
+        pausedAmount: 1
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
