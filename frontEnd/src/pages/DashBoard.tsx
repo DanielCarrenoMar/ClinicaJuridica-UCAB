@@ -6,6 +6,7 @@ import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
 import { useNavigate } from "react-router";
 import { useGetAllCaseActions } from "#domain/useCaseHooks/useCaseActions.ts";
+import LoadingSpinner from "#components/LoadingSpinner.tsx";
 
 function DashBoard() {
     const navigate = useNavigate()
@@ -44,7 +45,16 @@ function DashBoard() {
                         </span>
 
                         <div className="flex flex-col gap-2 flex-11">
-                            {caseActions.map((action, index) => (
+                            {loadingCaseActions && 
+                                <div className="flex justify-center">
+                                    <LoadingSpinner />
+                                </div>
+                            }
+                            {
+                                errorCaseActions && 
+                                <p className="text-error text-center">Error al cargar las acciones de casos.</p>
+                            }
+                            {!errorCaseActions && caseActions.map((action, index) => (
                                 <CaseActionCard 
                                     key={index}
                                     caseAction={action}
