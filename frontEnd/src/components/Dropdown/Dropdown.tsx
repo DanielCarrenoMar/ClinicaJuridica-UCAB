@@ -31,6 +31,7 @@ export default function Dropdown({ label = "Dropdown", children, selectedValue, 
   const [internalSelectedValue, setInternalSelectedValue] = useState<string | number | null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string>(label);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const currentSelectedValue = selectedValue !== undefined ? selectedValue : internalSelectedValue;
 
@@ -47,7 +48,11 @@ export default function Dropdown({ label = "Dropdown", children, selectedValue, 
   // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        (!contentRef.current || !contentRef.current.contains(event.target as Node))
+      ) {
         setIsOpen(false);
       }
     }
@@ -55,7 +60,7 @@ export default function Dropdown({ label = "Dropdown", children, selectedValue, 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownRef]);
+  }, [dropdownRef, contentRef]);
 
   const getDropdownPosition = () => {
     if (!dropdownRef.current) return { top: 0, left: 0 };
@@ -70,6 +75,7 @@ export default function Dropdown({ label = "Dropdown", children, selectedValue, 
   const dropdownContent = isOpen ? createPortal(
     <div className="fixed inset-0 z-50 pointer-events-none">
       <div 
+        ref={contentRef}
         className="absolute mt-2 w-48 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
         style={getDropdownPosition()}
       >
