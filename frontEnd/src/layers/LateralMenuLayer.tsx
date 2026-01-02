@@ -4,7 +4,7 @@ import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
 import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
-import GeneralSearch from "#components/GeneralSearch.tsx";
+import SearchBar from "#components/SearchBar.tsx";
 import { Outlet, useLocation, useOutletContext } from "react-router";
 
 type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
@@ -50,9 +50,8 @@ function LateralMenuLayer() {
             <main className="flex-1 flex flex-col">
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
-                        <GeneralSearch
-                            alwaysShowSearch={locationId === 'busqueda'}
-                            isOpen={isSearchOpen} 
+                        <SearchBar
+                            isOpen={locationId === 'busqueda' ? true : isSearchOpen} 
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
                         />

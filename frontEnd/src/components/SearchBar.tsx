@@ -1,16 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { animate } from 'animejs';
 import { Search, Close } from "flowbite-react-icons/outline";
 import { useNavigate } from 'react-router';
 
-interface GeneralSearchProps {
-    alwaysShowSearch?: boolean;
+interface SearchBarProps {
     isOpen: boolean;
     onToggle: (isOpen: boolean) => void;
     defaultValue?: string;
 }
 
-export default function GeneralSearch({ alwaysShowSearch, isOpen, onToggle, defaultValue = '' }: GeneralSearchProps) {
+export default function SearchBar({ isOpen, onToggle, defaultValue = '' }: SearchBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -19,7 +18,6 @@ export default function GeneralSearch({ alwaysShowSearch, isOpen, onToggle, defa
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        if (alwaysShowSearch) return;
         onToggle(false);
       }
     }
@@ -27,7 +25,7 @@ export default function GeneralSearch({ alwaysShowSearch, isOpen, onToggle, defa
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [alwaysShowSearch, onToggle]);
+  }, [onToggle]);
 
   useEffect(() => {
     if (isOpen) {
@@ -89,7 +87,7 @@ export default function GeneralSearch({ alwaysShowSearch, isOpen, onToggle, defa
           onClick={() => {
             if (inputRef.current == null) return
             if (inputRef.current.value === '') {
-              if (!alwaysShowSearch) onToggle(false);
+              onToggle(false);
               return;
             }
             inputRef.current.value = '';
