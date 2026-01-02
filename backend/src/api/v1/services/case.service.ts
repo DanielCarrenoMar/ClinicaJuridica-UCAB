@@ -263,7 +263,7 @@ class CaseService {
           b."fullName",
           b."gender",
           b."birthDate",
-          b."idNacionality",
+          b."idNationality",
           b."hasId"
         FROM "CaseBeneficiary" cb
         JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"

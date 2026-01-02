@@ -4,7 +4,7 @@ export interface ApplicantResponse {
   fullName: string;
   gender: string;
   birthDate: Date | string;
-  idNacionality: string;
+  idNationality: string;
   idState: number;
   municipalityNumber: number;
   parishNumber: number;

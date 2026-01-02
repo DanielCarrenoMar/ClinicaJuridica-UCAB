@@ -49,16 +49,16 @@ class BeneficiaryService {
   async create(data: any) {
     try {
       const fullName = data.fullName ?? data.name;
-      const idNacionality = data.idNacionality ?? data.idNationality ?? data.idType;
+      const idNationality = data.idNationality ?? data.idNationality ?? data.idType;
       const result = await prisma.$queryRaw`
         INSERT INTO "Beneficiary" (
           "identityCard", "fullName", "gender", "birthDate", 
-          "idNacionality", "hasId", "type", "idState", 
+          "idNationality", "hasId", "type", "idState", 
           "municipalityNumber", "parishNumber"
         )
         VALUES (
           ${data.identityCard}, ${fullName}, ${data.gender}, CAST(${data.birthDate} AS DATE), 
-          ${idNacionality}, ${data.hasId}, ${data.type}, ${data.idState}, 
+          ${idNationality}, ${data.hasId}, ${data.type}, ${data.idState}, 
           ${data.municipalityNumber}, ${data.parishNumber}
         )
         RETURNING *
@@ -72,14 +72,14 @@ class BeneficiaryService {
   async update(id: string, data: any) {
     try {
       const fullName = data.fullName ?? data.name;
-      const idNacionality = data.idNacionality ?? data.idNationality ?? data.idType;
+      const idNationality = data.idNationality ?? data.idNationality ?? data.idType;
       const result = await prisma.$queryRaw`
         UPDATE "Beneficiary"
         SET 
           "fullName" = COALESCE(${fullName}, "fullName"),
           "gender" = COALESCE(${data.gender}, "gender"),
           "birthDate" = COALESCE(CAST(${data.birthDate} AS DATE), "birthDate"),
-          "idNacionality" = COALESCE(${idNacionality}, "idNacionality"),
+          "idNationality" = COALESCE(${idNationality}, "idNationality"),
           "hasId" = COALESCE(${data.hasId}, "hasId"),
           "type" = COALESCE(${data.type}, "type"),
           "idState" = COALESCE(${data.idState}, "idState"),

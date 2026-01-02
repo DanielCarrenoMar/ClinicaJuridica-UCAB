@@ -1,4 +1,4 @@
-import { PrismaClient, Gender } from './generated/client.js';
+import { Gender, idNationality, PrismaClient } from '#src/generated/client.js';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
@@ -216,7 +216,7 @@ async function main() {
             gender: Gender.F,
             birthDate: new Date('1989-04-12'),
             fullName: 'Laura Campos',
-            idNacionality: 'VENEZUELAN' as any,
+            idNationality: "VENEZUELAN" as idNationality,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,
@@ -228,7 +228,7 @@ async function main() {
             gender: Gender.F,
             birthDate: new Date('1989-04-12'),
             fullName: 'Laura Campos',
-            idNacionality: 'VENEZUELAN' as any,
+            idNationality: "VENEZUELAN" as idNationality,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,
@@ -274,7 +274,7 @@ async function main() {
             gender: Gender.M,
             birthDate: new Date('1984-07-30'),
             fullName: 'Carlos Fuentes',
-            idNacionality: 'VENEZUELAN' as any,
+            idNationality: "VENEZUELAN" as idNationality,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,
@@ -286,7 +286,7 @@ async function main() {
             gender: Gender.M,
             birthDate: new Date('1984-07-30'),
             fullName: 'Carlos Fuentes',
-            idNacionality: 'VENEZUELAN' as any,
+            idNationality: "VENEZUELAN" as idNationality,
             hasId: true,
             type: 'APPLICANT' as any,
             idState: state.idState,

@@ -32,7 +32,7 @@ enum StudentType {
   SERVICE   @map("S")
 }
 
-enum idNacionality {
+enum idNationality {
   VENEZUELAN @map("V")
   FOREIGNER  @map("E")
   LEGAL      @map("J")
@@ -278,7 +278,7 @@ model Beneficiary {
   gender        Gender
   birthDate     DateTime        @db.Date
   fullName      String          @db.VarChar(63)
-  idNacionality idNacionality
+  idNationality idNationality
   hasId         Boolean
   type          BeneficiaryType
 

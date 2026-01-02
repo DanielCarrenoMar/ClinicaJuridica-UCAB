@@ -20,7 +20,7 @@ class ApplicantService {
       const applicants = await prisma.$queryRaw<RawApplicantDB[]>`
         SELECT 
           a.*, 
-          b."fullName", b."gender", b."birthDate", b."idNacionality", b."idState", b."municipalityNumber", b."parishNumber",
+          b."fullName", b."gender", b."birthDate", b."idNationality", b."idState", b."municipalityNumber", b."parishNumber",
           s."name" AS "stateName",
           m."name" AS "municipalityName",
           p."name" AS "parishName",
@@ -58,7 +58,7 @@ class ApplicantService {
       const applicantRows = await prisma.$queryRaw<RawApplicantDB[]>`
         SELECT
           a.*,
-          b."fullName", b."gender", b."birthDate", b."idNacionality",
+          b."fullName", b."gender", b."birthDate", b."idNationality",
           b."idState", b."municipalityNumber", b."parishNumber",
           s."name" AS "stateName",
           m."name" AS "municipalityName",
@@ -126,10 +126,10 @@ class ApplicantService {
         }
         await tx.$executeRaw`
           INSERT INTO "Beneficiary" 
-          ("identityCard", "fullName", "gender", "birthDate", "idNacionality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
+          ("identityCard", "fullName", "gender", "birthDate", "idNationality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
           VALUES (
             ${data.identityCard}, ${data.fullName}, ${data.gender}, 
-            CAST(${data.birthDate} AS DATE), ${data.idNacionality}, 
+            CAST(${data.birthDate} AS DATE), ${data.idNationality}, 
             true, 'S', ${data.idState}, ${data.municipalityNumber}, ${data.parishNumber}
           )
         `;
@@ -179,7 +179,7 @@ class ApplicantService {
         const result = await tx.$queryRaw<RawApplicantDB[]>`
           SELECT 
             a.*, 
-            b."fullName", b."gender", b."birthDate", b."idNacionality", b."idState", b."municipalityNumber", b."parishNumber",
+            b."fullName", b."gender", b."birthDate", b."idNationality", b."idState", b."municipalityNumber", b."parishNumber",
             s."name" AS "stateName",
             m."name" AS "municipalityName",
             p."name" AS "parishName",
@@ -287,7 +287,7 @@ class ApplicantService {
         const result = await tx.$queryRaw<RawApplicantDB[]>`
           SELECT 
             a.*, 
-            b."fullName", b."gender", b."birthDate", b."idNacionality", 
+            b."fullName", b."gender", b."birthDate", b."idNationality", 
             b."idState", b."municipalityNumber", b."parishNumber",
             s."name" AS "stateName",
             m."name" AS "municipalityName",
