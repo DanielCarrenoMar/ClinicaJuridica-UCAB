@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import type { CaseModel } from "#domain/models/case.ts";
-import type { CaseStatus } from "#domain/models/caseStatus.ts";
 import { Book, ScaleBalanced, User } from "flowbite-react-icons/solid";
+import type { CaseStatusTypeModel } from "#domain/typesModel.ts";
 
 interface CaseCardProps {
     caseData: CaseModel;
     matches?: Record<string, Array<[number, number]>>;
 }
 
-const statusConfig: Record<CaseStatus, { color: string; label: string }> = {
+const statusConfig: Record<CaseStatusTypeModel, { color: string; label: string }> = {
     OPEN: { color: "bg-success", label: "Abierto" },
     IN_PROGRESS: { color: "bg-warning", label: "En Trámite" },
     CLOSED: { color: "bg-error", label: "Cerrado" },
