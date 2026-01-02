@@ -5,7 +5,7 @@ import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plu
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
-import { Outlet, useLocation, useOutletContext } from "react-router";
+import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
 
 type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
 
@@ -20,6 +20,7 @@ export function useLateralMenuContext() {
 function LateralMenuLayer() {
     const [defaultSearchText, setDefaultSearchText] = useState("")
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const navigate = useNavigate();
     const location = useLocation()
     const locationId = location.pathname === '/' ? location.pathname : location.pathname.split('/')[1] as LateralmenuPages
     const [isSearchOpen, setIsSearchOpen] = useState(defaultSearchText !== '');
@@ -54,6 +55,7 @@ function LateralMenuLayer() {
                             isOpen={locationId === 'busqueda' || locationId === '/' ? true : isSearchOpen} 
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
+                            onSearch={(value)=>{navigate(`/busqueda?q=${encodeURIComponent(value)}`);}}
                             placeholder="Buscar Caso"
                         />
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />

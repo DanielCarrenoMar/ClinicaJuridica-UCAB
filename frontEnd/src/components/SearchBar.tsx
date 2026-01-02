@@ -5,21 +5,22 @@ import { useNavigate } from 'react-router';
 
 interface SearchBarProps {
     isOpen: boolean;
-    onToggle: (isOpen: boolean) => void;
+    onToggle?: (isOpen: boolean) => void;
     defaultValue?: string;
     placeholder?: string;
+    onChange?: (value: string) => void;
+    onSearch?: (value: string) => void;
 }
 
-export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeholder = "Buscar" }: SearchBarProps) {
+export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeholder = "Buscar", onChange, onSearch }: SearchBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        onToggle(false);
+        onToggle && onToggle(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -29,8 +30,10 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
   }, [onToggle]);
 
   useEffect(() => {
+    if (!containerRef.current) return;
+    
     if (isOpen) {
-      animate("#searchContainer", {
+      animate(containerRef.current, {
         width: ['40px', '100%'],
         backgroundColor: ['rgba(255,255,255,0.7)', 'rgba(255,255,255,1)'],
         borderRadius: ['100px', '24px'],
@@ -41,7 +44,7 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
         }
       });
     } else {
-      animate("#searchContainer", {
+      animate(containerRef.current, {
         width: ['100%', '40px'],
         backgroundColor: ['rgba(255,255,255,1)', 'rgba(255,255,255,0.7)'],
         borderRadius: ['24px', '100px'],
@@ -53,18 +56,18 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
   }, [isOpen]);
 
   function searchInputText(){
-    navigate(`/busqueda?q=${encodeURIComponent(inputRef.current?.value || '')}`);
+    const value = inputRef.current?.value || '';
+    if (onSearch) onSearch(value);
   }
 
   return (
     <div 
-      id='searchContainer'
       ref={containerRef}
       className={`bg-surface/70 flex items-center overflow-hidden`}
     >
       <button 
         onClick={() => { 
-          if (!isOpen) onToggle(true)
+          if (!isOpen) onToggle && onToggle(true)
           else searchInputText()
         }}
         className="group p-3 flex items-center justify-center cursor-pointer hover:bg-surface rounded-full transition-colors"
@@ -78,6 +81,7 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
           type="text" 
           placeholder={placeholder}
           className="w-full bg-transparent border-none outline-none text-body-small text-onSurface placeholder:text-onSurface/50 h-full "
+          onChange={(e) => onChange && onChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               searchInputText();
@@ -88,7 +92,7 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
           onClick={() => {
             if (inputRef.current == null) return
             if (inputRef.current.value === '') {
-              onToggle(false);
+              onToggle && onToggle(false);
               return;
             }
             inputRef.current.value = '';
