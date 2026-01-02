@@ -1,11 +1,10 @@
-import { daoToCaseModel } from "#domain/models/case.ts";
+import { daoToCaseModel, type CaseModel } from "#domain/models/case.ts";
 import type { CaseRepository } from "../../../domain/repositories";
 import { CASE_URL } from "./apiUrl";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
 import type { CaseStatusDAO } from "#database/daos/caseStatusDAO.ts";
 import type { StatusCaseAmountDAO } from "#database/daos/statusCaseAmountDAO.ts";
-import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import { daoToBeneficiaryModel } from "#domain/models/beneficiary.ts";
 import { daoToStatusCaseAmountModel } from "#domain/models/statusCaseAmount.ts";
 import { daoToCaseStatusModel } from "#domain/models/caseStatus.ts";
@@ -65,7 +64,8 @@ export function getCaseRepository(): CaseRepository {
                 body: JSON.stringify(data)
             });
             const result = await response.json();
-            return result.data as CaseInfoDAO;
+            const caseDAO: CaseInfoDAO = result.data;
+            return daoToCaseModel(caseDAO);
         },
         createCaseStatusFromCaseId: async (data) => {
             const response = await fetch(`${CASE_URL}/${data.idCase}/status`, {
@@ -78,7 +78,8 @@ export function getCaseRepository(): CaseRepository {
                 })
             });
             const result = await response.json();
-            return result.data as CaseStatusDAO;
+            const caseStatusDAO: CaseStatusInfoDAO = result.data;
+            return daoToCaseStatusModel(caseStatusDAO);
         },
         updateCase: async (id, data) => {
             const response = await fetch(`${CASE_URL}/${id}`, {
@@ -93,6 +94,13 @@ export function getCaseRepository(): CaseRepository {
             await fetch(`${CASE_URL}/${id}`, {
                 method: 'DELETE'
             });
+        },
+        findStatusCaseAmounts: async () => {
+            const response = await fetch(`${CASE_URL}/status/amount`);
+            if (!response.ok) throw new Error('Error fetching status case amounts');
+            const result = await response.json();
+            const dao: StatusCaseAmountDAO = result.data;
+            return daoToStatusCaseAmountModel(dao);
         }
     }
 }
