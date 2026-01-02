@@ -9,10 +9,39 @@ import { ChevronRight } from "flowbite-react-icons/outline";
 import { useEffect } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
+import { useCreateCase } from "#domain/useCaseHooks/useCase.ts";
+import { useCreateApplicant } from "#domain/useCaseHooks/useCreateApplicant.ts";
+import type { CaseDAO } from "#database/daos/caseDAO.ts";
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
     const { applicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
+    const { addCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
+    const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
+
+    function handleCreateCase(){
+        createApplicant(applicantModel)
+        .then((createdApplicant) => {
+            if (!createdApplicant) {
+                throw new Error("Applicant creation failed. Applicant is null.");
+            }
+            const caseToCreate: CaseDAO = {
+                ...caseDAO,
+                applicantId: createdApplicant.identityCard,
+            };
+            addCase(caseToCreate)
+            .then((createdCase) => {
+                if (createdCase) navigate(`/caso/${createdCase.idCase}`);
+                else throw new Error("Case creation failed. Case is null.");
+            })
+            .catch((error) => {
+                console.error("Error creating case", error);
+            });
+        })
+        .catch((error) => {
+            console.error("Error creating applicant", error);
+        });
+    }
 
     useEffect(() => {
         if (!applicantModel.identityCard) {
@@ -29,7 +58,7 @@ function CreateCaseCaseStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { navigate("/crearCaso/solicitante"); }} variant="outlined" icon={<UserEdit />} className="h-10 w-28">Volver</Button>
-                    <Button onClick={() => { navigate("/crearCaso/caso"); }} variant="resalted" icon={<ChevronRight />} className="w-32">Aceptar</Button>
+                    <Button onClick={handleCreateCase} variant="resalted" icon={<ChevronRight />} disabled={createCaseLoading || createApplicantLoading} className="w-32">Aceptar</Button>
                 </div>
             </header>
             <div className="px-4 py-2 flex flex-col gap-4">
