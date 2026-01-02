@@ -15,31 +15,36 @@ import { useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
-    const { applicantModel, caseDAO, updateCaseDAO } = useCaseOutletContext();
+    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting } = useCaseOutletContext();
     const { createCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
     const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
 
     function handleCreateCase(){
-        createApplicant(applicantModel)
-        .then((createdApplicant) => {
-            if (!createdApplicant) {
-                throw new Error("Applicant creation failed. Applicant is null.");
-            }
-            const caseToCreate: CaseDAO = {
-                ...caseDAO,
-                applicantId: createdApplicant.identityCard,
-            };
-            createCase(caseToCreate)
-            .then((createdCase) => {
-                if (createdCase) navigate(`/caso/${createdCase.idCase}`);
-                else throw new Error("Case creation failed. Case is null.");
+        let createdApplicant = applicantModel
+        if (!isApplicantExisting){
+            createApplicant(applicantModel).then((createdApplicant) => {
+                if (!createdApplicant) {
+                    throw new Error("Applicant creation failed. Applicant is null.");
+                }
+                createdApplicant = createdApplicant;
             })
             .catch((error) => {
-                console.error("Error creating case", error);
+                console.error("Error creating applicant", error);
             });
+        }
+        const caseToCreate: CaseDAO = {
+            ...caseDAO,
+            applicantId: createdApplicant.identityCard,
+            userId: 16000001, // TODO: Replace with actual user ID from auth context
+        };
+        console.log("Creating case with data:", caseToCreate);
+        createCase(caseToCreate)
+        .then((createdCase) => {
+            if (createdCase) navigate(`/caso/${createdCase.idCase}`);
+            else throw new Error("Case creation failed. Case is null.");
         })
         .catch((error) => {
-            console.error("Error creating applicant", error);
+            console.error("Error creating case", error);
         });
     }
 

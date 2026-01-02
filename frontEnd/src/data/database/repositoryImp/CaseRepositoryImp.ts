@@ -65,7 +65,7 @@ export function getCaseRepository(): CaseRepository {
                 body: JSON.stringify(data)
             });
             const result = await response.json();
-            return result.data as CaseDAO;
+            return result.data as CaseInfoDAO;
         },
         createCaseStatusFromCaseId: async (data) => {
             const response = await fetch(`${CASE_URL}/${data.idCase}/status`, {

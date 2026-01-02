@@ -14,6 +14,8 @@ export type CaseOutletContext = {
     applicantModel: ApplicantModel;
     setApplicantModel: Dispatch<SetStateAction<ApplicantModel>>;
     updateApplicantModel: (updatedFields: Partial<ApplicantModel>) => void;
+    isApplicantExisting: boolean;
+    setIsApplicantExisting: Dispatch<SetStateAction<boolean>>;
 };
 
 export function useCaseOutletContext() {
@@ -23,6 +25,7 @@ export function useCaseOutletContext() {
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
     const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({identityCard: ''} as ApplicantModel);
+    const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
 
     useEffect(() => {
         console.log("applicantModel updated:", applicantModel);
@@ -47,7 +50,7 @@ function CreateCase() {
 
     return (
         <Box className="p-0! overflow-hidden">
-            <Outlet context={{ caseDAO, setCaseDAO, updateCaseDAO, applicantModel, setApplicantModel, updateApplicantModel }} />
+            <Outlet context={{ caseDAO, setCaseDAO, updateCaseDAO, applicantModel, setApplicantModel, updateApplicantModel, isApplicantExisting, setIsApplicantExisting }} />
         </Box>
     );
 }

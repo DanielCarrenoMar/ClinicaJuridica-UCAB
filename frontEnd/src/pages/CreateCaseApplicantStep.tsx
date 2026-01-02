@@ -9,7 +9,7 @@ import Button from "#components/Button.tsx";
 import { CaretDown, ChevronRight, Close, Home, Users } from "flowbite-react-icons/outline";
 import { CheckCircle, InfoCircle, UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
-import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel, PersonID } from "#domain/typesModel.ts";
+import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel } from "#domain/typesModel.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
@@ -22,8 +22,8 @@ const AUTOFILL_SPINNER_MS = 420;
 
 function CreateCaseApplicantStep() {
     const navigate = useNavigate();
+    const { applicantModel, updateApplicantModel, setIsApplicantExisting } = useCaseOutletContext();
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
-    const { applicantModel, updateApplicantModel } = useCaseOutletContext();
     const [identityCardInput, setIdentityCardInput] = useState(applicantModel.identityCard);
     const [isVerifyingIdentityCard, setIsVerifyingIdentityCard] = useState(false);
 
@@ -34,7 +34,7 @@ function CreateCaseApplicantStep() {
 
     const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
     const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
-    const [lastIdentityCard, setLastIdentityCard] = useState<PersonID>("");
+    const [lastIdentityCard, setLastIdentityCard] = useState<string>("");
 
     const [haveMinDataToNextStep, setHaveMinDataToNextStep] = useState(false);
 
@@ -97,9 +97,11 @@ function CreateCaseApplicantStep() {
             if (applicant) {
                 setFoundApplicant(applicant);
                 setShowAutoFillToast(true);
+                setIsApplicantExisting(true);
             } else {
                 setFoundApplicant(null);
                 setShowAutoFillToast(false);
+                setIsApplicantExisting(false);
             }
         }, LOOKUP_DEBOUNCE_MS);
 
