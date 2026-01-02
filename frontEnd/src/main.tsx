@@ -14,11 +14,12 @@ import Nuclei from '#pages/Nuclei.tsx';
 import Config from '#pages/Config.tsx';
 import SearchCases from '#pages/SearchCases.tsx';
 import LateralMenuLayer from '#layers/LateralMenuLayer.tsx';
+import CaseInfo from '#pages/CaseInfo.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <Routes>
-      <Route element={<LateralMenuLayer/>}>
+      <Route element={<LateralMenuLayer />}>
         <Route index element={<DashBoard />} />
         <Route path="/crearCaso/*" element={<CreateCase />}>
           <Route index element={<Navigate to="solicitante" replace />} />
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/nucleos" element={<Nuclei />} />
         <Route path="/configuracion" element={<Config />} />
         <Route path="/busqueda" element={<SearchCases />} />
+        <Route path="/caso/:id" element={<CaseInfo />} />
       </Route>
     </Routes>
   </BrowserRouter>

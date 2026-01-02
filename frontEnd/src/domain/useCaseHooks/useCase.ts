@@ -34,6 +34,33 @@ export function useGetCases() {
     };
 }
 
+export function useGetCaseById() {
+    const { findCaseById } = getCaseRepository();
+    const [caseData, setCaseData] = useState<CaseModel | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadCase = useCallback(async (id: string) => {
+        setLoading(true);
+        try {
+            const data = await findCaseById(id);
+            setCaseData(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return {
+        caseData,
+        loading,
+        error,
+        loadCase
+    };
+}
+
 export function useCreateCase() {
     const { createCase } = getCaseRepository();
     const [loading, setLoading] = useState(false);
