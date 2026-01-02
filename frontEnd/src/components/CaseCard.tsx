@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { CaseModel } from "#domain/models/case.ts";
 import { Book, ScaleBalanced, User } from "flowbite-react-icons/solid";
+import { useNavigate } from "react-router";
 import type { CaseStatusTypeModel } from "#domain/typesModel.ts";
 
 interface CaseCardProps {
@@ -43,6 +44,7 @@ function highlightText(text: string | number, indices?: Array<[number, number]>)
 
 export default function CaseCard({ caseData, matches }: CaseCardProps) {
     const {
+        idCase,
         compoundKey,
         caseStatus,
         createdAt,
@@ -53,11 +55,16 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
         lastActionDescription
     } = caseData;
 
+    const navigate = useNavigate();
+
     const config = statusConfig[caseStatus] || statusConfig.OPEN;
     const formattedDate = createdAt.toLocaleDateString("es-ES");
 
     return (
-        <div className="bg-surface/70 flex flex-col gap-1 h-28 overflow-hidden relative rounded-3xl w-full max-w-5xl">
+        <div
+            onClick={() => navigate(`/caso/${idCase}`)}
+            className="bg-surface/70 flex flex-col gap-1 h-28 overflow-hidden relative rounded-3xl w-full max-w-5xl cursor-pointer hover:bg-surface transition-colors"
+        >
             <header className={`flex text-surface justify-between relative ${config.color} px-4 pt-2.5 pb-2`}>
                 <h4 className="text-body-medium ">
                     {highlightText(compoundKey, matches?.compoundKey)}
@@ -69,13 +76,13 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
             <div className="flex gap-2.5 items-start relative text-body-small w-full px-4 py-2">
                 <div className="flex flex-col gap-1 justify-center min-w-40">
                     <span className="flex gap-1 items-center">
-                        <User/>
+                        <User />
                         <p className="font-light truncate max-w-32">
                             {highlightText(applicantName, matches?.applicantName)}
                         </p>
                     </span>
                     <span className="flex gap-1 items-center">
-                        <ScaleBalanced/>
+                        <ScaleBalanced />
                         <p className="font-ligh truncate max-w-32">
                             {highlightText(legalAreaName, matches?.legalAreaName)}
                         </p>
@@ -86,7 +93,7 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
 
                 <div className="flex flex-col text-body-small gap-1 justify-between h-full min-w-40">
                     <span className="flex gap-2 items-start">
-                        <Book/>
+                        <Book />
                         <span className="flex flex-col items-center">
                             <h5 className="align-middle">
                                 Última acción {lastActionDate ? `el ${lastActionDate.toLocaleDateString("es-ES")}` : 'N/A'}
