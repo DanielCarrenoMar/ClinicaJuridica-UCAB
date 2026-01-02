@@ -6,8 +6,8 @@ export interface CaseDAO {
   applicantId: string;
   idNucleus: string;
   idLegalArea: number;
-  teacherId: string;
-  teacherTerm: string;
+  teacherId?: string;
+  teacherTerm?: string;
   idCourt?: number;
 }
 
@@ -17,7 +17,7 @@ export const defaultCaseDAO: CaseDAO = {
   applicantId: "",
   idNucleus: "",
   idLegalArea: 0,
-  teacherId: "",
-  teacherTerm: "",
+  teacherId: undefined,
+  teacherTerm: undefined,
   idCourt: undefined,
 };
