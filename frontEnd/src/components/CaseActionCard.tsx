@@ -6,7 +6,7 @@ interface AccionCardProps extends HTMLAttributes<HTMLDivElement> {
   caseAction: CaseActionModel
 }
 
-export default function AccionCard({ 
+export default function CaseActionCard({ 
   caseAction,
   className = '',
   ...props 
@@ -19,7 +19,7 @@ export default function AccionCard({
       <Link to={`/usuario/${caseAction.userId}`} className="text-body-large flex-1 hover:underline">
         {caseAction.userName}
       </Link>
-      <Link to={`/caso/${caseAction.idCase}`} className="text-body-medium flex-1 hover:underline">
+      <Link to={`/caso/${caseAction.caseCompoundKey}`} className="text-body-medium flex-1 hover:underline">
         {caseAction.caseCompoundKey}
       </Link>
       <p className="text-body-small flex-1">

@@ -1,51 +1,15 @@
 import Box from "#components/Box.tsx";
 import Button from "#components/Button.tsx";
 
-import AccionCard from "#components/ActionCard.tsx";
+import CaseActionCard from "#components/CaseActionCard.tsx";
 import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
-import type { CaseActionModel } from "#domain/models/caseAction.ts";
-import TextInput from "#components/TextInput.tsx";
 import { useNavigate } from "react-router";
-
-const mockActions: CaseActionModel[] = [
-    {
-        userName: "Alejandro Vielma",
-        caseCompoundKey: "GY_24_24_123",
-        registryDate: new Date("01/01/2025"),
-        actionNumber: 1,
-        idCase: 1,
-        notes: null,
-        userId: "3112312",
-        userNacionality: "V",
-        description: "Actualización de expediente: Incorporación de boleta de notificación."
-    },
-    {
-        userName: "Pedro Carvajal",
-        caseCompoundKey: "GY_24_24_124",
-        registryDate: new Date("01/01/2025"),
-        actionNumber: 2,
-        idCase: 2,
-        notes: null,
-        userId: "31512340",
-        userNacionality: "V",
-        description: "Envío de reporte mensual de avances estratégicos."
-    },
-    {
-        userName: "Daniel Carreño",
-        caseCompoundKey: "GY_24_24_125",
-        registryDate: new Date("01/01/2025"),
-        actionNumber: 3,
-        idCase: 3,
-        notes: null,
-        userId: "31522270",
-        userNacionality: "V",
-        description: "Redacción de recurso de apelación."
-    },
-];
+import { useGetAllCaseActions } from "#domain/useCaseHooks/useCaseActions.ts";
 
 function DashBoard() {
     const navigate = useNavigate()
+    const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
 
     return (
         
@@ -80,8 +44,8 @@ function DashBoard() {
                         </span>
 
                         <div className="flex flex-col gap-2 flex-11">
-                            {mockActions.map((action, index) => (
-                                <AccionCard 
+                            {caseActions.map((action, index) => (
+                                <CaseActionCard 
                                     key={index}
                                     caseAction={action}
                                 />

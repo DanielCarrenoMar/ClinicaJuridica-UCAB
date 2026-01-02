@@ -6,7 +6,7 @@ class CaseActionService {
         SELECT 
           a.*,
           u."fullName" as "userName",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "caseCompoundKey"
         FROM "CaseAction" a
         JOIN "Case" c ON a."idCase" = c."idCase"
         JOIN "User" u ON a."userId" = u."identityCard"
