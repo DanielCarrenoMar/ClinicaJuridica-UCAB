@@ -1,35 +1,26 @@
-import type { GenderType } from "#domain/mtypes.ts";
-import type { GenderDAO, UserTypeDAO } from "#database/typesDAO.ts";
+import { typeDaoToGenderTypeModel, type GenderTypeModel } from "#domain/mtypes.ts";
+import type { UserTypeDAO } from "#database/typesDAO.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
-type UserType = "COORDINATOR" | "TEACHER" | "STUDENT";
+
+type UserTypeModel = "coordinator" | "teacher" | "student";
 export interface UserModel {
     identityCard: string;
     fullName: string;
-    gender?: GenderType;
+    gender?: GenderTypeModel;
     email: string;
     password: string;
     isActive: boolean;
-    type: UserType;
+    type: UserTypeModel;
 }
 
-export function genderTypeDaoToModel(dao: GenderDAO): GenderType {
-    switch (dao) {
-        case "M":
-            return "MALE";
-        case "F":
-            return "FEMALE";
-    }
-}
-
-export function userTypeDaoToModel(dao: UserTypeDAO): UserType {
+export function userTypeDaoToModel(dao: UserTypeDAO): UserTypeModel {
     switch (dao) {
         case "E":
-            return "STUDENT";
+            return "student";
         case "C":
-            return "COORDINATOR";
+            return "coordinator";
         case "P":
-            return "TEACHER";
-
+            return "teacher";
     }
 }
 
@@ -37,7 +28,7 @@ export function daoToUserModel(dao: UserDAO): UserModel {
     const { type, gender, ...rest } = dao;
     return {
         type: userTypeDaoToModel(type),
-        gender: gender ? genderTypeDaoToModel(gender) : undefined,
+        gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
         ...rest
     }
 }

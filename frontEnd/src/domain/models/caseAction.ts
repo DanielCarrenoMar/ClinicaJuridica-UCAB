@@ -1,4 +1,3 @@
-import type { PersonID } from "#domain/mtypes.ts";
 import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 
 export interface CaseActionModel {
@@ -7,7 +6,7 @@ export interface CaseActionModel {
     actionNumber: number;
     description: string;
     notes?: string;
-    userId: PersonID;
+    userId: string;
     userName: string;
     registryDate: Date;
 }

@@ -9,7 +9,7 @@ import Button from "#components/Button.tsx";
 import { CaretDown, ChevronRight, Close, Home, Users } from "flowbite-react-icons/outline";
 import { CheckCircle, InfoCircle, UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
-import type { GenderType, IdNacionality, MaritalStatus, PersonID } from "#domain/mtypes.ts";
+import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel, PersonID } from "#domain/mtypes.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
@@ -184,7 +184,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Sexo"
                     selectedValue={applicantModel.gender || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderType });}}
+                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderTypeModel });}}
                 >
                     <DropdownOption value="male">Masculino</DropdownOption>
                     <DropdownOption value="female">Femenino</DropdownOption>
@@ -194,7 +194,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Nacionalidad"
                     selectedValue={applicantModel.idNationality || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ idNationality: value as IdNacionality }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ idNationality: value as IdNacionalityTypeModel }); }}
                 >
                     <DropdownOption value="V">Venezolana</DropdownOption>
                     <DropdownOption value="E">Extranjera</DropdownOption>
@@ -205,7 +205,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Estado Civil*"
                     selectedValue={applicantModel.maritalStatus || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatus }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
                 >
                     <DropdownOption value="single">Soltero/a</DropdownOption>
                     <DropdownOption value="married">Casado/a</DropdownOption>

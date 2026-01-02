@@ -1,11 +1,11 @@
-export type GenderDAO = "M" | "F";
+export type GenderTypeDAO = "M" | "F";
 export type UserTypeDAO = "E" | "P" | "C";
 export type TeacherTypeDAO = "R" | "V";
 export type StudentTypeDAO = "R" | "V" | "E" | "S";
-export type IdTypeDAO = "V" | "E" | "J";
+export type IdNationalityTypeDAO = "V" | "E" | "J";
 export type BeneficiaryTypeDAO = "B" | "S";
-export type MaritalStatusDAO = "S" | "C" | "D" | "V";
+export type MaritalStatusTypeDAO = "S" | "C" | "D" | "V";
 export type ProcessTypeDAO = "T" | "A" | "CM" | "R";
 export type CaseBeneficiaryTypeDAO = "D" | "I";
-export type AppointmentStatusDAO = "C" | "P" | "R";
-export type CaseStatusEnumDAO = "A" | "T" | "P" | "C";
+export type AppointmentStatusTypeDAO = "C" | "P" | "R";
+export type CaseStatusTypeDAO = "A" | "T" | "P" | "C";

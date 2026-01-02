@@ -1,7 +1,7 @@
-import type { BeneficiaryTypeDAO, GenderDAO, IdTypeDAO as NationalityTypeDAO } from "../typesDAO.ts";
+import type { BeneficiaryTypeDAO, GenderTypeDAO, IdNationalityTypeDAO as NationalityTypeDAO } from "../typesDAO.ts";
 
 export interface BeneficiaryDAO {
-  gender: GenderDAO;
+  gender: GenderTypeDAO;
   birthDate: Date;
   fullName: string;
   idNationality: NationalityTypeDAO;

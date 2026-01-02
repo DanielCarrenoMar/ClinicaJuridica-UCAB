@@ -1,9 +1,9 @@
-import type { CaseStatusEnumDAO } from "../typesDAO.ts";
+import type { CaseStatusTypeDAO } from "../typesDAO.ts";
 
 export interface CaseStatusDAO {
   idCase: number;
   statusNumber: number;
-  status: CaseStatusEnumDAO;
+  status: CaseStatusTypeDAO;
   reason?: string;
   userId: string;
   registryDate: Date;

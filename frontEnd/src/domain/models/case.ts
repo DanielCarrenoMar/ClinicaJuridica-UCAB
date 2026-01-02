@@ -1,15 +1,13 @@
-import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
-import { caseStatusDAOEnumToModel, type CaseStatus } from "./caseStatus";
-import type { ProcessType } from "#domain/mtypes.ts";
+import { typeDaoToCaseStatusTypeModel, typeDaoToProcessTypeModel, type CaseStatusTypeModel, type ProcessTypeModel } from "#domain/mtypes.ts";
 
 export interface CaseModel {
     idCase: number;
     compoundKey: string;
     problemSummary: string;
     createdAt: Date;
-    caseStatus: CaseStatus;
-    processType: ProcessType;
+    caseStatus: CaseStatusTypeModel;
+    processType: ProcessTypeModel;
     applicantId: string;
     idNucleus: string;
     term: string;
@@ -25,24 +23,11 @@ export interface CaseModel {
     lastActionDescription?: string;
 }
 
-function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
-    switch (processTypeDAO) {
-        case "A":
-            return "advice";
-        case "CM":
-            return "mediation";
-        case "R":
-            return "drafting";
-        case "T":
-            return "in progress";
-    }
-}
-
 export function daoToCaseModel(dao:CaseInfoDAO): CaseModel {
     const {processType, caseStatus, createdAt, lastActionDate,...rest} = dao
     return {
-        processType: processTypeDAOToModel(processType),
-        caseStatus: caseStatusDAOEnumToModel(caseStatus),
+        processType: typeDaoToProcessTypeModel(processType),
+        caseStatus: typeDaoToCaseStatusTypeModel(caseStatus),
         lastActionDate: lastActionDate ? new Date(lastActionDate) : undefined,
         createdAt: new Date(createdAt),
         ...rest,

@@ -1,15 +1,15 @@
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
-import type { PersonID, GenderType, IdNacionality } from "#domain/mtypes.ts";
+import type { GenderTypeModel, IdNacionalityTypeModel } from "#domain/mtypes.ts";
 import { genderTypeDaoToModel } from "./user";
 type BeneficiaryType = "BENEFICIARY" | "APPLICANT";
 
 export interface BeneficiaryModel {
-    identityCard: PersonID;
-    gender: GenderType;
+    identityCard: string;
+    gender: GenderTypeModel;
     birthDate: Date;
     fullName: string;
-    idNationality: IdNacionality;
+    idNationality: IdNacionalityTypeModel;
     hasId: boolean;
     type: BeneficiaryType;
     idState?: number;
@@ -26,15 +26,12 @@ function beneficiaryTypeDAOtoModel(type: BeneficiaryTypeDAO): BeneficiaryType {
             return "BENEFICIARY";
         case "S":
             return "APPLICANT";
-        default:
-            throw new Error(`Unknown BeneficiaryTypeDAO: ${type}`);
     }
 }
 
 export function daoToBeneficiaryModel(dao: BeneficiaryInfoDAO): BeneficiaryModel {
-    const { idNacionality, type, gender, ...rest } = dao;
+    const { type, gender, ...rest } = dao;
     return {
-        idNationality: idNacionality,
         type: beneficiaryTypeDAOtoModel(type),
         gender: genderTypeDaoToModel(gender),
         ...rest
