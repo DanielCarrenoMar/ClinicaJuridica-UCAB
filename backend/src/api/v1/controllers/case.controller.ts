@@ -45,16 +45,17 @@ export async function createCase(req: Request, res: Response): Promise<void> {
   try {
     const caseData = req.body;
 
-    if (
-      !caseData.problemSummary || 
-      !caseData.processType || 
-      !caseData.applicantId || 
-      !caseData.idLegalArea ||
-      !caseData.term
-    ) {
+    const missingFields = [];
+    if (!caseData.problemSummary) missingFields.push('problemSummary');
+    if (!caseData.processType) missingFields.push('processType');
+    if (!caseData.applicantId) missingFields.push('applicantId');
+    if (!caseData.idLegalArea) missingFields.push('idLegalArea');
+    if (!caseData.term) missingFields.push('term');
+
+    if (missingFields.length > 0) {
       res.status(400).json({
         success: false,
-        message: 'Faltan campos obligatorios para el expediente'
+        message: `Faltan campos obligatorios para el expediente: ${missingFields.join(', ')}`
       });
       return;
     }
