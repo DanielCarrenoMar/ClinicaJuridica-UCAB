@@ -15,6 +15,7 @@ import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBenefi
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import ConfirmDialog from "#components/ConfirmDialog.tsx";
 import { useNavigate } from "react-router";
+import DatePicker from "#components/DatePicker.tsx";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
@@ -61,7 +62,7 @@ function CreateCaseApplicantStep() {
         ));
         /*console.log("Have min data to next step:", {
             "isVerifyingIdentityCard": isVerifyingIdentityCard,
-            "showAutoFillToast": showAutoFillToast,
+            "NOT showAutoFillToast": !showAutoFillToast,
             "fullName": applicantModel.fullName !== undefined,
             "fullNameTrimmed": applicantModel.fullName?.trim().length > 0,
             "identityCard": applicantModel.identityCard !== undefined,
@@ -170,13 +171,13 @@ function CreateCaseApplicantStep() {
                     placeholder="Juan Perez"
                 />
             </div>
-
+            
             <div className="col-span-3">
-                <TitleTextInput
+                <DatePicker
                     label="Fecha Nacimiento"
-                    value={applicantModel.birthDate?.toLocaleDateString()}
+                    value={applicantModel.birthDate ? applicantModel.birthDate.toISOString().split('T')[0] : undefined}
                     onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
-                    placeholder="DD/MM/AAAA"
+                    
                 />
             </div>
             <div className="col-span-2">
