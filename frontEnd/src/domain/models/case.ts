@@ -1,12 +1,7 @@
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import { caseStatusDAOEnumToModel, type CaseStatus } from "./caseStatus";
-
-type ProcessType =
-    "IN_PROGRESS" |  // Tramite
-    "ADVICE" |  // Asesoria
-    "MEDIATION" |  // Conciliacion y mediacion
-    "DRAFTING";  // Redaccion
+import type { ProcessType } from "#domain/mtypes.ts";
 
 export interface CaseModel {
     idCase: number;
@@ -33,13 +28,13 @@ export interface CaseModel {
 function processTypeDAOToModel(processTypeDAO: ProcessTypeDAO): ProcessType {
     switch (processTypeDAO) {
         case "A":
-            return "ADVICE";
+            return "advice";
         case "CM":
-            return "MEDIATION";
+            return "mediation";
         case "R":
-            return "DRAFTING";
+            return "drafting";
         case "T":
-            return "IN_PROGRESS";
+            return "in progress";
     }
 }
 
