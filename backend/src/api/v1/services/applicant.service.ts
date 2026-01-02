@@ -1,17 +1,6 @@
 import prisma from '#src/config/database.js';
 import type { ApplicantResponse, RawApplicantDB } from '../interfaces/Applicant.js';
 
-function normalizeMaritalStatus(value: any) {
-  if (!value) return null;
-  const v = String(value);
-  if (v === 'S' || v === 'C' || v === 'D' || v === 'V') return v;
-  if (v === 'single') return 'S';
-  if (v === 'married') return 'C';
-  if (v === 'divorced') return 'D';
-  if (v === 'widowed') return 'V';
-  return null;
-}
-
 function coerceNumber(value: any): number | null {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -129,8 +118,8 @@ class ApplicantService {
   async createApplicant(data: ApplicantResponse): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
-        const maritalStatus = normalizeMaritalStatus(data.maritalStatus);
         let applicantEducationLevelId = coerceNumber(data.applicantEducationLevel);
+
         if (!applicantEducationLevelId && typeof data.applicantEducationLevel === 'string') {
           const level = await tx.educationLevel.findUnique({ where: { name: data.applicantEducationLevel } });
           applicantEducationLevelId = level?.idLevel ?? null;
@@ -153,7 +142,7 @@ class ApplicantService {
           )
           VALUES (
             ${data.identityCard}, ${data.email}, ${data.cellPhone}, ${data.homePhone}, 
-            ${maritalStatus}, ${data.isConcubine || false}, ${data.isHeadOfHousehold || false},
+            ${data.maritalStatus}, ${data.isConcubine || false}, ${data.isHeadOfHousehold || false},
             ${data.headEducationLevelId}, ${data.headStudyTime}, 
             ${applicantEducationLevelId}, 
             ${data.applicantStudyTime}, ${data.workConditionId}, ${data.activityConditionId}
@@ -234,7 +223,6 @@ class ApplicantService {
   async updateApplicant(id: number | string, data: Partial<ApplicantResponse>): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
-        const maritalStatus = normalizeMaritalStatus(data.maritalStatus);
         let applicantEducationLevelId = coerceNumber(data.applicantEducationLevel);
         if (!applicantEducationLevelId && typeof data.applicantEducationLevel === 'string') {
           const level = await tx.educationLevel.findUnique({ where: { name: data.applicantEducationLevel } });
@@ -254,7 +242,7 @@ class ApplicantService {
             "email" = COALESCE(${data.email}, "email"), 
             "cellPhone" = COALESCE(${data.cellPhone}, "cellPhone"), 
             "homePhone" = COALESCE(${data.homePhone}, "homePhone"), 
-            "maritalStatus" = COALESCE(${maritalStatus}, "maritalStatus"),
+            "maritalStatus" = COALESCE(${data.maritalStatus}, "maritalStatus"),
             "isConcubine" = COALESCE(${data.isConcubine}, "isConcubine"),
             "isHeadOfHousehold" = COALESCE(${data.isHeadOfHousehold}, "isHeadOfHousehold"),
             "headEducationLevelId" = COALESCE(${data.headEducationLevelId}, "headEducationLevelId"),
