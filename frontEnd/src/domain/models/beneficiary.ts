@@ -1,9 +1,8 @@
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
-import type { GenderTypeModel, IdNacionalityTypeModel } from "#domain/typesModel.ts";
-import { genderTypeDaoToModel } from "./user";
-type BeneficiaryType = "BENEFICIARY" | "APPLICANT";
+import { typeDaoToGenderTypeModel, type GenderTypeModel, type IdNacionalityTypeModel } from "#domain/typesModel.ts";
 
+type BeneficiaryType = "beneficiary" | "applicant";
 export interface BeneficiaryModel {
     identityCard: string;
     gender: GenderTypeModel;
@@ -23,9 +22,9 @@ export interface BeneficiaryModel {
 function beneficiaryTypeDAOtoModel(type: BeneficiaryTypeDAO): BeneficiaryType {
     switch (type) {
         case "B":
-            return "BENEFICIARY";
+            return "beneficiary";
         case "S":
-            return "APPLICANT";
+            return "applicant";
     }
 }
 
@@ -33,7 +32,7 @@ export function daoToBeneficiaryModel(dao: BeneficiaryInfoDAO): BeneficiaryModel
     const { type, gender, ...rest } = dao;
     return {
         type: beneficiaryTypeDAOtoModel(type),
-        gender: genderTypeDaoToModel(gender),
+        gender: typeDaoToGenderTypeModel(gender),
         ...rest
     }
 }
