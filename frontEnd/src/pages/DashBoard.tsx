@@ -6,10 +6,13 @@ import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
 import { useNavigate } from "react-router";
 import { useGetAllCaseActions } from "#domain/useCaseHooks/useCaseActions.ts";
+import LoadingSpinner from "#components/LoadingSpinner.tsx";
+import { useGetStatusCaseAmounts } from "#domain/useCaseHooks/useCase.ts";
 
 function DashBoard() {
     const navigate = useNavigate()
     const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
+    const { statusAmounts, loading: loadingStatusAmounts, error: errorStatusAmounts } = useGetStatusCaseAmounts();
 
     return (
         
@@ -44,7 +47,16 @@ function DashBoard() {
                         </span>
 
                         <div className="flex flex-col gap-2 flex-11">
-                            {caseActions.map((action, index) => (
+                            {loadingCaseActions && 
+                                <div className="flex justify-center">
+                                    <LoadingSpinner />
+                                </div>
+                            }
+                            {
+                                errorCaseActions && 
+                                <p className="text-error text-center">Error al cargar las acciones de casos.</p>
+                            }
+                            {!errorCaseActions && caseActions.map((action, index) => (
                                 <CaseActionCard 
                                     key={index}
                                     caseAction={action}
@@ -55,7 +67,7 @@ function DashBoard() {
                     <Box className="col-span-2 h-fit flex flex-col">
                         <h2 className="text-label-small text-onSurface mb-4">Estado de Casos</h2>
                         <div className="flex-1 flex mx-4 max-w-72">
-                            <CasesDonutChart />
+                            <CasesDonutChart statusAmounts={statusAmounts} />
                         </div>
                     </Box>
                 </section>

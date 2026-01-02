@@ -2,6 +2,7 @@ import type { CaseActionRepository } from "#domain/repositories.ts";
 import { daoToCaseActionModel, type CaseActionModel } from "#domain/models/caseAction.ts";
 import { CASE_ACTION_URL } from "./apiUrl";
 import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
+import type { StatusCaseAmountModel } from "#domain/models/statusCaseAmount.ts";
 
 export function getCaseActionRepository(): CaseActionRepository {
 	return {
@@ -10,8 +11,7 @@ export function getCaseActionRepository(): CaseActionRepository {
 				const actionsRes = await fetch(`${CASE_ACTION_URL}`);
 
 				if (!actionsRes.ok) {
-					console.error("Error al obtener datos de las APIs");
-					return null;
+					throw new Error("El servidor respondió con un error al obtener las acciones de casos.");
 				}
 
 				const actionsData = await actionsRes.json();
@@ -21,8 +21,7 @@ export function getCaseActionRepository(): CaseActionRepository {
 				return actionsList.map(action => daoToCaseActionModel(action));
 
 			} catch (error) {
-				console.error("Error de red o parsing:", error);
-				return null;
+				throw error;
 			}
 		},
 
@@ -37,7 +36,6 @@ export function getCaseActionRepository(): CaseActionRepository {
 			return daoToCaseActionModel(caseActionDAO);
 		},
 
-		// 3. CREAR UNA ACCIÓN NUEVA
 		createCaseAction: async (data) => {
 			try {
 				const response = await fetch(CASE_ACTION_URL, {
@@ -49,16 +47,27 @@ export function getCaseActionRepository(): CaseActionRepository {
 				});
 
 				if (!response.ok) {
-					return null; // O lanzar error
+					throw new Error("El servidor respondió con un error al crear la acción del caso.");
 				}
 
-				// Generalmente el backend devuelve el objeto creado
 				const responseData = await response.json();
 				return responseData.data;
 			} catch (error) {
-				console.error("Error al crear acción:", error);
-				return null;
+				throw error;
 			}
 		},
+
+		findStatusCaseAmounts: async (): Promise<StatusCaseAmountModel> => {
+			try {
+				const response = await fetch(`${CASE_ACTION_URL}/statusAmounts`);
+				if (!response.ok) {
+					throw new Error("El servidor respondió con un error al obtener las cantidades de estados de casos.");
+				}
+				const data = await response.json();
+				return data.data as StatusCaseAmountModel;
+			} catch (error) {
+				throw error;
+			}
+		}
 	} as CaseActionRepository;
 }

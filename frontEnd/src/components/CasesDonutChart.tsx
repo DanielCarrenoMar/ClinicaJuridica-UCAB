@@ -1,32 +1,38 @@
-import { useState } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import type { StatusCaseAmountModel } from '#domain/models/statusCaseAmount.ts';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export const data = {
-  labels: ['Abiertos', 'En Tramite', 'Cerrados', 'En Pausa'],
-  datasets: [
-    {
-      data: [26, 30, 40, 4],
-      backgroundColor: [
-        '#4990E2',
-        '#F39C0F',
-        '#E84C3C',
-        '#202020',
-      ],
-      borderColor: [
-        '#4990E2',
-        '#F39C0F',
-        '#E84C3C',
-        '#202020',
-      ],
-      borderWidth: 1,
-    },
-  ],
-};
+interface CasesDonutChartProps {
+  statusAmounts: StatusCaseAmountModel;
+}
 
-export default function CasesDonutChart() {
+export default function CasesDonutChart( {statusAmounts}:CasesDonutChartProps ) {
+
+  const data = {
+    labels: ['Abiertos', 'En Tramite', 'Cerrados', 'En Pausa'],
+    datasets: [
+      {
+        //data: [statusAmounts.open, statusAmounts.inProcess, statusAmounts.closed, statusAmounts.paused],
+        data: [1,1,1,1],
+        backgroundColor: [
+          '#4990E2',
+          '#F39C0F',
+          '#E84C3C',
+          '#202020',
+        ],
+        borderColor: [
+          '#4990E2',
+          '#F39C0F',
+          '#E84C3C',
+          '#202020',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
     <div className="flex flex-col w-full gap-8">
         <div className='flex-1'>
