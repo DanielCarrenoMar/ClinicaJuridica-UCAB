@@ -14,8 +14,7 @@ export default function CasesDonutChart( {statusAmounts}:CasesDonutChartProps ) 
     labels: ['Abiertos', 'En Tramite', 'Cerrados', 'En Pausa'],
     datasets: [
       {
-        //data: [statusAmounts.open, statusAmounts.inProcess, statusAmounts.closed, statusAmounts.paused],
-        data: [1,1,1,1],
+        data: [statusAmounts.openAmount, statusAmounts.inProgressAmount, statusAmounts.closedAmount, statusAmounts.pausedAmount],
         backgroundColor: [
           '#4990E2',
           '#F39C0F',
