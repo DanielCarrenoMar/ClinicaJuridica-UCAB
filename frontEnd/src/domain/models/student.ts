@@ -1,7 +1,7 @@
 import type { UserModel } from "./user.ts";
 import type { StudentTypeDAO } from "#database/typesDAO.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
-import { typeDaoToGenderTypeModel } from "#domain/mtypes.ts";
+import { typeDaoToGenderTypeModel } from "#domain/typesModel.ts";
 
 type StudentTypeModel = "regular" | "volunteer" | "graduate" | "service";
 export interface StudentModel extends Omit<UserModel, 'type'> {

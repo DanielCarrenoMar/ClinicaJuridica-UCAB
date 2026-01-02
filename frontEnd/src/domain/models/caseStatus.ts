@@ -1,6 +1,6 @@
 import type { CaseStatusInfoDAO } from "#database/daos/caseStatusInfoDAO.ts";
 import type { CaseStatusTypeDAO } from "#database/typesDAO.ts";
-import { typeDaoToCaseStatusTypeModel, type CaseStatusTypeModel } from "#domain/mtypes.ts";
+import { typeDaoToCaseStatusTypeModel, type CaseStatusTypeModel } from "#domain/typesModel.ts";
 
 export interface CaseStatusModel {
     idCase: number;

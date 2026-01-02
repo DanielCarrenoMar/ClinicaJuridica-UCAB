@@ -9,7 +9,7 @@ import Button from "#components/Button.tsx";
 import { CaretDown, ChevronRight, Close, Home, Users } from "flowbite-react-icons/outline";
 import { CheckCircle, InfoCircle, UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
-import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel, PersonID } from "#domain/mtypes.ts";
+import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel, PersonID } from "#domain/typesModel.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";

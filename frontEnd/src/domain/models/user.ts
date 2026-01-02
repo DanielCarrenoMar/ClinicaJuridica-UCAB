@@ -1,4 +1,4 @@
-import { typeDaoToGenderTypeModel, type GenderTypeModel } from "#domain/mtypes.ts";
+import { typeDaoToGenderTypeModel, type GenderTypeModel } from "#domain/typesModel.ts";
 import type { UserTypeDAO } from "#database/typesDAO.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 

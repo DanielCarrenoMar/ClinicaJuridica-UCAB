@@ -1,6 +1,6 @@
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
-import type { GenderTypeModel, IdNacionalityTypeModel } from "#domain/mtypes.ts";
+import type { GenderTypeModel, IdNacionalityTypeModel } from "#domain/typesModel.ts";
 import { genderTypeDaoToModel } from "./user";
 type BeneficiaryType = "BENEFICIARY" | "APPLICANT";
 
