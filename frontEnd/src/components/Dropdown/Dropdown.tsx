@@ -26,7 +26,7 @@ interface DropdownProps {
   showTitle?: boolean;
 }
 
-export default function Dropdown({ label = "Dropdown", children, selectedValue, onSelectionChange, showTitle = false }: DropdownProps) {
+export default function Dropdown({ label = "Seleccionar", children, selectedValue, onSelectionChange, showTitle = false }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValue, setInternalSelectedValue] = useState<string | number | null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string>(label);
