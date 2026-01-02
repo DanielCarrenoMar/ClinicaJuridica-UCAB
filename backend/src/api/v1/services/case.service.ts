@@ -13,7 +13,8 @@ class CaseService {
           co."subject" as "courtName",
           cs."status" as "caseStatus",
           ca."registryDate" as "lastActionDate",
-          ca."description" as "lastActionDescription"
+          ca."description" as "lastActionDescription",
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
 
           FROM "Case" c
           JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
@@ -54,7 +55,8 @@ class CaseService {
             u."fullName" as "teacherName",
             cs."status" as "caseStatus",
             ca."registryDate" as "lastActionDate",
-            ca."description" as "lastActionDescription"
+            ca."description" as "lastActionDescription",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -235,9 +237,11 @@ class CaseService {
       const actions = await prisma.$queryRaw`
         SELECT 
           a.*, 
-          u."fullName" as "userName"
+          u."fullName" as "userName",
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
         FROM "CaseAction" a
         JOIN "User" u ON a."userId" = u."identityCard"
+        JOIN "Case" c ON a."idCase" = c."idCase"
         WHERE a."idCase" = ${idCase}
         ORDER BY a."registryDate" DESC
       `;
