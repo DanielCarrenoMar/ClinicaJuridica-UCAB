@@ -1,16 +1,16 @@
-import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO } from "#database/typesDAO.ts";
+import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO, AppointmentStatusTypeDAO } from "#database/typesDAO.ts";
 
 export type IdNacionalityTypeModel = "V" | "E" | "J";
 export type IDTypeModel = 'V' | 'E' | 'J';
 export type GenderTypeModel = 'male' | 'female';
 export type MaritalStatusTypeModel = 'single' | 'married' | 'divorced' | 'widowed';
-export type ProcessTypeModel = 
+export type ProcessTypeModel =
     "in progress" |  // Tramite
     "advice" |  // Asesoria
     "mediation" |  // Conciliacion y mediacion
     "drafting";  // Redaccion
 export type CaseStatusTypeModel = "OPEN" | "IN_PROGRESS" | "PAUSED" | "CLOSED";
-
+export type AppointmentStatusTypeModel = "COMPLETED" | "SCHEDULED" | "CANCELLED";
 export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel {
     switch (gender) {
         case 'M':
@@ -99,6 +99,27 @@ export function typeModelToCaseStatusTypeDao(caseStatusModel: CaseStatusTypeMode
         case "PAUSED":
             return "P";
         case "CLOSED":
+            return "C";
+    }
+}
+
+export function typeDaoToAppointmentStatusTypeModel(appointmentStatusDAO: AppointmentStatusTypeDAO): AppointmentStatusTypeModel {
+    switch (appointmentStatusDAO) {
+        case "R":
+            return "COMPLETED";
+        case "P":
+            return "SCHEDULED";
+        case "C":
+            return "CANCELLED";
+    }
+}
+export function typeModelToAppointmentStatusTypeDao(appointmentStatusModel: AppointmentStatusTypeModel): AppointmentStatusTypeDAO {
+    switch (appointmentStatusModel) {
+        case "COMPLETED":
+            return "R";
+        case "SCHEDULED":
+            return "P";
+        case "CANCELLED":
             return "C";
     }
 }

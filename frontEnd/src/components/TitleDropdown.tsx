@@ -10,10 +10,10 @@ interface TitleDropdownProps {
   dropdownLabel?: string;
 }
 
-export default function TitleDropdown({ 
-  label, 
-  children, 
-  selectedValue, 
+export default function TitleDropdown({
+  label,
+  children,
+  selectedValue,
   onSelectionChange,
   className = '',
   dropdownLabel = "Seleccionar"
@@ -26,13 +26,13 @@ export default function TitleDropdown({
         </h4>
       </div>
       <div className="w-full">
-        <Dropdown 
-            label={dropdownLabel} 
-            selectedValue={selectedValue} 
-            onSelectionChange={onSelectionChange}
-            showTitle={!selectedValue}
+        <Dropdown
+          label={dropdownLabel}
+          selectedValue={selectedValue}
+          onSelectionChange={onSelectionChange}
+          showTitle={!selectedValue}
         >
-            {children}
+          {children}
         </Dropdown>
       </div>
     </div>
