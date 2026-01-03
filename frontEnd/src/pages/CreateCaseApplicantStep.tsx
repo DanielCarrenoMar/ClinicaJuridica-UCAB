@@ -407,7 +407,7 @@ function CreateCaseApplicantStep() {
 
     return (
         <>
-            <header className="bg-surface/70 flex items-center justify-between px-4 h-16">
+            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16">
                 <div className="flex items-center gap-2.5">
                     <UserEditS className="size-8!" />
                     <h1 className="text-label-medium">Solicitante</h1>
