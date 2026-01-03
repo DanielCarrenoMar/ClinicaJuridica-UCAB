@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface User {
     id: number;
@@ -9,22 +9,35 @@ interface User {
 interface AuthContextType {
     user: User | null;
     permissionLevel: number;
-    login: (user: User) => void;
+    login: (mail: string, password: string) => void;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    // Mock initial user for demonstration
-    const [user, setUser] = useState<User | null>({
-        id: 1,
-        name: "Minervis",
-        permissionLevel: 1 
+    const [user, setUser] = useState<User | null>(() => {
+        const storedUser = localStorage.getItem('user');
+        return storedUser ? JSON.parse(storedUser) : null;
     });
 
-    const login = (userData: User) => {
-        setUser(userData);
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem('user');
+        }
+    }, [user]);
+
+    const login = (mail: string, password: string) => {
+        // Mock login logic
+        console.log(`Logging in with ${mail} and ${password}`);
+        const newUser = {
+            id: 1,
+            name: "Usuario Demo",
+            permissionLevel: 1
+        };
+        setUser(newUser);
     };
 
     const logout = () => {

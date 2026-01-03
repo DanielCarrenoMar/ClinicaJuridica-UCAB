@@ -6,6 +6,7 @@ interface TextInputProps {
   className?: string;
   placeholder?: string;
   multiline?: boolean;
+  type?: string;
 }
 
 export default function TextInput({ 
@@ -13,7 +14,8 @@ export default function TextInput({
   onChangeText, 
   className = '',
   placeholder = "Lorem ipsum dolor sit amet...",
-  multiline = false
+  multiline = false,
+  type = "text"
 }: TextInputProps) {
   
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,7 +37,7 @@ export default function TextInput({
           />
         ) : (
           <input
-            type="text"
+            type={type}
             defaultValue={defaultText}
             onChange={handleChange}
             placeholder={placeholder}

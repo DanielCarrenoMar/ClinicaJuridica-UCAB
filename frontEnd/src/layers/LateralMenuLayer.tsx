@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
+import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
@@ -19,7 +19,7 @@ export function useLateralMenuContext() {
 }
 
 function LateralMenuLayer() {
-    const { user, permissionLevel } = useAuth();
+    const { user, permissionLevel, logout } = useAuth();
     const [defaultSearchText, setDefaultSearchText] = useState("")
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navigate = useNavigate();
@@ -71,6 +71,9 @@ function LateralMenuLayer() {
                                 {permissionLevel === 1 ? 'Super Admin' : permissionLevel === 2 ? 'Admin' : 'Usuario'}
                             </p>
                         </div>
+                        <Button icon={<ArrowLeftToBracket />} onClick={logout} >
+                           Cerrar sesión
+                        </Button>
                     </span>
                 </header>
                 <div className="flex-1 overflow-y-auto">
