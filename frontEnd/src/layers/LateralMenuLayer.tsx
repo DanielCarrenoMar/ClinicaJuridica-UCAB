@@ -66,9 +66,9 @@ function LateralMenuLayer() {
                             <User className="w-6 h-6" />
                         </div>
                         <div className=" hidden sm:block">
-                            <h4 className="text-body-large text-onSurface">{user?.name || 'Usuario'}</h4>
+                            <h4 className="text-body-large text-onSurface">{user?.fullName || 'Usuario'}</h4>
                             <p className="text-body-small text-onSurface/70">
-                                {permissionLevel === 1 ? 'Super Admin' : permissionLevel === 2 ? 'Admin' : 'Usuario'}
+                                {user?.type || 'Tipo de Usuario'}
                             </p>
                         </div>
                         <Button icon={<ArrowLeftToBracket />} onClick={logout} >

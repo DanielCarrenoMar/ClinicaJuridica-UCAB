@@ -1,13 +1,8 @@
+import type { UserModel, UserTypeModel } from '#domain/models/user.ts';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-interface User {
-    id: number;
-    name: string;
-    permissionLevel: number; // 1: Super Admin, 2: Admin, 3: User
-}
-
 interface AuthContextType {
-    user: User | null;
+    user: UserModel | null;
     permissionLevel: number;
     login: (mail: string, password: string) => void;
     logout: () => void;
@@ -15,8 +10,19 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function roleToPermissionLevel(role: UserTypeModel): number {
+    switch (role) {
+        case "coordinator":
+            return 1;
+        case "teacher":
+            return 2;
+        case "student":
+            return 3;
+    }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(() => {
+    const [user, setUser] = useState<UserModel | null>(() => {
         const storedUser = localStorage.getItem('user');
         return storedUser ? JSON.parse(storedUser) : null;
     });
@@ -32,10 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = (mail: string, password: string) => {
         // Mock login logic
         console.log(`Logging in with ${mail} and ${password}`);
-        const newUser = {
-            id: 1,
-            name: "Usuario Demo",
-            permissionLevel: 1
+        const newUser : UserModel = {
+            identityCard: "16000001",
+            fullName: "Juan Perez",
+            email: mail,
+            password: password,
+            isActive: true,
+            type: "coordinator"
         };
         setUser(newUser);
     };
@@ -45,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     // Default to a high number (low permission) if no user
-    const permissionLevel = user ? user.permissionLevel : 99;
+    const permissionLevel = user ? roleToPermissionLevel(user.type) : 99;
 
     return (
         <AuthContext.Provider value={{ user, permissionLevel, login, logout }}>

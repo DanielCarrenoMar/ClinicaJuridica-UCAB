@@ -2,7 +2,7 @@ import { typeDaoToGenderTypeModel, type GenderTypeModel } from "#domain/typesMod
 import type { UserTypeDAO } from "#database/typesDAO.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 
-type UserTypeModel = "coordinator" | "teacher" | "student";
+export type UserTypeModel = "coordinator" | "teacher" | "student";
 export interface UserModel {
     identityCard: string;
     fullName: string;

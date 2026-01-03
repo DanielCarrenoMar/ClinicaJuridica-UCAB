@@ -12,6 +12,7 @@ import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import { useCreateCase } from "#domain/useCaseHooks/useCase.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import { useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
+import { useAuth } from "../context/AuthContext.tsx";
 
 const legalAmbits = [
     {
@@ -190,6 +191,7 @@ function CreateCaseCaseStep() {
     const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting } = useCaseOutletContext();
     const { createCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
     const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
+    const { user } = useAuth()
 
     const [subjectIndex, setSubjectIndex] = useState<number | null>(null);
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
@@ -210,7 +212,7 @@ function CreateCaseCaseStep() {
         const caseToCreate: CaseDAO = {
             ...caseDAO,
             applicantId: createdApplicant.identityCard,
-            userId: "16000001", // TODO: Replace with actual user ID from auth context
+            userId: user?.identityCard || "",
         };
         console.log("Creating case with data:", caseToCreate);
         createCase(caseToCreate)
