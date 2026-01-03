@@ -25,10 +25,10 @@ const STATUS_TRANSLATIONS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-    "OPEN": "!bg-success !text-white !border-black", // Success color from index.css
-    "IN_PROGRESS": "!bg-warning !text-white !border-black", // Blue-500 equivalent
-    "PAUSED": "!bg-warning !text-white !border-black", // Warning color from index.css
-    "CLOSED": "!bg-error !text-white !border-black" // Error color from index.css
+    "OPEN": "!bg-success !text-white", // Success color from index.css
+    "IN_PROGRESS": "!bg-warning !text-white", // Blue-500 equivalent
+    "PAUSED": "!bg-onSurface !text-white", // Warning color from index.css
+    "CLOSED": "!bg-error !text-white" // Error color from index.css
 };
 
 const PROCESS_TYPE_TRANSLATIONS: Record<string, string> = {
@@ -113,13 +113,11 @@ export default function CaseInfo() {
     const [activeTab, setActiveTab] = useState("general");
 
     // Citas Tab State
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
     const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
 
     // Recaudos Tab State
-    const [isSupportSearchOpen, setIsSupportSearchOpen] = useState(false);
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
     const [selectedSupportDocument, setSelectedSupportDocument] = useState<SupportDocumentModel | null>(null);
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
@@ -267,15 +265,14 @@ export default function CaseInfo() {
                     {activeTab === 'citas' && (
                         <div className="flex flex-col h-full gap-6">
                             <div className="flex justify-between items-center gap-4">
-                                <div className="w-full max-w-md h-12 relative">
+                                <div className='flex-1'>
                                     <SearchBar
-                                        isOpen={isSearchOpen}
-                                        onToggle={setIsSearchOpen}
+                                        isOpen={true}
                                         placeholder="Buscar citas..."
                                         onChange={setSearchQuery}
                                     />
                                 </div>
-                                <Button onClick={() => { }}>
+                                <Button variant='outlined' onClick={() => { }}>
                                     Añadir Cita
                                 </Button>
                             </div>
@@ -312,15 +309,14 @@ export default function CaseInfo() {
                     {activeTab === 'recaudos' && (
                         <div className="flex flex-col h-full gap-6">
                             <div className="flex justify-between items-center gap-4">
-                                <div className="w-full max-w-md h-12 relative">
+                                <div className="flex-1">
                                     <SearchBar
-                                        isOpen={isSupportSearchOpen}
-                                        onToggle={setIsSupportSearchOpen}
+                                        isOpen={true}
                                         placeholder="Buscar recaudos..."
                                         onChange={setSupportSearchQuery}
                                     />
                                 </div>
-                                <Button onClick={() => { }}>
+                                <Button variant='outlined' onClick={() => { }}>
                                     Añadir Recaudo
                                 </Button>
                             </div>
