@@ -12,8 +12,8 @@ export interface CaseModel {
     idNucleus: string;
     term: string;
     idLegalArea: number;
-    teacherId: string;
-    teacherTerm: string;
+    teacherId?: string;
+    teacherTerm?: string;
     idCourt?: number;
     applicantName: string;
     legalAreaName: string;
