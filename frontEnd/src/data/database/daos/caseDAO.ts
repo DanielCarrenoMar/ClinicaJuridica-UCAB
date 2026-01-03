@@ -9,7 +9,7 @@ export interface CaseDAO {
   teacherId?: string;
   teacherTerm?: string;
   idCourt?: number;
-  userId: number;
+  userId: string;
 }
 
 export const defaultCaseDAO: CaseDAO = {
@@ -21,5 +21,5 @@ export const defaultCaseDAO: CaseDAO = {
   teacherId: undefined,
   teacherTerm: undefined,
   idCourt: undefined,
-  userId: 0,
+  userId: "",
 };

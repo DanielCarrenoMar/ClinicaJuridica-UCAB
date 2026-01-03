@@ -210,7 +210,7 @@ function CreateCaseCaseStep() {
         const caseToCreate: CaseDAO = {
             ...caseDAO,
             applicantId: createdApplicant.identityCard,
-            userId: 16000001, // TODO: Replace with actual user ID from auth context
+            userId: "16000001", // TODO: Replace with actual user ID from auth context
         };
         console.log("Creating case with data:", caseToCreate);
         createCase(caseToCreate)
