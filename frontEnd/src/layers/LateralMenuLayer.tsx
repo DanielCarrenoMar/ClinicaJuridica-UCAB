@@ -6,6 +6,7 @@ import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
 import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
 
@@ -18,13 +19,13 @@ export function useLateralMenuContext() {
 }
 
 function LateralMenuLayer() {
+    const { user, permissionLevel } = useAuth();
     const [defaultSearchText, setDefaultSearchText] = useState("")
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation()
     const locationId = location.pathname === '/' ? location.pathname : location.pathname.split('/')[1] as LateralmenuPages
     const [isSearchOpen, setIsSearchOpen] = useState(defaultSearchText !== '');
-    let permission = 1
 
     return (
         <div className="flex gap-6 h-full">
@@ -36,12 +37,12 @@ function LateralMenuLayer() {
                 <LateralMenuItem id='reportes' label='Generar Reportes' icon={<InfoCircle />} link='/reportes' />
                 <LateralMenuTitle label='Administración' />
                 {
-                    permission <= 2 && <>
+                    permissionLevel <= 2 && <>
                         <LateralMenuItem id='usuarios' label='Usuarios' icon={<UsersGroup />} link='/usuarios' />
                     </>
                 }
                 {
-                    permission <= 1 && <>
+                    permissionLevel <= 1 && <>
                         <LateralMenuItem id='semestres' label='Semestres' icon={<Clock />} link='/semestres' />
                         <LateralMenuItem id='nucleos' label='Nucleos' icon={<MapPinAlt />} link='/nucleos' />
                         <LateralMenuItem id='configuracion' label='Configuración' icon={<Cog />} link='/configuracion' />
@@ -65,8 +66,10 @@ function LateralMenuLayer() {
                             <User className="w-6 h-6" />
                         </div>
                         <div className=" hidden sm:block">
-                            <h4 className="text-body-large text-onSurface">Minervis</h4>
-                            <p className="text-body-small text-onSurface/70">Coordinadora</p>
+                            <h4 className="text-body-large text-onSurface">{user?.name || 'Usuario'}</h4>
+                            <p className="text-body-small text-onSurface/70">
+                                {permissionLevel === 1 ? 'Super Admin' : permissionLevel === 2 ? 'Admin' : 'Usuario'}
+                            </p>
                         </div>
                     </span>
                 </header>
