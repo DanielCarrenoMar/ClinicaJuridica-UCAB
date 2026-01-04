@@ -18,6 +18,7 @@ import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Pen } from 'flowbite-react-icons/outline';
+import type { CaseModel } from '#domain/models/case.ts';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
@@ -91,9 +92,11 @@ type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Histori
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
     const { caseData, loading, error } = useGetCaseById(id || "");
+    const [localCaseData, setLocalCaseData] = useState<CaseModel>();
+    const [isDataModified, setIsDataModified] = useState(false);
+
     const { editCase, loading: updating } = useUpdateCase();
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState<any>({});
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
 
     // Citas Tab State
@@ -107,29 +110,24 @@ export default function CaseInfo() {
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
 
     useEffect(() => {
-        if (caseData) {
-            setFormData(caseData);
-        }
+        if (!caseData) return
+        setLocalCaseData(caseData);
+        
     }, [caseData]);
+    useEffect(() => {
+        if (!localCaseData) return
+        const hasChanges = JSON.stringify(localCaseData) !== JSON.stringify(caseData);
+        setIsDataModified(hasChanges);
+    }, [localCaseData]);
 
-    const handleSave = async () => {
-        if (!id) return;
-        try {
-            await editCase(id, formData);
-            setIsEditing(false);
-            loadCase(id);
-        } catch (e) {
-            console.error("Failed to update case", e);
-        }
-    };
+
 
     const handleStatusChange = (newStatus: string) => {
-        // Updated to only change local state as requested
-        setFormData((prev: any) => ({ ...prev, caseStatus: newStatus }));
+        setLocalCaseData((prev: any) => ({ ...prev, caseStatus: newStatus }));
     };
 
     const handleChange = (field: string, value: string) => {
-        setFormData((prev: any) => ({ ...prev, [field]: value }));
+        setLocalCaseData((prev: any) => ({ ...prev, [field]: value }));
     };
 
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
@@ -154,7 +152,7 @@ export default function CaseInfo() {
                         <h4 className="text-label-small mb-1">Tribunal</h4>
                     </header>
                     <TextInput
-                            defaultText={formData.courtName}
+                            defaultText={localCaseData?.courtName}
                             onChangeText={(val) => handleChange('courtName', val)}
                     />
                 </div>
@@ -165,7 +163,7 @@ export default function CaseInfo() {
                 </header>
                 <TextInput
                     multiline
-                    defaultText={formData.problemSummary}
+                    defaultText={localCaseData?.problemSummary}
                     onChangeText={(val) => handleChange('problemSummary', val)}
                 />
             </section>
@@ -334,23 +332,26 @@ export default function CaseInfo() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
-                    <div>
-                        <Dropdown
-                            label={formData.caseStatus || caseData.caseStatus} // Use formData for immediate update
-                            triggerClassName={getStatusColor(formData.caseStatus || caseData.caseStatus)}
-                            selectedValue={formData.caseStatus || caseData.caseStatus}
-                            onSelectionChange={(val) => handleStatusChange(val as string)}
-                        >
-                            <DropdownOption value="Abierto">Abierto</DropdownOption>
-                            <DropdownOption value="En Espera">En Espera</DropdownOption>
-                            <DropdownOption value="Pausado">Pausado</DropdownOption>
-                            <DropdownOption value="Cerrado">Cerrado</DropdownOption>
-                        </Dropdown>
-                    </div>
-
-                    <Button variant="outlined" onClick={() => { }} className='px-4' icon={<FilePdf/>}>
-                        Exportar
-                    </Button>
+                    <Dropdown
+                        label={localCaseData?.caseStatus} // Use formData for immediate update
+                        triggerClassName={getStatusColor(localCaseData?.caseStatus ?? "Abierto")}
+                        selectedValue={localCaseData?.caseStatus}
+                        onSelectionChange={(val) => handleStatusChange(val as string)}
+                    >
+                        <DropdownOption value="Abierto">Abierto</DropdownOption>
+                        <DropdownOption value="En Espera">En Espera</DropdownOption>
+                        <DropdownOption value="Pausado">Pausado</DropdownOption>
+                        <DropdownOption value="Cerrado">Cerrado</DropdownOption>
+                    </Dropdown>
+                    {
+                        isDataModified ? (
+                            <Button variant='resalted' className='w-32'>Guardar</Button>
+                        ) : (
+                            <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf/>}>
+                                Exportar
+                            </Button>
+                        )
+                    }
                 </span>
             </header>
 
