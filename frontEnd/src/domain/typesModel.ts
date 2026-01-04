@@ -2,8 +2,8 @@ import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTyp
 
 export type IdNacionalityTypeModel = "V" | "E" | "J";
 export type IDTypeModel = 'V' | 'E' | 'J';
-export type GenderTypeModel = 'male' | 'female';
-export type MaritalStatusTypeModel = 'single' | 'married' | 'divorced' | 'widowed';
+export type GenderTypeModel = 'Masculino' | 'Femenino';
+export type MaritalStatusTypeModel = 'Soltero' | 'Casado' | 'Divorciado' | 'Viudo';
 export type ProcessTypeModel =
     "Tramite" |
     "Asesoria" |
@@ -14,16 +14,16 @@ export type AppointmentStatusTypeModel = "Completada" | "Programada" | "Cancelad
 export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel {
     switch (gender) {
         case 'M':
-            return 'male';
+            return 'Masculino';
         case 'F':
-            return 'female';
+            return 'Femenino';
     }
 }
 export function typeModelToGenderTypeDao(gender: GenderTypeModel): GenderTypeDAO {
     switch (gender) {
-        case 'male':
+        case 'Masculino':
             return 'M';
-        case 'female':
+        case 'Femenino':
             return 'F';
     }
 }
@@ -31,24 +31,24 @@ export function typeModelToGenderTypeDao(gender: GenderTypeModel): GenderTypeDAO
 export function typeDaoToMaritalStatusTypeModel(dao: MaritalStatusTypeDAO): MaritalStatusTypeModel {
     switch (dao) {
         case "S":
-            return "single";
+            return "Soltero";
         case "C":
-            return "married";
+            return "Casado";
         case "D":
-            return "divorced";
+            return "Divorciado";
         case "V":
-            return "widowed";
+            return "Viudo";
     }
 }
 export function typeModelToMaritalStatusTypeDao(model: MaritalStatusTypeModel): MaritalStatusTypeDAO {
     switch (model) {
-        case "single":
+        case "Soltero":
             return "S";
-        case "married":
+        case "Casado":
             return "C";
-        case "divorced":
+        case "Divorciado":
             return "D";
-        case "widowed":
+        case "Viudo":
             return "V";
     }
 }
