@@ -171,7 +171,7 @@ export default function CaseInfo() {
                         <h4 className="text-label-small mb-1">Tribunal</h4>
                     </header>
                     <TextInput
-                        defaultText={localCaseData?.courtName}
+                        value={localCaseData?.courtName || ''}
                         onChangeText={(val) => handleChange({ courtName: val })}
                         placeholder=''
                     />
@@ -183,7 +183,7 @@ export default function CaseInfo() {
                 </header>
                 <TextInput
                     multiline
-                    defaultText={localCaseData?.problemSummary}
+                    value={localCaseData?.problemSummary || ''}
                     onChangeText={(val) => handleChange({ problemSummary: val })}
                 />
             </section>

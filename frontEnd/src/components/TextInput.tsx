@@ -2,6 +2,7 @@ import type { ChangeEvent } from 'react';
 
 interface TextInputProps {
   defaultText?: string;
+  value?: string;
   onChangeText?: (text: string) => void;
   className?: string;
   placeholder?: string;
@@ -10,7 +11,8 @@ interface TextInputProps {
 }
 
 export default function TextInput({ 
-  defaultText = '', 
+  defaultText, 
+  value,
   onChangeText, 
   className = '',
   placeholder = "Lorem ipsum dolor sit amet...",
@@ -24,12 +26,15 @@ export default function TextInput({
     }
   };
 
+  const isControlled = value !== undefined;
+
   return (
     <div className={`w-full ${className}`}>
       {
         multiline ? (
           <textarea
-            defaultValue={defaultText}
+            value={isControlled ? value : undefined}
+            defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
             className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 resize-y"
@@ -38,7 +43,8 @@ export default function TextInput({
         ) : (
           <input
             type={type}
-            defaultValue={defaultText}
+            value={isControlled ? value : undefined}
+            defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
             className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40"
