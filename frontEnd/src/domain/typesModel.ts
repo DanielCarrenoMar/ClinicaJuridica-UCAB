@@ -5,10 +5,10 @@ export type IDTypeModel = 'V' | 'E' | 'J';
 export type GenderTypeModel = 'male' | 'female';
 export type MaritalStatusTypeModel = 'single' | 'married' | 'divorced' | 'widowed';
 export type ProcessTypeModel =
-    "in progress" |  // Tramite
-    "advice" |  // Asesoria
-    "mediation" |  // Conciliacion y mediacion
-    "drafting";  // Redaccion
+    "Tramite" |
+    "Asesoria" |
+    "Conciliacion y mediacion" |
+    "Redaccion";
 export type CaseStatusTypeModel = "OPEN" | "IN_PROGRESS" | "PAUSED" | "CLOSED";
 export type AppointmentStatusTypeModel = "COMPLETED" | "SCHEDULED" | "CANCELLED";
 export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel {
@@ -56,24 +56,24 @@ export function typeModelToMaritalStatusTypeDao(model: MaritalStatusTypeModel): 
 export function typeDaoToProcessTypeModel(processTypeDAO: ProcessTypeDAO): ProcessTypeModel {
     switch (processTypeDAO) {
         case "A":
-            return "advice";
+            return "Asesoria";
         case "CM":
-            return "mediation";
+            return "Conciliacion y mediacion";
         case "R":
-            return "drafting";
+            return "Redaccion";
         case "T":
-            return "in progress";
+            return "Tramite";
     }
 }
 export function typeModelToProcessTypeDao(processTypeModel: ProcessTypeModel): ProcessTypeDAO {
     switch (processTypeModel) {
-        case "advice":
+        case "Asesoria":
             return "A";
-        case "mediation":
+        case "Conciliacion y mediacion":
             return "CM";
-        case "drafting":
+        case "Redaccion":
             return "R";
-        case "in progress":
+        case "Tramite":
             return "T";
     }
 }
