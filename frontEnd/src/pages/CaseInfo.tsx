@@ -17,8 +17,10 @@ import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDial
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
-import { Close, Pen } from 'flowbite-react-icons/outline';
+import { CircleMinus, Close, Pen, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import type { CaseModel } from '#domain/models/case.ts';
+import InBox from '#components/InBox.tsx';
+import { useAuth } from '../context/AuthContext';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
@@ -100,6 +102,7 @@ export default function CaseInfo() {
     const { editCase, loading: updating } = useUpdateCase();
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Involucrados");
     const { students } = useGetStudentsByCaseId(Number(id));
+    const {permissionLevel} = useAuth()
 
     // Citas Tab State
     const [searchQuery, setSearchQuery] = useState("");
@@ -291,7 +294,14 @@ export default function CaseInfo() {
                     <h4 className="text-label-small mb-4">Responsables</h4>
                     <div className="flex flex-col gap-4">
                         <section>
-                            <h5 className="text-body-large mb-2">Profesor</h5>
+                            <header className="flex justify-between items-center mb-2">
+                                <h5 className="text-body-large">Profesor</h5>
+                                {permissionLevel < 3 && (
+                                    <Button icon={<UserEdit />} variant="outlined" className='h-10' onClick={() => { }}>
+                                        Cambiar
+                                    </Button>
+                                )}
+                            </header>
                             {caseData.teacherName ? (
                                 <span className="flex items-center gap-3">
                                     <UserCircle />
@@ -302,16 +312,42 @@ export default function CaseInfo() {
                             )}
                         </section>
                         <section>
-                            <h5 className="text-body-large mb-2">Estudiantes</h5>
-                            {students.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
-                            <ul>
-                                {students.map((student) => (
-                                    <li key={student.identityCard} className="flex items-center gap-3 mb-2">
-                                        <UserCircle />
-                                        <p className="text-body-medium">{student.fullName}</p>
-                                    </li>
-                                ))}
-                            </ul>
+                            <header className="flex justify-between items-center mb-2">
+                                <h5 className="text-body-large">Estudiantes</h5>
+                                {permissionLevel < 3 && (
+                                    <Button icon={<UserAdd />} variant="outlined" className='h-10' onClick={() => { }}>
+                                        Asignar
+                                    </Button>
+                                )}
+                            </header>
+                            {
+                                permissionLevel < 3 ? (
+                                    <InBox>
+                                        <ul>
+                                            {students.map((student) => (
+                                                <li key={student.identityCard} className="flex items-center gap-3 mb-2">
+                                                    <UserCircle />
+                                                    <p className="text-body-medium">{student.fullName}</p>
+                                                    <CircleMinus />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </InBox>
+                                ) : (
+                                    <>
+                                        {students.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
+                                        <ul>
+                                            {students.map((student) => (
+                                                <li key={student.identityCard} className="flex items-center gap-3 mb-2">
+                                                    <UserCircle />
+                                                    <p className="text-body-medium">{student.fullName}</p>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                )
+                            }
+                            
                         </section>
                     </div>
                 </article>
@@ -320,9 +356,9 @@ export default function CaseInfo() {
             <section className="flex-1 flex flex-col">
                 <header className="flex justify-between items-center mb-4">
                     <h4 className="text-label-small ">Beneficiarios</h4>
-                    <Button variant="outlined" onClick={() => { }}>Añadir</Button>
+                    <Button variant="outlined" className='h-10' onClick={() => { }}>Añadir</Button>
                 </header>
-                <div className="px-4 py-2 border border-onSurface/20 bg-surface rounded-xl flex flex-col gap-4">
+                <InBox>
                     <div className="flex justify-between items-start">
                         <span className="text-body-medium ">Jose Luis Enrique Calderon</span>
                         <span className="text-body-small Variant">V-1231231231</span>
@@ -331,7 +367,7 @@ export default function CaseInfo() {
                         <span className="text-body-medium ">Pedro Gallego Enrique Calderon</span>
                         <span className="text-body-small Variant">V-1231231231</span>
                     </div>
-                </div>
+                </InBox>
             </section>
         </div>
     );
