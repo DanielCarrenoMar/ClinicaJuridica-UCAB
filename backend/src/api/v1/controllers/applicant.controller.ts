@@ -19,7 +19,6 @@ export async function getAllApplicant(req: Request, res: Response): Promise<void
 
 export async function getApplicantById(req: Request, res: Response): Promise<void> {
   try {
-    // IMPORTANTE: No usamos parseInt porque identityCard es VARCHAR en tu DB
     const { id } = req.params; 
 
     const result = await applicantService.getApplicantById(id);
@@ -45,7 +44,6 @@ export async function createApplicant(req: Request, res: Response): Promise<void
   try {
     const data = req.body;
 
-    // Validación básica coincidiendo con tu ApplicantResponse
     if (!data.identityCard || !data.fullName) {
        res.status(400).json({ success: false, message: 'Faltan campos requeridos: identityCard y fullName son obligatorios.' });
        return;
@@ -54,7 +52,7 @@ export async function createApplicant(req: Request, res: Response): Promise<void
     const result = await applicantService.createApplicant(data);
 
     if (!result.success) {
-      res.status(400).json(result); // 400 Bad Request si falló la lógica de negocio (ej. duplicado)
+      res.status(400).json(result); 
       return;
     }
 
@@ -71,7 +69,6 @@ export async function updateApplicant(req: Request, res: Response): Promise<void
     const result = await applicantService.updateApplicant(id, req.body);
 
     if (!result.success) {
-      // Puede ser 404 (no encontrado) o 400 (error de datos), asumimos 400 o el mensaje del servicio
       res.status(400).json(result); 
       return;
     }
@@ -89,7 +86,7 @@ export async function deleteApplicant(req: Request, res: Response): Promise<void
     const result = await applicantService.deleteApplicant(id);
 
     if (!result.success) {
-      res.status(404).json(result); // Asumimos 404 si no se pudo borrar porque no existía
+      res.status(404).json(result);
       return;
     }
 
@@ -102,7 +99,4 @@ export async function deleteApplicant(req: Request, res: Response): Promise<void
 
 export const deleteApplicantById = deleteApplicant;
 
-// Nota: getFullProfile era idéntico a getApplicantById. 
-// Si no tiene lógica diferente, usa getApplicantById en la ruta.
-// Si necesitas mantenerlo separado por semántica, aquí está reutilizando la lógica:
 export const getFullProfile = getApplicantById;

@@ -228,7 +228,7 @@ export async function getDocuments(req: Request, res: Response): Promise<void> {
   res.status(501).json({ success: false, message: "Funcionalidad 'Ver Documentos' no implementada aún" });
 }
 
-export async function addDocument(req: Request, res: Response): Promise<void> {
+export async function createDocumentByCaseId(req: Request, res: Response): Promise<void> {
   res.status(501).json({ success: false, message: "Funcionalidad 'Subir Documento' no implementada aún" });
 }
 
@@ -236,9 +236,10 @@ export async function deleteDocument(req: Request, res: Response): Promise<void>
   res.status(501).json({ success: false, message: "Funcionalidad 'Eliminar Documento' no implementada aún" });
 }
 
-// ==================== LOS 3 ENDPOINTS QUE NECESITAS ====================
+export async function getDocumentByCaseId(req: Request, res: Response): Promise<void> {
+  res.status(501).json({ success: false, message: "Funcionalidad 'Eliminar Documento' no implementada aún" });
+}
 
-// createStatusForCaseId <= CaseStatusDAO
 export async function createStatusForCaseId(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
@@ -251,22 +252,14 @@ export async function createStatusForCaseId(req: Request, res: Response): Promis
 
     const data = req.body;
 
-    // Validación de campos obligatorios
     if (!data.status || !data.userId) {
-      res.status(400).json({ 
-        success: false, 
-        message: 'Los campos "status" y "userId" son obligatorios' 
-      });
+      res.status(400).json({ success: false, message: 'Los campos "status" y "userId" son obligatorios' });
       return;
     }
 
-    // Validar que el status sea válido
-    const validStatuses = ['A', 'T', 'P', 'C']; // Abierto, En Trámite, En Pausa, Cerrado
+    const validStatuses = ['A', 'T', 'P', 'C'];
     if (!validStatuses.includes(data.status)) {
-      res.status(400).json({ 
-        success: false, 
-        message: 'Status inválido. Valores permitidos: A, T, P, C' 
-      });
+      res.status(400).json({ success: false, message: 'Status inválido. Valores permitidos: A, T, P, C' });
       return;
     }
 
@@ -284,7 +277,6 @@ export async function createStatusForCaseId(req: Request, res: Response): Promis
   }
 }
 
-// getStudentsFromCaseId -> StudentDAO
 export async function getStudentsFromCaseId(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
@@ -303,6 +295,131 @@ export async function getStudentsFromCaseId(req: Request, res: Response): Promis
     }
 
     res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getAppoitmentByCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const result = await caseService.getAppoitmentByCaseId(caseId);
+    
+    if (!result.success) {
+      res.status(404).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function createAppoitmentForCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const data = req.body;
+
+    if (!data.plannedDate || !data.userId) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Los campos "plannedDate" y "userId" son obligatorios' 
+      });
+      return;
+    }
+
+    if (data.status && !['C', 'P', 'R'].includes(data.status)) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Status inválido. Valores permitidos: C (Cancelled), P (Scheduled), R (Completed)' 
+      });
+      return;
+    }
+
+    const result = await caseService.createAppoitmentForCaseId(caseId, data);
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getSupportDocumentsById(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const result = await caseService.getSupportDocumentsById(caseId);
+    
+    if (!result.success) {
+      res.status(404).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function createSupportDocumentForCaseId(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const data = req.body;
+
+    // Validación de campos obligatorios
+    if (!data.title || !data.description) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Los campos "title" y "description" son obligatorios' 
+      });
+      return;
+    }
+
+    const result = await caseService.createSupportDocumentForCaseId(caseId, data);
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(201).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: errorMessage });

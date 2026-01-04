@@ -342,9 +342,6 @@ class CaseService {
     }
   }
 
-  // ==================== LOS 3 ENDPOINTS QUE NECESITAS ====================
-  
-  // getStudentsFromCaseId -> StudentDAO
   async getStudentsFromCaseId(caseId) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
@@ -370,12 +367,10 @@ class CaseService {
     }
   }
 
-  // createStatusForCaseId <= CaseStatusDAO
   async createStatusForCaseId(caseId, data) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
       
-      // Verificar que el caso existe
       const caseExists = await prisma.$queryRaw`
         SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
       `;
@@ -384,18 +379,15 @@ class CaseService {
         return { success: false, message: 'Caso no encontrado' };
       }
 
-      // Validar campos obligatorios
       if (!data.status || !data.userId) {
         return { success: false, message: 'status y userId son obligatorios' };
       }
 
-      // Obtener el próximo número de estado
       const lastStatus = await prisma.$queryRaw`
         SELECT MAX("statusNumber") as max FROM "CaseStatus" WHERE "idCase" = ${id}
       `;
       const nextNumber = (Number(lastStatus[0]?.max) || 0) + 1;
 
-      // Insertar el nuevo estado
       const newStatus = await prisma.$queryRaw`
         INSERT INTO "CaseStatus" ("idCase", "statusNumber", "status", "reason", "userId", "registryDate")
         VALUES (${id}, ${nextNumber}, ${data.status}, ${data.reason || null}, ${data.userId}, NOW())
@@ -407,6 +399,125 @@ class CaseService {
       return { success: false, error: error.message };
     }
   }
+
+  async getAppoitmentByCaseId(caseId) {
+    try {
+      const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
+      
+      const appointments = await prisma.$queryRaw`
+        SELECT 
+          a."appointmentNumber" as "appointmentId",
+          a."plannedDate",
+          a."executionDate",
+          a."status",
+          a."guidance",
+          a."registryDate",
+          u."fullName" as "userName",
+          u."email" as "userEmail",
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+        FROM "Appointment" a
+        JOIN "User" u ON a."userId" = u."identityCard"
+        JOIN "Case" c ON a."idCase" = c."idCase"
+        WHERE a."idCase" = ${id}
+        ORDER BY a."plannedDate" DESC
+      `;
+
+      return { success: true, data: appointments };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async createAppoitmentForCaseId(caseId, data) {
+    try {
+      const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
+      
+      const caseExists = await prisma.$queryRaw`
+        SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
+      `;
+      
+      if (!Array.isArray(caseExists) || caseExists.length === 0) {
+        return { success: false, message: 'Caso no encontrado' };
+      }
+
+      if (!data.plannedDate || !data.userId) {
+        return { success: false, message: 'plannedDate y userId son obligatorios' };
+      }
+
+      const lastAppointment = await prisma.$queryRaw`
+        SELECT MAX("appointmentNumber") as max FROM "Appointment" WHERE "idCase" = ${id}
+      `;
+      const nextNumber = (Number(lastAppointment[0]?.max) || 0) + 1;
+
+      const newAppointment = await prisma.$queryRaw`
+        INSERT INTO "Appointment" ("idCase", "appointmentNumber", "plannedDate", "executionDate", "status", "guidance", "userId", "registryDate")
+        VALUES (${id}, ${nextNumber}, ${data.plannedDate}, ${data.executionDate || null}, ${data.status || 'P'}, ${data.guidance || null}, ${data.userId}, NOW())
+        RETURNING *
+      `;
+
+      return { success: true, data: newAppointment[0] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async getSupportDocumentsById(caseId) {
+    try {
+      const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
+      
+      const documents = await prisma.$queryRaw`
+        SELECT 
+          sd."supportNumber" as "documentId",
+          sd."title",
+          sd."description",
+          sd."submissionDate",
+          sd."fileUrl",
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+        FROM "SupportDocument" sd
+        JOIN "Case" c ON sd."idCase" = c."idCase"
+        WHERE sd."idCase" = ${id}
+        ORDER BY sd."submissionDate" DESC
+      `;
+
+      return { success: true, data: documents };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async createSupportDocumentForCaseId(caseId, data) {
+    try {
+      const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
+      
+      const caseExists = await prisma.$queryRaw`
+        SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
+      `;
+      
+      if (!Array.isArray(caseExists) || caseExists.length === 0) {
+        return { success: false, message: 'Caso no encontrado' };
+      }
+
+      if (!data.title || !data.description) {
+        return { success: false, message: 'title y description son obligatorios' };
+      }
+
+      const lastDocument = await prisma.$queryRaw`
+        SELECT MAX("supportNumber") as max FROM "SupportDocument" WHERE "idCase" = ${id}
+      `;
+      const nextNumber = (Number(lastDocument[0]?.max) || 0) + 1;
+
+      const newDocument = await prisma.$queryRaw`
+        INSERT INTO "SupportDocument" ("idCase", "supportNumber", "title", "description", "submissionDate", "fileUrl")
+        VALUES (${id}, ${nextNumber}, ${data.title}, ${data.description}, ${data.submissionDate || NOW()}, ${data.fileUrl || null})
+        RETURNING *
+      `;
+
+      return { success: true, data: newDocument[0] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
 }
 
 export default new CaseService();
