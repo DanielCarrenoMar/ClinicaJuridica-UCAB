@@ -43,6 +43,10 @@ export default function Dropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setSelectedLabel(label);
+  }, [label]);
+
   const currentSelectedValue = selectedValue !== undefined ? selectedValue : internalSelectedValue;
 
   const selectOption = (value: string | number, optionLabel: string) => {
