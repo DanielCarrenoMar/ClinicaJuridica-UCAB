@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useGetCaseById, useUpdateCase } from '#domain/useCaseHooks/useCase.ts';
+import { useGetCaseById, useGetStudentsByCaseId, useUpdateCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -15,7 +15,7 @@ import type { AppointmentModel } from '#domain/models/appointment.ts';
 import SupportDocumentCard from '#components/SupportDocumentCard.tsx';
 import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDialog.tsx';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
-import { Clipboard, User, CalendarMonth, Book, File, FilePdf } from 'flowbite-react-icons/solid';
+import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, Pen } from 'flowbite-react-icons/outline';
 import type { CaseModel } from '#domain/models/case.ts';
@@ -92,17 +92,14 @@ type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Histori
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
 
-    if (!id) {
-        return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
-    }
+    if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
     const { caseData, loading, error } = useGetCaseById(Number(id));
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [isDataModified, setIsDataModified] = useState(false);
-
     const { editCase, loading: updating } = useUpdateCase();
-    const [isEditing, setIsEditing] = useState(false);
-    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
+    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Involucrados");
+    const { students } = useGetStudentsByCaseId(Number(id));
 
     // Citas Tab State
     const [searchQuery, setSearchQuery] = useState("");
@@ -151,9 +148,9 @@ export default function CaseInfo() {
 
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
     if (error) return <div className="text-error">Error al cargar el caso: {error.message}</div>;
-    if (!caseData) return <div className="text-onSurface">No se encontró el caso</div>;
+    if (!caseData) return <div className="">No se encontró el caso</div>;
 
-    const getStatusColor = (status: CaseStatusTypeModel) => STATUS_COLORS[status] || "bg-surface text-onSurface";
+    const getStatusColor = (status: CaseStatusTypeModel) => STATUS_COLORS[status] || "bg-surface ";
 
     const GeneralTabContent = (
         <div className="flex flex-col gap-6">
@@ -281,63 +278,67 @@ export default function CaseInfo() {
 
     const InvolucradosTabContent = (
         <div className="flex flex-col md:flex-row gap-8 h-full">
-            <div className="flex-1 flex flex-col gap-8 bg-surface rounded-xl p-6">
-                <div>
-                    <h3 className="text-title-small text-onSurface mb-4">Solicitante</h3>
-                    <div className="flex items-center gap-3">
-                        <User className="w-8 h-8 text-onSurface" />
-                        <p className="text-body-large text-onSurface font-medium">{caseData.applicantName}</p>
-                    </div>
-                </div>
+            <section className="flex-1 flex flex-col gap-8">
+                <article>
+                    <h4 className="text-label-small mb-4">Solicitante</h4>
+                    <span className="flex items-center gap-3">
+                        <User/>
+                        <p className="text-body-medium">{caseData.applicantName}</p>
+                    </span>
+                </article>
 
-                <div>
-                    <h3 className="text-title-small text-onSurface mb-4">Responsables</h3>
+                <article>
+                    <h4 className="text-label-small mb-4">Responsables</h4>
                     <div className="flex flex-col gap-4">
-                        <div>
-                            <h4 className="text-label-large text-onSurface font-bold mb-2">Profesor</h4>
-                            <div className="flex items-center gap-3">
-                                <User className="w-6 h-6 text-onSurface/70" />
-                                <p className="text-body-medium text-onSurface">{caseData.teacherName || "Sin Profesor Asignado"}</p>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 className="text-label-large text-onSurface font-bold mb-2">Estudiantes</h4>
-                            <div className="flex items-center gap-3">
-                                <User className="w-6 h-6 text-onSurface/70" />
-                                <p className="text-body-medium text-onSurface">Juan Alberto Garrido Diaz</p>
-                            </div>
-                            <div className="flex items-center gap-3 mt-2">
-                                <User className="w-6 h-6 text-onSurface/70" />
-                                <p className="text-body-medium text-onSurface">Jose Maria Garrido Diaz</p>
-                            </div>
-                        </div>
+                        <section>
+                            <h5 className="text-body-large mb-2">Profesor</h5>
+                            {caseData.teacherName ? (
+                                <span className="flex items-center gap-3">
+                                    <UserCircle />
+                                    <p className="text-body-medium">{caseData.teacherName}</p>
+                                </span>
+                            ) : (
+                                <p className="text-body-small">Sin Profesor Asignado</p>
+                            )}
+                        </section>
+                        <section>
+                            <h5 className="text-body-large mb-2">Estudiantes</h5>
+                            {students.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
+                            <ul>
+                                {students.map((student) => (
+                                    <li key={student.identityCard} className="flex items-center gap-3 mb-2">
+                                        <UserCircle />
+                                        <p className="text-body-medium">{student.fullName}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    </div>
+                </article>
+            </section>
+
+            <section className="flex-1 flex flex-col">
+                <header className="flex justify-between items-center mb-4">
+                    <h4 className="text-label-small ">Beneficiarios</h4>
+                    <Button variant="outlined" onClick={() => { }}>Añadir</Button>
+                </header>
+                <div className="px-4 py-2 border border-onSurface/20 bg-surface rounded-xl flex flex-col gap-4">
+                    <div className="flex justify-between items-start">
+                        <span className="text-body-medium ">Jose Luis Enrique Calderon</span>
+                        <span className="text-body-small Variant">V-1231231231</span>
+                    </div>
+                    <div className="flex justify-between items-start">
+                        <span className="text-body-medium ">Pedro Gallego Enrique Calderon</span>
+                        <span className="text-body-small Variant">V-1231231231</span>
                     </div>
                 </div>
-            </div>
-
-            <div className="flex-1 h-full flex flex-col bg-surface rounded-xl p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-title-small text-onSurface">Beneficiarios</h3>
-                    <Button variant="outlined" className="px-4 py-1" onClick={() => { }}>Añadir</Button>
-                </div>
-                <Box className="flex-1 h-full border border-onSurface/20 bg-transparent flex flex-col gap-4">
-
-                    <div className="flex justify-between items-start">
-                        <span className="text-body-medium text-onSurface">Jose Luis Enrique Calderon</span>
-                        <span className="text-body-small text-onSurfaceVariant">V-1231231231</span>
-                    </div>
-                    <div className="flex justify-between items-start">
-                        <span className="text-body-medium text-onSurface">Pedro Gallego Enrique Calderon</span>
-                        <span className="text-body-small text-onSurfaceVariant">V-1231231231</span>
-                    </div>
-                </Box>
-            </div>
+            </section>
         </div>
     );
 
     const HistorialTabContent = (
         <div className="flex flex-col gap-4">
-            <p className="text-body-medium text-onSurface">Historial de actividades del caso aparecerá aquí.</p>
+            <p className="text-body-medium ">Historial de actividades del caso aparecerá aquí.</p>
         </div>
     );
 
@@ -358,7 +359,7 @@ export default function CaseInfo() {
                         </Button>
                     }
                     <Dropdown
-                        label={localCaseData?.caseStatus} // Use formData for immediate update
+                        label={localCaseData?.caseStatus}
                         triggerClassName={getStatusColor(localCaseData?.caseStatus ?? "Abierto")}
                         selectedValue={localCaseData?.caseStatus}
                         onSelectionChange={(val) => handleStatusChange(val as string)}
