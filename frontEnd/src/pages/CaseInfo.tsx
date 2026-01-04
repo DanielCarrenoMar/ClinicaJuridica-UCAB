@@ -19,10 +19,10 @@ import { Clipboard, User, CalendarMonth, Book, File, FilePdf } from 'flowbite-re
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
-    "Abierto": "!bg-success !text-white",
-    "En Espera": "!bg-warning !text-white",
-    "Pausado": "!bg-onSurface !text-white",
-    "Cerrado": "!bg-error !text-white"
+    "Abierto": "bg-success! text-white border-0",
+    "En Espera": "bg-warning! text-white border-0",
+    "Pausado": "bg-onSurface! text-white border-0",
+    "Cerrado": "bg-error! text-white border-0"
 };
 
 const MOCK_APPOINTMENTS: AppointmentModel[] = [
@@ -142,19 +142,17 @@ export default function CaseInfo() {
     const getStatusColor = (status: CaseStatusTypeModel) => STATUS_COLORS[status] || "bg-surface text-onSurface";
 
     return (
-        <>
-            <header className="bg-surface/70 flex items-center justify-between px-4 h-16">
-                <div className="flex items-center gap-2.5">
-                    <div className="p-2 bg-onSurface/5 rounded-lg">
-                        <Clipboard className="size-6 text-onSurface" />
-                    </div>
+        <Box className='p-0!'>
+            <header className="bg-surface/70 flex items-center justify-between px-4 rounded-xl h-16">
+                <span className="flex gap-3 items-center">
+                    <Clipboard className='size-6!'/>
                     <div>
-                        <h1 className="text-label-medium">{caseData.compoundKey}</h1>
-                        <p className="text-body-small text-onSurfaceVariant"> <b>Fecha:</b> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
+                        <h1 className="text-label-small">{caseData.compoundKey}</h1>
+                        <p className="text-body-small"> <strong className='text-body-medium'>Fecha:</strong> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
                     </div>
-                </div>
-                <div className="flex items-center gap-4 h-full">
-                    <div className="w-[120px]">
+                </span>
+                <span className="flex items-center gap-4 h-full">
+                    <div>
                         <Dropdown
                             label={formData.caseStatus || caseData.caseStatus} // Use formData for immediate update
                             triggerClassName={getStatusColor(formData.caseStatus || caseData.caseStatus)}
@@ -171,7 +169,7 @@ export default function CaseInfo() {
                     <Button variant="outlined" onClick={() => { }} className="h-10 w-fit px-4" icon={<FilePdf className="mr-2 h-5 w-5" />}>
                         Exportar
                     </Button>
-                </div>
+                </span>
             </header>
 
             <section className="flex py-2">
@@ -393,6 +391,6 @@ export default function CaseInfo() {
                     )}
                 </div>
             </section >
-        </>
+        </Box>
     );
 }
