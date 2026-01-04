@@ -21,10 +21,13 @@ export interface CaseModel {
     courtName?: string;
     lastActionDate?: Date;
     lastActionDescription?: string;
+    subjectName: string;
+    subjectCategoryName: string;
+
 }
 
-export function daoToCaseModel(dao:CaseInfoDAO): CaseModel {
-    const {processType, caseStatus, createdAt, lastActionDate,...rest} = dao
+export function daoToCaseModel(dao: CaseInfoDAO): CaseModel {
+    const { processType, caseStatus, createdAt, lastActionDate, ...rest } = dao
     return {
         processType: typeDaoToProcessTypeModel(processType),
         caseStatus: typeDaoToCaseStatusTypeModel(caseStatus),

@@ -28,7 +28,6 @@ const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
 const MOCK_APPOINTMENTS: AppointmentModel[] = [
     {
         idCase: 1,
-        caseCompoundKey: "CJ-2024-001",
         appointmentNumber: 1,
         plannedDate: new Date(2024, 0, 15, 10, 0),
         status: "Completada",
@@ -39,7 +38,6 @@ const MOCK_APPOINTMENTS: AppointmentModel[] = [
     },
     {
         idCase: 1,
-        caseCompoundKey: "CJ-2024-001",
         appointmentNumber: 2,
         plannedDate: new Date(2024, 1, 20, 14, 30),
         status: "Programada",
@@ -50,7 +48,6 @@ const MOCK_APPOINTMENTS: AppointmentModel[] = [
     },
     {
         idCase: 1,
-        caseCompoundKey: "CJ-2024-001",
         appointmentNumber: 3,
         plannedDate: new Date(2024, 2, 5, 9, 0),
         status: "Cancelada",
@@ -64,7 +61,6 @@ const MOCK_APPOINTMENTS: AppointmentModel[] = [
 const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
     {
         idCase: 1,
-        caseCompoundKey: "CJ-2024-001",
         supportNumber: 1,
         title: "Cédula de Identidad",
         description: "Copia legible de la cédula de identidad del solicitante.",
@@ -73,7 +69,6 @@ const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
     },
     {
         idCase: 1,
-        caseCompoundKey: "CJ-2024-001",
         supportNumber: 2,
         title: "Constancia de Residencia",
         description: "Documento emitido por el CNE o Consejo Comunal que avale la residencia actual.",
@@ -82,7 +77,6 @@ const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
     },
     {
         idCase: 1,
-        caseCompoundKey: "CJ-2024-001",
         supportNumber: 3,
         title: "Informe Médico",
         description: "Informe detallado de la condición de salud que motiva la solicitud. Incluye antecedentes y tratamiento actual.",

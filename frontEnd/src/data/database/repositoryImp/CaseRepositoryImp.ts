@@ -1,9 +1,8 @@
-import { daoToCaseModel, type CaseModel } from "#domain/models/case.ts";
+import { daoToCaseModel } from "#domain/models/case.ts";
 import type { CaseRepository } from "../../../domain/repositories";
 import { CASE_URL } from "./apiUrl";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
-import type { CaseStatusDAO } from "#database/daos/caseStatusDAO.ts";
 import type { StatusCaseAmountDAO } from "#database/daos/statusCaseAmountDAO.ts";
 import { daoToBeneficiaryModel } from "#domain/models/beneficiary.ts";
 import { daoToStatusCaseAmountModel } from "#domain/models/statusCaseAmount.ts";

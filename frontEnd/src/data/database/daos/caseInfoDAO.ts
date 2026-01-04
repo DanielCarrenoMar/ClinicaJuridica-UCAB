@@ -13,4 +13,7 @@ export interface CaseInfoDAO extends CaseDAO {
   caseStatus: CaseStatusTypeDAO;
   compoundKey: string;
   createdAt: string;
+  subjectName: string;
+  subjectCategoryName: string;
+
 }

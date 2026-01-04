@@ -2,7 +2,6 @@ import type { SupportDocumentInfoDAO } from "#database/daos/supportDocumentInfoD
 
 export interface SupportDocumentModel {
     idCase: number;
-    caseCompoundKey: string;
     supportNumber: number;
     title: string;
     description: string;

@@ -3,7 +3,6 @@ import type { AppointmentStatusTypeModel } from "#domain/typesModel.ts";
 import { typeDaoToAppointmentStatusTypeModel } from "#domain/typesModel.ts";
 export interface AppointmentModel {
     idCase: number;
-    caseCompoundKey: string;
     appointmentNumber: number;
     plannedDate: Date;
     executionDate?: Date;
