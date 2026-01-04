@@ -9,7 +9,7 @@ export type ProcessTypeModel =
     "Asesoria" |
     "Conciliacion y mediacion" |
     "Redaccion";
-export type CaseStatusTypeModel = "OPEN" | "IN_PROGRESS" | "PAUSED" | "CLOSED";
+export type CaseStatusTypeModel = "Abierto" | "En Espera" | "Pausado" | "Cerrado";
 export type AppointmentStatusTypeModel = "COMPLETED" | "SCHEDULED" | "CANCELLED";
 export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel {
     switch (gender) {
@@ -81,24 +81,24 @@ export function typeModelToProcessTypeDao(processTypeModel: ProcessTypeModel): P
 export function typeDaoToCaseStatusTypeModel(caseStatusDAO: CaseStatusTypeDAO): CaseStatusTypeModel {
     switch (caseStatusDAO) {
         case "A":
-            return "OPEN";
+            return "Abierto";
         case "T":
-            return "IN_PROGRESS";
+            return "En Espera";
         case "P":
-            return "PAUSED";
+            return "Pausado";
         case "C":
-            return "CLOSED";
+            return "Cerrado";
     }
 }
 export function typeModelToCaseStatusTypeDao(caseStatusModel: CaseStatusTypeModel): CaseStatusTypeDAO {
     switch (caseStatusModel) {
-        case "OPEN":
+        case "Abierto":
             return "A";
-        case "IN_PROGRESS":
+        case "En Espera":
             return "T";
-        case "PAUSED":
+        case "Pausado":
             return "P";
-        case "CLOSED":
+        case "Cerrado":
             return "C";
     }
 }
