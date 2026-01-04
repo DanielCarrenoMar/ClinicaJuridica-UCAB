@@ -17,6 +17,7 @@ import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDial
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
+import { Pen } from 'flowbite-react-icons/outline';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
@@ -85,13 +86,15 @@ const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
     }
 ];
 
+type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Historial"; 
+
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
-    const { caseData, loading, error, loadCase } = useGetCaseById();
+    const { caseData, loading, error } = useGetCaseById(id || "");
     const { editCase, loading: updating } = useUpdateCase();
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<any>({});
-    const [activeTab, setActiveTab] = useState("general");
+    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
 
     // Citas Tab State
     const [searchQuery, setSearchQuery] = useState("");
@@ -102,12 +105,6 @@ export default function CaseInfo() {
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
     const [selectedSupportDocument, setSelectedSupportDocument] = useState<SupportDocumentModel | null>(null);
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
-
-    useEffect(() => {
-        if (id) {
-            loadCase(id);
-        }
-    }, [id, loadCase]);
 
     useEffect(() => {
         if (caseData) {
@@ -141,6 +138,191 @@ export default function CaseInfo() {
 
     const getStatusColor = (status: CaseStatusTypeModel) => STATUS_COLORS[status] || "bg-surface text-onSurface";
 
+    const GeneralTabContent = (
+        <div className="flex flex-col gap-6">
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h4 className="text-label-small mb-1">Ámbito Legal</h4>
+                    <p className="text-body-medium">{caseData.legalAreaName}</p>
+                </div>
+                <div>
+                    <h4 className="text-label-small mb-1">Tipo de Trámite</h4>
+                    <p className="text-body-medium">{caseData.processType}</p>
+                </div>
+                <div>
+                    <header className='flex gap-2 items-center'>
+                        <h4 className="text-label-small mb-1">Tribunal</h4>
+                    </header>
+                    <TextInput
+                            defaultText={formData.courtName}
+                            onChangeText={(val) => handleChange('courtName', val)}
+                    />
+                </div>
+            </section>
+            <section>
+                <header className="flex gap-2 items-center mb-2">
+                    <h3 className="text-label-medium">Síntesis del Problema</h3>
+                </header>
+                <TextInput
+                    multiline
+                    defaultText={formData.problemSummary}
+                    onChangeText={(val) => handleChange('problemSummary', val)}
+                />
+            </section>
+        </div>
+    );
+
+    const CitasTabContent = (
+        <div className="flex flex-col h-full gap-6">
+            <div className="flex justify-between items-center gap-4">
+                <div className='flex-1'>
+                    <SearchBar
+                        isOpen={true}
+                        placeholder="Buscar citas..."
+                        onChange={setSearchQuery}
+                    />
+                </div>
+                <Button variant='outlined' onClick={() => { }}>
+                    Añadir Cita
+                </Button>
+            </div>
+
+            <div className="flex flex-col gap-4 pb-20">
+                {MOCK_APPOINTMENTS
+                    .filter(apt =>
+                        apt.guidance?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        apt.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        apt.status.toString().toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(apt => (
+                        <AppointmentCard
+                            key={apt.appointmentNumber}
+                            appointment={apt}
+                            applicantName={caseData.applicantName}
+                            onClick={() => {
+                                setSelectedAppointment(apt);
+                                setIsAppointmentDialogOpen(true);
+                            }}
+                        />
+                    ))}
+            </div>
+
+            <AppointmentDetailsDialog
+                open={isAppointmentDialogOpen}
+                onClose={() => setIsAppointmentDialogOpen(false)}
+                appointment={selectedAppointment}
+                applicantName={caseData.applicantName}
+            />
+        </div>
+    );
+
+    const RecaudosTabContent = (
+        <div className="flex flex-col h-full gap-6">
+            <div className="flex justify-between items-center gap-4">
+                <div className="flex-1">
+                    <SearchBar
+                        isOpen={true}
+                        placeholder="Buscar recaudos..."
+                        onChange={setSupportSearchQuery}
+                    />
+                </div>
+                <Button variant='outlined' onClick={() => { }}>
+                    Añadir Recaudo
+                </Button>
+            </div>
+
+            <div className="flex flex-col gap-4 pb-20">
+                {MOCK_SUPPORT_DOCUMENTS
+                    .filter(doc =>
+                        doc.title.toLowerCase().includes(supportSearchQuery.toLowerCase()) ||
+                        doc.description.toLowerCase().includes(supportSearchQuery.toLowerCase())
+                    )
+                    .map(doc => (
+                        <SupportDocumentCard
+                            key={doc.supportNumber}
+                            document={doc}
+                            onClick={() => {
+                                setSelectedSupportDocument(doc);
+                                setIsSupportDialogOpen(true);
+                            }}
+                            onDownload={(e) => {
+                                e.stopPropagation();
+                                console.log("Downloading", doc.title);
+                            }}
+                        />
+                    ))}
+            </div>
+
+            <SupportDocumentDetailsDialog
+                open={isSupportDialogOpen}
+                onClose={() => setIsSupportDialogOpen(false)}
+                document={selectedSupportDocument}
+            />
+        </div>
+    );
+
+    const InvolucradosTabContent = (
+        <div className="flex flex-col md:flex-row gap-8 h-full">
+            <div className="flex-1 flex flex-col gap-8 bg-surface rounded-xl p-6">
+                <div>
+                    <h3 className="text-title-small text-onSurface mb-4">Solicitante</h3>
+                    <div className="flex items-center gap-3">
+                        <User className="w-8 h-8 text-onSurface" />
+                        <p className="text-body-large text-onSurface font-medium">{caseData.applicantName}</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-title-small text-onSurface mb-4">Responsables</h3>
+                    <div className="flex flex-col gap-4">
+                        <div>
+                            <h4 className="text-label-large text-onSurface font-bold mb-2">Profesor</h4>
+                            <div className="flex items-center gap-3">
+                                <User className="w-6 h-6 text-onSurface/70" />
+                                <p className="text-body-medium text-onSurface">{caseData.teacherName || "Sin Profesor Asignado"}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 className="text-label-large text-onSurface font-bold mb-2">Estudiantes</h4>
+                            <div className="flex items-center gap-3">
+                                <User className="w-6 h-6 text-onSurface/70" />
+                                <p className="text-body-medium text-onSurface">Juan Alberto Garrido Diaz</p>
+                            </div>
+                            <div className="flex items-center gap-3 mt-2">
+                                <User className="w-6 h-6 text-onSurface/70" />
+                                <p className="text-body-medium text-onSurface">Jose Maria Garrido Diaz</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex-1 h-full flex flex-col bg-surface rounded-xl p-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-title-small text-onSurface">Beneficiarios</h3>
+                    <Button variant="outlined" className="px-4 py-1" onClick={() => { }}>Añadir</Button>
+                </div>
+                <Box className="flex-1 h-full border border-onSurface/20 bg-transparent flex flex-col gap-4">
+
+                    <div className="flex justify-between items-start">
+                        <span className="text-body-medium text-onSurface">Jose Luis Enrique Calderon</span>
+                        <span className="text-body-small text-onSurfaceVariant">V-1231231231</span>
+                    </div>
+                    <div className="flex justify-between items-start">
+                        <span className="text-body-medium text-onSurface">Pedro Gallego Enrique Calderon</span>
+                        <span className="text-body-small text-onSurfaceVariant">V-1231231231</span>
+                    </div>
+                </Box>
+            </div>
+        </div>
+    );
+
+    const HistorialTabContent = (
+        <div className="flex flex-col gap-4">
+            <p className="text-body-medium text-onSurface">Historial de actividades del caso aparecerá aquí.</p>
+        </div>
+    );
+
     return (
         <Box className='p-0!'>
             <header className="bg-surface/70 flex items-center justify-between px-4 rounded-xl h-16">
@@ -166,229 +348,29 @@ export default function CaseInfo() {
                         </Dropdown>
                     </div>
 
-                    <Button variant="outlined" onClick={() => { }} className="h-10 w-fit px-4" icon={<FilePdf className="mr-2 h-5 w-5" />}>
+                    <Button variant="outlined" onClick={() => { }} className='px-4' icon={<FilePdf/>}>
                         Exportar
                     </Button>
                 </span>
             </header>
 
             <section className="flex py-2">
-                <Tabs selectedId={activeTab} onChange={setActiveTab}>
-                    <Tabs.Item id="general" label="General" icon={<Clipboard/>} />
-                    <Tabs.Item id="involucrados" label="Involucrados" icon={<User/>} />
-                    <Tabs.Item id="citas" label="Citas" icon={<CalendarMonth/>} />
-                    <Tabs.Item id="recaudos" label="Recaudos" icon={<File/>} />
-                    <Tabs.Item id="historial" label="Historial" icon={<Book/>} />
+                <Tabs selectedId={activeTab} onChange={(id) => setActiveTab(id as CaseInfoTabs)}>
+                    <Tabs.Item id="General" label="General" icon={<Clipboard/>} />
+                    <Tabs.Item id="Involucrados" label="Involucrados" icon={<User/>} />
+                    <Tabs.Item id="Citas" label="Citas" icon={<CalendarMonth/>} />
+                    <Tabs.Item id="Recaudos" label="Recaudos" icon={<File/>} />
+                    <Tabs.Item id="Historial" label="Historial" icon={<Book/>} />
                 </Tabs>
             </section>
 
-            <section className="px-4 pb-6 h-full overflow-hidden flex flex-col">
+            <section className="px-4 pb-6 h-full flex flex-col">
                 <div className="flex-1 overflow-y-auto pr-2">
-                    {activeTab === 'general' && (
-                        <div className="flex flex-col gap-6">
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <h3 className="text-label-medium text-onSurface">Síntesis del Problema</h3>
-                                    {isEditing ? (
-                                        <div className="flex gap-2">
-                                            <Button variant="outlined" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                                            <Button variant="filled" onClick={handleSave} disabled={updating}>
-                                                {updating ? "Guardando..." : "Guardar Cambios"}
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <Button variant="outlined" onClick={() => setIsEditing(true)}>Editar Información</Button>
-                                    )}
-                                </div>
-
-                                <Box className="min-h-[150px] bg-surface rounded-xl p-4">
-                                    {isEditing ? (
-                                        <TextInput
-                                            multiline
-                                            defaultText={formData.problemSummary}
-                                            onChangeText={(val) => handleChange('problemSummary', val)}
-                                            className="h-full"
-                                        />
-                                    ) : (
-                                        <p className="text-body-medium text-onSurface">{caseData.problemSummary}</p>
-                                    )}
-                                </Box>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-                                <div>
-                                    <h4 className="text-title-medium text-onSurface font-bold mb-1">Ámbito Legal</h4>
-                                    <p className="text-body-medium text-onSurface">{caseData.legalAreaName}</p>
-                                </div>
-                                <div>
-                                    <h4 className="text-title-medium text-onSurface font-bold mb-1">Tipo de Trámite</h4>
-                                    <p className="text-body-medium text-onSurface">{caseData.processType}</p>
-                                </div>
-                                <div>
-                                    <h4 className="text-title-medium text-onSurface font-bold mb-1">Tribunal</h4>
-                                    {isEditing ? (
-                                        <TextInput
-                                            defaultText={formData.courtName}
-                                            onChangeText={(val) => handleChange('courtName', val)}
-                                        />
-                                    ) : (
-                                        <p className="text-body-medium text-onSurface">{caseData.courtName || "Sin Tribunal"}</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'citas' && (
-                        <div className="flex flex-col h-full gap-6">
-                            <div className="flex justify-between items-center gap-4">
-                                <div className='flex-1'>
-                                    <SearchBar
-                                        isOpen={true}
-                                        placeholder="Buscar citas..."
-                                        onChange={setSearchQuery}
-                                    />
-                                </div>
-                                <Button variant='outlined' onClick={() => { }}>
-                                    Añadir Cita
-                                </Button>
-                            </div>
-
-                            <div className="flex flex-col gap-4 pb-20">
-                                {MOCK_APPOINTMENTS
-                                    .filter(apt =>
-                                        apt.guidance?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                        apt.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                        apt.status.toString().toLowerCase().includes(searchQuery.toLowerCase())
-                                    )
-                                    .map(apt => (
-                                        <AppointmentCard
-                                            key={apt.appointmentNumber}
-                                            appointment={apt}
-                                            applicantName={caseData.applicantName}
-                                            onClick={() => {
-                                                setSelectedAppointment(apt);
-                                                setIsAppointmentDialogOpen(true);
-                                            }}
-                                        />
-                                    ))}
-                            </div>
-
-                            <AppointmentDetailsDialog
-                                open={isAppointmentDialogOpen}
-                                onClose={() => setIsAppointmentDialogOpen(false)}
-                                appointment={selectedAppointment}
-                                applicantName={caseData.applicantName}
-                            />
-                        </div>
-                    )}
-
-                    {activeTab === 'recaudos' && (
-                        <div className="flex flex-col h-full gap-6">
-                            <div className="flex justify-between items-center gap-4">
-                                <div className="flex-1">
-                                    <SearchBar
-                                        isOpen={true}
-                                        placeholder="Buscar recaudos..."
-                                        onChange={setSupportSearchQuery}
-                                    />
-                                </div>
-                                <Button variant='outlined' onClick={() => { }}>
-                                    Añadir Recaudo
-                                </Button>
-                            </div>
-
-                            <div className="flex flex-col gap-4 pb-20">
-                                {MOCK_SUPPORT_DOCUMENTS
-                                    .filter(doc =>
-                                        doc.title.toLowerCase().includes(supportSearchQuery.toLowerCase()) ||
-                                        doc.description.toLowerCase().includes(supportSearchQuery.toLowerCase())
-                                    )
-                                    .map(doc => (
-                                        <SupportDocumentCard
-                                            key={doc.supportNumber}
-                                            document={doc}
-                                            onClick={() => {
-                                                setSelectedSupportDocument(doc);
-                                                setIsSupportDialogOpen(true);
-                                            }}
-                                            onDownload={(e) => {
-                                                e.stopPropagation();
-                                                console.log("Downloading", doc.title);
-                                            }}
-                                        />
-                                    ))}
-                            </div>
-
-                            <SupportDocumentDetailsDialog
-                                open={isSupportDialogOpen}
-                                onClose={() => setIsSupportDialogOpen(false)}
-                                document={selectedSupportDocument}
-                            />
-                        </div>
-                    )}
-
-                    {activeTab === 'involucrados' && (
-                        <div className="flex flex-col md:flex-row gap-8 h-full">
-                            <div className="flex-1 flex flex-col gap-8 bg-surface rounded-xl p-6">
-                                <div>
-                                    <h3 className="text-title-small text-onSurface mb-4">Solicitante</h3>
-                                    <div className="flex items-center gap-3">
-                                        <User className="w-8 h-8 text-onSurface" />
-                                        <p className="text-body-large text-onSurface font-medium">{caseData.applicantName}</p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h3 className="text-title-small text-onSurface mb-4">Responsables</h3>
-                                    <div className="flex flex-col gap-4">
-                                        <div>
-                                            <h4 className="text-label-large text-onSurface font-bold mb-2">Profesor</h4>
-                                            <div className="flex items-center gap-3">
-                                                <User className="w-6 h-6 text-onSurface/70" />
-                                                <p className="text-body-medium text-onSurface">{caseData.teacherName || "Sin Profesor Asignado"}</p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4 className="text-label-large text-onSurface font-bold mb-2">Estudiantes</h4>
-                                            <div className="flex items-center gap-3">
-                                                <User className="w-6 h-6 text-onSurface/70" />
-                                                <p className="text-body-medium text-onSurface">Juan Alberto Garrido Diaz</p>
-                                            </div>
-                                            <div className="flex items-center gap-3 mt-2">
-                                                <User className="w-6 h-6 text-onSurface/70" />
-                                                <p className="text-body-medium text-onSurface">Jose Maria Garrido Diaz</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 h-full flex flex-col bg-surface rounded-xl p-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-title-small text-onSurface">Beneficiarios</h3>
-                                    <Button variant="outlined" className="px-4 py-1" onClick={() => { }}>Añadir</Button>
-                                </div>
-                                <Box className="flex-1 h-full border border-onSurface/20 bg-transparent flex flex-col gap-4">
-
-                                    <div className="flex justify-between items-start">
-                                        <span className="text-body-medium text-onSurface">Jose Luis Enrique Calderon</span>
-                                        <span className="text-body-small text-onSurfaceVariant">V-1231231231</span>
-                                    </div>
-                                    <div className="flex justify-between items-start">
-                                        <span className="text-body-medium text-onSurface">Pedro Gallego Enrique Calderon</span>
-                                        <span className="text-body-small text-onSurfaceVariant">V-1231231231</span>
-                                    </div>
-                                </Box>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab !== 'general' && activeTab !== 'involucrados' && (
-                        <div className="flex justify-center items-center h-full text-onSurface/50">
-                            Contenido de {activeTab} próximamente
-                        </div>
-                    )}
+                    {activeTab === 'General' && GeneralTabContent}
+                    {activeTab === 'Citas' && CitasTabContent}
+                    {activeTab === 'Recaudos' && RecaudosTabContent}
+                    {activeTab === 'Involucrados' && InvolucradosTabContent}
+                    {activeTab === 'Historial' && HistorialTabContent}
                 </div>
             </section >
         </Box>

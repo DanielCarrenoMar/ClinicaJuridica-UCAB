@@ -35,7 +35,7 @@ export function useGetCases() {
     };
 }
 
-export function useGetCaseById() {
+export function useGetCaseById(id: string) {
     const { findCaseById } = getCaseRepository();
     const [caseData, setCaseData] = useState<CaseModel | null>(null);
     const [loading, setLoading] = useState(true);
@@ -53,6 +53,10 @@ export function useGetCaseById() {
             setLoading(false);
         }
     }, []);
+
+    useEffect(() => {
+        loadCase(id);
+    }, [loadCase]);
 
     return {
         caseData,
