@@ -16,26 +16,13 @@ import SupportDocumentCard from '#components/SupportDocumentCard.tsx';
 import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDialog.tsx';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf } from 'flowbite-react-icons/solid';
+import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
 
-const STATUS_TRANSLATIONS: Record<string, string> = {
-    "OPEN": "ABIERTO",
-    "IN_PROGRESS": "EN TRÁMITE",
-    "PAUSED": "EN PAUSA",
-    "CLOSED": "CERRADO"
-};
-
-const STATUS_COLORS: Record<string, string> = {
-    "OPEN": "!bg-success !text-white", // Success color from index.css
-    "IN_PROGRESS": "!bg-warning !text-white", // Blue-500 equivalent
-    "PAUSED": "!bg-onSurface !text-white", // Warning color from index.css
-    "CLOSED": "!bg-error !text-white" // Error color from index.css
-};
-
-const PROCESS_TYPE_TRANSLATIONS: Record<string, string> = {
-    "in progress": "En Trámite",
-    "advice": "Asesoría",
-    "mediation": "Mediación",
-    "drafting": "Redacción"
+const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
+    "Abierto": "!bg-success !text-white",
+    "En Espera": "!bg-warning !text-white",
+    "Pausado": "!bg-onSurface !text-white",
+    "Cerrado": "!bg-error !text-white"
 };
 
 const MOCK_APPOINTMENTS: AppointmentModel[] = [
@@ -44,7 +31,7 @@ const MOCK_APPOINTMENTS: AppointmentModel[] = [
         caseCompoundKey: "CJ-2024-001",
         appointmentNumber: 1,
         plannedDate: new Date(2024, 0, 15, 10, 0),
-        status: "COMPLETED",
+        status: "Completada",
         userId: "user-123",
         userName: "Prof. Alberto",
         registryDate: new Date(2024, 0, 1),
@@ -55,7 +42,7 @@ const MOCK_APPOINTMENTS: AppointmentModel[] = [
         caseCompoundKey: "CJ-2024-001",
         appointmentNumber: 2,
         plannedDate: new Date(2024, 1, 20, 14, 30),
-        status: "SCHEDULED",
+        status: "Programada",
         userId: "user-456",
         userName: "Estudiante Maria",
         registryDate: new Date(2024, 1, 15),
@@ -66,7 +53,7 @@ const MOCK_APPOINTMENTS: AppointmentModel[] = [
         caseCompoundKey: "CJ-2024-001",
         appointmentNumber: 3,
         plannedDate: new Date(2024, 2, 5, 9, 0),
-        status: "CANCELLED",
+        status: "Cancelada",
         userId: "user-789",
         userName: "Prof. Alberto",
         registryDate: new Date(2024, 2, 1),
@@ -158,9 +145,7 @@ export default function CaseInfo() {
     if (error) return <div className="text-error">Error al cargar el caso: {error.message}</div>;
     if (!caseData) return <div className="text-onSurface">No se encontró el caso</div>;
 
-    const translateStatus = (status: string) => STATUS_TRANSLATIONS[status] || status;
-    const translateProcessType = (type: string) => PROCESS_TYPE_TRANSLATIONS[type] || type;
-    const getStatusColor = (status: string) => STATUS_COLORS[status] || "bg-surface text-onSurface";
+    const getStatusColor = (status: CaseStatusTypeModel) => STATUS_COLORS[status] || "bg-surface text-onSurface";
 
     return (
         <>
@@ -177,15 +162,15 @@ export default function CaseInfo() {
                 <div className="flex items-center gap-4 h-full">
                     <div className="w-[120px]">
                         <Dropdown
-                            label={translateStatus(formData.caseStatus || caseData.caseStatus)} // Use formData for immediate update
+                            label={formData.caseStatus || caseData.caseStatus} // Use formData for immediate update
                             triggerClassName={getStatusColor(formData.caseStatus || caseData.caseStatus)}
                             selectedValue={formData.caseStatus || caseData.caseStatus}
                             onSelectionChange={(val) => handleStatusChange(val as string)}
                         >
-                            <DropdownOption value="OPEN">ABIERTO</DropdownOption>
-                            <DropdownOption value="IN_PROGRESS">EN TRÁMITE</DropdownOption>
-                            <DropdownOption value="PAUSED">EN PAUSA</DropdownOption>
-                            <DropdownOption value="CLOSED">CERRADO</DropdownOption>
+                            <DropdownOption value="Abierto">Abierto</DropdownOption>
+                            <DropdownOption value="En Espera">En Espera</DropdownOption>
+                            <DropdownOption value="Pausado">Pausado</DropdownOption>
+                            <DropdownOption value="Cerrado">Cerrado</DropdownOption>
                         </Dropdown>
                     </div>
 
@@ -245,7 +230,7 @@ export default function CaseInfo() {
                                 </div>
                                 <div>
                                     <h4 className="text-title-medium text-onSurface font-bold mb-1">Tipo de Trámite</h4>
-                                    <p className="text-body-medium text-onSurface">{translateProcessType(caseData.processType)}</p>
+                                    <p className="text-body-medium text-onSurface">{caseData.processType}</p>
                                 </div>
                                 <div>
                                     <h4 className="text-title-medium text-onSurface font-bold mb-1">Tribunal</h4>
