@@ -26,15 +26,15 @@ export interface ApplicantRepository {
 
 export interface CaseRepository {
     findAllCases(): Promise<CaseModel[]>;
-    findCaseById(id: string): Promise<CaseModel | null>;
+    findCaseById(id: number): Promise<CaseModel | null>;
     findBeneficiariesByCaseId(idCase: number): Promise<BeneficiaryModel[]>;
     findCaseStatusByCaseId(idCase: number): Promise<CaseStatusModel[]>;
     findStudentsByCaseId(idCase: number): Promise<StudentModel[]>;
     getStatusCaseAmount(): Promise<StatusCaseAmountModel[]>;
     createCase(data: CaseDAO): Promise<CaseModel>;
     createCaseStatusFromCaseId(data: CaseStatusDAO): Promise<CaseStatusModel>;
-    updateCase(id: string, data: Partial<CaseModel>): Promise<CaseModel>;
-    deleteCase(id: string): Promise<void>;
+    updateCase(id: number, data: Partial<CaseModel>): Promise<CaseModel>;
+    deleteCase(id: number): Promise<void>;
     findStatusCaseAmounts(): Promise<StatusCaseAmountModel>;
 }
 

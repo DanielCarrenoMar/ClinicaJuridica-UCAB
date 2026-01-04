@@ -91,7 +91,12 @@ type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Histori
 
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
-    const { caseData, loading, error } = useGetCaseById(id || "");
+
+    if (!id) {
+        return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
+    }
+
+    const { caseData, loading, error } = useGetCaseById(Number(id));
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [isDataModified, setIsDataModified] = useState(false);
 
@@ -125,7 +130,7 @@ export default function CaseInfo() {
     }
     function saveChanges() {
         if (!localCaseData) return;
-        editCase(localCaseData.idCase.toString(), localCaseData)
+        editCase(localCaseData.idCase, localCaseData)
             .then(() => {
                 setIsDataModified(false);
             })

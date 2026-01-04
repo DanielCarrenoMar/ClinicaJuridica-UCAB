@@ -35,13 +35,13 @@ export function useGetCases() {
     };
 }
 
-export function useGetCaseById(id: string) {
+export function useGetCaseById(id: number) {
     const { findCaseById } = getCaseRepository();
     const [caseData, setCaseData] = useState<CaseModel | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadCase = useCallback(async (id: string) => {
+    const loadCase = useCallback(async (id: number) => {
         setLoading(true);
         try {
             const data = await findCaseById(id);
@@ -97,7 +97,7 @@ export function useUpdateCase() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const editCase = async (id: string, data: Partial<CaseModel>) => {
+    const editCase = async (id: number, data: Partial<CaseModel>) => {
         setLoading(true);
         try {
             const updatedCase = await updateCase(id, data);
@@ -123,7 +123,7 @@ export function useDeleteCase() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const removeCase = async (id: string) => {
+    const removeCase = async (id: number) => {
         setLoading(true);
         try {
             await deleteCase(id);
