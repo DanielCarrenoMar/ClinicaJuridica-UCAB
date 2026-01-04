@@ -174,11 +174,11 @@ export default function CaseInfo() {
 
             <section className="flex py-2">
                 <Tabs selectedId={activeTab} onChange={setActiveTab}>
-                    <Tabs.Item id="general" label="General" icon={<Clipboard className="w-5 h-5" />} />
-                    <Tabs.Item id="involucrados" label="Involucrados" icon={<User className="w-5 h-5" />} />
-                    <Tabs.Item id="citas" label="Citas" icon={<CalendarMonth className="w-5 h-5" />} />
-                    <Tabs.Item id="recaudos" label="Recaudos" icon={<File className="w-5 h-5" />} />
-                    <Tabs.Item id="historial" label="Historial" icon={<Book className="w-5 h-5" />} />
+                    <Tabs.Item id="general" label="General" icon={<Clipboard/>} />
+                    <Tabs.Item id="involucrados" label="Involucrados" icon={<User/>} />
+                    <Tabs.Item id="citas" label="Citas" icon={<CalendarMonth/>} />
+                    <Tabs.Item id="recaudos" label="Recaudos" icon={<File/>} />
+                    <Tabs.Item id="historial" label="Historial" icon={<Book/>} />
                 </Tabs>
             </section>
 
