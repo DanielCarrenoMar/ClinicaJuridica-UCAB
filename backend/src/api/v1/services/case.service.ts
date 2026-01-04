@@ -44,67 +44,71 @@ class CaseService {
     }
   }
 
-    async getCaseById(id: number) {
-      try {
-        const caseData = await prisma.$queryRaw`
-          SELECT 
-            c.*,
-            b."fullName" as "applicantName",
-            la."name" as "legalAreaName",
-            ct."subject" as "courtName",
-            u."fullName" as "teacherName",
-            cs."status" as "caseStatus",
-            ca."registryDate" as "lastActionDate",
-            ca."description" as "lastActionDescription",
-            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-          FROM "Case" c
-          JOIN "Applicant" a ON c."applicantId" = a."identityCard"
-          JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-          JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
-          LEFT JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND c."teacherTerm" = t."term"
-          LEFT JOIN "User" u ON t."identityCard" = u."identityCard"
-          LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
-          LEFT JOIN LATERAL (
-            SELECT cs1."status"
-            FROM "CaseStatus" cs1
-            WHERE cs1."idCase" = c."idCase"
-            ORDER BY cs1."statusNumber" DESC
-            LIMIT 1
-          ) cs ON TRUE
-          LEFT JOIN LATERAL (
-            SELECT ca1."registryDate", ca1."description"
-            FROM "CaseAction" ca1
-            WHERE ca1."idCase" = c."idCase"
-            ORDER BY ca1."registryDate" DESC
-            LIMIT 1
-          ) ca ON TRUE
-          WHERE c."idCase" = ${id}
-        `;
+  async getCaseById(id: number) {
+    try {
+      const caseData = await prisma.$queryRaw`
+        SELECT 
+          c.*,
+          b."fullName" as "applicantName",
+          la."name" as "legalAreaName",
+          s."name" as "subjectName",
+          sc."name" as "subjectCategoryName",
+          ct."subject" as "courtName",
+          u."fullName" as "teacherName",
+          cs."status" as "caseStatus",
+          ca."registryDate" as "lastActionDate",
+          ca."description" as "lastActionDescription",
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+        FROM "Case" c
+        JOIN "Applicant" a ON c."applicantId" = a."identityCard"
+        JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+        JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+        JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
+        JOIN "Subject" s ON sc."idSubject" = s."idSubject"
+        LEFT JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND c."teacherTerm" = t."term"
+        LEFT JOIN "User" u ON t."identityCard" = u."identityCard"
+        LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
+        LEFT JOIN LATERAL (
+          SELECT cs1."status"
+          FROM "CaseStatus" cs1
+          WHERE cs1."idCase" = c."idCase"
+          ORDER BY cs1."statusNumber" DESC
+          LIMIT 1
+        ) cs ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT ca1."registryDate", ca1."description"
+          FROM "CaseAction" ca1
+          WHERE ca1."idCase" = c."idCase"
+          ORDER BY ca1."registryDate" DESC
+          LIMIT 1
+        ) ca ON TRUE
+        WHERE c."idCase" = ${id}
+      `;
 
-        if (!Array.isArray(caseData) || caseData.length === 0) {
-          return { success: false, message: 'Caso no encontrado' };
-        }
-
-        const statuses = await prisma.$queryRaw`
-          SELECT * FROM "CaseStatus" WHERE "idCase" = ${id} ORDER BY "registryDate" DESC
-        `;
-
-        const students = await prisma.$queryRaw`
-          SELECT s.*, u."fullName" 
-          FROM "AssignedStudent" asg
-          JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
-          JOIN "User" u ON s."identityCard" = u."identityCard"
-          WHERE asg."idCase" = ${id}
-        `;
-
-        return {
-          success: true,
-          data: { ...caseData[0], statuses, assignedStudents: students }
-        };
-      } catch (error) {
-        return { success: false, error: error.message };
+      if (!Array.isArray(caseData) || caseData.length === 0) {
+        return { success: false, message: 'Caso no encontrado' };
       }
+
+      const statuses = await prisma.$queryRaw`
+        SELECT * FROM "CaseStatus" WHERE "idCase" = ${id} ORDER BY "registryDate" DESC
+      `;
+
+      const students = await prisma.$queryRaw`
+        SELECT s.*, u."fullName" 
+        FROM "AssignedStudent" asg
+        JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
+        JOIN "User" u ON s."identityCard" = u."identityCard"
+        WHERE asg."idCase" = ${id}
+      `;
+
+      return {
+        success: true,
+        data: { ...caseData[0], statuses, assignedStudents: students }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
+  }
 
   async createCase(data) {
     try {
