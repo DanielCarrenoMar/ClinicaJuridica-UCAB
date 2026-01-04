@@ -3,6 +3,9 @@ import type { CaseModel } from '../models/case';
 import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
 import type { CaseDAO } from '#database/daos/caseDAO.ts';
 import type { StatusCaseAmountModel } from '#domain/models/statusCaseAmount.ts';
+import type { StudentModel } from '../models/student';
+import type { BeneficiaryModel } from '../models/beneficiary';
+import type { CaseStatusDAO } from '#database/daos/caseStatusDAO.ts';
 
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
@@ -177,3 +180,92 @@ export function useGetStatusCaseAmounts() {
         refresh: loadStatusAmounts
     };
 }
+
+export function useGetStudentsByCaseId(id: number) {
+    const { findStudentsByCaseId } = getCaseRepository();
+    const [students, setStudents] = useState<StudentModel[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadStudents = useCallback(async (id: number) => {
+        setLoading(true);
+        try {
+            const data = await findStudentsByCaseId(id);
+            setStudents(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id) loadStudents(id);
+    }, [id, loadStudents]);
+
+    return {
+        students,
+        loading,
+        error,
+        loadStudents
+    };
+}
+
+export function useGetBeneficiariesByCaseId(id: number) {
+    const { findBeneficiariesByCaseId } = getCaseRepository();
+    const [beneficiaries, setBeneficiaries] = useState<BeneficiaryModel[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadBeneficiaries = useCallback(async (id: number) => {
+        setLoading(true);
+        try {
+            const data = await findBeneficiariesByCaseId(id);
+            setBeneficiaries(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id) loadBeneficiaries(id);
+    }, [id, loadBeneficiaries]);
+
+    return {
+        beneficiaries,
+        loading,
+        error,
+        loadBeneficiaries
+    };
+}
+
+export function useCreateCaseStatus() {
+    const { createCaseStatusFromCaseId } = getCaseRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const createStatus = async (data: CaseStatusDAO) => {
+        setLoading(true);
+        try {
+            const newStatus = await createCaseStatusFromCaseId(data);
+            setError(null);
+            return newStatus;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        createStatus,
+        loading,
+        error
+    };
+}
+
