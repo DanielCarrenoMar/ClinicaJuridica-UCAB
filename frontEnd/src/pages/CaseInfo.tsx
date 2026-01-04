@@ -17,7 +17,7 @@ import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDial
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
-import { Pen } from 'flowbite-react-icons/outline';
+import { Close, Pen } from 'flowbite-react-icons/outline';
 import type { CaseModel } from '#domain/models/case.ts';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
@@ -120,14 +120,28 @@ export default function CaseInfo() {
         setIsDataModified(hasChanges);
     }, [localCaseData]);
 
+    function discardChanges() {
+        setLocalCaseData(caseData || undefined);
+    }
+    function saveChanges() {
+        if (!localCaseData) return;
+        editCase(localCaseData.idCase.toString(), localCaseData)
+            .then(() => {
+                setIsDataModified(false);
+            })
+            .catch((err) => {
+                console.error("Error updating case:", err);
+            });
+    }
+
 
 
     const handleStatusChange = (newStatus: string) => {
         setLocalCaseData((prev: any) => ({ ...prev, caseStatus: newStatus }));
     };
 
-    const handleChange = (field: string, value: string) => {
-        setLocalCaseData((prev: any) => ({ ...prev, [field]: value }));
+    const handleChange = (updateField: Partial<CaseModel>) => {
+        setLocalCaseData((prev: any) => ({ ...prev, ...updateField }));
     };
 
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
@@ -152,8 +166,9 @@ export default function CaseInfo() {
                         <h4 className="text-label-small mb-1">Tribunal</h4>
                     </header>
                     <TextInput
-                            defaultText={localCaseData?.courtName}
-                            onChangeText={(val) => handleChange('courtName', val)}
+                        defaultText={localCaseData?.courtName}
+                        onChangeText={(val) => handleChange({ courtName: val })}
+                        placeholder=''
                     />
                 </div>
             </section>
@@ -164,7 +179,7 @@ export default function CaseInfo() {
                 <TextInput
                     multiline
                     defaultText={localCaseData?.problemSummary}
-                    onChangeText={(val) => handleChange('problemSummary', val)}
+                    onChangeText={(val) => handleChange({ problemSummary: val })}
                 />
             </section>
         </div>
@@ -332,6 +347,11 @@ export default function CaseInfo() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
+                    {
+                        isDataModified && <Button onClick={discardChanges} icon={<Close />} variant='outlined'>
+                            Cancelar Cambios
+                        </Button>
+                    }
                     <Dropdown
                         label={localCaseData?.caseStatus} // Use formData for immediate update
                         triggerClassName={getStatusColor(localCaseData?.caseStatus ?? "Abierto")}
