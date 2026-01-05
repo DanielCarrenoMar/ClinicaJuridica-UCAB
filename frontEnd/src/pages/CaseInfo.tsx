@@ -124,28 +124,28 @@ export default function CaseInfo() {
     const GeneralTabContent = (
         <div className="flex flex-col gap-6">
             <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-label-small font-bold">Ámbito Legal</h4>
+                <article className="flex flex-col">
+                    <h4 className="text-label-small mb-1">Ámbito Legal</h4>
                     <div className="flex flex-col gap-2 pl-2 border-l-2 border-onSurface/10">
                         <div>
-                            <span className="text-xs text-onSurfaceVariant uppercase tracking-wider">Materia</span>
+                            <h5 className="text-body-large">Materia</h5>
                             <p className="text-body-medium font-medium">{caseData.subjectName}</p>
                         </div>
                         <div>
-                            <span className="text-xs text-onSurfaceVariant uppercase tracking-wider">Categoría</span>
+                            <h5 className="text-body-large">Categoría</h5>
                             <p className="text-body-medium font-medium">{caseData.subjectCategoryName}</p>
                         </div>
                         <div>
-                            <span className="text-xs text-onSurfaceVariant uppercase tracking-wider">Ámbito</span>
+                            <h5 className="text-body-large">Ámbito</h5>
                             <p className="text-body-medium font-medium">{caseData.legalAreaName}</p>
                         </div>
                     </div>
-                </div>
-                <div>
+                </article>
+                <article>
                     <h4 className="text-label-small mb-1">Tipo de Trámite</h4>
                     <p className="text-body-medium">{caseData.processType}</p>
-                </div>
-                <div>
+                </article>
+                <article>
                     <header className='flex gap-2 items-center'>
                         <h4 className="text-label-small mb-1">Tribunal</h4>
                     </header>
@@ -154,7 +154,7 @@ export default function CaseInfo() {
                         onChangeText={(val) => handleChange({ courtName: val })}
                         placeholder=''
                     />
-                </div>
+                </article>
             </section>
             <section>
                 <header className="flex gap-2 items-center mb-2">
