@@ -7,6 +7,7 @@ import caseActionRoutes from './caseAction.routes.js';
 import studentRoutes from './student.routes.js';
 import teacherRoutes from './teacher.routes.js';
 import healthRoutes from './health.routes.js'; // Asegúrate de crear este archivo
+import appointmentRoutes from './appointment.routes.js';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.use('/case-actions', caseActionRoutes);
 router.use('/students', studentRoutes);
 router.use('/teachers', teacherRoutes);
 router.use('/salud', healthRoutes);
+router.use('/appointments', appointmentRoutes);
 
 // Ruta raíz de la API v1
 router.get('/', (req, res) => {

@@ -8,6 +8,7 @@ interface DatePickerProps {
   name?: string;
   id?: string;
   required?: boolean;
+  min?: string;
 }
 
 export default function DatePicker({
@@ -17,7 +18,8 @@ export default function DatePicker({
   className = '',
   name,
   id,
-  required = false
+  required = false,
+  min
 }: DatePickerProps) {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -29,8 +31,8 @@ export default function DatePicker({
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
       {label && (
-        <label 
-          htmlFor={id || name} 
+        <label
+          htmlFor={id || name}
           className="flex items-center px-1.5 w-full text-body-large text-onSurface"
         >
           {label}
@@ -43,6 +45,7 @@ export default function DatePicker({
         value={value}
         onChange={handleChange}
         required={required}
+        min={min}
         className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 text-onSurface"
       />
     </div>

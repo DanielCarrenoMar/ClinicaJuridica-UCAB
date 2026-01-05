@@ -1,6 +1,7 @@
 import type { CaseActionDAO } from "#database/daos/caseActionDAO.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import type { CaseStatusDAO } from "#database/daos/caseStatusDAO.ts";
+import type { AppointmentDAO } from "#database/daos/appointmentDAO.ts";
 import type { ApplicantModel } from "./models/applicant"
 import type { BeneficiaryModel } from "./models/beneficiary";
 import type { CaseModel } from "./models/case";
@@ -8,7 +9,7 @@ import type { CaseActionModel } from "./models/caseAction";
 import type { CaseStatusModel } from "./models/caseStatus";
 import type { StatusCaseAmountModel } from "./models/statusCaseAmount";
 import type { StudentModel } from "./models/student";
-
+import type { AppointmentModel } from "./models/appointment"
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -43,6 +44,13 @@ export interface CaseActionRepository {
     findAllCaseActions(): Promise<CaseActionModel[]>;
     findCaseActionById(id: string): Promise<CaseActionModel | null>;
     createCaseAction(data: CaseActionDAO): Promise<CaseActionDAO>;
+}
+
+export interface AppointmentRepository {
+    findAllAppointments(): Promise<AppointmentModel[]>;
+    findAppointmentById(id: number): Promise<AppointmentModel | null>;
+    createAppointment(data: AppointmentDAO): Promise<AppointmentModel>;
+    updateAppointment(id: number, data: Partial<AppointmentModel>): Promise<AppointmentModel>;
 }
 
 export interface UserRepository {

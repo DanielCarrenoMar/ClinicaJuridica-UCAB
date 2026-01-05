@@ -5,6 +5,7 @@ export const USER_URL = "http://localhost:3000/api/v1/users";
 export const CASE_ACTION_URL = "http://localhost:3000/api/v1/case-actions";
 export const STUDENT_URL = "http://localhost:3000/api/v1/students";
 export const TEACHER_URL = "http://localhost:3000/api/v1/teachers";
+export const APPOINTMENT_URL = "http://localhost:3000/api/v1/appointments";
 export const STATE_URL = "http://localhost:3000/api/v1/catalogs/states";
 export const MUNICIPALITY_URL = "http://localhost:3000/api/v1/catalogs/municipalities";
 export const PARISH_URL = "http://localhost:3000/api/v1/catalogs/parishes";

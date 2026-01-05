@@ -15,6 +15,8 @@ import type { AppointmentModel } from '#domain/models/appointment.ts';
 import SupportDocumentCard from '#components/SupportDocumentCard.tsx';
 import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDialog.tsx';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
+import AddAppointmentDialog from '#components/AddAppointmentDialog.tsx';
+import EditAppointmentDialog from '#components/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { CircleMinus, Close, Pen, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
@@ -22,6 +24,8 @@ import type { CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
+import { findAllAppointments, createAppointment, updateAppointment } from '#domain/useCaseHooks/useAppointment.ts';
+import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
@@ -30,38 +34,8 @@ const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Cerrado": "bg-error! text-white border-0"
 };
 
-const MOCK_APPOINTMENTS: AppointmentModel[] = [
-    {
-        idCase: 1,
-        appointmentNumber: 1,
-        plannedDate: new Date(2024, 0, 15, 10, 0),
-        status: "Completada",
-        userId: "user-123",
-        userName: "Prof. Alberto",
-        registryDate: new Date(2024, 0, 1),
-        guidance: "Primera revisión del caso y entrevista inicial."
-    },
-    {
-        idCase: 1,
-        appointmentNumber: 2,
-        plannedDate: new Date(2024, 1, 20, 14, 30),
-        status: "Programada",
-        userId: "user-456",
-        userName: "Estudiante Maria",
-        registryDate: new Date(2024, 1, 15),
-        guidance: "Entrega de recaudos pendientes y firma de documentos."
-    },
-    {
-        idCase: 1,
-        appointmentNumber: 3,
-        plannedDate: new Date(2024, 2, 5, 9, 0),
-        status: "Cancelada",
-        userId: "user-789",
-        userName: "Prof. Alberto",
-        registryDate: new Date(2024, 2, 1),
-        guidance: "Cancelada por fuerza mayor."
-    }
-];
+// Mock data removed
+
 
 const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
     {
@@ -90,19 +64,27 @@ const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
     }
 ];
 
-type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Historial"; 
+type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Historial";
 
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
 
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
-    const {permissionLevel} = useAuth()
+    const { permissionLevel } = useAuth()
     const { caseData, loading, error } = useGetCaseById(Number(id));
     const { editCase, loading: updating } = useUpdateCase();
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
     const { students } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
+
+    // Appointment Hooks
+    const { appointments: allAppointments, refresh: refreshAppointments } = findAllAppointments();
+    const { createAppointment: createNewAppointment } = createAppointment();
+    const { updateAppointment: updateAppt } = updateAppointment();
+    const userContext = useAuth();
+
+    const appointments = allAppointments.filter(a => a.idCase === Number(id));
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [isDataModified, setIsDataModified] = useState(false);
@@ -111,6 +93,8 @@ export default function CaseInfo() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
     const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
+    const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = useState(false);
+    const [isEditAppointmentDialogOpen, setIsEditAppointmentDialogOpen] = useState(false);
 
     // Recaudos Tab State
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
@@ -120,7 +104,7 @@ export default function CaseInfo() {
     useEffect(() => {
         if (!caseData) return
         setLocalCaseData(caseData);
-        
+
     }, [caseData]);
     useEffect(() => {
         if (!localCaseData) return
@@ -161,9 +145,22 @@ export default function CaseInfo() {
     const GeneralTabContent = (
         <div className="flex flex-col gap-6">
             <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h4 className="text-label-small mb-1">Ámbito Legal</h4>
-                    <p className="text-body-medium">{caseData.legalAreaName}</p>
+                <div className="flex flex-col gap-3">
+                    <h4 className="text-label-small font-bold">Ámbito Legal</h4>
+                    <div className="flex flex-col gap-2 pl-2 border-l-2 border-onSurface/10">
+                        <div>
+                            <span className="text-xs text-onSurfaceVariant uppercase tracking-wider">Materia</span>
+                            <p className="text-body-medium font-medium">{caseData.subjectName}</p>
+                        </div>
+                        <div>
+                            <span className="text-xs text-onSurfaceVariant uppercase tracking-wider">Categoría</span>
+                            <p className="text-body-medium font-medium">{caseData.subjectCategoryName}</p>
+                        </div>
+                        <div>
+                            <span className="text-xs text-onSurfaceVariant uppercase tracking-wider">Ámbito</span>
+                            <p className="text-body-medium font-medium">{caseData.legalAreaName}</p>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <h4 className="text-label-small mb-1">Tipo de Trámite</h4>
@@ -203,15 +200,15 @@ export default function CaseInfo() {
                         onChange={setSearchQuery}
                     />
                 </div>
-                <Button variant='outlined' onClick={() => { }}>
+                <Button variant='outlined' onClick={() => setIsAddAppointmentDialogOpen(true)}>
                     Añadir Cita
                 </Button>
             </section>
 
             <section className="flex flex-col gap-4 pb-20">
-                {MOCK_APPOINTMENTS
+                {appointments
                     .filter(apt =>
-                        apt.guidance?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (apt.guidance?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
                         apt.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         apt.status.toString().toLowerCase().includes(searchQuery.toLowerCase())
                     )
@@ -233,6 +230,49 @@ export default function CaseInfo() {
                 onClose={() => setIsAppointmentDialogOpen(false)}
                 appointment={selectedAppointment}
                 applicantName={caseData.applicantName}
+                onEdit={() => {
+                    setIsAppointmentDialogOpen(false);
+                    setIsEditAppointmentDialogOpen(true);
+                }}
+            />
+
+            <AddAppointmentDialog
+                open={isAddAppointmentDialogOpen}
+                onClose={() => setIsAddAppointmentDialogOpen(false)}
+                onAdd={async (data) => {
+                    if (!caseData || !userContext.user) return;
+                    try {
+                        const newAppt: AppointmentDAO = {
+                            idCase: caseData.idCase,
+                            appointmentNumber: 0, // Backend auto-increments
+                            plannedDate: data.plannedDate,
+                            executionDate: data.executionDate,
+                            status: "P", // Programada
+                            guidance: data.guidance,
+                            userId: userContext.user.identityCard,
+                            registryDate: new Date()
+                        };
+                        await createNewAppointment(newAppt);
+                        refreshAppointments();
+                    } catch (error) {
+                        console.error("Error creating appointment:", error);
+                    }
+                }}
+            />
+
+            <EditAppointmentDialog
+                open={isEditAppointmentDialogOpen}
+                onClose={() => setIsEditAppointmentDialogOpen(false)}
+                appointment={selectedAppointment}
+                onSave={async (idCase, appointmentNumber, data) => {
+                    try {
+                        await updateAppt(idCase, { ...data, appointmentNumber });
+                        refreshAppointments();
+                        setIsEditAppointmentDialogOpen(false);
+                    } catch (error) {
+                        console.error("Error updating appointment:", error);
+                    }
+                }}
             />
         </div>
     );
@@ -288,7 +328,7 @@ export default function CaseInfo() {
                 <article>
                     <h4 className="text-label-small mb-4">Solicitante</h4>
                     <span className="flex items-center gap-3">
-                        <User/>
+                        <User />
                         <p className="text-body-medium">{caseData.applicantName}</p>
                     </span>
                 </article>
@@ -350,7 +390,7 @@ export default function CaseInfo() {
                                     </>
                                 )
                             }
-                            
+
                         </section>
                     </div>
                 </article>
@@ -393,20 +433,20 @@ export default function CaseInfo() {
             <section className="flex flex-col gap-4 pb-20">
                 {caseActionsLoading && <LoadingSpinner />}
                 {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
-            {
-                caseActions.length === 0 ? (
-                    <span className="flex flex-col items-center justify-center gap-4 mt-20">
-                        <p className="text-body-small">No hay acciones registradas para este caso.</p>
-                    </span>
-                ) : (
-                    caseActions.map((caseAction) => (
-                        <CaseActionCard key={caseAction.id} caseAction={caseAction} />
-                    ))
-                )
-            }
+                {
+                    caseActions.length === 0 ? (
+                        <span className="flex flex-col items-center justify-center gap-4 mt-20">
+                            <p className="text-body-small">No hay acciones registradas para este caso.</p>
+                        </span>
+                    ) : (
+                        caseActions.map((caseAction) => (
+                            <CaseActionCard key={caseAction.id} caseAction={caseAction} />
+                        ))
+                    )
+                }
             </section>
 
-            
+
         </div>
     );
 
@@ -414,7 +454,7 @@ export default function CaseInfo() {
         <Box className='p-0!'>
             <header className="bg-surface/70 flex items-center justify-between px-4 rounded-xl h-16">
                 <span className="flex gap-3 items-center">
-                    <Clipboard className='size-6!'/>
+                    <Clipboard className='size-6!' />
                     <div>
                         <h1 className="text-label-small">{caseData.compoundKey}</h1>
                         <p className="text-body-small"> <strong className='text-body-medium'>Fecha:</strong> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
@@ -441,7 +481,7 @@ export default function CaseInfo() {
                         isDataModified ? (
                             <Button variant='resalted' className='w-32'>Guardar</Button>
                         ) : (
-                            <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf/>}>
+                            <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf />}>
                                 Exportar
                             </Button>
                         )
@@ -451,11 +491,11 @@ export default function CaseInfo() {
 
             <section className="flex py-2">
                 <Tabs selectedId={activeTab} onChange={(id) => setActiveTab(id as CaseInfoTabs)}>
-                    <Tabs.Item id="General" label="General" icon={<Clipboard/>} />
-                    <Tabs.Item id="Involucrados" label="Involucrados" icon={<User/>} />
-                    <Tabs.Item id="Citas" label="Citas" icon={<CalendarMonth/>} />
-                    <Tabs.Item id="Recaudos" label="Recaudos" icon={<File/>} />
-                    <Tabs.Item id="Historial" label="Historial" icon={<Book/>} />
+                    <Tabs.Item id="General" label="General" icon={<Clipboard />} />
+                    <Tabs.Item id="Involucrados" label="Involucrados" icon={<User />} />
+                    <Tabs.Item id="Citas" label="Citas" icon={<CalendarMonth />} />
+                    <Tabs.Item id="Recaudos" label="Recaudos" icon={<File />} />
+                    <Tabs.Item id="Historial" label="Historial" icon={<Book />} />
                 </Tabs>
             </section>
 

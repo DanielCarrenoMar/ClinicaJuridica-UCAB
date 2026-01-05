@@ -15,9 +15,11 @@ export interface AppointmentModel {
 
 
 export function daoToAppointmentModel(dao: AppointmentInfoDAO): AppointmentModel {
-    const { registryDate, status, ...rest } = dao;
+    const { registryDate, plannedDate, executionDate, status, ...rest } = dao;
     return {
         registryDate: new Date(registryDate),
+        plannedDate: new Date(plannedDate),
+        executionDate: executionDate ? new Date(executionDate) : undefined,
         status: typeDaoToAppointmentStatusTypeModel(status),
         ...rest
     }

@@ -1,36 +1,36 @@
 import type { AppointmentModel } from "#domain/models/appointment.ts";
-import { CloseCircle, CalendarMonth, User, ClipboardList, Clock } from "flowbite-react-icons/outline";
+import { CloseCircle, CalendarMonth, User, ClipboardList, Clock, Pen } from "flowbite-react-icons/outline";
 
 interface AppointmentDetailsDialogProps {
     open: boolean;
     onClose: () => void;
+    onEdit?: () => void;
     appointment: AppointmentModel | null;
     applicantName: string;
 }
 
-const TRANSLATED_STATUS: Record<string, string> = {
-    "SCHEDULED": "Programada",
-    "COMPLETED": "Realizada",
-    "CANCELLED": "Cancelada"
-};
 
-const STATUS_COLORS: Record<string, string> = {
-    "SCHEDULED": "bg-warning text-white",
-    "COMPLETED": "bg-success text-white",
-    "CANCELLED": "bg-error text-white",
-    "Default": "bg-surfaceVariant text-onSurfaceVariant"
-};
+
 
 export default function AppointmentDetailsDialog({
     open,
     onClose,
+    onEdit,
     appointment,
     applicantName
 }: AppointmentDetailsDialogProps) {
     if (!open || !appointment) return null;
 
-    const statusLabel = TRANSLATED_STATUS[appointment.status as string] || appointment.status;
-    const statusColor = STATUS_COLORS[appointment.status as string] || STATUS_COLORS.Default;
+    const statusLabel = appointment.status;
+
+    const STATUS_COLORS_MAP: Record<string, string> = {
+        "Programada": "bg-warning text-white",
+        "Completada": "bg-success text-white",
+        "Cancelada": "bg-error text-white",
+        "Default": "bg-surfaceVariant text-onSurfaceVariant"
+    };
+
+    const statusColor = STATUS_COLORS_MAP[appointment.status as string] || STATUS_COLORS_MAP.Default;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
@@ -40,9 +40,16 @@ export default function AppointmentDetailsDialog({
             >
                 <div className="flex justify-between items-start">
                     <h2 className="text-title-large text-onSurface font-bold">Detalles de la Cita</h2>
-                    <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
-                        <CloseCircle className="w-8 h-8" />
-                    </button>
+                    <div className="flex gap-2">
+                        {onEdit && (
+                            <button onClick={onEdit} className="text-primary hover:text-primary/80 cursor-pointer transition-colors" title="Editar cita">
+                                <Pen className="w-6 h-6" />
+                            </button>
+                        )}
+                        <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
+                            <CloseCircle className="w-8 h-8" />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-4">

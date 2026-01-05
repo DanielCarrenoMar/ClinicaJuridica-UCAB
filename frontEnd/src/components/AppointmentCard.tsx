@@ -10,8 +10,8 @@ interface AppointmentCardProps {
 export default function AppointmentCard({ appointment, applicantName, onClick }: AppointmentCardProps) {
 
     // Determine the date to show based on status
-    const dateLabel = appointment.status === "COMPLETED" ? "Realizada el" :
-        appointment.status === "CANCELLED" ? "Cancelada el" : "Programada para el";
+    const dateLabel = appointment.status === "Completada" ? "Realizada el" :
+        appointment.status === "Cancelada" ? "Cancelada el" : "Programada para el";
 
     const dateString = appointment.plannedDate.toLocaleDateString("es-ES", {
         day: '2-digit',
