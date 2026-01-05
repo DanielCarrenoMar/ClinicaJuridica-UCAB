@@ -1,5 +1,6 @@
 import { getCaseActionRepository } from "#database/repositoryImp/caseActionRepositoryImp.ts";
 import type { CaseActionModel } from "#domain/models/caseAction.ts";
+import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 import { useCallback, useEffect, useState } from "react";
 
 export function useGetAllCaseActions() {
@@ -32,4 +33,30 @@ export function useGetAllCaseActions() {
         error,
         refresh: loadCaseActions
     };
-} 
+}
+
+export function createCaseAction() {
+    const { createCaseAction } = getCaseActionRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const createAction = useCallback(async (data: CaseActionInfoDAO) => {
+        setLoading(true);
+        try {
+            const newAction = await createCaseAction(data);
+            setError(null);
+            return newAction;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return {
+        createCaseAction: createAction,
+        loading,
+        error
+    };
+}

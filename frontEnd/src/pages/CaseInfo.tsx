@@ -18,13 +18,13 @@ import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
-import { CircleMinus, Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
+import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
-import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
+import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
 import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
@@ -33,7 +33,10 @@ import UserSearchDialog from '#components/dialogs/UserSearchDialog.tsx';
 import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
+import AddCaseActionDialog from '#components/dialogs/AddCaseActionDialog.tsx';
 import type { StudentModel } from '#domain/models/student.ts';
+import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
+import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -53,8 +56,9 @@ export default function CaseInfo() {
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
     const { students: caseStudents, loadStudents: loadCaseStudents } = useGetStudentsByCaseId(Number(id));
-    const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
+    const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(Number(id));
     const { setStudentsToCase } = useSetStudentsToCase()
+    const { createCaseAction: createAction } = createCaseAction();
 
     const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
@@ -84,6 +88,8 @@ export default function CaseInfo() {
     const [searchQuery, setSearchQuery] = useState("");
     // Recaudos Tab State
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
+    // Historial Tab State
+    const [caseActionSearchQuery, setCaseActionSearchQuery] = useState("");
     const [selectedSupportDocument, setSelectedSupportDocument] = useState<SupportDocumentModel | null>(null);
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
     const [isAddSupportDialogOpen, setIsAddSupportDialogOpen] = useState(false);
@@ -91,6 +97,7 @@ export default function CaseInfo() {
 
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
+    const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
 
     useEffect(() => {
         if (!caseData) return
@@ -244,7 +251,7 @@ export default function CaseInfo() {
                 onAdd={async (data) => {
                     if (!caseData || !user) return;
                     try {
-                        const newAppt: AppointmentDAO = {
+                        const newAppt: AppointmentInfoDAO = {
                             idCase: caseData.idCase,
                             appointmentNumber: 0, // Backend auto-increments
                             plannedDate: data.plannedDate,
@@ -252,6 +259,7 @@ export default function CaseInfo() {
                             status: "P", // Programada
                             guidance: data.guidance,
                             userId: user.identityCard,
+                            userName: user.fullName,
                             registryDate: new Date()
                         };
                         await createNewAppointment(newAppt);
@@ -496,10 +504,10 @@ export default function CaseInfo() {
                     <SearchBar
                         isOpen={true}
                         placeholder="Buscar acciones..."
-                        onChange={() => { }}
+                        onChange={setCaseActionSearchQuery}
                     />
                 </div>
-                <Button variant='outlined' onClick={() => { }}>
+                <Button variant='outlined' onClick={() => setIsAddCaseActionDialogOpen(true)}>
                     Añadir Acción
                 </Button>
             </section>
@@ -508,18 +516,53 @@ export default function CaseInfo() {
                 {caseActionsLoading && <LoadingSpinner />}
                 {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
                 {
-                    caseActions.length === 0 ? (
+                    caseActions
+                        .filter(action =>
+                            action.description.toLowerCase().includes(caseActionSearchQuery.toLowerCase()) ||
+                            (action.notes?.toLowerCase() || "").includes(caseActionSearchQuery.toLowerCase()) ||
+                            action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
+                        )
+                        .length === 0 ? (
                         <span className="flex flex-col items-center justify-center gap-4 mt-20">
                             <p className="text-body-small">No hay acciones registradas para este caso.</p>
                         </span>
                     ) : (
-                        caseActions.map((caseAction) => (
-                            <CaseActionCard key={caseAction.id} caseAction={caseAction} />
-                        ))
+                        caseActions
+                            .filter(action =>
+                                action.description.toLowerCase().includes(caseActionSearchQuery.toLowerCase()) ||
+                                (action.notes?.toLowerCase() || "").includes(caseActionSearchQuery.toLowerCase()) ||
+                                action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
+                            )
+                            .map((caseAction) => (
+                                <CaseActionCard key={caseAction.id} caseAction={caseAction} />
+                            ))
                     )
                 }
             </section>
 
+            <AddCaseActionDialog
+                open={isAddCaseActionDialogOpen}
+                onClose={() => setIsAddCaseActionDialogOpen(false)}
+                onAdd={async (actionData) => {
+                    if (!caseData || !user) return;
+                    try {
+                        const newAction: CaseActionInfoDAO = {
+                            idCase: caseData.idCase,
+                            caseCompoundKey: caseData.compoundKey,
+                            actionNumber: 0, // Backend auto-increments
+                            description: actionData.description,
+                            notes: actionData.notes,
+                            userId: user.identityCard,
+                            userName: user.fullName,
+                            registryDate: new Date()
+                        };
+                        await createAction(newAction);
+                        loadCaseActions(Number(id));
+                    } catch (error) {
+                        console.error("Error creating case action:", error);
+                    }
+                }}
+            />
 
         </div>
     );

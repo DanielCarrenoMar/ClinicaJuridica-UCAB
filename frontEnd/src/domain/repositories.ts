@@ -37,7 +37,7 @@ export interface CaseRepository {
     findStudentsByCaseId(idCase: number): Promise<StudentModel[]>;
     getStatusCaseAmount(): Promise<StatusCaseAmountModel[]>;
     createCase(data: CaseDAO): Promise<CaseModel>;
-    createCaseStatusFromCaseId(id:number, data: CaseStatusDAO): Promise<CaseStatusModel>;
+    createCaseStatusFromCaseId(id: number, data: CaseStatusDAO): Promise<CaseStatusModel>;
     updateCase(id: number, data: Partial<CaseDAO>): Promise<CaseModel>;
     deleteCase(id: number): Promise<void>;
     findStatusCaseAmounts(): Promise<StatusCaseAmountModel>;
@@ -53,7 +53,7 @@ export interface CaseRepository {
 export interface CaseActionRepository {
     findAllCaseActions(): Promise<CaseActionModel[]>;
     findCaseActionById(id: string): Promise<CaseActionModel | null>;
-    createCaseAction(data: CaseActionDAO): Promise<CaseActionDAO>;
+    createCaseAction(data: CaseActionDAO): Promise<CaseActionModel>;
 }
 
 
