@@ -1,17 +1,19 @@
 import type { SupportDocumentModel } from "#domain/models/supportDocument.ts";
 import Button from "#components/Button.tsx";
-import { CloseCircle, CalendarMonth, FilePdf, Download, AlignLeft } from "flowbite-react-icons/outline";
+import { CloseCircle, CalendarMonth, FilePdf, Download, AlignLeft, Pen } from "flowbite-react-icons/outline";
 
 interface SupportDocumentDetailsDialogProps {
     open: boolean;
     onClose: () => void;
     document: SupportDocumentModel | null;
+    onEdit?: () => void;
 }
 
 export default function SupportDocumentDetailsDialog({
     open,
     onClose,
-    document
+    document,
+    onEdit
 }: SupportDocumentDetailsDialogProps) {
     if (!open || !document) return null;
 
@@ -23,9 +25,16 @@ export default function SupportDocumentDetailsDialog({
             >
                 <div className="flex justify-between items-start">
                     <h2 className="text-title-large text-onSurface font-bold">Detalles del Recaudo</h2>
-                    <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
-                        <CloseCircle className="w-8 h-8" />
-                    </button>
+                    <div className="flex gap-2">
+                        {onEdit && (
+                            <button onClick={onEdit} className="text-onSurface/50 hover:text-primary cursor-pointer transition-colors p-1">
+                                <Pen className="w-6 h-6" />
+                            </button>
+                        )}
+                        <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
+                            <CloseCircle className="w-8 h-8" />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-4">

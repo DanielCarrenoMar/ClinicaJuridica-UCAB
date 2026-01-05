@@ -26,43 +26,16 @@ import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import { createAppointment, updateAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
-
+import { createSupportDocument, updateSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
+import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
+import AddSupportDocumentDialog from '#components/AddSupportDocumentDialog.tsx';
+import EditSupportDocumentDialog from '#components/EditSupportDocumentDialog.tsx';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
     "Pausado": "bg-onSurface! text-white border-0",
     "Cerrado": "bg-error! text-white border-0"
 };
-
-// Mock data removed
-
-
-const MOCK_SUPPORT_DOCUMENTS: SupportDocumentModel[] = [
-    {
-        idCase: 1,
-        supportNumber: 1,
-        title: "Cédula de Identidad",
-        description: "Copia legible de la cédula de identidad del solicitante.",
-        submissionDate: new Date(2024, 0, 10),
-        fileUrl: "#"
-    },
-    {
-        idCase: 1,
-        supportNumber: 2,
-        title: "Constancia de Residencia",
-        description: "Documento emitido por el CNE o Consejo Comunal que avale la residencia actual.",
-        submissionDate: new Date(2024, 0, 12),
-        fileUrl: "#"
-    },
-    {
-        idCase: 1,
-        supportNumber: 3,
-        title: "Informe Médico",
-        description: "Informe detallado de la condición de salud que motiva la solicitud. Incluye antecedentes y tratamiento actual.",
-        submissionDate: new Date(2024, 0, 15),
-        fileUrl: "#"
-    }
-];
 
 type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Historial";
 
@@ -78,9 +51,15 @@ export default function CaseInfo() {
     const { students } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
 
-    const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
+    const { appointments, loading: appointmentsLoading, error: appointmentsError, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
     const { updateAppointment: updateAppt } = updateAppointment();
+
+    // Support Document Hooks
+    const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
+    const { createSupportDocument: createNewSupportDocument } = createSupportDocument();
+    const { updateSupportDocument: updateSupDocument } = updateSupportDocument();
+
     const userContext = useAuth();
 
     // Recaudos Tab State
@@ -98,6 +77,8 @@ export default function CaseInfo() {
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
     const [selectedSupportDocument, setSelectedSupportDocument] = useState<SupportDocumentModel | null>(null);
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
+    const [isAddSupportDialogOpen, setIsAddSupportDialogOpen] = useState(false);
+    const [isEditSupportDialogOpen, setIsEditSupportDialogOpen] = useState(false);
 
     useEffect(() => {
         if (!caseData) return
@@ -285,13 +266,13 @@ export default function CaseInfo() {
                         onChange={setSupportSearchQuery}
                     />
                 </div>
-                <Button variant='outlined' onClick={() => { }}>
+                <Button variant='outlined' onClick={() => setIsAddSupportDialogOpen(true)}>
                     Añadir Recaudo
                 </Button>
             </div>
 
             <div className="flex flex-col gap-4 pb-20">
-                {MOCK_SUPPORT_DOCUMENTS
+                {supportDocuments
                     .filter(doc =>
                         doc.title.toLowerCase().includes(supportSearchQuery.toLowerCase()) ||
                         doc.description.toLowerCase().includes(supportSearchQuery.toLowerCase())
@@ -316,6 +297,47 @@ export default function CaseInfo() {
                 open={isSupportDialogOpen}
                 onClose={() => setIsSupportDialogOpen(false)}
                 document={selectedSupportDocument}
+                onEdit={() => {
+                    setIsSupportDialogOpen(false);
+                    setIsEditSupportDialogOpen(true);
+                }}
+            />
+
+            <AddSupportDocumentDialog
+                open={isAddSupportDialogOpen}
+                onClose={() => setIsAddSupportDialogOpen(false)}
+                onAdd={async (data) => {
+                    if (!caseData) return;
+                    try {
+                        const newDoc: SupportDocumentDAO = {
+                            idCase: caseData.idCase,
+                            supportNumber: 0, // Backend handles this
+                            title: data.title,
+                            description: data.description,
+                            submissionDate: data.submissionDate,
+                            fileUrl: data.fileUrl || ""
+                        };
+                        await createNewSupportDocument(newDoc);
+                        loadSupportDocuments(Number(id));
+                    } catch (error) {
+                        console.error("Error creating support document:", error);
+                    }
+                }}
+            />
+
+            <EditSupportDocumentDialog
+                open={isEditSupportDialogOpen}
+                onClose={() => setIsEditSupportDialogOpen(false)}
+                document={selectedSupportDocument}
+                onSave={async (idCase, supportNumber, data) => {
+                    try {
+                        await updateSupDocument(idCase, { ...data, supportNumber });
+                        loadSupportDocuments(Number(id));
+                        setIsEditSupportDialogOpen(false);
+                    } catch (error) {
+                        console.error("Error updating support document:", error);
+                    }
+                }}
             />
         </div>
     );

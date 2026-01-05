@@ -117,11 +117,11 @@ class CaseService {
         const lastSemester = await tx.$queryRaw`
           SELECT "term" FROM "Semester" ORDER BY "startDate" DESC LIMIT 1
         `;
-        
+
         if (!lastSemester || lastSemester.length === 0) {
-             throw new Error("No se encontraron semestres registrados");
+          throw new Error("No se encontraron semestres registrados");
         }
-        
+
         const currentTerm = lastSemester[0].term;
 
         const newCase = await tx.$queryRaw`
@@ -197,10 +197,10 @@ class CaseService {
   async deleteCase(id) {
     try {
       await prisma.$transaction(async (tx) => {
-         await tx.$executeRaw`DELETE FROM "CaseStatus" WHERE "idCase" = ${id}`;
-         await tx.$executeRaw`DELETE FROM "AssignedStudent" WHERE "idCase" = ${id}`;
-         await tx.$executeRaw`DELETE FROM "Case" WHERE "idCase" = ${id}`;
-      }); 
+        await tx.$executeRaw`DELETE FROM "CaseStatus" WHERE "idCase" = ${id}`;
+        await tx.$executeRaw`DELETE FROM "AssignedStudent" WHERE "idCase" = ${id}`;
+        await tx.$executeRaw`DELETE FROM "Case" WHERE "idCase" = ${id}`;
+      });
       return { success: true, message: 'Caso eliminado correctamente' };
     } catch (error) {
       return { success: false, error: error.message };
@@ -265,7 +265,7 @@ class CaseService {
       return { success: false, error: error.message };
     }
   }
-  
+
   async getBeneficiariesFromCaseId(idCase) {
     try {
       const beneficiaries = await prisma.$queryRaw`
@@ -309,16 +309,16 @@ class CaseService {
           COUNT(*) FILTER (WHERE "status" = 'C') AS "closedAmount"
         FROM LatestStatuses
       `;
-      
+
       const data = result[0];
-      return { 
-        success: true, 
+      return {
+        success: true,
         data: {
           inProgressAmount: Number(data.inProgressAmount || 0),
           openAmount: Number(data.openAmount || 0),
           pausedAmount: Number(data.pausedAmount || 0),
           closedAmount: Number(data.closedAmount || 0)
-        } 
+        }
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -349,7 +349,7 @@ class CaseService {
   async getStudentsFromCaseId(caseId) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
-      
+
       const students = await prisma.$queryRaw`
         SELECT 
           s."identityCard" as "studentId",
@@ -374,11 +374,11 @@ class CaseService {
   async createStatusForCaseId(caseId, data) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
-      
+
       const caseExists = await prisma.$queryRaw`
         SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
       `;
-      
+
       if (!Array.isArray(caseExists) || caseExists.length === 0) {
         return { success: false, message: 'Caso no encontrado' };
       }
@@ -407,10 +407,11 @@ class CaseService {
   async getAppoitmentByCaseId(caseId) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
-      
+
       const appointments = await prisma.$queryRaw`
         SELECT 
-          a."appointmentNumber" as "appointmentId",
+          a."idCase",
+          a."appointmentNumber",
           a."plannedDate",
           a."executionDate",
           a."status",
@@ -435,11 +436,11 @@ class CaseService {
   async createAppoitmentForCaseId(caseId, data) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
-      
+
       const caseExists = await prisma.$queryRaw`
         SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
       `;
-      
+
       if (!Array.isArray(caseExists) || caseExists.length === 0) {
         return { success: false, message: 'Caso no encontrado' };
       }
@@ -468,10 +469,11 @@ class CaseService {
   async getSupportDocumentsById(caseId) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
-      
+
       const documents = await prisma.$queryRaw`
         SELECT 
-          sd."supportNumber" as "documentId",
+          sd."idCase",
+          sd."supportNumber",
           sd."title",
           sd."description",
           sd."submissionDate",
@@ -492,11 +494,11 @@ class CaseService {
   async createSupportDocumentForCaseId(caseId, data) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
-      
+
       const caseExists = await prisma.$queryRaw`
         SELECT "idCase" FROM "Case" WHERE "idCase" = ${id}
       `;
-      
+
       if (!Array.isArray(caseExists) || caseExists.length === 0) {
         return { success: false, message: 'Caso no encontrado' };
       }
