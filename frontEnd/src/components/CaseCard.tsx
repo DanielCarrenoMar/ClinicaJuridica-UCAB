@@ -10,10 +10,10 @@ interface CaseCardProps {
 }
 
 const statusConfig: Record<CaseStatusTypeModel, { color: string; label: string }> = {
-    OPEN: { color: "bg-success", label: "Abierto" },
-    IN_PROGRESS: { color: "bg-warning", label: "En Trámite" },
-    CLOSED: { color: "bg-error", label: "Cerrado" },
-    PAUSED: { color: "bg-onSurface", label: "En Pausa" },
+    "Abierto": { color: "bg-success", label: "Abierto" },
+    "En Espera": { color: "bg-warning", label: "En Espera" },
+    "Cerrado": { color: "bg-error", label: "Cerrado" },
+    "Pausado": { color: "bg-onSurface", label: "Pausado" },
 };
 
 function highlightText(text: string | number, indices?: Array<[number, number]>): ReactNode {
@@ -57,7 +57,7 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
 
     const navigate = useNavigate();
 
-    const config = statusConfig[caseStatus] || statusConfig.OPEN;
+    const config = statusConfig[caseStatus] || statusConfig.Abierto;
     const formattedDate = createdAt.toLocaleDateString("es-ES");
 
     return (
