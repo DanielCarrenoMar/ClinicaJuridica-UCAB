@@ -115,3 +115,28 @@ export function updateAppointment() {
         error
     };
 }
+
+export function deleteAppointment() {
+    const { deleteAppointment } = getAppointmentRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const deleteAppointmentData = useCallback(async (idCase: number, appointmentNumber: number) => {
+        setLoading(true);
+        try {
+            await deleteAppointment(idCase, appointmentNumber);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return {
+        deleteAppointment: deleteAppointmentData,
+        loading,
+        error
+    };
+}

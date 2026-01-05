@@ -58,6 +58,7 @@ export interface AppointmentRepository {
     findAppointmentById(id: number): Promise<AppointmentModel | null>;
     createAppointment(data: AppointmentDAO): Promise<AppointmentModel>;
     updateAppointment(id: number, data: Partial<AppointmentModel>): Promise<AppointmentModel>;
+    deleteAppointment(idCase: number, appointmentNumber: number): Promise<void>;
 }
 
 export interface SupportDocumentRepository {
@@ -65,6 +66,7 @@ export interface SupportDocumentRepository {
     findSupportDocumentById(id: number): Promise<SupportDocumentModel | null>;
     createSupportDocument(data: SupportDocumentDAO): Promise<SupportDocumentModel>;
     updateSupportDocument(id: number, data: Partial<SupportDocumentModel>): Promise<SupportDocumentModel>;
+    deleteSupportDocument(idCase: number, supportNumber: number): Promise<void>;
 }
 
 export interface UserRepository {

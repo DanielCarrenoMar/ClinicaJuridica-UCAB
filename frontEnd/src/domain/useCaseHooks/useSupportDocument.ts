@@ -115,3 +115,28 @@ export function updateSupportDocument() {
         error
     };
 }
+
+export function deleteSupportDocument() {
+    const { deleteSupportDocument } = getSupportDocumentRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const deleteSupportDocumentData = useCallback(async (idCase: number, supportNumber: number) => {
+        setLoading(true);
+        try {
+            await deleteSupportDocument(idCase, supportNumber);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return {
+        deleteSupportDocument: deleteSupportDocumentData,
+        loading,
+        error
+    };
+}

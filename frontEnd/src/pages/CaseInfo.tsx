@@ -23,9 +23,9 @@ import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
-import { createAppointment, updateAppointment } from '#domain/useCaseHooks/useAppointment.ts';
+import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
-import { createSupportDocument, updateSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
+import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
 import EditSupportDocumentDialog from '#components/dialogs/EditSupportDocumentDialog.tsx';
@@ -48,7 +48,7 @@ export default function CaseInfo() {
 
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
-    const { user ,permissionLevel } = useAuth()
+    const { user, permissionLevel } = useAuth()
     const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
@@ -58,6 +58,7 @@ export default function CaseInfo() {
     const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
     const { updateAppointment: updateAppt } = updateAppointment();
+    const { deleteAppointment: deleteAppt } = deleteAppointment();
 
     const { students } = useGetAllStudents();
     const { teachers } = useGetAllTeachers();
@@ -66,6 +67,7 @@ export default function CaseInfo() {
     const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
     const { createSupportDocument: createNewSupportDocument } = createSupportDocument();
     const { updateSupportDocument: updateSupDocument } = updateSupportDocument();
+    const { deleteSupportDocument: deleteSupDocument } = deleteSupportDocument();
 
     // Recaudos Tab State
     const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
@@ -90,7 +92,7 @@ export default function CaseInfo() {
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
 
 
-    useEffect(()=>{
+    useEffect(() => {
         console.error(updateError)
     }, [updateError])
 
@@ -233,6 +235,17 @@ export default function CaseInfo() {
                     setIsAppointmentDialogOpen(false);
                     setIsEditAppointmentDialogOpen(true);
                 }}
+                onDelete={async () => {
+                    if (!selectedAppointment) return;
+                    try {
+                        await deleteAppt(selectedAppointment.idCase, selectedAppointment.appointmentNumber);
+                        loadAppointments(Number(id));
+                        setIsAppointmentDialogOpen(false);
+                        setSelectedAppointment(null);
+                    } catch (error) {
+                        console.error("Error deleting appointment:", error);
+                    }
+                }}
             />
 
             <AddAppointmentDialog
@@ -320,6 +333,17 @@ export default function CaseInfo() {
                 onEdit={() => {
                     setIsSupportDialogOpen(false);
                     setIsEditSupportDialogOpen(true);
+                }}
+                onDelete={async () => {
+                    if (!selectedSupportDocument) return;
+                    try {
+                        await deleteSupDocument(selectedSupportDocument.idCase, selectedSupportDocument.supportNumber);
+                        loadSupportDocuments(Number(id));
+                        setIsSupportDialogOpen(false);
+                        setSelectedSupportDocument(null);
+                    } catch (error) {
+                        console.error("Error deleting support document:", error);
+                    }
                 }}
             />
 

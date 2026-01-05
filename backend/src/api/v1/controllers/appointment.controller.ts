@@ -99,3 +99,18 @@ export async function updateAppointment(req: Request, res: Response): Promise<vo
         res.status(500).json({ success: false, error: msg });
     }
 }
+
+export async function deleteAppointment(req: Request, res: Response): Promise<void> {
+    try {
+        const { id, appointmentNumber } = req.params;
+        const result = await appointmentService.deleteAppointment(parseInt(id), parseInt(appointmentNumber));
+        if (!result.success) {
+            res.status(400).json(result);
+            return;
+        }
+        res.status(200).json(result);
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Error desconocido al eliminar';
+        res.status(500).json({ success: false, error: msg });
+    }
+}
