@@ -101,6 +101,18 @@ class SupportDocumentService {
             return { success: false, error: error.message };
         }
     }
+
+    async deleteSupportDocument(idCase: number, supportNumber: number) {
+        try {
+            await prisma.$executeRaw`
+                DELETE FROM "SupportDocument"
+                WHERE "idCase" = ${idCase} AND "supportNumber" = ${supportNumber}
+            `;
+            return { success: true, message: 'Documento eliminado exitosamente' };
+        } catch (error: any) {
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 export default new SupportDocumentService();

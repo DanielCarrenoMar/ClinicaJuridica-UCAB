@@ -26,7 +26,7 @@ function ConfirmDialog({
     <Dialog
       open={open}
       title={title}
-      onClose={onCancel ?? (() => {})}
+      onClose={onCancel ?? (() => { })}
       className="max-w-md"
     >
       <div className="flex flex-col gap-2">
@@ -42,8 +42,7 @@ function ConfirmDialog({
           {cancelLabel}
         </Button>
         <Button
-          variant="outlined"
-          className="flex-1"
+          className="flex-1 !bg-error !text-surface"
           onClick={onConfirm}
           icon={<CheckCircle />}
         >

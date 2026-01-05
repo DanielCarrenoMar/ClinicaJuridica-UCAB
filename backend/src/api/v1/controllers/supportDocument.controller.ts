@@ -78,3 +78,20 @@ export async function updateSupportDocument(req: Request, res: Response): Promis
         res.status(500).json({ success: false, error: msg });
     }
 }
+
+export async function deleteSupportDocument(req: Request, res: Response): Promise<void> {
+    try {
+        const { id, supportNumber } = req.params;
+        const result = await supportDocumentService.deleteSupportDocument(parseInt(id), parseInt(supportNumber));
+
+        if (!result.success) {
+            res.status(400).json(result);
+            return;
+        }
+
+        res.status(200).json(result);
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : 'Error desconocido al eliminar documento';
+        res.status(500).json({ success: false, error: msg });
+    }
+}

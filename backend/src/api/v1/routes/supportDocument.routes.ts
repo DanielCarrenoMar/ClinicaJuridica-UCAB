@@ -7,5 +7,6 @@ router.get('/', supportDocumentController.getAllSupportDocuments);
 router.get('/:id', supportDocumentController.getSupportDocumentById);
 router.post('/', supportDocumentController.createSupportDocument);
 router.put('/:id', supportDocumentController.updateSupportDocument);
+router.delete('/:id/:supportNumber', supportDocumentController.deleteSupportDocument);
 
 export default router;

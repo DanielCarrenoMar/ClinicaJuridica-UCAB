@@ -41,5 +41,10 @@ export function getSupportDocumentRepository(): SupportDocumentRepository {
             const result = await response.json();
             return result.data;
         },
+        deleteSupportDocument: async (idCase, supportNumber) => {
+            await fetch(`${SUPPORT_DOCUMENT_URL}/${idCase}/${supportNumber}`, {
+                method: "DELETE",
+            });
+        },
     }
 }

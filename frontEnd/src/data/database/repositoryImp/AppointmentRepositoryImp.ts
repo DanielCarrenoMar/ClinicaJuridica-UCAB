@@ -41,5 +41,10 @@ export function getAppointmentRepository(): AppointmentRepository {
             const result = await response.json();
             return result.data;
         },
+        deleteAppointment: async (idCase, appointmentNumber) => {
+            await fetch(`${APPOINTMENT_URL}/${idCase}/${appointmentNumber}`, {
+                method: 'DELETE'
+            });
+        },
     }
 }
