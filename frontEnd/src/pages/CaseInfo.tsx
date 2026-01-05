@@ -228,7 +228,7 @@ export default function CaseInfo() {
                 open={isAddAppointmentDialogOpen}
                 onClose={() => setIsAddAppointmentDialogOpen(false)}
                 onAdd={async (data) => {
-                    if (!caseData || !userContext.user) return;
+                    if (!caseData || !user) return;
                     try {
                         const newAppt: AppointmentDAO = {
                             idCase: caseData.idCase,
@@ -237,7 +237,7 @@ export default function CaseInfo() {
                             executionDate: data.executionDate,
                             status: "P", // Programada
                             guidance: data.guidance,
-                            userId: userContext.user.identityCard,
+                            userId: user.identityCard,
                             registryDate: new Date()
                         };
                         await createNewAppointment(newAppt);
