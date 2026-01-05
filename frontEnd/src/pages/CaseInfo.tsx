@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCase } from '#domain/useCaseHooks/useCase.ts';
+import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCase, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -24,7 +24,7 @@ import type { CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
-import { findAllAppointments, createAppointment, updateAppointment } from '#domain/useCaseHooks/useAppointment.ts';
+import { createAppointment, updateAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
@@ -78,24 +78,22 @@ export default function CaseInfo() {
     const { students } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
 
-    // Appointment Hooks
-    const { appointments: allAppointments, refresh: refreshAppointments } = findAllAppointments();
+    const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
     const { updateAppointment: updateAppt } = updateAppointment();
     const userContext = useAuth();
 
-    const appointments = allAppointments.filter(a => a.idCase === Number(id));
+    // Recaudos Tab State
+    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
+    const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
+    const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = useState(false);
+    const [isEditAppointmentDialogOpen, setIsEditAppointmentDialogOpen] = useState(false);
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [isDataModified, setIsDataModified] = useState(false);
 
     // Citas Tab State
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
-    const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
-    const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = useState(false);
-    const [isEditAppointmentDialogOpen, setIsEditAppointmentDialogOpen] = useState(false);
-
     // Recaudos Tab State
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
     const [selectedSupportDocument, setSelectedSupportDocument] = useState<SupportDocumentModel | null>(null);
@@ -253,7 +251,7 @@ export default function CaseInfo() {
                             registryDate: new Date()
                         };
                         await createNewAppointment(newAppt);
-                        refreshAppointments();
+                        loadAppointments(Number(id));
                     } catch (error) {
                         console.error("Error creating appointment:", error);
                     }
@@ -267,7 +265,7 @@ export default function CaseInfo() {
                 onSave={async (idCase, appointmentNumber, data) => {
                     try {
                         await updateAppt(idCase, { ...data, appointmentNumber });
-                        refreshAppointments();
+                        loadAppointments(Number(id));
                         setIsEditAppointmentDialogOpen(false);
                     } catch (error) {
                         console.error("Error updating appointment:", error);

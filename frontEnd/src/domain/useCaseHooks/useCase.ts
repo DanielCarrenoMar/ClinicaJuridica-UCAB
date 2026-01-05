@@ -6,7 +6,8 @@ import type { StatusCaseAmountModel } from '#domain/models/statusCaseAmount.ts';
 import type { StudentModel } from '../models/student';
 import type { BeneficiaryModel } from '../models/beneficiary';
 import type { CaseStatusDAO } from '#database/daos/caseStatusDAO.ts';
-
+import type { AppointmentModel } from '#domain/models/appointment.ts';
+import type { SupportDocumentModel } from '#domain/models/supportDocument.ts'
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
@@ -286,7 +287,7 @@ export function useGetCaseActionsByCaseId(id: number) {
         } finally {
             setLoading(false);
         }
-        }, []);
+    }, []);
 
     useEffect(() => {
         if (id) loadCaseActions(id);
@@ -297,5 +298,67 @@ export function useGetCaseActionsByCaseId(id: number) {
         loading,
         error,
         loadCaseActions
+    };
+}
+
+export function useGetAppointmentByCaseId(id: number) {
+    const { findAppointmentByCaseId } = getCaseRepository();
+    const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadAppointments = useCallback(async (id: number) => {
+        setLoading(true);
+        try {
+            const data = await findAppointmentByCaseId(id);
+            setAppointments(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id) loadAppointments(id);
+    }, [id, loadAppointments]);
+
+    return {
+        appointments,
+        loading,
+        error,
+        loadAppointments
+    };
+}
+
+export function useGetSupportDocumentByCaseId(id: number) {
+    const { findSupportDocumentByCaseId } = getCaseRepository();
+    const [supportDocument, setSupportDocuments] = useState<SupportDocumentModel[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadSupportDocuments = useCallback(async (id: number) => {
+        setLoading(true);
+        try {
+            const data = await findSupportDocumentByCaseId(id);
+            setSupportDocuments(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id) loadSupportDocuments(id);
+    }, [id, loadSupportDocuments]);
+
+    return {
+        supportDocument,
+        loading,
+        error,
+        loadSupportDocuments
     };
 }

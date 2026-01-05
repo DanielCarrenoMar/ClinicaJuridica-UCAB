@@ -2,6 +2,7 @@ import type { CaseActionDAO } from "#database/daos/caseActionDAO.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import type { CaseStatusDAO } from "#database/daos/caseStatusDAO.ts";
 import type { AppointmentDAO } from "#database/daos/appointmentDAO.ts";
+import type { SupportDocumentDAO } from "#database/daos/supportDocumentDAO.ts";
 import type { ApplicantModel } from "./models/applicant"
 import type { BeneficiaryModel } from "./models/beneficiary";
 import type { CaseModel } from "./models/case";
@@ -9,7 +10,8 @@ import type { CaseActionModel } from "./models/caseAction";
 import type { CaseStatusModel } from "./models/caseStatus";
 import type { StatusCaseAmountModel } from "./models/statusCaseAmount";
 import type { StudentModel } from "./models/student";
-import type { AppointmentModel } from "./models/appointment"
+import type { AppointmentModel } from "./models/appointment";
+import type { SupportDocumentModel } from "./models/supportDocument";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -38,6 +40,8 @@ export interface CaseRepository {
     deleteCase(id: number): Promise<void>;
     findStatusCaseAmounts(): Promise<StatusCaseAmountModel>;
     findCaseActionsByCaseId(idCase: number): Promise<CaseActionModel[]>;
+    findAppointmentByCaseId(idCase: number): Promise<AppointmentModel[]>;
+    findSupportDocumentByCaseId(idCase: number): Promise<SupportDocumentModel[]>;
 }
 
 export interface CaseActionRepository {
@@ -51,6 +55,13 @@ export interface AppointmentRepository {
     findAppointmentById(id: number): Promise<AppointmentModel | null>;
     createAppointment(data: AppointmentDAO): Promise<AppointmentModel>;
     updateAppointment(id: number, data: Partial<AppointmentModel>): Promise<AppointmentModel>;
+}
+
+export interface SupportDocumentRepository {
+    findAllSupportDocuments(): Promise<SupportDocumentModel[]>;
+    findSupportDocumentById(id: number): Promise<SupportDocumentModel | null>;
+    createSupportDocument(data: SupportDocumentDAO): Promise<SupportDocumentModel>;
+    updateSupportDocument(id: number, data: Partial<SupportDocumentModel>): Promise<SupportDocumentModel>;
 }
 
 export interface UserRepository {

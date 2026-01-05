@@ -10,6 +10,12 @@ import { daoToCaseStatusModel } from "#domain/models/caseStatus.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import { daoToStudentModel } from "#domain/models/student.ts";
 import type { CaseStatusInfoDAO } from "#database/daos/caseStatusInfoDAO.ts";
+import { daoToAppointmentModel } from "#domain/models/appointment.ts";
+import type { AppointmentInfoDAO } from "#database/daos/appointmentInfoDAO.ts";
+import { daoToSupportDocumentModel } from "#domain/models/supportDocument.ts";
+import type { SupportDocumentDAO } from "#database/daos/supportDocumentDAO.ts";
+import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
+import { daoToCaseActionModel } from "#domain/models/caseAction.ts";
 
 export function getCaseRepository(): CaseRepository {
     return {
@@ -105,8 +111,22 @@ export function getCaseRepository(): CaseRepository {
             const response = await fetch(`${CASE_URL}/${idCase}/actions`);
             if (!response.ok) return [];
             const result = await response.json();
-            const daoList = result.data;
-            return daoList;
+            const daoList: CaseActionInfoDAO[] = result.data;
+            return daoList.map(daoToCaseActionModel);
+        },
+        findAppointmentByCaseId: async (idCase) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/appointments`);
+            if (!response.ok) return [];
+            const result = await response.json();
+            const daoList: AppointmentInfoDAO[] = result.data;
+            return daoList.map(daoToAppointmentModel);
+        },
+        findSupportDocumentByCaseId: async (idCase) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/support-documents`);
+            if (!response.ok) return [];
+            const result = await response.json();
+            const daoList: SupportDocumentDAO[] = result.data;
+            return daoList.map(daoToSupportDocumentModel);
         }
     }
 }
