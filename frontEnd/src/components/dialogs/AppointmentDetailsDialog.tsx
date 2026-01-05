@@ -1,5 +1,6 @@
 import type { AppointmentModel } from "#domain/models/appointment.ts";
-import { CloseCircle, CalendarMonth, User, ClipboardList, Clock, Pen } from "flowbite-react-icons/outline";
+import { CalendarMonth, User, ClipboardList, Clock, Pen } from "flowbite-react-icons/outline";
+import Dialog from "#components/dialogs/Dialog.tsx";
 
 interface AppointmentDetailsDialogProps {
     open: boolean;
@@ -33,32 +34,29 @@ export default function AppointmentDetailsDialog({
     const statusColor = STATUS_COLORS_MAP[appointment.status as string] || STATUS_COLORS_MAP.Default;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
-            <div
-                className="w-full max-w-lg rounded-xl bg-surface shadow-xl border border-onSurface/10 p-6 flex flex-col gap-6"
-                onClick={e => e.stopPropagation()}
-            >
-                <div className="flex justify-between items-start">
-                    <h2 className="text-title-large text-onSurface font-bold">Detalles de la Cita</h2>
-                    <div className="flex gap-2">
-                        {onEdit && (
-                            <button onClick={onEdit} className="text-primary hover:text-primary/80 cursor-pointer transition-colors" title="Editar cita">
-                                <Pen className="w-6 h-6" />
-                            </button>
-                        )}
-                        <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
-                            <CloseCircle className="w-8 h-8" />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-4">
+        <Dialog
+            open={open}
+            title="Detalles de la Cita"
+            onClose={onClose}
+            headerItems={
+                onEdit ? (
+                    <button
+                        onClick={onEdit}
+                        className="text-primary hover:text-primary/80 cursor-pointer transition-colors"
+                        title="Editar cita"
+                    >
+                        <Pen className="w-6 h-6" />
+                    </button>
+                ) : undefined
+            }
+        >
+            <div className="flex flex-col gap-4">
                     {/* Header Info */}
                     <div className="flex items-center gap-3 p-3 bg-surfaceVariant/30 rounded-lg border border-surfaceVariant">
                         <div className={`px-3 py-1 rounded-full text-label-medium ${statusColor}`}>
                             {statusLabel}
                         </div>
-                        <div className="h-4 w-[1px] bg-onSurface/20"></div>
+                        <div className="h-4 w-px bg-onSurface/20"></div>
                         <span className="text-body-medium text-onSurface">
                             Cita #{appointment.appointmentNumber}
                         </span>
@@ -124,8 +122,7 @@ export default function AppointmentDetailsDialog({
                             </div>
                         )}
                     </div>
-                </div>
             </div>
-        </div>
+        </Dialog>
     );
 }

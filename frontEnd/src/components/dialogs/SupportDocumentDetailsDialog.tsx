@@ -1,6 +1,7 @@
 import type { SupportDocumentModel } from "#domain/models/supportDocument.ts";
 import Button from "#components/Button.tsx";
-import { CloseCircle, CalendarMonth, FilePdf, Download, AlignLeft, Pen } from "flowbite-react-icons/outline";
+import { CalendarMonth, FilePdf, Download, AlignLeft, Pen } from "flowbite-react-icons/outline";
+import Dialog from "#components/dialogs/Dialog.tsx";
 
 interface SupportDocumentDetailsDialogProps {
     open: boolean;
@@ -18,26 +19,22 @@ export default function SupportDocumentDetailsDialog({
     if (!open || !document) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
-            <div
-                className="w-full max-w-lg rounded-xl bg-surface shadow-xl border border-onSurface/10 p-6 flex flex-col gap-6"
-                onClick={e => e.stopPropagation()}
-            >
-                <div className="flex justify-between items-start">
-                    <h2 className="text-title-large text-onSurface font-bold">Detalles del Recaudo</h2>
-                    <div className="flex gap-2">
-                        {onEdit && (
-                            <button onClick={onEdit} className="text-onSurface/50 hover:text-primary cursor-pointer transition-colors p-1">
-                                <Pen className="w-6 h-6" />
-                            </button>
-                        )}
-                        <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
-                            <CloseCircle className="w-8 h-8" />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-4">
+        <Dialog
+            open={open}
+            title="Detalles del Recaudo"
+            onClose={onClose}
+            headerItems={
+                onEdit ? (
+                    <button
+                        onClick={onEdit}
+                        className="text-onSurface/50 hover:text-primary cursor-pointer transition-colors p-1"
+                    >
+                        <Pen className="w-6 h-6" />
+                    </button>
+                ) : undefined
+            }
+        >
+            <div className="flex flex-col gap-4">
                     {/* Header Info */}
                     <div className="flex items-center gap-3 p-4 bg-surfaceVariant/30 rounded-lg border border-surfaceVariant">
                         <div className="p-2 bg-surface rounded-md">
@@ -65,13 +62,13 @@ export default function SupportDocumentDetailsDialog({
                         <label className="flex items-center gap-2 text-label-medium text-onSurface/70">
                             <AlignLeft className="w-4 h-4" /> Descripción
                         </label>
-                        <p className="text-body-medium text-onSurface bg-background p-3 rounded-lg border border-onSurface/5 min-h-[80px]">
+                        <p className="text-body-medium text-onSurface bg-background p-3 rounded-lg border border-onSurface/5 min-h-20">
                             {document.description || "Sin descripción disponible."}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-onSurface/10">
+            <div className="flex justify-end gap-3 pt-4 border-t border-onSurface/10">
                     <Button
                         variant="filled"
                         onClick={() => window.open(document.fileUrl, '_blank')}
@@ -79,8 +76,7 @@ export default function SupportDocumentDetailsDialog({
                     >
                         Descargar
                     </Button>
-                </div>
             </div>
-        </div>
+        </Dialog>
     );
 }

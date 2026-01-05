@@ -1,12 +1,15 @@
 import Button from "#components/Button.tsx";
 import { Close } from "flowbite-react-icons/outline";
+import type { ReactNode } from "react";
 
 interface DialogProps {
     open: boolean;
-    title: string;
-    headerItems?: React.ReactNode;
-    children: React.ReactNode;
+    title: ReactNode;
+    headerItems?: ReactNode;
+    children: ReactNode;
     onClose: () => void;
+    className?: string;
+    id?: string;
 }
 
 export default function Dialog({
@@ -14,14 +17,18 @@ export default function Dialog({
     title,
     headerItems,
     children,
-    onClose
+    onClose,
+    className = "",
+    id
 }: DialogProps) {
     if (!open) return null;
 
+    const dialogId = id ?? (typeof title === "string" ? title : undefined);
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm px-4" onClick={onClose}>
-            <div id={title}
-                className="w-full max-w-lg rounded-xl bg-surface shadow-xl border border-onSurface/10 p-6 flex flex-col gap-6" 
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
+            <div id={dialogId}
+                className={`w-full max-w-lg rounded-xl bg-surface shadow-xl border border-onSurface/10 p-6 flex flex-col gap-6 ${className}`}
                 onClick={e => e.stopPropagation()}
             >
                 <header className="flex items-center justify-between">
