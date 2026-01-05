@@ -1,14 +1,14 @@
 import { useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
+import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clipboard, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
 import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
-type LateralmenuPages = '/' | 'crearCaso' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
+type LateralmenuPages = '/' | 'crearCaso' | 'busqueda' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
 
 export type LateralMenuContext = {
     setDefaultSearchText: (value: string) => void
@@ -32,6 +32,7 @@ function LateralMenuLayer() {
             <LateralMenu activeItemId={locationId} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)}>
                 <LateralMenuItem id='/' label='Inicio' icon={<Home />} link='/' />
                 <LateralMenuItem id='crearCaso' label='Crear Caso' icon={<Plus />} link='/crearCaso' />
+                <LateralMenuItem id='busqueda' label='Casos' icon={<Clipboard />} link='/busqueda' />
                 <LateralMenuItem id='calendario' label='Calendario' icon={<CalendarMonth />} link='/calendario' />
                 <LateralMenuItem id='acciones' label='Historial de Accciones' icon={<Book />} link='/acciones' />
                 <LateralMenuItem id='reportes' label='Generar Reportes' icon={<InfoCircle />} link='/reportes' />
