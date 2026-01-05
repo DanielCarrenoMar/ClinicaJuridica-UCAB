@@ -1,6 +1,46 @@
 import prisma from '#src/config/database.js';
 
 class StudentService {
+  async getAllStudents(term?: string) {
+    try {
+      let resolvedTerm = term;
+      
+      if (!resolvedTerm) {
+        const termRows = await prisma.$queryRaw`
+          SELECT MAX("term") as term
+          FROM "Semester"
+        ` as Array<{ term: string | null }>;
+        
+        resolvedTerm = termRows?.[0]?.term ?? undefined;
+      }
+
+      if (!resolvedTerm) {
+        return { success: false, message: 'No se encontró un término válido' };
+      }
+
+      const students = await prisma.$queryRaw`
+        SELECT
+          u."identityCard",
+          u."fullName",
+          u."gender",
+          u."email",
+          u."isActive",
+          u."type" AS "userType",
+          s."term",
+          s."nrc",
+          s."type" AS "studentType"
+        FROM "Student" s
+        JOIN "User" u ON s."identityCard" = u."identityCard"
+        WHERE s."term" = ${resolvedTerm}
+        ORDER BY u."fullName"
+      `;
+
+      return { success: true, data: students };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async getStudentById(identityCard: string, term?: string) {
     try {
       const termRows = term

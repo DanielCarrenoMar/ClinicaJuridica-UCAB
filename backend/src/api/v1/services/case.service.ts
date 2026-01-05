@@ -524,6 +524,136 @@ class CaseService {
     }
   }
 
+  async addBeneficiaryToCase(idCase, beneficiaryData) {
+    try {
+      const caseExists = await prisma.$queryRaw`
+        SELECT "idCase" FROM "Case" WHERE "idCase" = ${idCase}
+      `;
+
+      if (!Array.isArray(caseExists) || caseExists.length === 0) {
+        return { success: false, message: 'Caso no encontrado' };
+      }
+
+      const beneficiaryExists = await prisma.$queryRaw`
+        SELECT "identityCard" FROM "Beneficiary" WHERE "identityCard" = ${beneficiaryData.beneficiaryId}
+      `;
+
+      if (!Array.isArray(beneficiaryExists) || beneficiaryExists.length === 0) {
+        return { success: false, message: 'Beneficiario no encontrado' };
+      }
+
+      const exists = await prisma.$queryRaw`
+        SELECT * FROM "CaseBeneficiary" 
+        WHERE "idCase" = ${idCase} AND "beneficiaryId" = ${beneficiaryData.beneficiaryId}
+      `;
+
+      if (Array.isArray(exists) && exists.length > 0) {
+        return { success: false, message: 'El beneficiario ya está asignado a este caso' };
+      }
+
+      const assignment = await prisma.$queryRaw`
+        INSERT INTO "CaseBeneficiary" 
+        ("idCase", "beneficiaryId", "relationship", "type", "description")
+        VALUES (
+          ${idCase}, 
+          ${beneficiaryData.beneficiaryId}, 
+          ${beneficiaryData.relationship}, 
+          ${beneficiaryData.type}, 
+          ${beneficiaryData.description}
+        )
+        RETURNING *
+      `;
+
+      return { success: true, data: assignment[0] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async addStudentToCase(idCase, studentData) {
+    try {
+      const caseExists = await prisma.$queryRaw`
+        SELECT "idCase" FROM "Case" WHERE "idCase" = ${idCase}
+      `;
+
+      if (!Array.isArray(caseExists) || caseExists.length === 0) {
+        return { success: false, message: 'Caso no encontrado' };
+      }
+
+      const studentExists = await prisma.$queryRaw`
+        SELECT "identityCard", "term" FROM "Student" 
+        WHERE "identityCard" = ${studentData.studentId} AND "term" = ${studentData.term}
+      `;
+
+      if (!Array.isArray(studentExists) || studentExists.length === 0) {
+        return { success: false, message: 'Estudiante no encontrado en el término especificado' };
+      }
+
+      const exists = await prisma.$queryRaw`
+        SELECT * FROM "AssignedStudent" 
+        WHERE "idCase" = ${idCase} AND "studentId" = ${studentData.studentId} AND "term" = ${studentData.term}
+      `;
+
+      if (Array.isArray(exists) && exists.length > 0) {
+        return { success: false, message: 'El estudiante ya está asignado a este caso en este periodo' };
+      }
+
+      const assignment = await prisma.$queryRaw`
+        INSERT INTO "AssignedStudent" ("idCase", "studentId", "term")
+        VALUES (${idCase}, ${studentData.studentId}, ${studentData.term})
+        RETURNING *
+      `;
+
+      return { success: true, data: assignment[0] };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async removeBeneficiaryFromCase(idCase, beneficiaryId) {
+    try {
+      const exists = await prisma.$queryRaw`
+        SELECT * FROM "CaseBeneficiary" 
+        WHERE "idCase" = ${idCase} AND "beneficiaryId" = ${beneficiaryId}
+      `;
+
+      if (!Array.isArray(exists) || exists.length === 0) {
+        return { success: false, message: 'El beneficiario no está asignado a este caso' };
+      }
+
+      await prisma.$queryRaw`
+        DELETE FROM "CaseBeneficiary" 
+        WHERE "idCase" = ${idCase} AND "beneficiaryId" = ${beneficiaryId}
+      `;
+
+      return { success: true, message: 'Beneficiario removido del caso correctamente' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async removeStudentFromCase(idCase, studentId, term) {
+    try {
+      const exists = await prisma.$queryRaw`
+        SELECT * FROM "AssignedStudent" 
+        WHERE "idCase" = ${idCase} AND "studentId" = ${studentId} AND "term" = ${term}
+      `;
+
+      if (!Array.isArray(exists) || exists.length === 0) {
+        return { success: false, message: 'El estudiante no está asignado a este caso' };
+      }
+
+      await prisma.$queryRaw`
+        DELETE FROM "AssignedStudent" 
+        WHERE "idCase" = ${idCase} AND "studentId" = ${studentId} AND "term" = ${term}
+      `;
+
+      return { success: true, message: 'Estudiante removido del caso correctamente' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
 }
 
 export default new CaseService();

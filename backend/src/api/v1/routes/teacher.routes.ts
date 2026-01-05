@@ -3,6 +3,7 @@ import * as teacherController from '../controllers/teacher.controller.js';
 
 const router = Router();
 
+router.get('/', teacherController.getAllTeachers);
 router.get('/:id', teacherController.getTeacherById);
 
 export default router;

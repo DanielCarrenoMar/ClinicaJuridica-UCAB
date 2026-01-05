@@ -1,6 +1,45 @@
 import prisma from '#src/config/database.js';
 
 class TeacherService {
+  async getAllTeachers(term?: string) {
+    try {
+      let resolvedTerm = term;
+      
+      if (!resolvedTerm) {
+        const termRows = await prisma.$queryRaw`
+          SELECT MAX("term") as term
+          FROM "Semester"
+        ` as Array<{ term: string | null }>;
+        
+        resolvedTerm = termRows?.[0]?.term ?? undefined;
+      }
+
+      if (!resolvedTerm) {
+        return { success: false, message: 'No se encontró un término válido' };
+      }
+
+      const teachers = await prisma.$queryRaw`
+        SELECT
+          u."identityCard",
+          u."fullName",
+          u."gender",
+          u."email",
+          u."isActive",
+          u."type" AS "userType",
+          t."term",
+          t."type" AS "teacherType"
+        FROM "Teacher" t
+        JOIN "User" u ON t."identityCard" = u."identityCard"
+        WHERE t."term" = ${resolvedTerm}
+        ORDER BY u."fullName"
+      `;
+
+      return { success: true, data: teachers };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async getTeacherById(identityCard: string, term?: string) {
     try {
       const termRows = term

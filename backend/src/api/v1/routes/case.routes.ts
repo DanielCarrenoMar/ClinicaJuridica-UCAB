@@ -24,15 +24,16 @@ router.post('/:id/support-documents', caseController.createSupportDocumentForCas
 router.post('/:id/actions', caseController.addAction);
 router.get('/:id/actions/', caseController.getActionsInfoFromCaseId);
 router.get('/:id/beneficiaries', caseController.getBeneficiariesFromCaseId);
-router.get('/:id/status', caseController.getCaseStatusFromCaseId);
 router.patch('/:id/status', caseController.changeCaseStatus);
-
-router.post('/:id/appointments', caseController.scheduleAppointment);
-router.patch('/:id/appointments/:appId', caseController.updateAppointmentStatus);
 
 router.get('/:id/documents', caseController.getDocuments);
 router.post('/:id/documents', caseController.createDocumentByCaseId);
 router.delete('/:id/documents/:docId', caseController.deleteDocument);
 router.get('/:id/documents/:docId', caseController.getDocumentByCaseId);
+
+router.post('/:id/students', caseController.addStudentToCase);
+router.delete('/:id/students', caseController.removeStudentFromCase);
+router.post('/:id/beneficiaries', caseController.addBeneficiaryToCase);
+router.delete('/:id/beneficiaries', caseController.removeBeneficiaryFromCase);
 
 export default router;

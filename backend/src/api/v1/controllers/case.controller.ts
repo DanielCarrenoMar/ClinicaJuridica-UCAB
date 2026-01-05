@@ -403,7 +403,6 @@ export async function createSupportDocumentForCaseId(req: Request, res: Response
 
     const data = req.body;
 
-    // Validación de campos obligatorios
     if (!data.title || !data.description) {
       res.status(400).json({ 
         success: false, 
@@ -420,6 +419,147 @@ export async function createSupportDocumentForCaseId(req: Request, res: Response
     }
 
     res.status(201).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function addStudentToCase(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const { studentId, term } = req.body;
+
+    if (!studentId || !term) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Los campos "studentId" y "term" son obligatorios' 
+      });
+      return;
+    }
+
+    const result = await caseService.addStudentToCase(caseId, { studentId, term });
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function removeStudentFromCase(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const { studentId, term } = req.body;
+
+    if (!studentId || !term) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Los campos "studentId" y "term" son obligatorios' 
+      });
+      return;
+    }
+
+    const result = await caseService.removeStudentFromCase(caseId, studentId, term);
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function addBeneficiaryToCase(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const { beneficiaryId, relationship, type, description } = req.body;
+
+    if (!beneficiaryId || !relationship || !type) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Los campos "beneficiaryId", "relationship" y "type" son obligatorios' 
+      });
+      return;
+    }
+
+    const result = await caseService.addBeneficiaryToCase(caseId, { 
+      beneficiaryId, 
+      relationship, 
+      type, 
+      description 
+    });
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function removeBeneficiaryFromCase(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const caseId = parseInt(id);
+
+    if (isNaN(caseId)) {
+      res.status(400).json({ success: false, message: 'ID de caso inválido' });
+      return;
+    }
+
+    const { beneficiaryId } = req.body;
+
+    if (!beneficiaryId) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'El campo "beneficiaryId" es obligatorio' 
+      });
+      return;
+    }
+
+    const result = await caseService.removeBeneficiaryFromCase(caseId, beneficiaryId);
+    
+    if (!result.success) {
+      res.status(400).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: errorMessage });
