@@ -4,7 +4,7 @@ import Dropdown from './Dropdown/Dropdown';
 interface TitleDropdownProps {
   label: string;
   children: ReactNode;
-  selectedValue?: string | number | null;
+  selectedValue?: string | number;
   onSelectionChange?: (value: string | number) => void;
   className?: string;
   dropdownLabel?: string;

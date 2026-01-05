@@ -50,7 +50,7 @@ export default function CaseInfo() {
     const { user ,permissionLevel } = useAuth()
     const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
-    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
+    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
     const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
 

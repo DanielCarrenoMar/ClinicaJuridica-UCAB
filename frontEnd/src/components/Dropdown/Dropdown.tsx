@@ -1,10 +1,10 @@
-import { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useEffect, type ReactNode, Children, isValidElement } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown } from 'flowbite-react-icons/outline';
 
 // Context definition
 interface DropdownContextType {
-  selectedValue: string | number | null;
+  selectedValue?: string | number;
   selectOption: (value: string | number, label: string) => void;
 }
 
@@ -21,7 +21,7 @@ export const useDropdownContext = () => {
 interface DropdownProps {
   label?: string;
   children: ReactNode;
-  selectedValue?: string | number | null; // Controlled
+  selectedValue?: string | number;
   onSelectionChange?: (value: string | number) => void;
   showTitle?: boolean;
   disabled?: boolean;
@@ -38,28 +38,44 @@ export default function Dropdown({
   triggerClassName = ""
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [internalSelectedValue, setInternalSelectedValue] = useState<string | number | null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string>(label);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelectedLabel(label);
-  }, [label]);
+    if (selectedValue === undefined || selectedValue === null) {
+      setSelectedLabel(label);
+      return;
+    }
 
-  const currentSelectedValue = selectedValue !== undefined ? selectedValue : internalSelectedValue;
+    let matchedLabel: string | null = null;
+
+    Children.forEach(children, (child) => {
+      if (!isValidElement(child)) return;
+
+      // Only consider DropdownOption-like children
+      const childTypeName = typeof child.type === 'function' ? child.type.name : null;
+      if (childTypeName !== 'DropdownOption') return;
+
+      const props: any = child.props;
+      if (props?.value === undefined) return;
+      if (String(props.value) !== String(selectedValue)) return;
+      if (typeof props.children !== 'string') return;
+
+      matchedLabel = props.children;
+    });
+
+    setSelectedLabel(matchedLabel ?? label);
+  }, [selectedValue, children, label]);
 
   const selectOption = (value: string | number, optionLabel: string) => {
     if (onSelectionChange) {
       onSelectionChange(value);
-    } else {
-      setInternalSelectedValue(value);
     }
     setSelectedLabel(optionLabel);
     setIsOpen(false);
   };
 
-  // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -100,7 +116,7 @@ export default function Dropdown({
   ) : null;
 
   return (
-    <DropdownContext.Provider value={{ selectedValue: currentSelectedValue, selectOption }}>
+    <DropdownContext.Provider value={{ selectedValue: selectedValue, selectOption }}>
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           type="button"
