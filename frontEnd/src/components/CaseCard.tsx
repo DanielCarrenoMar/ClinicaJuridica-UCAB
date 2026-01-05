@@ -74,7 +74,7 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                 </h5>
             </header>
             <div className="flex gap-2.5 items-start relative text-body-small w-full px-4 py-2">
-                <div className="flex flex-col gap-1 justify-center min-w-40">
+                <div className="flex flex-col gap-1 justify-center w-50">
                     <span className="flex gap-1 items-center">
                         <User />
                         <p className="font-light truncate max-w-32">
@@ -83,7 +83,7 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                     </span>
                     <span className="flex gap-1 items-center">
                         <ScaleBalanced />
-                        <p className="font-ligh truncate max-w-32">
+                        <p className="font-ligh truncate">
                             {highlightText(legalAreaName, matches?.legalAreaName)}
                         </p>
                     </span>
