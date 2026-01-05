@@ -269,3 +269,33 @@ export function useCreateCaseStatus() {
     };
 }
 
+export function useGetCaseActionsByCaseId(id: number) {
+    const { findCaseActionsByCaseId } = getCaseRepository();
+    const [caseActions, setCaseActions] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadCaseActions = useCallback(async (id: number) => {
+        setLoading(true);
+        try {
+            const data = await findCaseActionsByCaseId(id);
+            setCaseActions(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+        }, []);
+
+    useEffect(() => {
+        if (id) loadCaseActions(id);
+    }, [id, loadCaseActions]);
+
+    return {
+        caseActions,
+        loading,
+        error,
+        loadCaseActions
+    };
+}

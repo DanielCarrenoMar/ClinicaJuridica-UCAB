@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useGetCaseById, useGetStudentsByCaseId, useUpdateCase } from '#domain/useCaseHooks/useCase.ts';
+import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -96,13 +96,15 @@ export default function CaseInfo() {
 
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
+    const {permissionLevel} = useAuth()
     const { caseData, loading, error } = useGetCaseById(Number(id));
+    const { editCase, loading: updating } = useUpdateCase();
+    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
+    const { students } = useGetStudentsByCaseId(Number(id));
+    const { caseActions } = useGetCaseActionsByCaseId(Number(id));
+
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [isDataModified, setIsDataModified] = useState(false);
-    const { editCase, loading: updating } = useUpdateCase();
-    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Involucrados");
-    const { students } = useGetStudentsByCaseId(Number(id));
-    const {permissionLevel} = useAuth()
 
     // Citas Tab State
     const [searchQuery, setSearchQuery] = useState("");

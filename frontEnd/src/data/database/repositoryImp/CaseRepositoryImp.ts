@@ -100,6 +100,13 @@ export function getCaseRepository(): CaseRepository {
             const result = await response.json();
             const dao: StatusCaseAmountDAO = result.data;
             return daoToStatusCaseAmountModel(dao);
+        },
+        findCaseActionsByCaseId: async (idCase) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/actions`);
+            if (!response.ok) return [];
+            const result = await response.json();
+            const daoList = result.data;
+            return daoList;
         }
     }
 }
