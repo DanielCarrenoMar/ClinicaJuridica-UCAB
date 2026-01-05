@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
+import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -52,8 +52,9 @@ export default function CaseInfo() {
     const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
-    const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
+    const { students: caseStudents, loadStudents: loadCaseStudents } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
+    const { setStudentsToCase } = useSetStudentsToCase()
 
     const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
@@ -91,11 +92,6 @@ export default function CaseInfo() {
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
 
-
-    useEffect(() => {
-        console.error(updateError)
-    }, [updateError])
-
     useEffect(() => {
         if (!caseData) return
         setLocalCaseData(caseData);
@@ -113,19 +109,13 @@ export default function CaseInfo() {
         setLocalCaseData(caseData || undefined);
         setLocalStudents(caseStudents);
     }
-    function saveChanges() {
+    async function saveChanges() {
         if (!localCaseData || !caseData) return;
-        updateCase(caseData.idCase, localCaseData)
-            .then(() => {
-                loadCase(Number(id));
-            })
+        await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
+        await updateCase(caseData.idCase, localCaseData)
+        loadCase(Number(id));
+        loadCaseStudents(Number(id));
     }
-
-
-
-    const handleStatusChange = (newStatus: string) => {
-        setLocalCaseData((prev: any) => ({ ...prev, caseStatus: newStatus }));
-    };
 
     const handleChange = (updateField: Partial<CaseModel>) => {
         setLocalCaseData((prev: any) => ({ ...prev, ...updateField }));
@@ -430,12 +420,16 @@ export default function CaseInfo() {
                             {
                                 permissionLevel < 3 ? (
                                     <InBox>
-                                        <ul>
+                                        <ul className='flex flex-col gap-3'>
                                             {localCaseStudents.map((student) => (
-                                                <li key={student.identityCard} className="flex items-center gap-3 mb-2">
-                                                    <UserCircle />
-                                                    <p className="text-body-medium">{student.fullName}</p>
-                                                    <Button icon={<CircleMinus />} variant='outlined'></Button>
+                                                <li key={student.identityCard}>
+                                                    <span className="flex items-center justify-between">
+                                                        <div className='flex gap-3'>
+                                                            <UserCircle />
+                                                            <p className="text-body-medium">{student.fullName}</p>
+                                                        </div>
+                                                        <Button onClick={() => setLocalStudents((prev) => prev.filter(s => s.identityCard !== student.identityCard))} icon={<Close />} className='p-2!' variant='outlined'></Button>
+                                                    </span>
                                                 </li>
                                             ))}
                                         </ul>
@@ -461,7 +455,7 @@ export default function CaseInfo() {
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsStudentSearchDialogOpen(false)}
                             users={students}
-                            onSelect={(student) => { setLocalStudents((prev) => [...prev, student]);}}
+                            onSelect={(student) => { if (!localCaseStudents.some(s => s.identityCard === student.identityCard)) setLocalStudents((prev) => [...prev, student]);}}
                         />
 
                         <UserSearchDialog
@@ -550,7 +544,7 @@ export default function CaseInfo() {
                         label={localCaseData?.caseStatus}
                         triggerClassName={getStatusColor(localCaseData?.caseStatus ?? "Abierto")}
                         selectedValue={localCaseData?.caseStatus}
-                        onSelectionChange={(val) => handleStatusChange(val as string)}
+                        onSelectionChange={(val) => handleChange({ caseStatus: val as CaseStatusTypeModel })}
                     >
                         <DropdownOption value="Abierto">Abierto</DropdownOption>
                         <DropdownOption value="En Espera">En Espera</DropdownOption>

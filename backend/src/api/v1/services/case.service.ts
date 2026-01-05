@@ -356,12 +356,12 @@ class CaseService {
 
       const students = await prisma.$queryRaw`
         SELECT 
-          s."identityCard" as "studentId",
+          s."identityCard",
           s."term",
           s."nrc",
           s."type",
-          u."fullName" as "studentName",
-          u."email" as "studentEmail"
+          u."fullName",
+          u."email"
         FROM "AssignedStudent" asg
         JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
         JOIN "User" u ON s."identityCard" = u."identityCard"
@@ -584,27 +584,31 @@ class CaseService {
         return { success: false, message: 'Caso no encontrado' };
       }
 
+      const actualTerm = (await prisma.$queryRaw`
+        SELECT "term" FROM "Semester" ORDER BY "startDate" DESC LIMIT 1
+      `)[0]?.term;
+
       const studentExists = await prisma.$queryRaw`
         SELECT "identityCard", "term" FROM "Student" 
-        WHERE "identityCard" = ${studentData.studentId} AND "term" = ${studentData.term}
+        WHERE "identityCard" = ${studentData.studentId} AND "term" = ${actualTerm}
       `;
 
       if (!Array.isArray(studentExists) || studentExists.length === 0) {
-        return { success: false, message: 'Estudiante no encontrado en el término especificado' };
+        return { success: true, message: 'Estudiante no encontrado en el término especificado' };
       }
 
       const exists = await prisma.$queryRaw`
         SELECT * FROM "AssignedStudent" 
-        WHERE "idCase" = ${idCase} AND "studentId" = ${studentData.studentId} AND "term" = ${studentData.term}
+        WHERE "idCase" = ${idCase} AND "studentId" = ${studentData.studentId} AND "term" = ${actualTerm}
       `;
 
       if (Array.isArray(exists) && exists.length > 0) {
-        return { success: false, message: 'El estudiante ya está asignado a este caso en este periodo' };
+        return { success: true, message: 'El estudiante ya está asignado a este caso en este periodo' };
       }
 
       const assignment = await prisma.$queryRaw`
         INSERT INTO "AssignedStudent" ("idCase", "studentId", "term")
-        VALUES (${idCase}, ${studentData.studentId}, ${studentData.term})
+        VALUES (${idCase}, ${studentData.studentId}, ${actualTerm})
         RETURNING *
       `;
 
@@ -622,7 +626,7 @@ class CaseService {
       `;
 
       if (!Array.isArray(exists) || exists.length === 0) {
-        return { success: false, message: 'El beneficiario no está asignado a este caso' };
+        return { success: true, message: 'El beneficiario no está asignado a este caso' };
       }
 
       await prisma.$queryRaw`
@@ -636,20 +640,25 @@ class CaseService {
     }
   }
 
-  async removeStudentFromCase(idCase, studentId, term) {
+  async removeStudentFromCase(idCase: number, studentId: string) {
     try {
+      const actualTerm = (await prisma.$queryRaw`
+        SELECT "term" FROM "Semester" ORDER BY "startDate" DESC LIMIT 1
+      `)[0]?.term;
+
       const exists = await prisma.$queryRaw`
         SELECT * FROM "AssignedStudent" 
-        WHERE "idCase" = ${idCase} AND "studentId" = ${studentId} AND "term" = ${term}
+        WHERE "idCase" = ${idCase} AND "studentId" = ${studentId} AND "term" = ${actualTerm}
       `;
 
       if (!Array.isArray(exists) || exists.length === 0) {
-        return { success: false, message: 'El estudiante no está asignado a este caso' };
+        return { success: true, message: 'El estudiante no está asignado a este caso' };
       }
+
 
       await prisma.$queryRaw`
         DELETE FROM "AssignedStudent" 
-        WHERE "idCase" = ${idCase} AND "studentId" = ${studentId} AND "term" = ${term}
+        WHERE "idCase" = ${idCase} AND "studentId" = ${studentId} AND "term" = ${actualTerm}
       `;
 
       return { success: true, message: 'Estudiante removido del caso correctamente' };

@@ -44,6 +44,10 @@ export interface CaseRepository {
     findCaseActionsByCaseId(idCase: number): Promise<CaseActionModel[]>;
     findAppointmentByCaseId(idCase: number): Promise<AppointmentModel[]>;
     findSupportDocumentByCaseId(idCase: number): Promise<SupportDocumentModel[]>;
+    addStudentToCase(idCase: number, identityCard: string): Promise<void>;
+    removeStudentFromCase(idCase: number, identityCard: string): Promise<void>;
+    addBeneficiaryToCase(idCase: number, idBeneficiary: string): Promise<void>;
+    removeBeneficiaryFromCase(idCase: number, idBeneficiary: string): Promise<void>;
 }
 
 export interface CaseActionRepository {

@@ -18,6 +18,15 @@ import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 import { daoToCaseActionModel } from "#domain/models/caseAction.ts";
 
 export function getCaseRepository(): CaseRepository {
+    async function getCaseTerm(idCase: number): Promise<string> {
+        const responseCase = await fetch(`${CASE_URL}/${idCase}`);
+        if (!responseCase.ok) throw new Error('Error fetching case term');
+        const casesData = await responseCase.json();
+        const caseDAO: CaseInfoDAO = casesData.data;
+        // Backend returns term as string on Case
+        return (caseDAO as any).term;
+    }
+
     return {
         findAllCases: async () => {
             const responseCase = await fetch(CASE_URL);
@@ -127,6 +136,57 @@ export function getCaseRepository(): CaseRepository {
             const result = await response.json();
             const daoList: SupportDocumentDAO[] = result.data;
             return daoList.map(daoToSupportDocumentModel);
-        }
+        },
+
+        addStudentToCase: async (idCase, identityCard) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/students`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: identityCard })
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => null);
+                throw new Error(result?.message || result?.error || 'Error adding student to case');
+            }
+        },
+
+        removeStudentFromCase: async (idCase, identityCard) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/students/${identityCard}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => null);
+                throw new Error(result?.message || result?.error || 'Error removing student from case');
+            }
+        },
+
+        addBeneficiaryToCase: async (idCase, idBeneficiary) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/beneficiaries`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    beneficiaryId: idBeneficiary,
+                    relationship: 'Beneficiario',
+                    type: 'D',
+                    description: ''
+                })
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => null);
+                throw new Error(result?.message || result?.error || 'Error adding beneficiary to case');
+            }
+        },
+
+        removeBeneficiaryFromCase: async (idCase, idBeneficiary) => {
+            const response = await fetch(`${CASE_URL}/${idCase}/beneficiaries/${idBeneficiary}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const result = await response.json().catch(() => null);
+                throw new Error(result?.message || result?.error || 'Error removing beneficiary from case');
+            }
+        },
     }
 }

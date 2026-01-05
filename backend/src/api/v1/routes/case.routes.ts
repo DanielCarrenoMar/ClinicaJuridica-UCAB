@@ -32,8 +32,8 @@ router.delete('/:id/documents/:docId', caseController.deleteDocument);
 router.get('/:id/documents/:docId', caseController.getDocumentByCaseId);
 
 router.post('/:id/students', caseController.addStudentToCase);
-router.delete('/:id/students', caseController.removeStudentFromCase);
+router.delete('/:id/students/:studentId', caseController.removeStudentFromCase);
 router.post('/:id/beneficiaries', caseController.addBeneficiaryToCase);
-router.delete('/:id/beneficiaries', caseController.removeBeneficiaryFromCase);
+router.delete('/:id/beneficiaries/:beneficiaryId', caseController.removeBeneficiaryFromCase);
 
 export default router;

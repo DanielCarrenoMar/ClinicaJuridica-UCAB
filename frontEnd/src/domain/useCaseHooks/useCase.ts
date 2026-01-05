@@ -342,3 +342,37 @@ export function useGetSupportDocumentByCaseId(id: number) {
         loadSupportDocuments
     };
 }
+
+export function useSetStudentsToCase() {
+    const { addStudentToCase, removeStudentFromCase, findStudentsByCaseId } = getCaseRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    async function setStudentsToCase(idCase: number, studentIds: string[]) {
+        setLoading(true);
+        try {
+            const currentStudents = await findStudentsByCaseId(idCase);
+            const currentStudentIds = currentStudents.map(s => s.identityCard);
+
+            const toAdd = studentIds.filter(id => !currentStudentIds.includes(id));
+            const toRemove = currentStudentIds.filter(id => !studentIds.includes(id));
+
+            await Promise.all([
+                ...toAdd.map(id => addStudentToCase(idCase, id)),
+                ...toRemove.map(id => removeStudentFromCase(idCase, id))
+            ]);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return {
+        setStudentsToCase,
+        loading,
+        error
+    };
+}

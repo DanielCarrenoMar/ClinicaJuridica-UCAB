@@ -435,17 +435,17 @@ export async function addStudentToCase(req: Request, res: Response): Promise<voi
       return;
     }
 
-    const { studentId, term } = req.body;
+    const { studentId } = req.body;
 
-    if (!studentId || !term) {
+    if (!studentId) {
       res.status(400).json({ 
         success: false, 
-        message: 'Los campos "studentId" y "term" son obligatorios' 
+        message: 'El campo "studentId" es obligatorio' 
       });
       return;
     }
 
-    const result = await caseService.addStudentToCase(caseId, { studentId, term });
+    const result = await caseService.addStudentToCase(caseId, { studentId });
     
     if (!result.success) {
       res.status(400).json(result);
@@ -461,7 +461,7 @@ export async function addStudentToCase(req: Request, res: Response): Promise<voi
 
 export async function removeStudentFromCase(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params;
+    const { id, studentId } = req.params;
     const caseId = parseInt(id);
 
     if (isNaN(caseId)) {
@@ -469,17 +469,15 @@ export async function removeStudentFromCase(req: Request, res: Response): Promis
       return;
     }
 
-    const { studentId, term } = req.body;
-
-    if (!studentId || !term) {
+    if (!studentId) {
       res.status(400).json({ 
         success: false, 
-        message: 'Los campos "studentId" y "term" son obligatorios' 
+        message: 'El campo "studentId" es obligatorio'
       });
       return;
     }
 
-    const result = await caseService.removeStudentFromCase(caseId, studentId, term);
+    const result = await caseService.removeStudentFromCase(caseId, studentId);
     
     if (!result.success) {
       res.status(400).json(result);
@@ -534,15 +532,13 @@ export async function addBeneficiaryToCase(req: Request, res: Response): Promise
 
 export async function removeBeneficiaryFromCase(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params;
+    const { id, beneficiaryId } = req.params;
     const caseId = parseInt(id);
 
     if (isNaN(caseId)) {
       res.status(400).json({ success: false, message: 'ID de caso inválido' });
       return;
     }
-
-    const { beneficiaryId } = req.body;
 
     if (!beneficiaryId) {
       res.status(400).json({ 
