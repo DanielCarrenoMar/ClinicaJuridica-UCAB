@@ -87,6 +87,8 @@ export default function CaseInfo() {
     const [searchQuery, setSearchQuery] = useState("");
     // Recaudos Tab State
     const [supportSearchQuery, setSupportSearchQuery] = useState("");
+    // Historial Tab State
+    const [caseActionSearchQuery, setCaseActionSearchQuery] = useState("");
     const [selectedSupportDocument, setSelectedSupportDocument] = useState<SupportDocumentModel | null>(null);
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
     const [isAddSupportDialogOpen, setIsAddSupportDialogOpen] = useState(false);
@@ -508,7 +510,7 @@ export default function CaseInfo() {
                     <SearchBar
                         isOpen={true}
                         placeholder="Buscar acciones..."
-                        onChange={() => { }}
+                        onChange={setCaseActionSearchQuery}
                     />
                 </div>
                 <Button variant='outlined' onClick={() => setIsAddCaseActionDialogOpen(true)}>
@@ -520,14 +522,26 @@ export default function CaseInfo() {
                 {caseActionsLoading && <LoadingSpinner />}
                 {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
                 {
-                    caseActions.length === 0 ? (
+                    caseActions
+                        .filter(action =>
+                            action.description.toLowerCase().includes(caseActionSearchQuery.toLowerCase()) ||
+                            (action.notes?.toLowerCase() || "").includes(caseActionSearchQuery.toLowerCase()) ||
+                            action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
+                        )
+                        .length === 0 ? (
                         <span className="flex flex-col items-center justify-center gap-4 mt-20">
                             <p className="text-body-small">No hay acciones registradas para este caso.</p>
                         </span>
                     ) : (
-                        caseActions.map((caseAction) => (
-                            <CaseActionCard key={caseAction.id} caseAction={caseAction} />
-                        ))
+                        caseActions
+                            .filter(action =>
+                                action.description.toLowerCase().includes(caseActionSearchQuery.toLowerCase()) ||
+                                (action.notes?.toLowerCase() || "").includes(caseActionSearchQuery.toLowerCase()) ||
+                                action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
+                            )
+                            .map((caseAction) => (
+                                <CaseActionCard key={caseAction.id} caseAction={caseAction} />
+                            ))
                     )
                 }
             </section>
