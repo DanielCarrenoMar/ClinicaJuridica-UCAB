@@ -51,6 +51,7 @@ function CreateCase() {
     return (
         <Box className="p-0!">
             <Outlet context={{ caseDAO, setCaseDAO, updateCaseDAO, applicantModel, setApplicantModel, updateApplicantModel, isApplicantExisting, setIsApplicantExisting }} />
+            <footer className="h-60"></footer>
         </Box>
     );
 }
