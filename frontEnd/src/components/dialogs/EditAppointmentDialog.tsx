@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { CloseCircle } from "flowbite-react-icons/outline";
-import Button from './Button';
-import DatePicker from './DatePicker';
-import TextInput from './TextInput';
-import TitleDropdown from './TitleDropdown';
-import DropdownOption from './Dropdown/DropdownOption';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { AppointmentStatusTypeModel } from '#domain/typesModel.ts';
 import { typeModelToAppointmentStatusTypeDao } from '#domain/typesModel.ts';
+import Button from '#components/Button.tsx';
+import DatePicker from '#components/DatePicker.tsx';
+import DropdownOption from '#components/Dropdown/DropdownOption.tsx';
+import TextInput from '#components/TextInput.tsx';
+import TitleDropdown from '#components/TitleDropdown.tsx';
 
 interface EditAppointmentDialogProps {
     open: boolean;

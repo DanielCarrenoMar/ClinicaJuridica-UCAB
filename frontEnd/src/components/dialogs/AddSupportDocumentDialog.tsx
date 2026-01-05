@@ -1,46 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CloseCircle } from "flowbite-react-icons/outline";
-import Button from './Button';
-import TextInput from './TextInput';
-import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
+import Button from '#components/Button.tsx';
+import TextInput from '#components/TextInput.tsx';
 
-interface EditSupportDocumentDialogProps {
+interface AddSupportDocumentDialogProps {
     open: boolean;
     onClose: () => void;
-    onSave: (idCase: number, supportNumber: number, data: Partial<SupportDocumentModel>) => void;
-    document: SupportDocumentModel | null;
+    onAdd: (document: { title: string; description: string; submissionDate: Date; fileUrl?: string }) => void;
 }
 
-export default function EditSupportDocumentDialog({
+export default function AddSupportDocumentDialog({
     open,
     onClose,
-    onSave,
-    document
-}: EditSupportDocumentDialogProps) {
+    onAdd
+}: AddSupportDocumentDialogProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [fileUrl, setFileUrl] = useState("");
 
-    useEffect(() => {
-        if (document) {
-            setTitle(document.title);
-            setDescription(document.description);
-            setFileUrl(document.fileUrl || "");
-        }
-    }, [document]);
-
-    if (!open || !document) return null;
+    if (!open) return null;
 
     const handleSubmit = () => {
         if (!title || !description) return;
 
-        const updateData: Partial<SupportDocumentModel> = {
+        onAdd({
             title,
             description,
+            submissionDate: new Date(),
             fileUrl: fileUrl || undefined
-        };
+        });
 
-        onSave(document.idCase, document.supportNumber, updateData);
+        // Reset form
+        setTitle("");
+        setDescription("");
+        setFileUrl("");
         onClose();
     };
 
@@ -53,7 +46,7 @@ export default function EditSupportDocumentDialog({
                 onClick={e => e.stopPropagation()}
             >
                 <div className="flex justify-between items-start">
-                    <h2 className="text-title-large text-onSurface font-bold">Editar Recaudo #{document.supportNumber}</h2>
+                    <h2 className="text-title-large text-onSurface font-bold">Nuevo Recaudo</h2>
                     <button onClick={onClose} className="text-onSurface/50 hover:text-onSurface cursor-pointer transition-colors">
                         <CloseCircle className="w-8 h-8" />
                     </button>
@@ -91,7 +84,7 @@ export default function EditSupportDocumentDialog({
                         onClick={handleSubmit}
                         disabled={!title || !description}
                     >
-                        Guardar Cambios
+                        Añadir
                     </Button>
                 </div>
             </div>

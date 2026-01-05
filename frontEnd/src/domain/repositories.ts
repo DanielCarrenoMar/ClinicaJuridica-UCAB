@@ -12,6 +12,8 @@ import type { StatusCaseAmountModel } from "./models/statusCaseAmount";
 import type { StudentModel } from "./models/student";
 import type { AppointmentModel } from "./models/appointment";
 import type { SupportDocumentModel } from "./models/supportDocument";
+import type { UserModel } from "./models/user";
+import type { TeacherModel } from "./models/teacher";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -66,13 +68,16 @@ export interface SupportDocumentRepository {
 }
 
 export interface UserRepository {
-    findUserById(id: string): Promise<any | null>;
+    findAllUsers(): Promise<UserModel[]>;
+    findUserById(id: string): Promise<UserModel | null>;
 }
 
 export interface StudentRepository {
-    findStudentById(id: string): Promise<any | null>;
+    findAllStudents(): Promise<StudentModel[]>;
+    findStudentById(id: string): Promise<StudentModel | null>;
 }
 
 export interface TeacherRepository {
-    findTeacherById(id: string): Promise<any | null>;
+    findAllTeachers(): Promise<TeacherModel[]>;
+    findTeacherById(id: string): Promise<TeacherModel | null>;
 }

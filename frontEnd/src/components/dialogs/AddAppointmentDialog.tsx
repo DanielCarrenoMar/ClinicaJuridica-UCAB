@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { CloseCircle, CalendarMonth, ClipboardList, Clock } from "flowbite-react-icons/outline";
-import Button from './Button';
-import DatePicker from './DatePicker';
-import TextInput from './TextInput';
+import { CloseCircle } from "flowbite-react-icons/outline";
+import Button from '#components/Button.tsx';
+import DatePicker from '#components/DatePicker.tsx';
+import TextInput from '#components/TextInput.tsx';
 
 interface AddAppointmentDialogProps {
     open: boolean;

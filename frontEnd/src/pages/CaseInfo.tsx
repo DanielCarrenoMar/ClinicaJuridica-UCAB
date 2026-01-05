@@ -10,16 +10,15 @@ import Dropdown from '#components/Dropdown/Dropdown.tsx'; // Changed from TitleD
 import DropdownOption from '#components/Dropdown/DropdownOption.tsx';
 import SearchBar from '#components/SearchBar.tsx';
 import AppointmentCard from '#components/AppointmentCard.tsx';
-import AppointmentDetailsDialog from '#components/AppointmentDetailsDialog.tsx';
+import AppointmentDetailsDialog from '#components/dialogs/AppointmentDetailsDialog.tsx';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import SupportDocumentCard from '#components/SupportDocumentCard.tsx';
-import SupportDocumentDetailsDialog from '#components/SupportDocumentDetailsDialog.tsx';
+import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDetailsDialog.tsx';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
-import AddAppointmentDialog from '#components/AddAppointmentDialog.tsx';
-import EditAppointmentDialog from '#components/EditAppointmentDialog.tsx';
+import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
-import { CircleMinus, Close, Pen, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
+import { CircleMinus, Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import type { CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
@@ -28,8 +27,12 @@ import { createAppointment, updateAppointment } from '#domain/useCaseHooks/useAp
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
 import { createSupportDocument, updateSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
-import AddSupportDocumentDialog from '#components/AddSupportDocumentDialog.tsx';
-import EditSupportDocumentDialog from '#components/EditSupportDocumentDialog.tsx';
+import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
+import EditSupportDocumentDialog from '#components/dialogs/EditSupportDocumentDialog.tsx';
+import UserSearchDialog from '#components/dialogs/UserSearchDialog.tsx';
+import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
+import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
+import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -48,12 +51,15 @@ export default function CaseInfo() {
     const { caseData, loading, error } = useGetCaseById(Number(id));
     const { editCase, loading: updating } = useUpdateCase();
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
-    const { students } = useGetStudentsByCaseId(Number(id));
+    const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
 
-    const { appointments, loading: appointmentsLoading, error: appointmentsError, loadAppointments } = useGetAppointmentByCaseId(Number(id));
+    const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
     const { updateAppointment: updateAppt } = updateAppointment();
+
+    const { students } = useGetAllStudents();
+    const { teachers } = useGetAllTeachers();
 
     // Support Document Hooks
     const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
@@ -79,6 +85,9 @@ export default function CaseInfo() {
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
     const [isAddSupportDialogOpen, setIsAddSupportDialogOpen] = useState(false);
     const [isEditSupportDialogOpen, setIsEditSupportDialogOpen] = useState(false);
+
+    const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
+    const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
 
     useEffect(() => {
         if (!caseData) return
@@ -360,7 +369,7 @@ export default function CaseInfo() {
                             <header className="flex justify-between items-center mb-2">
                                 <h5 className="text-body-large">Profesor</h5>
                                 {permissionLevel < 3 && (
-                                    <Button icon={<UserEdit />} variant="outlined" className='h-10' onClick={() => { }}>
+                                    <Button icon={<UserEdit />} variant="outlined" className='h-10' onClick={() => setIsTeacherSearchDialogOpen(true)}>
                                         Cambiar
                                     </Button>
                                 )}
@@ -378,7 +387,7 @@ export default function CaseInfo() {
                             <header className="flex justify-between items-center mb-2">
                                 <h5 className="text-body-large">Estudiantes</h5>
                                 {permissionLevel < 3 && (
-                                    <Button icon={<UserAdd />} variant="outlined" className='h-10' onClick={() => { }}>
+                                    <Button icon={<UserAdd />} variant="outlined" className='h-10' onClick={() => setIsStudentSearchDialogOpen(true)}>
                                         Asignar
                                     </Button>
                                 )}
@@ -387,7 +396,7 @@ export default function CaseInfo() {
                                 permissionLevel < 3 ? (
                                     <InBox>
                                         <ul>
-                                            {students.map((student) => (
+                                            {caseStudents.map((student) => (
                                                 <li key={student.identityCard} className="flex items-center gap-3 mb-2">
                                                     <UserCircle />
                                                     <p className="text-body-medium">{student.fullName}</p>
@@ -398,9 +407,9 @@ export default function CaseInfo() {
                                     </InBox>
                                 ) : (
                                     <>
-                                        {students.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
+                                        {caseStudents.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
                                         <ul>
-                                            {students.map((student) => (
+                                            {caseStudents.map((student) => (
                                                 <li key={student.identityCard} className="flex items-center gap-3 mb-2">
                                                     <UserCircle />
                                                     <p className="text-body-medium">{student.fullName}</p>
@@ -410,8 +419,24 @@ export default function CaseInfo() {
                                     </>
                                 )
                             }
-
                         </section>
+                        <UserSearchDialog
+                            open={isStudentSearchDialogOpen}
+                            title="Buscar Estudiante"
+                            placeholder="Buscar por nombre o cédula..."
+                            onClose={() => setIsStudentSearchDialogOpen(false)}
+                            users={students}
+                            onSelect={() => { }}
+                        />
+
+                        <UserSearchDialog
+                            open={isTeacherSearchDialogOpen}
+                            title="Buscar Profesor"
+                            placeholder="Buscar por nombre o cédula..."
+                            onClose={() => setIsTeacherSearchDialogOpen(false)}
+                            users={teachers}
+                            onSelect={() => { }}
+                        />
                     </div>
                 </article>
             </section>
@@ -499,7 +524,7 @@ export default function CaseInfo() {
                     </Dropdown>
                     {
                         isDataModified ? (
-                            <Button variant='resalted' className='w-32'>Guardar</Button>
+                            <Button variant='resalted' className='w-32' onClick={saveChanges} disabled={updating}>Guardar</Button>
                         ) : (
                             <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf />}>
                                 Exportar

@@ -13,7 +13,7 @@ import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel } 
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
-import ConfirmDialog from "#components/ConfirmDialog.tsx";
+import ConfirmDialog from "#components/dialogs/ConfirmDialog.tsx";
 import { useNavigate } from "react-router";
 import DatePicker from "#components/DatePicker.tsx";
 
