@@ -16,13 +16,13 @@ function DashBoard() {
 
     return (
         
-            <div className="flex flex-col gap-3 h-full">
+            <div className="flex flex-col gap-3">
                 <section className="flex">
                     <Button className="h-14 w-96" onClick={() => navigate('/crearCaso')}>
                         Nuevo Caso
                     </Button>
                 </section>
-                <section className="grid grid-cols-6 gap-3 flex-1 min-h-0">
+                <section className="grid grid-cols-6 gap-3 flex-1">
                     <Box className="col-span-4 h-full flex flex-col gap-2">
                         <span className="flex items-center justify-between pb-2">
                             <h2 className="text-label-small text-onSurface">Ultimas acciones</h2>
@@ -64,7 +64,7 @@ function DashBoard() {
                             ))}
                         </div>
                     </Box>
-                    <Box className="col-span-2 h-fit flex flex-col">
+                    <Box className="col-span-2 flex flex-col">
                         <h2 className="text-label-small text-onSurface mb-4">Estado de Casos</h2>
                         <div className="flex-1 flex mx-4 max-w-72">
                             <CasesDonutChart statusAmounts={statusAmounts} />
