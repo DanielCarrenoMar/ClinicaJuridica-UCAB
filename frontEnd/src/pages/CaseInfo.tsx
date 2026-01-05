@@ -21,6 +21,7 @@ import { CircleMinus, Close, Pen, UserAdd, UserEdit } from 'flowbite-react-icons
 import type { CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
+import CaseActionCard from '#components/CaseActionCard.tsx';
 
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
@@ -101,7 +102,7 @@ export default function CaseInfo() {
     const { editCase, loading: updating } = useUpdateCase();
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
     const { students } = useGetStudentsByCaseId(Number(id));
-    const { caseActions } = useGetCaseActionsByCaseId(Number(id));
+    const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [isDataModified, setIsDataModified] = useState(false);
@@ -194,7 +195,7 @@ export default function CaseInfo() {
 
     const CitasTabContent = (
         <div className="flex flex-col h-full gap-6">
-            <div className="flex justify-between items-center gap-4">
+            <section className="flex justify-between items-center gap-4">
                 <div className='flex-1'>
                     <SearchBar
                         isOpen={true}
@@ -205,9 +206,9 @@ export default function CaseInfo() {
                 <Button variant='outlined' onClick={() => { }}>
                     Añadir Cita
                 </Button>
-            </div>
+            </section>
 
-            <div className="flex flex-col gap-4 pb-20">
+            <section className="flex flex-col gap-4 pb-20">
                 {MOCK_APPOINTMENTS
                     .filter(apt =>
                         apt.guidance?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -225,7 +226,7 @@ export default function CaseInfo() {
                             }}
                         />
                     ))}
-            </div>
+            </section>
 
             <AppointmentDetailsDialog
                 open={isAppointmentDialogOpen}
@@ -375,8 +376,37 @@ export default function CaseInfo() {
     );
 
     const HistorialTabContent = (
-        <div className="flex flex-col gap-4">
-            <p className="text-body-medium ">Historial de actividades del caso aparecerá aquí.</p>
+        <div className="flex flex-col h-full gap-6">
+            <section className="flex justify-between items-center gap-4">
+                <div className='flex-1'>
+                    <SearchBar
+                        isOpen={true}
+                        placeholder="Buscar acciones..."
+                        onChange={() => { }}
+                    />
+                </div>
+                <Button variant='outlined' onClick={() => { }}>
+                    Añadir Acción
+                </Button>
+            </section>
+
+            <section className="flex flex-col gap-4 pb-20">
+                {caseActionsLoading && <LoadingSpinner />}
+                {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
+            {
+                caseActions.length === 0 ? (
+                    <span className="flex flex-col items-center justify-center gap-4 mt-20">
+                        <p className="text-body-small">No hay acciones registradas para este caso.</p>
+                    </span>
+                ) : (
+                    caseActions.map((caseAction) => (
+                        <CaseActionCard key={caseAction.id} caseAction={caseAction} />
+                    ))
+                )
+            }
+            </section>
+
+            
         </div>
     );
 
