@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { CaseModel } from '../models/case';
+import { modelToCaseDao, type CaseModel } from '../models/case';
 import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts';
 import type { CaseDAO } from '#database/daos/caseDAO.ts';
 import type { StatusCaseAmountModel } from '#domain/models/statusCaseAmount.ts';
@@ -96,15 +96,17 @@ export function useCreateCase() {
     };
 }
 
-export function useUpdateCase() {
-    const { updateCase } = getCaseRepository();
+export function useUpdateCaseWithCaseModel(userId: string) {
+    const { updateCase: updateCaseData } = getCaseRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const editCase = async (id: number, data: Partial<CaseModel>) => {
+    const updateCase = async (id: number, data: CaseModel) => {
         setLoading(true);
+        const caseDao: CaseDAO = modelToCaseDao(data, userId);
+
         try {
-            const updatedCase = await updateCase(id, data);
+            const updatedCase = await updateCaseData(id, caseDao);
             setError(null);
             return updatedCase;
         } catch (err) {
@@ -116,7 +118,7 @@ export function useUpdateCase() {
     };
 
     return {
-        editCase,
+        updateCase,
         loading,
         error
     };

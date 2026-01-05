@@ -38,7 +38,7 @@ export interface CaseRepository {
     getStatusCaseAmount(): Promise<StatusCaseAmountModel[]>;
     createCase(data: CaseDAO): Promise<CaseModel>;
     createCaseStatusFromCaseId(data: CaseStatusDAO): Promise<CaseStatusModel>;
-    updateCase(id: number, data: Partial<CaseModel>): Promise<CaseModel>;
+    updateCase(id: number, data: Partial<CaseDAO>): Promise<CaseModel>;
     deleteCase(id: number): Promise<void>;
     findStatusCaseAmounts(): Promise<StatusCaseAmountModel>;
     findCaseActionsByCaseId(idCase: number): Promise<CaseActionModel[]>;

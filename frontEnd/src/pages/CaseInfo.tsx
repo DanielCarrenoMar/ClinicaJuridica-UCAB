@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCase, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
+import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -19,7 +19,7 @@ import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
 import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { CircleMinus, Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
-import type { CaseModel } from '#domain/models/case.ts';
+import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
@@ -47,9 +47,9 @@ export default function CaseInfo() {
 
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
-    const { permissionLevel } = useAuth()
+    const { user ,permissionLevel } = useAuth()
     const { caseData, loading, error } = useGetCaseById(Number(id));
-    const { editCase, loading: updating } = useUpdateCase();
+    const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
     const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
@@ -65,8 +65,6 @@ export default function CaseInfo() {
     const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
     const { createSupportDocument: createNewSupportDocument } = createSupportDocument();
     const { updateSupportDocument: updateSupDocument } = updateSupportDocument();
-
-    const userContext = useAuth();
 
     // Recaudos Tab State
     const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
@@ -89,6 +87,11 @@ export default function CaseInfo() {
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
 
+
+    useEffect(()=>{
+        console.error(updateError)
+    }, [updateError])
+
     useEffect(() => {
         if (!caseData) return
         setLocalCaseData(caseData);
@@ -104,14 +107,11 @@ export default function CaseInfo() {
         setLocalCaseData(caseData || undefined);
     }
     function saveChanges() {
-        if (!localCaseData) return;
-        editCase(localCaseData.idCase, localCaseData)
-            .then(() => {
-                setIsDataModified(false);
-            })
-            .catch((err) => {
-                console.error("Error updating case:", err);
-            });
+        if (!localCaseData || !caseData) return;
+        updateCase(caseData.idCase, localCaseData)
+        .then(() => {
+            setIsDataModified(false);
+        })
     }
 
 

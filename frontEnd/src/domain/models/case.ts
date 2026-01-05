@@ -1,5 +1,6 @@
+import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
-import { typeDaoToCaseStatusTypeModel, typeDaoToProcessTypeModel, type CaseStatusTypeModel, type ProcessTypeModel } from "#domain/typesModel.ts";
+import { typeDaoToCaseStatusTypeModel, typeDaoToProcessTypeModel, typeModelToCaseStatusTypeDao, typeModelToProcessTypeDao, type CaseStatusTypeModel, type ProcessTypeModel } from "#domain/typesModel.ts";
 
 export interface CaseModel {
     idCase: number;
@@ -23,16 +24,28 @@ export interface CaseModel {
     lastActionDescription?: string;
     subjectName: string;
     subjectCategoryName: string;
-
 }
 
 export function daoToCaseModel(dao: CaseInfoDAO): CaseModel {
-    const { processType, caseStatus, createdAt, lastActionDate, ...rest } = dao
     return {
-        processType: typeDaoToProcessTypeModel(processType),
-        caseStatus: typeDaoToCaseStatusTypeModel(caseStatus),
-        lastActionDate: lastActionDate ? new Date(lastActionDate) : undefined,
-        createdAt: new Date(createdAt),
-        ...rest,
+        ...dao,
+        processType: typeDaoToProcessTypeModel(dao.processType),
+        caseStatus: typeDaoToCaseStatusTypeModel(dao.caseStatus),
+        lastActionDate: dao.lastActionDate ? new Date(dao.lastActionDate) : undefined,
+        createdAt: new Date(dao.createdAt),
     }
+}
+
+export function modelToCaseDao( model: CaseModel, userId: string ): CaseDAO {
+    return {
+        problemSummary: model.problemSummary,
+        processType: typeModelToProcessTypeDao(model.processType),
+        applicantId: model.applicantId,
+        idNucleus: model.idNucleus,
+        idLegalArea: model.idLegalArea,
+        teacherId: model.teacherId,
+        teacherTerm: model.teacherTerm,
+        idCourt: model.idCourt,
+        userId,
+    };
 }
