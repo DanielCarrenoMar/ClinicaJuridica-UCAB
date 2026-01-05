@@ -48,7 +48,7 @@ export default function CaseInfo() {
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
     const { user ,permissionLevel } = useAuth()
-    const { caseData, loading, error } = useGetCaseById(Number(id));
+    const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
     const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
@@ -109,9 +109,9 @@ export default function CaseInfo() {
     function saveChanges() {
         if (!localCaseData || !caseData) return;
         updateCase(caseData.idCase, localCaseData)
-        .then(() => {
-            setIsDataModified(false);
-        })
+            .then(() => {
+                loadCase(Number(id));
+            })
     }
 
 
