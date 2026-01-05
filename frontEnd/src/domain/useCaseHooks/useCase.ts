@@ -8,6 +8,7 @@ import type { BeneficiaryModel } from '../models/beneficiary';
 import type { CaseStatusDAO } from '#database/daos/caseStatusDAO.ts';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts'
+import { typeModelToCaseStatusTypeDao } from '#domain/typesModel.ts';
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
@@ -97,21 +98,24 @@ export function useCreateCase() {
 }
 
 export function useUpdateCaseWithCaseModel(userId: string) {
-    const { updateCase: updateCaseData } = getCaseRepository();
+    const { updateCase: updateCaseData, createCaseStatusFromCaseId } = getCaseRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
     const updateCase = async (id: number, data: CaseModel) => {
         setLoading(true);
+        const caseStatusDao: CaseStatusDAO = {
+            status: typeModelToCaseStatusTypeDao(data.caseStatus),
+            userId: userId
+        }
         const caseDao: CaseDAO = modelToCaseDao(data, userId);
 
         try {
-            const updatedCase = await updateCaseData(id, caseDao);
+            await updateCaseData(id, caseDao);
+            await createCaseStatusFromCaseId(id, caseStatusDao);
             setError(null);
-            return updatedCase;
         } catch (err) {
             setError(err as Error);
-            throw err;
         } finally {
             setLoading(false);
         }
@@ -243,32 +247,6 @@ export function useGetBeneficiariesByCaseId(id: number) {
         loading,
         error,
         loadBeneficiaries
-    };
-}
-
-export function useCreateCaseStatus() {
-    const { createCaseStatusFromCaseId } = getCaseRepository();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
-
-    const createStatus = async (data: CaseStatusDAO) => {
-        setLoading(true);
-        try {
-            const newStatus = await createCaseStatusFromCaseId(data);
-            setError(null);
-            return newStatus;
-        } catch (err) {
-            setError(err as Error);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return {
-        createStatus,
-        loading,
-        error
     };
 }
 

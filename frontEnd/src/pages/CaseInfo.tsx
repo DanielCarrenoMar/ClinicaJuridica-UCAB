@@ -48,9 +48,9 @@ export default function CaseInfo() {
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
     const { user, permissionLevel } = useAuth()
-    const { caseData, loading, error } = useGetCaseById(Number(id));
+    const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
-    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("Citas");
+    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
     const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
 
@@ -112,7 +112,7 @@ export default function CaseInfo() {
         if (!localCaseData || !caseData) return;
         updateCase(caseData.idCase, localCaseData)
             .then(() => {
-                setIsDataModified(false);
+                loadCase(Number(id));
             })
     }
 
@@ -160,11 +160,17 @@ export default function CaseInfo() {
                     <header className='flex gap-2 items-center'>
                         <h4 className="text-label-small mb-1">Tribunal</h4>
                     </header>
-                    <TextInput
-                        value={localCaseData?.courtName || ''}
-                        onChangeText={(val) => handleChange({ courtName: val })}
-                        placeholder=''
-                    />
+                    <Dropdown
+                        selectedValue={localCaseData?.idCourt}
+                        onSelectionChange={(val) => handleChange({ idCourt: val as number })}
+                    >
+                        <DropdownOption value={1}>Civil</DropdownOption>
+                        <DropdownOption value={2}>Penal</DropdownOption>
+                        <DropdownOption value={3}>Agrario</DropdownOption>
+                        <DropdownOption value={4}>Contencioso Administrativo</DropdownOption>
+                        <DropdownOption value={5}>Protección de niños, niñas y adolescentes</DropdownOption>
+                        <DropdownOption value={6}>Laboral</DropdownOption>
+                    </Dropdown>
                 </article>
             </section>
             <section>

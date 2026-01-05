@@ -219,6 +219,38 @@ async function main() {
         console.log('Activity condition synced:', condition.name);
     }
 
+    console.log('Seeding courts');
+    const courtSubjects = [
+        'Civil',
+        'Penal',
+        'Agrario',
+        'Contencioso Administrativo',
+        'Protección de niños, niñas y adolescentes',
+        'Laboral',
+    ];
+
+    for (const subject of courtSubjects) {
+        const existing = await prisma.court.findFirst({ where: { subject } });
+        if (existing) {
+            if (!existing.isActive) {
+                await prisma.court.update({
+                    where: { idCourt: existing.idCourt },
+                    data: { isActive: true },
+                });
+            }
+            console.log('Court synced:', existing.subject);
+            continue;
+        }
+
+        const created = await prisma.court.create({
+            data: {
+                subject,
+                isActive: true,
+            },
+        });
+        console.log('Court created:', created.subject);
+    }
+
 
     console.log('✅ Seeding completed!');
 

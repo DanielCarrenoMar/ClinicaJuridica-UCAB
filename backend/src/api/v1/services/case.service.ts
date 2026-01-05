@@ -214,6 +214,10 @@ class CaseService {
       `;
       const nextNumber = (Number(lastStatus[0].max) || 0) + 1;
 
+      if (lastStatus[0].status === statusEnum) {
+        return { success: true, data: null, message: 'El estado es el mismo que el actual' };
+      }
+
       const newStatus = await prisma.$queryRaw`
         INSERT INTO "CaseStatus" ("idCase", "statusNumber", "status", "reason", "userId", "registryDate")
         VALUES (${idCase}, ${nextNumber}, ${statusEnum}, ${reason}, ${userId}, NOW())

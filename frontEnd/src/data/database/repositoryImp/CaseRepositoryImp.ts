@@ -72,13 +72,13 @@ export function getCaseRepository(): CaseRepository {
             const caseDAO: CaseInfoDAO = result.data;
             return daoToCaseModel(caseDAO);
         },
-        createCaseStatusFromCaseId: async (data) => {
-            const response = await fetch(`${CASE_URL}/${data.idCase}/status`, {
+        createCaseStatusFromCaseId: async (id, data) => {
+            const response = await fetch(`${CASE_URL}/${id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     statusEnum: data.status,
-                    reason: (data as any).reason,
+                    reason: data.reason,
                     userId: data.userId,
                 })
             });
