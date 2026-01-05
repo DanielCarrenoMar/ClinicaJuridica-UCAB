@@ -158,11 +158,17 @@ export default function CaseInfo() {
                     <header className='flex gap-2 items-center'>
                         <h4 className="text-label-small mb-1">Tribunal</h4>
                     </header>
-                    <TextInput
-                        value={localCaseData?.courtName || ''}
-                        onChangeText={(val) => handleChange({ courtName: val })}
-                        placeholder=''
-                    />
+                    <Dropdown
+                        selectedValue={localCaseData?.idCourt}
+                        onSelectionChange={(val) => handleChange({ idCourt: val as number })}
+                    >
+                        <DropdownOption value={1}>Civil</DropdownOption>
+                        <DropdownOption value={2}>Penal</DropdownOption>
+                        <DropdownOption value={3}>Agrario</DropdownOption>
+                        <DropdownOption value={4}>Contencioso Administrativo</DropdownOption>
+                        <DropdownOption value={5}>Protección de niños, niñas y adolescentes</DropdownOption>
+                        <DropdownOption value={6}>Laboral</DropdownOption>
+                    </Dropdown>
                 </article>
             </section>
             <section>

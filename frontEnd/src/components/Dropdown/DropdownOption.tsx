@@ -10,7 +10,7 @@ interface DropdownOptionProps {
 
 export default function DropdownOption({ value, children, icon, circleIcon = false }: DropdownOptionProps) {
   const { selectedValue, selectOption } = useDropdownContext();
-  const isSelected = selectedValue === value;
+  const isSelected = selectedValue !== null && String(selectedValue) === String(value);
 
   return (
     <div
