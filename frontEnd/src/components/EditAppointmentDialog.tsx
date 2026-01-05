@@ -57,6 +57,9 @@ export default function EditAppointmentDialog({
         onClose();
     };
 
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
             <div
@@ -86,6 +89,7 @@ export default function EditAppointmentDialog({
                         value={plannedDate}
                         onChange={setPlannedDate}
                         required
+                        min={today}
                     />
 
                     <DatePicker

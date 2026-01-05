@@ -50,6 +50,7 @@ export interface CaseActionRepository {
     createCaseAction(data: CaseActionDAO): Promise<CaseActionDAO>;
 }
 
+
 export interface AppointmentRepository {
     findAllAppointments(): Promise<AppointmentModel[]>;
     findAppointmentById(id: number): Promise<AppointmentModel | null>;
