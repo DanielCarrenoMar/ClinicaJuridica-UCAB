@@ -50,7 +50,8 @@ export function getCaseActionRepository(): CaseActionRepository {
 				}
 
 				const responseData = await response.json();
-				return responseData.data;
+				const caseActionDAO: CaseActionInfoDAO = responseData.data;
+				return daoToCaseActionModel(caseActionDAO);
 			} catch (error) {
 				throw error;
 			}

@@ -24,7 +24,7 @@ import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
-import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
+import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
 import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
@@ -33,7 +33,10 @@ import UserSearchDialog from '#components/dialogs/UserSearchDialog.tsx';
 import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
+import AddCaseActionDialog from '#components/dialogs/AddCaseActionDialog.tsx';
 import type { StudentModel } from '#domain/models/student.ts';
+import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
+import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -53,7 +56,8 @@ export default function CaseInfo() {
     const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
     const { students: caseStudents } = useGetStudentsByCaseId(Number(id));
-    const { caseActions, loading: caseActionsLoading, error: caseActionsError } = useGetCaseActionsByCaseId(Number(id));
+    const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(Number(id));
+    const { createCaseAction: createAction } = createCaseAction();
 
     const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
     const { createAppointment: createNewAppointment } = createAppointment();
@@ -90,6 +94,7 @@ export default function CaseInfo() {
 
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
+    const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
 
 
     useEffect(() => {
@@ -254,7 +259,7 @@ export default function CaseInfo() {
                 onAdd={async (data) => {
                     if (!caseData || !user) return;
                     try {
-                        const newAppt: AppointmentDAO = {
+                        const newAppt: AppointmentInfoDAO = {
                             idCase: caseData.idCase,
                             appointmentNumber: 0, // Backend auto-increments
                             plannedDate: data.plannedDate,
@@ -262,6 +267,7 @@ export default function CaseInfo() {
                             status: "P", // Programada
                             guidance: data.guidance,
                             userId: user.identityCard,
+                            userName: user.fullName,
                             registryDate: new Date()
                         };
                         await createNewAppointment(newAppt);
@@ -461,7 +467,7 @@ export default function CaseInfo() {
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsStudentSearchDialogOpen(false)}
                             users={students}
-                            onSelect={(student) => { setLocalStudents((prev) => [...prev, student]);}}
+                            onSelect={(student) => { setLocalStudents((prev) => [...prev, student]); }}
                         />
 
                         <UserSearchDialog
@@ -505,7 +511,7 @@ export default function CaseInfo() {
                         onChange={() => { }}
                     />
                 </div>
-                <Button variant='outlined' onClick={() => { }}>
+                <Button variant='outlined' onClick={() => setIsAddCaseActionDialogOpen(true)}>
                     Añadir Acción
                 </Button>
             </section>
@@ -526,6 +532,29 @@ export default function CaseInfo() {
                 }
             </section>
 
+            <AddCaseActionDialog
+                open={isAddCaseActionDialogOpen}
+                onClose={() => setIsAddCaseActionDialogOpen(false)}
+                onAdd={async (actionData) => {
+                    if (!caseData || !user) return;
+                    try {
+                        const newAction: CaseActionInfoDAO = {
+                            idCase: caseData.idCase,
+                            caseCompoundKey: caseData.compoundKey,
+                            actionNumber: 0, // Backend auto-increments
+                            description: actionData.description,
+                            notes: actionData.notes,
+                            userId: user.identityCard,
+                            userName: user.fullName,
+                            registryDate: new Date()
+                        };
+                        await createAction(newAction);
+                        loadCaseActions(Number(id));
+                    } catch (error) {
+                        console.error("Error creating case action:", error);
+                    }
+                }}
+            />
 
         </div>
     );

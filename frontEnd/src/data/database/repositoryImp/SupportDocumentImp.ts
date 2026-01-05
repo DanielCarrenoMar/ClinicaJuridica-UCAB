@@ -1,5 +1,5 @@
 import { SUPPORT_DOCUMENT_URL } from "./apiUrl";
-import type { SupportDocumentDAO } from "#database/daos/supportDocumentDAO.ts";
+import type { SupportDocumentInfoDAO } from "#database/daos/supportDocumentInfoDAO.ts";
 import { daoToSupportDocumentModel } from "#domain/models/supportDocument.ts";
 import type { SupportDocumentRepository } from "#domain/repositories.ts";
 export function getSupportDocumentRepository(): SupportDocumentRepository {
@@ -7,14 +7,14 @@ export function getSupportDocumentRepository(): SupportDocumentRepository {
         findAllSupportDocuments: async () => {
             const responseSupportDocument = await fetch(SUPPORT_DOCUMENT_URL);
             const supportDocumentData = await responseSupportDocument.json();
-            const supportDocumentDAOs: SupportDocumentDAO[] = supportDocumentData.data;
+            const supportDocumentDAOs: SupportDocumentInfoDAO[] = supportDocumentData.data;
             return supportDocumentDAOs.map(daoToSupportDocumentModel);
         },
         findSupportDocumentById: async (id: number) => {
             const responseSupportDocument = await fetch(`${SUPPORT_DOCUMENT_URL}/${id}`);
             if (!responseSupportDocument.ok) return null;
             const supportDocumentData = await responseSupportDocument.json();
-            const supportDocumentDAO: SupportDocumentDAO = supportDocumentData.data;
+            const supportDocumentDAO: SupportDocumentInfoDAO = supportDocumentData.data;
             return daoToSupportDocumentModel(supportDocumentDAO);
         },
         createSupportDocument: async (data) => {
@@ -27,7 +27,7 @@ export function getSupportDocumentRepository(): SupportDocumentRepository {
             });
             if (!response.ok) throw new Error("Error creating support document");
             const datas = await response.json();
-            const supportDocumentDAO: SupportDocumentDAO = datas.data;
+            const supportDocumentDAO: SupportDocumentInfoDAO = datas.data;
             return daoToSupportDocumentModel(supportDocumentDAO);
         },
         updateSupportDocument: async (id, data) => {
