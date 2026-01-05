@@ -33,6 +33,7 @@ import UserSearchDialog from '#components/dialogs/UserSearchDialog.tsx';
 import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
+import type { StudentModel } from '#domain/models/student.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -73,6 +74,7 @@ export default function CaseInfo() {
     const [isEditAppointmentDialogOpen, setIsEditAppointmentDialogOpen] = useState(false);
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
+    const [localCaseStudents, setLocalStudents] = useState<StudentModel[]>([]); // Local state for students
     const [isDataModified, setIsDataModified] = useState(false);
 
     // Citas Tab State
@@ -95,16 +97,19 @@ export default function CaseInfo() {
     useEffect(() => {
         if (!caseData) return
         setLocalCaseData(caseData);
-
-    }, [caseData]);
+        setLocalStudents(caseStudents);
+    }, [caseData, caseStudents]);
     useEffect(() => {
         if (!localCaseData) return
-        const hasChanges = JSON.stringify(localCaseData) !== JSON.stringify(caseData);
-        setIsDataModified(hasChanges);
-    }, [localCaseData]);
+        const hasChangesLocalData = JSON.stringify(localCaseData) !== JSON.stringify(caseData);
+        setIsDataModified(hasChangesLocalData);
+        const hasChangesStudents = JSON.stringify(localCaseStudents) !== JSON.stringify(caseStudents);
+        setIsDataModified(prev => prev || hasChangesStudents);
+    }, [localCaseData, localCaseStudents, caseData, caseStudents]);
 
     function discardChanges() {
         setLocalCaseData(caseData || undefined);
+        setLocalStudents(caseStudents);
     }
     function saveChanges() {
         if (!localCaseData || !caseData) return;
@@ -380,10 +385,10 @@ export default function CaseInfo() {
                                     </Button>
                                 )}
                             </header>
-                            {caseData.teacherName ? (
+                            {localCaseData?.teacherName ? (
                                 <span className="flex items-center gap-3">
                                     <UserCircle />
-                                    <p className="text-body-medium">{caseData.teacherName}</p>
+                                    <p className="text-body-medium">{localCaseData.teacherName}</p>
                                 </span>
                             ) : (
                                 <p className="text-body-small">Sin Profesor Asignado</p>
@@ -402,20 +407,20 @@ export default function CaseInfo() {
                                 permissionLevel < 3 ? (
                                     <InBox>
                                         <ul>
-                                            {caseStudents.map((student) => (
+                                            {localCaseStudents.map((student) => (
                                                 <li key={student.identityCard} className="flex items-center gap-3 mb-2">
                                                     <UserCircle />
                                                     <p className="text-body-medium">{student.fullName}</p>
-                                                    <CircleMinus />
+                                                    <Button icon={<CircleMinus />} variant='outlined'></Button>
                                                 </li>
                                             ))}
                                         </ul>
                                     </InBox>
                                 ) : (
                                     <>
-                                        {caseStudents.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
+                                        {localCaseStudents.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
                                         <ul>
-                                            {caseStudents.map((student) => (
+                                            {localCaseStudents.map((student) => (
                                                 <li key={student.identityCard} className="flex items-center gap-3 mb-2">
                                                     <UserCircle />
                                                     <p className="text-body-medium">{student.fullName}</p>
@@ -432,7 +437,7 @@ export default function CaseInfo() {
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsStudentSearchDialogOpen(false)}
                             users={students}
-                            onSelect={() => { }}
+                            onSelect={(student) => { setLocalStudents((prev) => [...prev, student]);}}
                         />
 
                         <UserSearchDialog
@@ -441,7 +446,7 @@ export default function CaseInfo() {
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsTeacherSearchDialogOpen(false)}
                             users={teachers}
-                            onSelect={() => { }}
+                            onSelect={(teacher) => { handleChange({ teacherId: teacher.identityCard }); handleChange({ teacherName: teacher.fullName }); }}
                         />
                     </div>
                 </article>
