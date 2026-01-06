@@ -32,7 +32,7 @@ export default function Dialog({
                 onClick={e => e.stopPropagation()}
             >
                 <header className="flex items-center justify-between">
-                    <h4 className="text-label-small">{title}</h4>
+                    <h4 className="text-label-medium">{title}</h4>
                     <span className="flex items-center gap-2">
                         {headerItems}
                         <Button icon={<Close />} variant="outlined" onClick={onClose}></Button>
