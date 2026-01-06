@@ -73,10 +73,10 @@ export default function PersonSearchDialog({
         placeholder={placeholder}
       />
 
-      <div className="flex flex-col gap-2 max-h-[60vh] overflow-auto">
+      <div className="flex flex-col gap-2 h-[60vh] overflow-auto">
         {results.length === 0 ? (
           <div className="text-body-medium text-onSurface/70 px-2 py-3">
-            No se encontraron usuarios.
+            No se encontraron resultados.
           </div>
         ) : (
           results.map((user) => (

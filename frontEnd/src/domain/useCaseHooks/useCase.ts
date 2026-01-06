@@ -377,3 +377,37 @@ export function useSetStudentsToCase() {
         error
     };
 }
+
+export function useSetBeneficiariesToCase() {
+    const { addBeneficiaryToCase, removeBeneficiaryFromCase, findBeneficiariesByCaseId } = getCaseRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    async function setBeneficiariesToCase(idCase: number, beneficiaryIds: string[]) {
+        setLoading(true);
+        try {
+            const currentBeneficiaries = await findBeneficiariesByCaseId(idCase);
+            const currentBeneficiaryIds = currentBeneficiaries.map(b => b.identityCard);
+
+            const toAdd = beneficiaryIds.filter(id => !currentBeneficiaryIds.includes(id));
+            const toRemove = currentBeneficiaryIds.filter(id => !beneficiaryIds.includes(id));
+
+            await Promise.all([
+                ...toAdd.map(id => addBeneficiaryToCase(idCase, id)),
+                ...toRemove.map(id => removeBeneficiaryFromCase(idCase, id))
+            ]);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return {
+        setBeneficiariesToCase,
+        loading,
+        error
+    };
+}

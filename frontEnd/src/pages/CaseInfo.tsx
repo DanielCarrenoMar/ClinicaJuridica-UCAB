@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
+import { useGetBeneficiariesByCaseId, useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetBeneficiariesToCase, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -34,12 +34,12 @@ import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
 import AddCaseActionDialog from '#components/dialogs/AddCaseActionDialog.tsx';
 import CaseActionDetailsDialog from '#components/dialogs/CaseActionDetailsDialog.tsx';
-import type { StudentModel } from '#domain/models/student.ts';
 import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
 import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import type { PersonModel } from '#domain/models/person.ts';
+import { useGetAllBeneficiaries } from '#domain/useCaseHooks/useBeneficiary.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -56,11 +56,13 @@ export default function CaseInfo() {
 
     const { user, permissionLevel } = useAuth()
     const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
-    const { updateCase, loading: updating, error: updateError } = useUpdateCaseWithCaseModel(user!!.identityCard);
+    const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
     const { students: caseStudents, loadStudents: loadCaseStudents } = useGetStudentsByCaseId(Number(id));
+    const { beneficiaries: caseBeneficiaries, loadBeneficiaries: loadCaseBeneficiaries } = useGetBeneficiariesByCaseId(Number(id));
     const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(Number(id));
     const { setStudentsToCase } = useSetStudentsToCase()
+    const { setBeneficiariesToCase } = useSetBeneficiariesToCase()
     const { createCaseAction: createAction } = createCaseAction();
 
     const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
@@ -70,6 +72,7 @@ export default function CaseInfo() {
 
     const { students } = useGetAllStudents();
     const { teachers } = useGetAllTeachers();
+    const { beneficiaries} = useGetAllBeneficiaries();
 
     // Support Document Hooks
     const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
@@ -85,6 +88,7 @@ export default function CaseInfo() {
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [localCaseStudents, setLocalStudents] = useState<PersonModel[]>([]); // Local state for students
+    const [localCaseBeneficiaries, setLocalBeneficiaries] = useState<PersonModel[]>([]); // Local state for beneficiaries
     const [isDataModified, setIsDataModified] = useState(false);
 
     // Citas Tab State
@@ -100,6 +104,7 @@ export default function CaseInfo() {
 
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
+    const [isBeneficiarySearchDialogOpen, setIsBeneficiarySearchDialogOpen] = useState(false);
     const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
@@ -108,25 +113,30 @@ export default function CaseInfo() {
         if (!caseData) return
         setLocalCaseData(caseData);
         setLocalStudents(caseStudents);
-    }, [caseData, caseStudents]);
+        setLocalBeneficiaries(caseBeneficiaries);
+    }, [caseData, caseStudents, caseBeneficiaries]);
     useEffect(() => {
         if (!localCaseData) return
         const hasChangesLocalData = JSON.stringify(localCaseData) !== JSON.stringify(caseData);
         setIsDataModified(hasChangesLocalData);
         const hasChangesStudents = JSON.stringify(localCaseStudents) !== JSON.stringify(caseStudents);
-        setIsDataModified(prev => prev || hasChangesStudents);
-    }, [localCaseData, localCaseStudents, caseData, caseStudents]);
+        const hasChangesBeneficiaries = JSON.stringify(localCaseBeneficiaries) !== JSON.stringify(caseBeneficiaries);
+        setIsDataModified(prev => prev || hasChangesStudents || hasChangesBeneficiaries);
+    }, [localCaseData, localCaseStudents, localCaseBeneficiaries, caseData, caseStudents, caseBeneficiaries]);
 
     function discardChanges() {
         setLocalCaseData(caseData || undefined);
         setLocalStudents(caseStudents);
+        setLocalBeneficiaries(caseBeneficiaries);
     }
     async function saveChanges() {
         if (!localCaseData || !caseData) return;
         await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
+        await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(b => b.identityCard));
         await updateCase(caseData.idCase, localCaseData)
         loadCase(Number(id));
         loadCaseStudents(Number(id));
+        loadCaseBeneficiaries(Number(id));
     }
 
     const handleChange = (updateField: Partial<CaseModel>) => {
@@ -487,18 +497,46 @@ export default function CaseInfo() {
             <section className="flex-1 flex flex-col">
                 <header className="flex justify-between items-center mb-4">
                     <h4 className="text-label-small ">Beneficiarios</h4>
-                    <Button variant="outlined" className='h-10' onClick={() => { }}>Añadir</Button>
+                    {permissionLevel < 3 && (
+                        <Button variant="outlined" className='h-10' onClick={() => setIsBeneficiarySearchDialogOpen(true)}>Añadir</Button>
+                    )}
                 </header>
                 <InBox>
-                    <div className="flex justify-between items-start">
-                        <span className="text-body-medium ">Jose Luis Enrique Calderon</span>
-                        <span className="text-body-small Variant">V-1231231231</span>
-                    </div>
-                    <div className="flex justify-between items-start">
-                        <span className="text-body-medium ">Pedro Gallego Enrique Calderon</span>
-                        <span className="text-body-small Variant">V-1231231231</span>
-                    </div>
+                    <ul className='flex flex-col gap-3'>
+                        {localCaseBeneficiaries.length === 0 && (
+                            <p className="text-body-small">Sin Beneficiarios Asignados</p>
+                        )}
+                        {localCaseBeneficiaries.map((beneficiary) => (
+                            <li key={beneficiary.identityCard}>
+                                <span className="flex items-center justify-between">
+                                    <div className='flex gap-3'>
+                                        <UserCircle />
+                                        <p className="text-body-medium">{beneficiary.fullName}</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => setLocalBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
+                                        icon={<Close />}
+                                        className='p-2!'
+                                        variant='outlined'
+                                    />
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
                 </InBox>
+
+                <PersonSearchDialog
+                    open={isBeneficiarySearchDialogOpen}
+                    title="Buscar Beneficiario"
+                    placeholder="Buscar por nombre o cédula..."
+                    onClose={() => setIsBeneficiarySearchDialogOpen(false)}
+                    users={beneficiaries}
+                    onSelect={(beneficiary) => {
+                        if (!localCaseBeneficiaries.some(b => b.identityCard === beneficiary.identityCard)) {
+                            setLocalBeneficiaries((prev) => [...prev, beneficiary]);
+                        }
+                    }}
+                />
             </section>
         </div>
     );
