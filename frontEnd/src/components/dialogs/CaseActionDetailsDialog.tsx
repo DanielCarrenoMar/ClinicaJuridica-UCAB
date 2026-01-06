@@ -34,35 +34,43 @@ export default function CaseActionDetailsDialog({
         >
             <div className="flex flex-col gap-3">
                 <section className="flex flex-col gap-1">
-                    <span className="flex gap-2 items-center">
-                        <Clipboard />
-                        <h4 className="text-label-small">
-                            Caso
-                        </h4>
-                    </span>
-                    <p className="text-body-medium">
-                        {caseAction.caseCompoundKey}
-                    </p>
+                    {caseAction.caseCompoundKey &&
+                        <article>
+                            <header className="flex gap-2 items-center">
+                                <Clipboard />
+                                <h4 className="text-label-small">
+                                    Caso
+                                </h4>
+                            </header>
+                            <p className="text-body-medium ps-7">
+                                {caseAction.caseCompoundKey}
+                            </p>
+                        </article>
+                    }
 
-                    <span className="flex gap-2 items-center">
-                        <UserCircle />
-                        <h4 className="text-label-small">
-                            Usuario Responsable
-                        </h4>
-                    </span>
-                    <p className="text-body-medium">
-                        {caseAction.userName}
-                    </p>
+                    <article>
+                        <header className="flex gap-2 items-center">
+                            <UserCircle />
+                            <h4 className="text-label-small">
+                                Usuario Responsable
+                            </h4>
+                        </header>
+                        <p className="text-body-medium ps-7">
+                            {caseAction.userName}
+                        </p>
+                    </article>
 
-                    <span className="flex gap-2 items-center">
-                        <CalendarMonth />
-                        <h4 className="text-label-small">
-                            Fecha de Registro
-                        </h4>
-                    </span>
-                    <p className="text-body-medium">
-                        {formatedData}
-                    </p>
+                    <article>
+                        <header className="flex gap-2 items-center">
+                            <CalendarMonth />
+                            <h4 className="text-label-small">
+                                Fecha de Registro
+                            </h4>
+                        </header>
+                        <p className="text-body-medium ps-7">
+                            {formatedData}
+                        </p>
+                    </article>
                 </section>
 
                 <section>
@@ -71,7 +79,7 @@ export default function CaseActionDetailsDialog({
                             Descripción
                         </h4>
                     </span>
-                    <InBox className="flex-1 overflow-y-scroll max-h-60">
+                    <InBox className="flex-1 overflow-y-scroll min-h-30">
                         <p className="text-body-small">
                             {caseAction.description}
                         </p>
