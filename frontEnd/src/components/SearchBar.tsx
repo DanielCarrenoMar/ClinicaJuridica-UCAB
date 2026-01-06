@@ -19,7 +19,7 @@ export default function SearchBar({ variant = 'filled', isOpen, onToggle, defaul
 
   const containerVariantClass =
     variant === 'outline'
-      ? 'border border-onSurface/40 bg-transparent'
+      ? 'border border-onSurface/20 hover:border-onSurface/40 bg-surface/70'
       : 'bg-surface/70';
 
   const openBackground = variant === 'outline' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,1)';

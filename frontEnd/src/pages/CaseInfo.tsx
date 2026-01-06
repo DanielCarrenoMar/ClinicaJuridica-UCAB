@@ -197,6 +197,7 @@ export default function CaseInfo() {
             <section className="flex justify-between items-center gap-4">
                 <div className='flex-1'>
                     <SearchBar
+                        variant='outline'
                         isOpen={true}
                         placeholder="Buscar citas..."
                         onChange={setSearchQuery}
@@ -296,6 +297,7 @@ export default function CaseInfo() {
             <div className="flex justify-between items-center gap-4">
                 <div className="flex-1">
                     <SearchBar
+                        variant='outline'
                         isOpen={true}
                         placeholder="Buscar recaudos..."
                         onChange={setSupportSearchQuery}
@@ -506,6 +508,7 @@ export default function CaseInfo() {
             <section className="flex justify-between items-center gap-4">
                 <div className='flex-1'>
                     <SearchBar
+                        variant='outline'
                         isOpen={true}
                         placeholder="Buscar acciones..."
                         onChange={setCaseActionSearchQuery}
