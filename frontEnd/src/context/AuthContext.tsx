@@ -1,12 +1,15 @@
-import type { UserModel, UserTypeModel } from '#domain/models/user.ts';
+import type { UserModel, UserTypeModel } from '../domain/models/user.ts';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { getUserRepository } from '#database/repositoryImp/UserRepositoryImp.ts';
+import { useLoginUser } from '../domain/useCaseHooks/useUser.ts';
 
 interface AuthContextType {
     user: UserModel | null;
     permissionLevel: number;
     login: (mail: string, password: string) => Promise<void>;
     logout: () => void;
+    loading: boolean;
+    error: string | null;
+    clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +31,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return storedUser ? JSON.parse(storedUser) : null;
     });
 
+    const { login: loginUser, loading, error, clearError } = useLoginUser();
+
     useEffect(() => {
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
@@ -37,29 +42,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [user]);
 
     const login = async (mail: string, password: string) => {
-        console.log('🔐 Iniciando login con:', { email: mail, password: '***' });
-        
-        try {
-            const userRepository = getUserRepository();
-            const user = await userRepository.authenticate(mail, password);
-            
-            console.log('👤 User authenticated:', user);
-            setUser(user);
-        } catch (error) {
-            console.error('💥 Error en login:', error);
-            throw error;
+        const loggedInUser = await loginUser(mail, password);
+        if (loggedInUser) {
+            setUser(loggedInUser);
         }
     };
 
     const logout = () => {
         setUser(null);
+        clearError();
     };
 
     // Default to a high number (low permission) if no user
     const permissionLevel = user ? roleToPermissionLevel(user.type) : 99;
 
     return (
-        <AuthContext.Provider value={{ user, permissionLevel, login, logout }}>
+        <AuthContext.Provider value={{ user, permissionLevel, login, logout, loading, error, clearError }}>
             {children}
         </AuthContext.Provider>
     );
