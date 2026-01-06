@@ -9,6 +9,7 @@ import type { CaseStatusDAO } from '#database/daos/caseStatusDAO.ts';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts'
 import { typeModelToCaseStatusTypeDao } from '#domain/typesModel.ts';
+import type { CaseActionModel } from '#domain/models/caseAction.ts';
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
@@ -252,7 +253,7 @@ export function useGetBeneficiariesByCaseId(id: number) {
 
 export function useGetCaseActionsByCaseId(id: number) {
     const { findCaseActionsByCaseId } = getCaseRepository();
-    const [caseActions, setCaseActions] = useState<any[]>([]);
+    const [caseActions, setCaseActions] = useState<CaseActionModel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 

@@ -77,13 +77,13 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                 <div className="flex flex-col gap-1 justify-center w-50">
                     <span className="flex gap-1 items-center">
                         <User />
-                        <p className="font-light truncate max-w-32">
+                        <p className="truncate max-w-32">
                             {highlightText(applicantName, matches?.applicantName)}
                         </p>
                     </span>
                     <span className="flex gap-1 items-center">
                         <ScaleBalanced />
-                        <p className="font-ligh truncate">
+                        <p className="truncate">
                             {highlightText(legalAreaName, matches?.legalAreaName)}
                         </p>
                     </span>

@@ -31,7 +31,7 @@ function ActionsHistory() {
     }, [caseActions, searchQuery]);
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col h-full">
             <section className="mb-4">
                 <SearchBar
                     isOpen={true}
@@ -39,25 +39,8 @@ function ActionsHistory() {
                     onChange={setSearchQuery}
                 />
             </section>
-            <section>
+            <section className="flex-1">
                 <Box className="col-span-4 h-full flex flex-col gap-2">
-                    <span className="px-0 py-2 text-body-small text-onSurface/70 border-b border-onSurface/10">
-                        <ul className="flex gap-5">
-                            <li className="flex-1">
-                                <p>Usuario</p>
-                            </li>
-                            <li className="flex-1">
-                                <p>ID Caso</p>
-                            </li>
-                            <li className="flex-1">
-                                <p>Fecha Creacion</p>
-                            </li>
-                            <li className="flex-3">
-                                <p>Descripcción</p>
-                            </li>
-                        </ul>
-                    </span>
-
                     <div className="flex flex-col gap-2 flex-11">
                         {loadingCaseActions &&
                             <div className="flex justify-center">

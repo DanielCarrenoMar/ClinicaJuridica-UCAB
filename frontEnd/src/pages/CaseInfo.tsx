@@ -22,7 +22,6 @@ import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
-import CaseActionInfoCard from '#components/CaseActionInfoCard.tsx';
 import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
 import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
@@ -39,6 +38,7 @@ import type { StudentModel } from '#domain/models/student.ts';
 import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
 import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
+import CaseActionCard from '#components/CaseActionCard.tsx';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -538,7 +538,7 @@ export default function CaseInfo() {
                                 action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
                             )
                             .map((caseAction) => (
-                                <CaseActionInfoCard
+                                <CaseActionCard
                                     key={caseAction.actionNumber}
                                     caseAction={caseAction}
                                     onClick={() => {

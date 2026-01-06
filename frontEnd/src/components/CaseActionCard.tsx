@@ -1,4 +1,3 @@
-import { ClipboardList } from 'flowbite-react-icons/solid';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import { Link } from 'react-router';
 
@@ -20,51 +19,42 @@ export default function CaseActionCard({
   });
 
   return (
-    <div
+    <span
       onClick={onClick}
-      className={`group w-full p-4 rounded-xl bg-surface border border-onSurface/10 hover:border-onSurface/30 hover:shadow-sm transition-all ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex flex-col gap-1 items-start w-full px-4 py-2.5 rounded-3xl hover:bg-surface bg-surface/70 ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
-      <div className="flex gap-4 items-start">
-        {/* Icon */}
-        <div className="shrink-0 w-12 h-12 bg-surfaceVariant/30 rounded-lg flex items-center justify-center text-onSurfaceVariant">
-          <ClipboardList className="w-6 h-6" />
+      <header className='flex items-end justify-between w-full'>
+        <div className='flex gap-2'>
+          {
+            caseAction.caseCompoundKey && 
+              <p className='text-body-medium'>
+                Caso &nbsp;
+                <Link
+                  to={`/caso/${caseAction.idCase}`}
+                  className="text-body-large hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {caseAction.caseCompoundKey}
+                </Link>
+                  &nbsp; por
+              </p>
+          }
+
+          <Link
+            to={`/usuario/${caseAction.userId}`}
+            className="text-body-large hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {caseAction.userName}
+          </Link>
         </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0 flex flex-col gap-2">
-          <div className="flex justify-between items-start gap-2">
-            <div className="flex flex-col gap-1">
-              <Link
-                to={`/usuario/${caseAction.userId}`}
-                className="text-title-medium text-onSurface font-bold hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {caseAction.userName}
-              </Link>
-              <Link
-                to={`/caso/${caseAction.idCase}`}
-                className="text-body-small text-onSurfaceVariant hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Caso: {caseAction.caseCompoundKey}
-              </Link>
-            </div>
-            <span className="text-body-small text-onSurfaceVariant shrink-0">
-              {dateString}
-            </span>
-          </div>
-
-          <p className="text-body-medium text-onSurface/80 line-clamp-1">
-            {caseAction.description}
-          </p>
-
-          {caseAction.notes && (
-            <p className="text-body-small text-onSurface/60 italic line-clamp-1">
-              Nota: {caseAction.notes}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
+        <span className="text-body-medium">
+          {dateString}
+        </span>
+      </header>
+      <p className="text-body-small indent-1 text-onSurface/70 line-clamp-3 text-ellipsis max-w-full">
+        {caseAction.description}
+      </p>
+    </span>
   );
 }
