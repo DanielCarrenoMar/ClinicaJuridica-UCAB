@@ -1,9 +1,9 @@
 import { useRef, useEffect } from 'react';
 import { animate } from 'animejs';
 import { Search, Close } from "flowbite-react-icons/outline";
-import { useNavigate } from 'react-router';
 
 interface SearchBarProps {
+    variant?: 'filled' | 'outline';
     isOpen: boolean;
     onToggle?: (isOpen: boolean) => void;
     defaultValue?: string;
@@ -12,10 +12,18 @@ interface SearchBarProps {
     onSearch?: (value: string) => void;
 }
 
-export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeholder = "Buscar", onChange, onSearch }: SearchBarProps) {
+export default function SearchBar({ variant = 'filled', isOpen, onToggle, defaultValue = '', placeholder = "Buscar", onChange, onSearch }: SearchBarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isFirstRender = useRef(true);
+
+  const containerVariantClass =
+    variant === 'outline'
+      ? 'border border-onSurface/40 bg-transparent'
+      : 'bg-surface/70';
+
+  const openBackground = variant === 'outline' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,1)';
+  const closedBackground = variant === 'outline' ? 'rgba(255,255,255,0)' : 'rgba(255,255,255,0.7)';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -35,7 +43,7 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
     if (isOpen) {
       animate(containerRef.current, {
         width: ['40px', '100%'],
-        backgroundColor: ['rgba(255,255,255,0.7)', 'rgba(255,255,255,1)'],
+        backgroundColor: [closedBackground, openBackground],
         borderRadius: ['100px', '24px'],
         duration: isFirstRender.current ? 0 : 300,
         easing: 'easeOutQuad',
@@ -46,14 +54,14 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
     } else {
       animate(containerRef.current, {
         width: ['100%', '40px'],
-        backgroundColor: ['rgba(255,255,255,1)', 'rgba(255,255,255,0.7)'],
+        backgroundColor: [openBackground, closedBackground],
         borderRadius: ['24px', '100px'],
         duration: isFirstRender.current ? 0 : 300,
         easing: 'easeOutQuad'
       });
     }
     if (isFirstRender.current) isFirstRender.current = false;
-  }, [isOpen]);
+  }, [isOpen, openBackground, closedBackground]);
 
   function searchInputText(){
     const value = inputRef.current?.value || '';
@@ -63,7 +71,7 @@ export default function SearchBar({ isOpen, onToggle, defaultValue = '', placeho
   return (
     <div 
       ref={containerRef}
-      className={`bg-surface/70 flex items-center overflow-hidden`}
+      className={`flex items-center overflow-hidden ${containerVariantClass}`}
     >
       <button 
         onClick={() => { 

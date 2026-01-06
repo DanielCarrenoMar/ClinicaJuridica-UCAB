@@ -4,6 +4,8 @@ import Fuse from "fuse.js";
 import TextInput from "#components/TextInput.tsx";
 import type { UserModel } from "#domain/models/user.ts";
 import Dialog from "./Dialog";
+import SearchBar from "#components/SearchBar.tsx";
+import UserCard from "#components/UserCard.tsx";
 
 type UserSearchable = Omit<UserModel, "type">;
 
@@ -67,9 +69,11 @@ export default function UserSearchDialog<TUser extends UserSearchable = UserSear
       title={title}
       onClose={onClose}
     >
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
+      <SearchBar
+        variant="outline"
+        isOpen={true}
+        defaultValue={query}
+        onChange={setQuery}
         placeholder={placeholder}
       />
 
@@ -80,29 +84,11 @@ export default function UserSearchDialog<TUser extends UserSearchable = UserSear
           </div>
         ) : (
           results.map((user) => (
-            <button
+            <UserCard
+              onClick={() => onSelect && onSelect(user)}
               key={user.identityCard}
-              type="button"
-              onClick={() => {
-                onSelect?.(user);
-                onClose();
-              }}
-              className="w-full text-left rounded-3xl border border-onSurface/10 bg-surface/70 hover:bg-surface transition-colors px-4 py-3"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-body-large text-onSurface font-medium truncate">
-                    {user.fullName}
-                  </div>
-                  <div className="text-body-small text-onSurface/70 truncate">
-                    Cédula: {user.identityCard}
-                  </div>
-                </div>
-                <div className="text-body-small text-onSurface/70 shrink-0">
-                  {user.email}
-                </div>
-              </div>
-            </button>
+              user={user}
+            />
           ))
         )}
       </div>
