@@ -107,7 +107,8 @@ export default function EditAppointmentDialog({
 
             <div className="flex justify-end gap-3 mt-2">
                 <Button
-                    variant="filled"
+                    variant="resalted"
+                    className='min-w-48 w-1/2'
                     onClick={handleSubmit}
                     disabled={!plannedDate}
                 >

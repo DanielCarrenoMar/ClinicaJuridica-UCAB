@@ -32,8 +32,8 @@ export default function CaseActionDetailsDialog({
             title="Detalles de la Acción"
             onClose={onClose}
         >
-            <div className="flex flex-col gap-3">
-                <section className="flex flex-col gap-1">
+            <div className="flex flex-col gap-4">
+                <section className="flex flex-wrap justify-between gap-6">
                     {caseAction.caseCompoundKey &&
                         <article>
                             <header className="flex gap-2 items-center">
@@ -51,7 +51,7 @@ export default function CaseActionDetailsDialog({
                     <article>
                         <header className="flex gap-2 items-center">
                             <UserCircle />
-                            <h4 className="text-label-small">
+                            <h4 className="text-body-large">
                                 Usuario Responsable
                             </h4>
                         </header>
@@ -63,7 +63,7 @@ export default function CaseActionDetailsDialog({
                     <article>
                         <header className="flex gap-2 items-center">
                             <CalendarMonth />
-                            <h4 className="text-label-small">
+                            <h4 className="text-body-large">
                                 Fecha de Registro
                             </h4>
                         </header>
@@ -75,7 +75,7 @@ export default function CaseActionDetailsDialog({
 
                 <section>
                     <span className="flex gap-2 items-center">
-                        <h4 className="text-label-medium">
+                        <h4 className="text-label-small">
                             Descripción
                         </h4>
                     </span>
