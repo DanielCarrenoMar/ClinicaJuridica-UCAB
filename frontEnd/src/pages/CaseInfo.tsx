@@ -460,7 +460,7 @@ export default function CaseInfo() {
         <div className="flex flex-col md:flex-row gap-8 h-full">
             <section className="flex-1 flex flex-col gap-8">
                 <article>
-                    <h4 className="text-label-small mb-4">Solicitante</h4>
+                    <h4 className="text-label-small mb-2">Solicitante</h4>
                     <span className="flex items-center gap-3">
                         <User />
                         <p className="text-body-medium">{caseData.applicantName}</p>
@@ -468,7 +468,7 @@ export default function CaseInfo() {
                 </article>
 
                 <article>
-                    <h4 className="text-label-small mb-4">Responsables</h4>
+                    <h4 className="text-label-small mb-2">Responsables</h4>
                     <div className="flex flex-col gap-4">
                         <section>
                             <header className="flex justify-between items-center mb-2">
@@ -671,7 +671,7 @@ export default function CaseInfo() {
     );
 
     return (
-        <Box className='p-0!'>
+        <Box className='p-0! h-full overflow-y-auto'>
             <header className="bg-surface/70 flex items-center justify-between px-4 rounded-xl h-16">
                 <span className="flex gap-3 items-center">
                     <Clipboard className='size-6!' />
@@ -719,7 +719,7 @@ export default function CaseInfo() {
                 </Tabs>
             </section>
 
-            <section className="px-4 pb-6 h-full flex flex-col">
+            <section className="px-4 pb-6 flex flex-col">
                 <div className="flex-1 overflow-y-auto pr-2">
                     {activeTab === 'General' && GeneralTabContent}
                     {activeTab === 'Citas' && CitasTabContent}
