@@ -104,6 +104,7 @@ export default function SearchBar({ variant = 'filled', isOpen, onToggle, defaul
               return;
             }
             inputRef.current.value = '';
+            if (onChange) onChange('');
             inputRef.current.focus();
           }}
           className="group shrink-0 p-1 hover:bg-surface rounded-full cursor-pointer"
