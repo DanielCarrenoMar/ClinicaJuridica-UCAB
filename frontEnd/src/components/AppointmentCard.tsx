@@ -1,5 +1,6 @@
-import { User } from 'flowbite-react-icons/solid';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
+import { UserCircle } from 'flowbite-react-icons/solid';
+import { Link } from 'react-router';
 
 interface AppointmentCardProps {
     appointment: AppointmentModel;
@@ -8,8 +9,6 @@ interface AppointmentCardProps {
 }
 
 export default function AppointmentCard({ appointment, applicantName, onClick }: AppointmentCardProps) {
-
-    // Determine the date to show based on status
     const dateLabel = appointment.status === "Completada" ? "Realizada el" :
         appointment.status === "Cancelada" ? "Cancelada el" : "Programada para el";
 
@@ -22,25 +21,21 @@ export default function AppointmentCard({ appointment, applicantName, onClick }:
     return (
         <div
             onClick={onClick}
-            className="group w-full p-4 rounded-xl bg-surface border border-onSurface/10 hover:border-onSurface/30 hover:shadow-sm transition-all cursor-pointer flex flex-col gap-2"
+            className={`group w-full py-2.5 px-4 rounded-3xl bg-surface/70 hover:bg-surface border border-onSurface/30 hover:border-onSurface/40 transition-all cursor-pointer flex flex-col gap-2 ${appointment.status !== 'Programada' && 'opacity-90 h-24'}`}
         >
-            <div className="flex justify-between items-center w-full">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-surfaceVariant/50 text-onSurface">
-                        <User className="w-6 h-6" />
-                    </div>
-                    <span className="text-title-medium text-onSurface font-bold">{applicantName}</span>
+            <header className="flex justify-between items-center w-full">
+                <span className="flex items-center text-body-medium">
+                    Creada por&nbsp;
+                    <Link to="#" className="text-body-large hover:underline" onClick={(e) => e.stopPropagation()}>{applicantName}</Link>
+                </span>
+                <div className="text-body-medium">
+                    <strong className='text-body-large'>{dateLabel}</strong> {dateString}
                 </div>
-                <div className="text-body-medium text-onSurfaceVariant">
-                    {dateLabel} <span className="text-onSurface font-medium">{dateString}</span>
-                </div>
-            </div>
+            </header>
 
-            <div className="pl-[52px]">
-                <p className="text-body-medium text-onSurface/80 line-clamp-2">
-                    {appointment.guidance || "Sin descripción disponible."}
-                </p>
-            </div>
+            {appointment.guidance && <p className="pl-6 text-body-medium text-onSurface/70 line-clamp-2">
+                {appointment.guidance}
+            </p>}
         </div>
     );
 }
