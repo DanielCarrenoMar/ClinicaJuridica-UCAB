@@ -1,7 +1,6 @@
 import type { UserModel, UserTypeModel } from '#domain/models/user.ts';
-import { userTypeDaoToModel } from '#domain/models/user.ts';
-import { typeDaoToGenderTypeModel } from '#domain/typesModel.ts';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { getUserRepository } from '#database/repositoryImp/UserRepositoryImp.ts';
 
 interface AuthContextType {
     user: UserModel | null;
@@ -41,45 +40,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('🔐 Iniciando login con:', { email: mail, password: '***' });
         
         try {
-            const response = await fetch('http://localhost:3000/api/v1/auth', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: mail, password })
-            });
-
-            console.log('📡 Response status:', response.status);
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('❌ Error response:', errorData);
-                throw new Error(errorData.message || 'Error en autenticación');
-            }
-
-            const result = await response.json();
-            console.log('✅ Login response:', result);
+            const userRepository = getUserRepository();
+            const user = await userRepository.authenticate(mail, password);
             
-            if (!result.success) {
-                console.error('❌ Login failed:', result.message);
-                throw new Error(result.message || 'Credenciales inválidas');
-            }
-
-            // Convertir DAO a UserModel usando las funciones de conversión
-            const userDAO = result.data;
-            const user: UserModel = {
-                identityCard: userDAO.identityCard,
-                fullName: userDAO.fullName,
-                gender: userDAO.gender ? typeDaoToGenderTypeModel(userDAO.gender) : undefined,
-                email: userDAO.email,
-                password: userDAO.password,
-                isActive: userDAO.isActive,
-                type: userTypeDaoToModel(userDAO.type)
-            };
-            
-            console.log('👤 User model created:', user);
+            console.log('👤 User authenticated:', user);
             setUser(user);
         } catch (error) {
             console.error('💥 Error en login:', error);
-            throw error; // Re-lanzar para que el Login.tsx pueda manejarlo
+            throw error;
         }
     };
 

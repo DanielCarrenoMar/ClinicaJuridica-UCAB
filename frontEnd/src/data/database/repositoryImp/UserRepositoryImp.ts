@@ -2,6 +2,9 @@ import type { UserRepository } from "#domain/repositories.ts";
 import { USER_URL } from "./apiUrl";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 import { daoToUserModel } from "#domain/models/user.ts";
+
+const AUTH_URL = "http://localhost:3000/api/v1/auth";
+
 export function getUserRepository(): UserRepository {
     return {
         findAllUsers: async () => {
@@ -18,6 +21,26 @@ export function getUserRepository(): UserRepository {
             const userDAO: UserDAO = userData.data;
             return daoToUserModel(userDAO);
         },
+        authenticate: async (email: string, password: string) => {
+            const response = await fetch(AUTH_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error en autenticación');
+            }
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Credenciales inválidas');
+            }
+
+            const userDAO: UserDAO = result.data;
+            return daoToUserModel(userDAO);
+        }
     } as UserRepository;
 }
