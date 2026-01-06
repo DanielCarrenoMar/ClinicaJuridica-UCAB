@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useGetBeneficiariesByCaseId, useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetBeneficiariesToCase, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
@@ -40,6 +40,7 @@ import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import type { PersonModel } from '#domain/models/person.ts';
 import { useGetAllBeneficiaries } from '#domain/useCaseHooks/useBeneficiary.ts';
+import Fuse from 'fuse.js';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -143,6 +144,70 @@ export default function CaseInfo() {
         setLocalCaseData((prev: any) => ({ ...prev, ...updateField }));
     };
 
+    const appointmentsFuse = useMemo(() => {
+        return new Fuse(appointments, {
+            keys: [
+                { name: 'guidance', weight: 0.55 },
+                { name: 'userName', weight: 0.25 },
+                { name: 'status', weight: 0.2 },
+            ],
+            threshold: 0.35,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
+        });
+    }, [appointments]);
+
+    const visibleAppointments = useMemo(() => {
+        const trimmed = searchQuery.trim();
+        const filtered = trimmed.length === 0
+            ? appointments
+            : appointmentsFuse.search(trimmed).map(r => r.item);
+
+        const rank = (status: AppointmentModel['status']) => status === 'Programada' ? 0 : 1;
+
+        return filtered
+            .map((appointment, index) => ({ appointment, index }))
+            .sort((a, b) => rank(a.appointment.status) - rank(b.appointment.status) || a.index - b.index)
+            .map(x => x.appointment);
+    }, [appointments, appointmentsFuse, searchQuery]);
+
+    const supportDocumentsFuse = useMemo(() => {
+        return new Fuse(supportDocuments, {
+            keys: [
+                { name: 'title', weight: 0.65 },
+                { name: 'description', weight: 0.35 },
+            ],
+            threshold: 0.35,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
+        });
+    }, [supportDocuments]);
+
+    const visibleSupportDocuments = useMemo(() => {
+        const trimmed = supportSearchQuery.trim();
+        if (trimmed.length === 0) return supportDocuments;
+        return supportDocumentsFuse.search(trimmed).map(r => r.item);
+    }, [supportDocuments, supportDocumentsFuse, supportSearchQuery]);
+
+    const caseActionsFuse = useMemo(() => {
+        return new Fuse(caseActions, {
+            keys: [
+                { name: 'description', weight: 0.6 },
+                { name: 'notes', weight: 0.2 },
+                { name: 'userName', weight: 0.2 },
+            ],
+            threshold: 0.35,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
+        });
+    }, [caseActions]);
+
+    const visibleCaseActions = useMemo(() => {
+        const trimmed = caseActionSearchQuery.trim();
+        if (trimmed.length === 0) return caseActions;
+        return caseActionsFuse.search(trimmed).map(r => r.item);
+    }, [caseActions, caseActionsFuse, caseActionSearchQuery]);
+
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
     if (error) return <div className="text-error">Error al cargar el caso: {error.message}</div>;
     if (!caseData) return <div className="">No se encontró el caso</div>;
@@ -220,12 +285,7 @@ export default function CaseInfo() {
             </section>
 
             <section className="flex flex-col gap-4 pb-20">
-                {appointments
-                    .filter(apt =>
-                        (apt.guidance?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-                        apt.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        apt.status.toString().toLowerCase().includes(searchQuery.toLowerCase())
-                    )
+                {visibleAppointments
                     .map(apt => (
                         <AppointmentCard
                             key={apt.appointmentNumber}
@@ -319,11 +379,7 @@ export default function CaseInfo() {
             </div>
 
             <div className="flex flex-col gap-4 pb-20">
-                {supportDocuments
-                    .filter(doc =>
-                        doc.title.toLowerCase().includes(supportSearchQuery.toLowerCase()) ||
-                        doc.description.toLowerCase().includes(supportSearchQuery.toLowerCase())
-                    )
+                {visibleSupportDocuments
                     .map(doc => (
                         <SupportDocumentCard
                             key={doc.supportNumber}
@@ -561,23 +617,12 @@ export default function CaseInfo() {
                 {caseActionsLoading && <LoadingSpinner />}
                 {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
                 {
-                    caseActions
-                        .filter(action =>
-                            action.description.toLowerCase().includes(caseActionSearchQuery.toLowerCase()) ||
-                            (action.notes?.toLowerCase() || "").includes(caseActionSearchQuery.toLowerCase()) ||
-                            action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
-                        )
-                        .length === 0 ? (
+                    visibleCaseActions.length === 0 ? (
                         <span className="flex flex-col items-center justify-center gap-4 mt-20">
                             <p className="text-body-small">No hay acciones registradas para este caso.</p>
                         </span>
                     ) : (
-                        caseActions
-                            .filter(action =>
-                                action.description.toLowerCase().includes(caseActionSearchQuery.toLowerCase()) ||
-                                (action.notes?.toLowerCase() || "").includes(caseActionSearchQuery.toLowerCase()) ||
-                                action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
-                            )
+                        visibleCaseActions
                             .map((caseAction) => (
                                 <CaseActionCard
                                     key={caseAction.actionNumber}
