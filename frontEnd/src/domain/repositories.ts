@@ -76,10 +76,7 @@ export interface SupportDocumentRepository {
 export interface UserRepository {
     findAllUsers(): Promise<UserModel[]>;
     findUserById(id: string): Promise<UserModel | null>;
-}
-
-export interface LoginRepository {
-    login(email: string, password: string): Promise<UserModel>;
+    authenticate(email: string, password: string): Promise<UserModel>;
 }
 
 export interface StudentRepository {
