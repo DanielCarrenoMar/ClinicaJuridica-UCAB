@@ -7,6 +7,7 @@ import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
 import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import { NotificationsProvider } from "../context/NotificationsContext";
 
 type LateralmenuPages = '/' | 'crearCaso' | 'busqueda' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
 
@@ -78,7 +79,9 @@ function LateralMenuLayer() {
                     </span>
                 </header>
                 <div className="flex-1 overflow-y-auto">
-                    <Outlet context={{ setDefaultSearchText }} />
+                    <NotificationsProvider>
+                        <Outlet context={{ setDefaultSearchText }} />
+                    </NotificationsProvider>
                 </div>
             </main>
         </div>

@@ -13,6 +13,7 @@ agent: agent
   - Variables y funciones en **inglés** y **camelCase**.
   - Componentes en **PascalCase**.
 - **Comentarios**: Evita comentarios obvios o innecesarios. El código debe ser autoexplicativo.
+- **Exportaciones**: No se usa el index para agrupar las exportaciones.
 
 ## Estilos (Tailwind CSS)
 - **Framework**: Usa Tailwind CSS V4.
