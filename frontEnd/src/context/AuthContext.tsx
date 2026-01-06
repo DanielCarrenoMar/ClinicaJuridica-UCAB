@@ -1,10 +1,12 @@
 import type { UserModel, UserTypeModel } from '#domain/models/user.ts';
+import { userTypeDaoToModel } from '#domain/models/user.ts';
+import { typeDaoToGenderTypeModel } from '#domain/typesModel.ts';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface AuthContextType {
     user: UserModel | null;
     permissionLevel: number;
-    login: (mail: string, password: string) => void;
+    login: (mail: string, password: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -35,18 +37,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, [user]);
 
-    const login = (mail: string, password: string) => {
-        // Mock login logic
-        console.log(`Logging in with ${mail} and ${password}`);
-        const newUser : UserModel = {
-            identityCard: "16000001",
-            fullName: "Juan Perez",
-            email: mail,
-            password: password,
-            isActive: true,
-            type: "coordinator"
-        };
-        setUser(newUser);
+    const login = async (mail: string, password: string) => {
+        console.log('🔐 Iniciando login con:', { email: mail, password: '***' });
+        
+        try {
+            const response = await fetch('http://localhost:3000/api/v1/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: mail, password })
+            });
+
+            console.log('📡 Response status:', response.status);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('❌ Error response:', errorData);
+                throw new Error(errorData.message || 'Error en autenticación');
+            }
+
+            const result = await response.json();
+            console.log('✅ Login response:', result);
+            
+            if (!result.success) {
+                console.error('❌ Login failed:', result.message);
+                throw new Error(result.message || 'Credenciales inválidas');
+            }
+
+            // Convertir DAO a UserModel usando las funciones de conversión
+            const userDAO = result.data;
+            const user: UserModel = {
+                identityCard: userDAO.identityCard,
+                fullName: userDAO.fullName,
+                gender: userDAO.gender ? typeDaoToGenderTypeModel(userDAO.gender) : undefined,
+                email: userDAO.email,
+                password: userDAO.password,
+                isActive: userDAO.isActive,
+                type: userTypeDaoToModel(userDAO.type)
+            };
+            
+            console.log('👤 User model created:', user);
+            setUser(user);
+        } catch (error) {
+            console.error('💥 Error en login:', error);
+            throw error; // Re-lanzar para que el Login.tsx pueda manejarlo
+        }
     };
 
     const logout = () => {

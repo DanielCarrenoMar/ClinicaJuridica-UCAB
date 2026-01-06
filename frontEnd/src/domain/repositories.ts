@@ -78,6 +78,10 @@ export interface UserRepository {
     findUserById(id: string): Promise<UserModel | null>;
 }
 
+export interface LoginRepository {
+    login(email: string, password: string): Promise<UserModel>;
+}
+
 export interface StudentRepository {
     findAllStudents(): Promise<StudentModel[]>;
     findStudentById(id: string): Promise<StudentModel | null>;

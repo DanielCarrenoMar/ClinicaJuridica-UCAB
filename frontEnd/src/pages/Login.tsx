@@ -9,12 +9,26 @@ import { ArrowRight } from 'flowbite-react-icons/outline';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        login(email, password);
-        navigate('/');
+    const handleLogin = async () => {
+        if (!email || !password) {
+            console.error('Email y contraseña son requeridos');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await login(email, password);
+            navigate('/');
+        } catch (error) {
+            console.error('Error en login:', error);
+            // Aquí podríamos mostrar un mensaje de error al usuario
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -50,8 +64,9 @@ export default function Login() {
                     className="w-full justify-center bg-primary text-onPrimary hover:bg-primary/90"
                     onClick={handleLogin}
                     icon={<ArrowRight />}
+                    disabled={isLoading}
                 >
-                    Ingresar
+                    {isLoading ? 'Ingresando...' : 'Ingresar'}
                 </Button>
             </div>
         </div>
