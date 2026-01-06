@@ -8,6 +8,7 @@ interface TextInputProps {
   placeholder?: string;
   multiline?: boolean;
   type?: string;
+  disabled?: boolean;
 }
 
 export default function TextInput({ 
@@ -17,7 +18,8 @@ export default function TextInput({
   className = '',
   placeholder = "Lorem ipsum dolor sit amet...",
   multiline = false,
-  type = "text"
+  type = "text",
+  disabled = false,
 }: TextInputProps) {
   
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -33,21 +35,23 @@ export default function TextInput({
       {
         multiline ? (
           <textarea
+            disabled={disabled}
             value={isControlled ? value : undefined}
             defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
-            className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 resize-y"
+            className="w-full disabled:opacity-70 bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 resize-y"
             rows={3}
           />
         ) : (
           <input
             type={type}
+            disabled={disabled}
             value={isControlled ? value : undefined}
             defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
-            className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40"
+            className="w-full disabled:opacity-70 bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40"
           />
         )
       }

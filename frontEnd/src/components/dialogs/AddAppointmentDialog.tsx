@@ -44,7 +44,7 @@ export default function AddAppointmentDialog({
         <Dialog open={open} title="Nueva Cita" onClose={onClose}>
             <div className="flex flex-col gap-4">
                 <DatePicker
-                    label="Fecha Planificada"
+                    label="Planificada para"
                     value={plannedDate}
                     onChange={setPlannedDate}
                     min={today}
@@ -52,16 +52,17 @@ export default function AddAppointmentDialog({
                 />
 
                 <DatePicker
-                    label="Fecha de Ejecución"
+                    label="Ejecutada el"
                     value={executionDate}
                     onChange={setExecutionDate}
                 />
 
-                <div className="flex flex-col gap-2">
-                    <label className="flex items-center px-1.5 w-full text-body-large text-onSurface">
-                        Orientación
+                <div className={`flex flex-col gap-2 ${executionDate === "" ? "opacity-70" : ""}`}>
+                    <label className="flex items-center px-1.5 w-full text-label-small text-onSurface">
+                        Orientación {executionDate}
                     </label>
                     <TextInput
+                        disabled={executionDate === ""}
                         multiline
                         placeholder="Ingrese los detalles de la orientación..."
                         onChangeText={setGuidance}
@@ -72,7 +73,8 @@ export default function AddAppointmentDialog({
 
             <div className="flex justify-end gap-3 mt-2">
                 <Button
-                    variant="filled"
+                    variant="resalted"
+                    className='min-w-48 w-1/2'
                     onClick={handleSubmit}
                     disabled={!plannedDate}
                 >
