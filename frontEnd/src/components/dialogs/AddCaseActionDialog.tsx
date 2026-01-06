@@ -47,35 +47,34 @@ export default function AddCaseActionDialog({
         >
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                    <label className="flex items-center px-1.5 w-full text-body-large text-onSurface">
-                        Descripción *
+                    <label className="flex items-center px-1.5 w-full text-label-small text-onSurface">
+                        Descripción
                     </label>
                     <TextInput
                         multiline
                         placeholder="Descripción de la acción..."
                         onChangeText={setDescription}
                         value={description}
-                        className="min-h-[100px]"
                     />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <label className="flex items-center px-1.5 w-full text-body-large text-onSurface">
-                        Notas (Opcional)
+                    <label className="flex items-center px-1.5 w-full text-label-small text-onSurface">
+                        Notas*
                     </label>
                     <TextInput
                         multiline
                         placeholder="Notas adicionales..."
                         onChangeText={setNotes}
                         value={notes}
-                        className="min-h-[80px]"
                     />
                 </div>
             </div>
 
             <div className="flex justify-end gap-3 mt-4">
                 <Button
-                    variant="filled"
+                    variant="resalted"
+                    className='min-w-48 w-1/2'
                     onClick={handleSubmit}
                     disabled={!description.trim()}
                 >
