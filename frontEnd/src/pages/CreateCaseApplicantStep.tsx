@@ -173,20 +173,20 @@ function CreateCaseApplicantStep() {
                     placeholder="Juan Perez"
                 />
             </div>
-            
+
             <div className="col-span-3">
                 <DatePicker
                     label="Fecha Nacimiento"
                     value={applicantModel.birthDate ? applicantModel.birthDate.toISOString().split('T')[0] : undefined}
                     onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
-                    
+
                 />
             </div>
             <div className="col-span-2">
                 <TitleDropdown
                     label="Sexo"
                     selectedValue={applicantModel.gender || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderTypeModel });}}
+                    onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderTypeModel }); }}
                 >
                     <DropdownOption value="male">Masculino</DropdownOption>
                     <DropdownOption value="female">Femenino</DropdownOption>
@@ -265,10 +265,21 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.applicantEducationLevel || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as string }); }}
                 >
-                    <DropdownOption value="PRIMARIA">Primaria</DropdownOption> {/*Hay que hacer una peticion para traer los tipos de la BD*/}
-                    <DropdownOption value="SECUNDARIA">Secundaria</DropdownOption>
-                    <DropdownOption value="UNIVERSITARIA">Universitaria</DropdownOption>
-                    <DropdownOption value="POSTGRADO">Postgrado</DropdownOption>
+                    <DropdownOption value={1}>Sin nivel</DropdownOption>
+                    <DropdownOption value={2}>Primaria (primer grado)</DropdownOption>
+                    <DropdownOption value={3}>Primaria (segundo grado)</DropdownOption>
+                    <DropdownOption value={4}>Primaria (tercer grado)</DropdownOption>
+                    <DropdownOption value={5}>Primaria (cuarto grado)</DropdownOption>
+                    <DropdownOption value={6}>Primaria (quinto grado)</DropdownOption>
+                    <DropdownOption value={7}>Primaria (sexto grado)</DropdownOption>
+                    <DropdownOption value={8}>Básica (1er año / 7mo grado)</DropdownOption>
+                    <DropdownOption value={9}>Básica (2do año / 8mo grado)</DropdownOption>
+                    <DropdownOption value={10}>Básica (3er año / 9no grado)</DropdownOption>
+                    <DropdownOption value={11}>Media Diversificada (4to año)</DropdownOption>
+                    <DropdownOption value={12}>Media Diversificada (5to año)</DropdownOption>
+                    <DropdownOption value={13}>Técnico Medio</DropdownOption>
+                    <DropdownOption value={14}>Técnico Superior</DropdownOption>
+                    <DropdownOption value={15}>Universitaria</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -277,9 +288,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.workConditionId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number }); }}
                 >
-                    <DropdownOption value={1}>Empleado</DropdownOption>
-                    <DropdownOption value={2}>Desempleado</DropdownOption>
-                    <DropdownOption value={3}>Independiente</DropdownOption>
+                    <DropdownOption value={1}>Patrono</DropdownOption>
+                    <DropdownOption value={2}>Empleado</DropdownOption>
+                    <DropdownOption value={3}>Obrero</DropdownOption>
+                    <DropdownOption value={4}>Cuenta Propia</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -288,8 +300,10 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.activityConditionId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number }); }}
                 >
-                    <DropdownOption value={1}>Activo</DropdownOption>
-                    <DropdownOption value={2}>Inactivo</DropdownOption>
+                    <DropdownOption value={1}>Ama de casa</DropdownOption>
+                    <DropdownOption value={2}>Estudiante</DropdownOption>
+                    <DropdownOption value={3}>Pensionado / Jubilado</DropdownOption>
+                    <DropdownOption value={4}>Otra</DropdownOption>
                 </TitleDropdown>
             </div>
         </>
@@ -357,10 +371,22 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.headEducationLevelId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
                 >
-                    <DropdownOption value={1}>Primaria</DropdownOption>
-                    <DropdownOption value={2}>Secundaria</DropdownOption>
-                    <DropdownOption value={3}>Universitaria</DropdownOption>
-                    <DropdownOption value={4}>Postgrado</DropdownOption>
+                    <DropdownOption value={1}>Sin nivel</DropdownOption>
+                    <DropdownOption value={2}>Primaria (primer grado)</DropdownOption>
+                    <DropdownOption value={3}>Primaria (segundo grado)</DropdownOption>
+                    <DropdownOption value={4}>Primaria (tercer grado)</DropdownOption>
+                    <DropdownOption value={5}>Primaria (cuarto grado)</DropdownOption>
+                    <DropdownOption value={6}>Primaria (quinto grado)</DropdownOption>
+                    <DropdownOption value={7}>Primaria (sexto grado)</DropdownOption>
+                    <DropdownOption value={8}>Básica (1er año / 7mo grado)</DropdownOption>
+                    <DropdownOption value={9}>Básica (2do año / 8mo grado)</DropdownOption>
+                    <DropdownOption value={10}>Básica (3er año / 9no grado)</DropdownOption>
+                    <DropdownOption value={11}>Media Diversificada (4to año)</DropdownOption>
+                    <DropdownOption value={12}>Media Diversificada (5to año)</DropdownOption>
+                    <DropdownOption value={13}>Técnico Medio</DropdownOption>
+                    <DropdownOption value={14}>Técnico Superior</DropdownOption>
+                    <DropdownOption value={15}>Universitaria</DropdownOption>
+                    <DropdownOption value={16}>Postgrado</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
@@ -385,7 +411,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Ninos entre 7 y 12 añosen el hogar*"
+                    label="Ninos entre 7 y 12 años en el hogar*"
                     value={applicantModel.children7to12Count?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);

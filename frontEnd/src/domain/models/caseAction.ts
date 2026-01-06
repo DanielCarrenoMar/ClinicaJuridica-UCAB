@@ -12,7 +12,7 @@ export interface CaseActionModel {
 }
 
 export function daoToCaseActionModel(dao: CaseActionInfoDAO): CaseActionModel {
-    const { registryDate, ...rest} = dao;
+    const { registryDate, ...rest } = dao;
     return {
         registryDate: new Date(registryDate),
         ...rest

@@ -22,7 +22,7 @@ import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
-import CaseActionCard from '#components/CaseActionCard.tsx';
+import CaseActionInfoCard from '#components/CaseActionInfoCard.tsx';
 import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
 import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
@@ -34,9 +34,11 @@ import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
 import AddCaseActionDialog from '#components/dialogs/AddCaseActionDialog.tsx';
+import CaseActionDetailsDialog from '#components/dialogs/CaseActionDetailsDialog.tsx';
 import type { StudentModel } from '#domain/models/student.ts';
 import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
 import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
+import type { CaseActionModel } from '#domain/models/caseAction.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -98,6 +100,8 @@ export default function CaseInfo() {
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
     const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
+    const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
+    const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
 
     useEffect(() => {
         if (!caseData) return
@@ -463,7 +467,7 @@ export default function CaseInfo() {
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsStudentSearchDialogOpen(false)}
                             users={students}
-                            onSelect={(student) => { if (!localCaseStudents.some(s => s.identityCard === student.identityCard)) setLocalStudents((prev) => [...prev, student]);}}
+                            onSelect={(student) => { if (!localCaseStudents.some(s => s.identityCard === student.identityCard)) setLocalStudents((prev) => [...prev, student]); }}
                         />
 
                         <UserSearchDialog
@@ -534,7 +538,14 @@ export default function CaseInfo() {
                                 action.userName.toLowerCase().includes(caseActionSearchQuery.toLowerCase())
                             )
                             .map((caseAction) => (
-                                <CaseActionCard key={caseAction.id} caseAction={caseAction} />
+                                <CaseActionInfoCard
+                                    key={caseAction.actionNumber}
+                                    caseAction={caseAction}
+                                    onClick={() => {
+                                        setSelectedCaseAction(caseAction);
+                                        setIsCaseActionDetailsDialogOpen(true);
+                                    }}
+                                />
                             ))
                     )
                 }
@@ -562,6 +573,12 @@ export default function CaseInfo() {
                         console.error("Error creating case action:", error);
                     }
                 }}
+            />
+
+            <CaseActionDetailsDialog
+                open={isCaseActionDetailsDialogOpen}
+                onClose={() => setIsCaseActionDetailsDialogOpen(false)}
+                caseAction={selectedCaseAction}
             />
 
         </div>
