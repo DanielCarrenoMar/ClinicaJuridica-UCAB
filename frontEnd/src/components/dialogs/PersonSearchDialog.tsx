@@ -1,31 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import Fuse from "fuse.js";
-
-import TextInput from "#components/TextInput.tsx";
-import type { UserModel } from "#domain/models/user.ts";
 import Dialog from "./Dialog";
 import SearchBar from "#components/SearchBar.tsx";
 import UserCard from "#components/UserCard.tsx";
+import type { PersonModel } from "#domain/models/person.ts";
 
-type UserSearchable = Omit<UserModel, "type">;
-
-interface UserSearchDialogProps<TUser extends UserSearchable = UserSearchable> {
+interface UserSearchDialogProps {
   open: boolean;
-  users: TUser[];
+  users: PersonModel[];
   onClose: () => void;
-  onSelect?: (user: TUser) => void;
+  onSelect?: (user: PersonModel) => void;
   title?: string;
   placeholder?: string;
 }
 
-export default function UserSearchDialog<TUser extends UserSearchable = UserSearchable>({
+export default function PersonSearchDialog({
   open,
   users,
   onClose,
   onSelect,
   title = "Buscar usuario",
   placeholder = "Buscar por nombre o cédula...",
-}: UserSearchDialogProps<TUser>) {
+}: UserSearchDialogProps) {
   const [query, setQuery] = useState("");
 
   useEffect(() => {

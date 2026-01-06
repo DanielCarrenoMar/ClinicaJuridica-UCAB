@@ -28,7 +28,7 @@ import { createSupportDocument, updateSupportDocument, deleteSupportDocument } f
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
 import EditSupportDocumentDialog from '#components/dialogs/EditSupportDocumentDialog.tsx';
-import UserSearchDialog from '#components/dialogs/UserSearchDialog.tsx';
+import PersonSearchDialog from '#components/dialogs/PersonSearchDialog.tsx';
 import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
@@ -39,6 +39,7 @@ import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
 import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import CaseActionCard from '#components/CaseActionCard.tsx';
+import type { PersonModel } from '#domain/models/person.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -83,7 +84,7 @@ export default function CaseInfo() {
     const [isEditAppointmentDialogOpen, setIsEditAppointmentDialogOpen] = useState(false);
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
-    const [localCaseStudents, setLocalStudents] = useState<StudentModel[]>([]); // Local state for students
+    const [localCaseStudents, setLocalStudents] = useState<PersonModel[]>([]); // Local state for students
     const [isDataModified, setIsDataModified] = useState(false);
 
     // Citas Tab State
@@ -232,7 +233,6 @@ export default function CaseInfo() {
                 open={isAppointmentDialogOpen}
                 onClose={() => setIsAppointmentDialogOpen(false)}
                 appointment={selectedAppointment}
-                applicantName={caseData.applicantName}
                 onEdit={() => {
                     setIsAppointmentDialogOpen(false);
                     setIsEditAppointmentDialogOpen(true);
@@ -463,7 +463,7 @@ export default function CaseInfo() {
                                 )
                             }
                         </section>
-                        <UserSearchDialog
+                        <PersonSearchDialog
                             open={isStudentSearchDialogOpen}
                             title="Buscar Estudiante"
                             placeholder="Buscar por nombre o cédula..."
@@ -472,7 +472,7 @@ export default function CaseInfo() {
                             onSelect={(student) => { if (!localCaseStudents.some(s => s.identityCard === student.identityCard)) setLocalStudents((prev) => [...prev, student]); }}
                         />
 
-                        <UserSearchDialog
+                        <PersonSearchDialog
                             open={isTeacherSearchDialogOpen}
                             title="Buscar Profesor"
                             placeholder="Buscar por nombre o cédula..."
