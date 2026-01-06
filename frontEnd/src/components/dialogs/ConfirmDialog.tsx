@@ -42,7 +42,8 @@ function ConfirmDialog({
           {cancelLabel}
         </Button>
         <Button
-          className="flex-1 !bg-error !text-surface"
+          variant="outlined"
+          className="flex-1"
           onClick={onConfirm}
           icon={<CheckCircle />}
         >
