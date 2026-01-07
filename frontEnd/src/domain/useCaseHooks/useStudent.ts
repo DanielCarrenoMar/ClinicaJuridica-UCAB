@@ -1,5 +1,6 @@
 import { getStudentRepository } from "#database/repositoryImp/StudentRepositoryImp.ts";
 import type { StudentModel } from "#domain/models/student.ts";
+import type { CaseModel } from "#domain/models/case.ts";
 import { useCallback, useEffect, useState } from "react";
 
 export function useGetAllStudents() {
@@ -67,5 +68,42 @@ export function useGetStudentById(id: string) {
         loading,
         error,
         loadStudent,
+    };
+}
+
+export function useGetCasesByStudentId(id: string) {
+    const { getCasesByStudentId } = getStudentRepository();
+    const [cases, setCases] = useState<CaseModel[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadCases = useCallback(async (studentId: string) => {
+        setLoading(true);
+        try {
+            const data = await getCasesByStudentId(studentId);
+            setCases(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!id) {
+            setCases([]);
+            setLoading(false);
+            return;
+        }
+
+        loadCases(id);
+    }, [id, loadCases]);
+
+    return {
+        cases,
+        loading,
+        error,
+        loadCases,
     };
 }

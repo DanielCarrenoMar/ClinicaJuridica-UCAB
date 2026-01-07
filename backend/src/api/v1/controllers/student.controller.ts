@@ -24,3 +24,15 @@ export async function getStudentById(req: Request, res: Response): Promise<void>
     res.status(500).json({ success: false, error: msg });
   }
 }
+
+export async function getCasesByStudentId(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+
+    const result = await studentService.getCasesByStudentId(id);
+    res.status(result.success ? 200 : 404).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}

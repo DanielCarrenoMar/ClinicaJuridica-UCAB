@@ -82,9 +82,11 @@ export interface UserRepository {
 export interface StudentRepository {
     findAllStudents(): Promise<StudentModel[]>;
     findStudentById(id: string): Promise<StudentModel | null>;
+    getCasesByStudentId(id: string): Promise<CaseModel[]>;
 }
 
 export interface TeacherRepository {
     findAllTeachers(): Promise<TeacherModel[]>;
     findTeacherById(id: string): Promise<TeacherModel | null>;
+    getCasesByTeacherId(id: string): Promise<CaseModel[]>;
 }

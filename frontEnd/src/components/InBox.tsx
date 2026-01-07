@@ -6,7 +6,7 @@ interface InBoxProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export default function InBox({ children, className, ...props }: InBoxProps){
     return(
-        <div className={`px-4 py-2 border border-onSurface/20 bg-surface rounded-xl flex flex-col gap-4 ${className}`} {...props} >
+        <div className={`px-4 py-2 border border-onSurface/20 bg-surface rounded-xl flex flex-col ${className}`} {...props} >
             {children}
         </div>
     )
