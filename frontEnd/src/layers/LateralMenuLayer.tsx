@@ -100,6 +100,7 @@ function LateralMenuLayer() {
                             user?.type !== 'coordinator' && (
                                 <div className="relative">
                                     <Button
+                                        variant={isAssignedCasesOpen ? 'active' : 'filled'}
                                         icon={<Bell />}
                                         onClick={() => setIsAssignedCasesOpen((prev) => !prev)}
                                     />
@@ -129,7 +130,7 @@ function LateralMenuLayer() {
                                                         <button
                                                             key={caseData.idCase}
                                                             type="button"
-                                                            className="text-left p-3 border border-onSurface/30 hover:border-onSurface/40 h-20 rounded-3xl cursor-pointer bg-surface/70 hover:bg-surface transition-colors"
+                                                            className="text-left items-start flex flex-col py-2.5 px-4 border border-onSurface/30 hover:border-onSurface/40 h-20 rounded-3xl cursor-pointer bg-surface/70 hover:bg-surface transition-colors"
                                                             onClick={() => {
                                                                 setIsAssignedCasesOpen(false);
                                                                 navigate(`/caso/${caseData.idCase}`);
