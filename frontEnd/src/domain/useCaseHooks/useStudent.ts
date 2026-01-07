@@ -71,7 +71,7 @@ export function useGetStudentById(id: string) {
     };
 }
 
-export function useGetCasesByStudentId(id: string) {
+export function useGetCasesByStudentId(id?: string) {
     const { getCasesByStudentId } = getStudentRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
     const [loading, setLoading] = useState(true);

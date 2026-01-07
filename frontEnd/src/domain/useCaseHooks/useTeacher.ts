@@ -71,7 +71,7 @@ export function useGetTeacherById(id: string) {
     };
 }
 
-export function useGetCasesByTeacherId(id: string) {
+export function useGetCasesByTeacherId(id?: string) {
     const { getCasesByTeacherId } = getTeacherRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
     const [loading, setLoading] = useState(true);

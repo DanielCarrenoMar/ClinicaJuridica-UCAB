@@ -34,15 +34,12 @@ function LateralMenuLayer() {
     const locationId = location.pathname === '/' ? location.pathname : location.pathname.split('/')[1] as LateralmenuPages
     const [isSearchOpen, setIsSearchOpen] = useState(defaultSearchText !== '');
 
-    const studentId = user?.type === 'student' ? user.identityCard : '';
-    const teacherId = user?.type === 'teacher' ? user.identityCard : '';
+    const { cases: studentCases, loading: studentCasesLoading, error: studentCasesError, loadCases: loadStudentCases } = useGetCasesByStudentId();
+    const { cases: teacherCases, loading: teacherCasesLoading, error: teacherCasesError, loadCases: loadTeacherCases } = useGetCasesByTeacherId();
 
-    const { cases: studentCases, loading: studentCasesLoading, error: studentCasesError } = useGetCasesByStudentId(studentId);
-    const { cases: teacherCases, loading: teacherCasesLoading, error: teacherCasesError } = useGetCasesByTeacherId(teacherId);
-
-    const assignedCases = user?.type === 'student' ? studentCases : user?.type === 'teacher' ? teacherCases : [];
-    const assignedCasesLoading = user?.type === 'student' ? studentCasesLoading : user?.type === 'teacher' ? teacherCasesLoading : false;
-    const assignedCasesError = user?.type === 'student' ? studentCasesError : user?.type === 'teacher' ? teacherCasesError : null;
+    const assignedCases = user?.type === 'student' ? studentCases : teacherCases;
+    const assignedCasesLoading = user?.type === 'student' ? studentCasesLoading : teacherCasesLoading;
+    const assignedCasesError = user?.type === 'student' ? studentCasesError : teacherCasesError;
 
     const latestAssignedCases = useMemo(() => {
         return [...assignedCases]
@@ -73,6 +70,15 @@ function LateralMenuLayer() {
             document.removeEventListener('touchstart', handlePointerDown);
         };
     }, [isAssignedCasesOpen]);
+
+    useEffect(() => {
+        if (!user) return;
+        if (user?.type === 'student') {
+            loadStudentCases(user?.identityCard);
+        }else {
+            loadTeacherCases(user?.identityCard);
+        }
+    }, [location.pathname, user]);
 
     return (
         <div className="flex gap-6 h-full">
@@ -117,66 +123,62 @@ function LateralMenuLayer() {
                             }}
                             placeholder="Buscar Caso"
                         />
-                        {
-                            user?.type !== 'coordinator' && (
-                                <div ref={assignedCasesRef} className="relative">
-                                    <Button
-                                        variant={isAssignedCasesOpen ? 'active' : 'filled'}
-                                        icon={<Bell />}
-                                        onClick={() => setIsAssignedCasesOpen((prev) => !prev)}
-                                    />
+                        <div ref={assignedCasesRef} className="relative">
+                            <Button
+                                variant={isAssignedCasesOpen ? 'active' : 'filled'}
+                                icon={<Bell />}
+                                onClick={() => setIsAssignedCasesOpen((prev) => !prev)}
+                            />
 
-                                    {isAssignedCasesOpen && (
-                                        <InBox className="absolute right-0 mt-2 w-96 z-50 gap-2">
-                                            <header className="flex items-center justify-between gap-4">
-                                                <h4 className="text-body-large">Últimos casos asignados</h4>
-                                                {assignedCasesLoading && <LoadingSpinner />}
-                                            </header>
+                            {isAssignedCasesOpen && (
+                                <InBox className="absolute right-0 mt-2 w-96 z-50 gap-2">
+                                    <header className="flex items-center justify-between gap-4">
+                                        <h4 className="text-body-large">Últimos casos asignados</h4>
+                                        {assignedCasesLoading && <LoadingSpinner />}
+                                    </header>
 
-                                            {assignedCasesError && (
-                                                <p className="text-body-small text-onSurface/70">
-                                                    Error cargando casos.
-                                                </p>
-                                            )}
-
-                                            {!assignedCasesLoading && !assignedCasesError && latestAssignedCases.length === 0 && (
-                                                <p className="text-body-small text-onSurface/70">
-                                                    No tienes casos asignados.
-                                                </p>
-                                            )}
-
-                                            {!assignedCasesLoading && !assignedCasesError && latestAssignedCases.length > 0 && (
-                                                <div className="flex flex-col gap-2 max-h-80 overflow-y-auto">
-                                                    {latestAssignedCases.map((caseData) => (
-                                                        <button
-                                                            key={caseData.idCase}
-                                                            type="button"
-                                                            className="text-left items-start flex flex-col py-2.5 px-4 border border-onSurface/20 hover:border-onSurface/40 h-20 rounded-3xl cursor-pointer bg-surface/70 hover:bg-surface transition-colors"
-                                                            onClick={() => {
-                                                                setIsAssignedCasesOpen(false);
-                                                                navigate(`/caso/${caseData.idCase}`);
-                                                            }}
-                                                        >
-                                                            <div className="flex justify-between gap-3">
-                                                                <h5 className="text-body-small text-onSurface truncate">
-                                                                    {caseData.compoundKey}
-                                                                </h5>
-                                                                <span className="text-body-small text-onSurface/70 shrink-0">
-                                                                    {(caseData.lastActionDate ?? caseData.createdAt).toLocaleDateString('es-ES')}
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-body-small text-onSurface/70 line-clamp-2">
-                                                                {caseData.problemSummary}
-                                                            </p>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </InBox>
+                                    {assignedCasesError && (
+                                        <p className="text-body-small text-onSurface/70">
+                                            Error cargando casos.
+                                        </p>
                                     )}
-                                </div>
-                            )
-                        }
+
+                                    {!assignedCasesLoading && !assignedCasesError && latestAssignedCases.length === 0 && (
+                                        <p className="text-body-small text-onSurface/70">
+                                            No tienes casos asignados.
+                                        </p>
+                                    )}
+
+                                    {!assignedCasesLoading && !assignedCasesError && latestAssignedCases.length > 0 && (
+                                        <div className="flex flex-col gap-2 max-h-80 overflow-y-auto">
+                                            {latestAssignedCases.map((caseData) => (
+                                                <button
+                                                    key={caseData.idCase}
+                                                    type="button"
+                                                    className="text-left items-start flex flex-col py-2.5 px-4 border border-onSurface/20 hover:border-onSurface/40 h-20 rounded-3xl cursor-pointer bg-surface/70 hover:bg-surface transition-colors"
+                                                    onClick={() => {
+                                                        setIsAssignedCasesOpen(false);
+                                                        navigate(`/caso/${caseData.idCase}`);
+                                                    }}
+                                                >
+                                                    <div className="flex justify-between gap-3">
+                                                        <h5 className="text-body-small text-onSurface truncate">
+                                                            {caseData.compoundKey}
+                                                        </h5>
+                                                        <span className="text-body-small text-onSurface/70 shrink-0">
+                                                            {(caseData.lastActionDate ?? caseData.createdAt).toLocaleDateString('es-ES')}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-body-small text-onSurface/70 line-clamp-2">
+                                                        {caseData.problemSummary}
+                                                    </p>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </InBox>
+                            )}
+                        </div>
                     </span>
                     <span className="flex items-center gap-3 ml-2">
                         <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-surface/40">
