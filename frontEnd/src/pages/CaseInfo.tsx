@@ -677,7 +677,10 @@ export default function CaseInfo() {
                     <Clipboard className='size-6!' />
                     <div>
                         <h1 className="text-label-small">{caseData.compoundKey}</h1>
-                        <p className="text-body-small"> <strong className='text-body-medium'>Fecha:</strong> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
+                        <span className='flex gap-2'>
+                            <p className="text-body-small"> <strong className='text-body-medium'>Fecha:</strong> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
+                            <p className="text-body-small"> <strong className='text-body-medium'>Term:</strong> {caseData.term}</p>
+                        </span>
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
