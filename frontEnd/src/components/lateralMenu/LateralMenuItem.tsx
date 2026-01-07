@@ -1,7 +1,6 @@
-import Button from "#components/Button.tsx";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router";
 import type { MenuItem } from "./LateralMenu";
+import LinkButton from "#components/LinkButton.tsx";
 
 interface LateralMenuItemProps extends MenuItem {
     id: string;
@@ -13,17 +12,17 @@ interface LateralMenuItemProps extends MenuItem {
 }
 
 function LateralMenuItem ({id, label, icon, link, onClick, isCollapsed, activeItemId}:LateralMenuItemProps){
-    const navigate = useNavigate();
 
     return (
-        <Button
+        <LinkButton
             id={id}
             icon={icon}
-            onClick={() => {navigate(link); if (onClick) onClick()}}
+            to={link}
+            onClick={onClick}
             variant={id === activeItemId ? 'active' : 'filled'}
         >
             {!isCollapsed && label}
-        </Button>
+        </LinkButton>
     )
 }
 export default LateralMenuItem;
