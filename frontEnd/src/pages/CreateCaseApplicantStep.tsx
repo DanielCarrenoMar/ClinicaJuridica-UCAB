@@ -386,7 +386,6 @@ function CreateCaseApplicantStep() {
                     <DropdownOption value={13}>Técnico Medio</DropdownOption>
                     <DropdownOption value={14}>Técnico Superior</DropdownOption>
                     <DropdownOption value={15}>Universitaria</DropdownOption>
-                    <DropdownOption value={16}>Postgrado</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">

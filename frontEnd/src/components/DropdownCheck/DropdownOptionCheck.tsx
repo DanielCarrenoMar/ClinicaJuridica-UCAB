@@ -12,7 +12,7 @@ export default function DropdownOptionCheck({ value, children }: DropdownOptionC
 
   return (
     <div
-      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer select-none"
+      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer select-none min-w-0"
       onClick={(e) => {
         e.stopPropagation();
         toggleOption(value);
@@ -20,11 +20,11 @@ export default function DropdownOptionCheck({ value, children }: DropdownOptionC
     >
       <input
         type="checkbox"
-        className="mr-3 h-4 w-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
+        className="shrink-0 mr-3 h-4 w-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
         checked={isSelected}
         readOnly
       />
-      <span className="font-['Poppins'] text-[13px]">{children}</span>
+      <span className="font-['Poppins'] text-[13px] leading-tight">{children}</span>
     </div>
   );
 }

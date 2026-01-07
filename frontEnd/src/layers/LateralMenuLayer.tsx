@@ -9,7 +9,7 @@ import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router
 import { useAuth } from "../context/AuthContext";
 import { NotificationsProvider } from "../context/NotificationsContext";
 
-type LateralmenuPages = '/' | 'crearCaso' | 'busqueda' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda"; 
+type LateralmenuPages = '/' | 'crearCaso' | 'busqueda' | 'calendario' | 'acciones' | 'reportes' | 'usuarios' | 'semestres' | 'nucleos' | 'configuracion' | "busqueda";
 
 export type LateralMenuContext = {
     setDefaultSearchText: (value: string) => void
@@ -55,10 +55,20 @@ function LateralMenuLayer() {
                 <header className="flex justify-end items-center gap-6 pb-4">
                     <span className="flex flex-1 justify-end gap-3">
                         <SearchBar
-                            isOpen={locationId === 'busqueda' || locationId === '/' ? true : isSearchOpen} 
+                            isOpen={locationId === 'busqueda' || locationId === '/' ? true : isSearchOpen}
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
-                            onSearch={(value)=>{navigate(`/busqueda?q=${encodeURIComponent(value)}`);}}
+                            onSearch={(value) => {
+                                const newParams = locationId === 'busqueda'
+                                    ? new URLSearchParams(location.search)
+                                    : new URLSearchParams();
+                                if (value) {
+                                    newParams.set('q', value);
+                                } else {
+                                    newParams.delete('q');
+                                }
+                                navigate(`/busqueda?${newParams.toString()}`);
+                            }}
                             placeholder="Buscar Caso"
                         />
                         <Button icon={<Bell />} className="bg-surface hover:bg-gray-50" />
@@ -74,7 +84,7 @@ function LateralMenuLayer() {
                             </p>
                         </div>
                         <Button icon={<ArrowLeftToBracket />} onClick={logout} >
-                           Cerrar sesión
+                            Cerrar sesión
                         </Button>
                     </span>
                 </header>
