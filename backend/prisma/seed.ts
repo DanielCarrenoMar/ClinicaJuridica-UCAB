@@ -515,8 +515,29 @@ async function main() {
         });
         console.log('📍 State synced:', state.name);
 
-        let munCounter = 1;
         for (const munItem of stateItem.municipalities) {
+            // Check if municipality already exists by name for this state
+            let existingMun = await prisma.municipality.findUnique({
+                where: {
+                    idState_name: {
+                        idState: state.idState,
+                        name: munItem.name
+                    }
+                }
+            });
+
+            let munNumber: number;
+            if (existingMun) {
+                munNumber = existingMun.municipalityNumber;
+            } else {
+                // Find next available number
+                const maxMun = await prisma.municipality.findFirst({
+                    where: { idState: state.idState },
+                    orderBy: { municipalityNumber: 'desc' },
+                });
+                munNumber = (maxMun?.municipalityNumber ?? 0) + 1;
+            }
+
             const municipality = await prisma.municipality.upsert({
                 where: {
                     idState_name: {
@@ -527,14 +548,39 @@ async function main() {
                 update: {},
                 create: {
                     idState: state.idState,
-                    municipalityNumber: munCounter++,
+                    municipalityNumber: munNumber,
                     name: munItem.name
                 }
             });
-            console.log(`   🏙️ Municipality synced: ${municipality.name}`);
+            console.log(`   🏙️ Municipality synced: ${municipality.name} (#${munNumber})`);
 
-            let parishCounter = 1;
             for (const parishName of munItem.parishes) {
+                // Check if parish already exists by name for this municipality
+                let existingParish = await prisma.parish.findUnique({
+                    where: {
+                        idState_municipalityNumber_name: {
+                            idState: municipality.idState,
+                            municipalityNumber: municipality.municipalityNumber,
+                            name: parishName
+                        }
+                    }
+                });
+
+                let pNumber: number;
+                if (existingParish) {
+                    pNumber = existingParish.parishNumber;
+                } else {
+                    // Find next available number
+                    const maxParish = await prisma.parish.findFirst({
+                        where: {
+                            idState: municipality.idState,
+                            municipalityNumber: municipality.municipalityNumber
+                        },
+                        orderBy: { parishNumber: 'desc' },
+                    });
+                    pNumber = (maxParish?.parishNumber ?? 0) + 1;
+                }
+
                 await prisma.parish.upsert({
                     where: {
                         idState_municipalityNumber_name: {
@@ -547,7 +593,7 @@ async function main() {
                     create: {
                         idState: municipality.idState,
                         municipalityNumber: municipality.municipalityNumber,
-                        parishNumber: parishCounter++,
+                        parishNumber: pNumber,
                         name: parishName
                     }
                 });
