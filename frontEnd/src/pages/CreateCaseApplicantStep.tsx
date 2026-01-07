@@ -188,8 +188,8 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.gender || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderTypeModel }); }}
                 >
-                    <DropdownOption value="male">Masculino</DropdownOption>
-                    <DropdownOption value="female">Femenino</DropdownOption>
+                    <DropdownOption value="Masculino">Masculino</DropdownOption>
+                    <DropdownOption value="Femenino">Femenino</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
@@ -209,20 +209,20 @@ function CreateCaseApplicantStep() {
                     selectedValue={applicantModel.maritalStatus || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
                 >
-                    <DropdownOption value="single">Soltero/a</DropdownOption>
-                    <DropdownOption value="married">Casado/a</DropdownOption>
-                    <DropdownOption value="divorced">Divorciado/a</DropdownOption>
-                    <DropdownOption value="widowed">Viudo/a</DropdownOption>
+                    <DropdownOption value="Soltero">Soltero/a</DropdownOption>
+                    <DropdownOption value="Casado">Casado/a</DropdownOption>
+                    <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
+                    <DropdownOption value="Viudo">Viudo/a</DropdownOption>
                 </TitleDropdown>
             </div>
             <div className="col-span-2">
                 <TitleDropdown
                     label="Concubinato*"
                     selectedValue={(applicantModel.isConcubine ?? false).toString()}
-                    onSelectionChange={(value) => { updateApplicantModel({ isConcubine: value === "true" }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ isConcubine: (value as number) === 1 }); }}
                 >
-                    <DropdownOption value="true">Si</DropdownOption>
-                    <DropdownOption value="false">No</DropdownOption>
+                    <DropdownOption value={1}>Si</DropdownOption>
+                    <DropdownOption value={0}>No</DropdownOption>
                 </TitleDropdown>
             </div>
 
@@ -404,7 +404,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ workingMemberCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    placeholder="4"
+                    placeholder=""
                 />
             </div>
 
@@ -416,7 +416,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
                     }}
-                    placeholder="1"
+                    placeholder=""
                 />
             </div>
             <div className="col-span-4">
@@ -424,7 +424,7 @@ function CreateCaseApplicantStep() {
                     label="Ingreso mensual del hogar*"
                     value={applicantModel.monthlyIncome ?? ""}
                     onChange={(text) => { updateApplicantModel({ monthlyIncome: text }); }}
-                    placeholder="$300"
+                    placeholder=""
                 />
             </div>
         </>
