@@ -1,6 +1,6 @@
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
-import { typeDaoToCaseStatusTypeModel, typeDaoToProcessTypeModel, typeModelToCaseStatusTypeDao, typeModelToProcessTypeDao, type CaseStatusTypeModel, type ProcessTypeModel } from "#domain/typesModel.ts";
+import { typeDaoToCaseStatusTypeModel, typeDaoToProcessTypeModel, typeModelToProcessTypeDao, type CaseStatusTypeModel, type ProcessTypeModel } from "#domain/typesModel.ts";
 
 export interface CaseModel {
     idCase: number;
@@ -36,7 +36,7 @@ export function daoToCaseModel(dao: CaseInfoDAO): CaseModel {
     }
 }
 
-export function modelToCaseDao( model: CaseModel, userId: string ): CaseDAO {
+export function modelToCaseDao(model: CaseModel, userId: string): CaseDAO {
     return {
         problemSummary: model.problemSummary,
         processType: typeModelToProcessTypeDao(model.processType),

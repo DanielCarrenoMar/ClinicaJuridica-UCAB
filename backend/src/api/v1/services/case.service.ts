@@ -9,6 +9,7 @@ class CaseService {
           c.*,
           b."fullName" as "applicantName",
           la."name" as "legalAreaName",
+          s."name" as "subjectName",
           u_teacher."fullName" as "teacherName",
           co."subject" as "courtName",
           cs."status" as "caseStatus",
@@ -19,6 +20,7 @@ class CaseService {
           FROM "Case" c
           JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+          JOIN "Subject" s ON la."idSubject" = s."idSubject"
           LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
           LEFT JOIN "Court" co ON c."idCourt" = co."idCourt"
           LEFT JOIN LATERAL (

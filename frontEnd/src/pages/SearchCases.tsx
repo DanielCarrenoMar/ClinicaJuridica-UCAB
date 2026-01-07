@@ -9,6 +9,12 @@ import { useLateralMenuContext } from "#layers/LateralMenuLayer.tsx";
 
 function SearchCases() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const getFilterValues = (key: string) => {
+        const param = searchParams.get(key);
+        // Using '|' as separator because some values contain commas
+        return param ? param.split('|') : [];
+    };
+
     const searchText = searchParams.get('q') || '';
     const { setDefaultSearchText } = useLateralMenuContext();
 
@@ -16,13 +22,29 @@ function SearchCases() {
         setDefaultSearchText(searchText);
     }, [searchText, setDefaultSearchText]);
 
-    const statusFilters = searchParams.getAll('status');
-    const caseTypeFilters = searchParams.getAll('caseType');
-    const courtFilters = searchParams.getAll('court');
-    const termFilters = searchParams.getAll('term');
-    const { cases, loading, error } = useGetCases();
+    const statusFilters = getFilterValues('status');
+    const caseTypeFilters = getFilterValues('caseType');
+    const courtFilters = getFilterValues('court');
+    const termFilters = getFilterValues('term');
 
-    const fuse = useMemo(() => new Fuse(cases, {
+    const { cases: realCases, loading, error } = useGetCases();
+
+    const cases = useMemo(() => [...realCases], [realCases]);
+
+
+    const filteredCases = useMemo(() => {
+        return cases.filter(c => {
+            const statusMatch = statusFilters.length === 0 || statusFilters.includes(c.caseStatus);
+            const typeMatch = caseTypeFilters.length === 0 || (!!c.subjectName && caseTypeFilters.some(f => f.toLowerCase() === c.subjectName.toLowerCase()));
+            const courtMatch = courtFilters.length === 0 || (!!c.courtName && courtFilters.some(f => f.toLowerCase() === (c.courtName || "").toLowerCase()));
+            const termMatch = termFilters.length === 0 || (!!c.term && termFilters.includes(c.term));
+
+            return !!(statusMatch && typeMatch && courtMatch && termMatch);
+        });
+    }, [cases, statusFilters, caseTypeFilters, courtFilters, termFilters]);
+
+    // 2. Then, apply Fuse.js search on the filtered results
+    const fuse = useMemo(() => new Fuse(filteredCases, {
         keys: [
             "compoundKey",
             "processType",
@@ -43,11 +65,11 @@ function SearchCases() {
         distance: 100,
         minMatchCharLength: 2,
         includeMatches: true
-    }), [cases]);
+    }), [filteredCases]);
 
     const searchResults = useMemo(() => {
         const query = searchText.trim();
-        if (!query) return cases.map(item => ({ caseData: item, matches: {} as Record<string, Array<[number, number]>> }));
+        if (!query) return filteredCases.map(item => ({ caseData: item, matches: undefined }));
 
         return fuse.search(query).map(result => {
             const matches: Record<string, Array<[number, number]>> = {};
@@ -57,80 +79,77 @@ function SearchCases() {
             });
             return { caseData: result.item, matches };
         });
-    }, [cases, fuse, searchText]);
+    }, [filteredCases, fuse, searchText]);
 
-    const getFilterValues = (key: string) => {
-        const param = searchParams.get(key);
-        return param ? param.split(',') : [];
-    };
 
     const handleFilterChange = useCallback((key: string, values: (string | number)[]) => {
         const newParams = new URLSearchParams(searchParams);
         if (values.length === 0) {
             newParams.delete(key);
         } else {
-            newParams.set(key, values.join(','));
+            newParams.set(key, values.join('|'));
         }
         setSearchParams(newParams);
     }, [searchParams, setSearchParams]);
 
     return (
         <>
-            <span className="flex text-body-small gap-4">
-                {searchText.length > 0 && <div>Buscando: {searchText}</div>}
-                <p>{statusFilters.join(', ')}</p>
-                <p>{caseTypeFilters.join(', ')}</p>
-                <p>{courtFilters.join(', ')}</p>
-                <p>{termFilters.join(', ')}</p>
-            </span>
             <div className="mb-3">
-                <h3 className="text-body-large">
-                    Filtros
-                </h3>
                 <span>
                     <ul className="flex gap-3">
                         <li>
-                            <DropdownCheck 
-                                label="Estatus" 
+                            <DropdownCheck
+                                label="Estatus"
                                 selectedValues={getFilterValues('status')}
                                 onSelectionChange={(values) => handleFilterChange('status', values)}
                             >
-                            <DropdownOptionCheck value="OPEN">Abierto</DropdownOptionCheck>
-                            <DropdownOptionCheck value="IN_PROGRESS">En Trámite</DropdownOptionCheck>
-                            <DropdownOptionCheck value="CLOSED">Cerrado</DropdownOptionCheck>
-                            <DropdownOptionCheck value="PAUSED">En Pausa</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Abierto">Abierto</DropdownOptionCheck>
+                                <DropdownOptionCheck value="En Espera">En Espera</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Pausado">Pausado</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Cerrado">Cerrado</DropdownOptionCheck>
                             </DropdownCheck>
                         </li>
                         <li>
-                            <DropdownCheck 
-                                label="Tipo de Caso" 
+                            <DropdownCheck
+                                label="Tipo de Caso"
                                 selectedValues={getFilterValues('caseType')}
                                 onSelectionChange={(values) => handleFilterChange('caseType', values)}
                             >
-                                <DropdownOptionCheck value="PENAL">Penal</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Materia Civil">Materia Civil</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Materia Penal">Materia Penal</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Materia Laboral">Materia Laboral</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Materia Mercantil">Materia Mercantil</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Materia Administrativa">Materia Administrativa</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Otros">Otros</DropdownOptionCheck>
                             </DropdownCheck>
                         </li>
                         <li>
-                            <DropdownCheck 
-                                label="Tribunal" 
+                            <DropdownCheck
+                                label="Tribunal"
                                 selectedValues={getFilterValues('court')}
                                 onSelectionChange={(values) => handleFilterChange('court', values)}
                             >
-                                <DropdownOptionCheck value="TRIBUNAL_1">Tribunal 1</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Civil">Civil</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Penal">Penal</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Agrario">Agrario</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Contencioso Administrativo">Contencioso Administrativo</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Protección de niños, niñas y adolescentes">Protección de niños, niñas y adolescentes</DropdownOptionCheck>
+                                <DropdownOptionCheck value="Laboral">Laboral</DropdownOptionCheck>
                             </DropdownCheck>
                         </li>
                         <li>
-                            <DropdownCheck 
-                                label="Periodo Academico" 
+                            <DropdownCheck
+                                label="Periodo Academico"
                                 selectedValues={getFilterValues('term')}
                                 onSelectionChange={(values) => handleFilterChange('term', values)}
                             >
+                                <DropdownOptionCheck value="2024-15">2024-15</DropdownOptionCheck>
                                 <DropdownOptionCheck value="2025-15">2025-15</DropdownOptionCheck>
                             </DropdownCheck>
                         </li>
                     </ul>
                 </span>
-            </div>
+            </div >
             <ul className="flex flex-col gap-3">
                 {
                     loading && (
@@ -138,8 +157,13 @@ function SearchCases() {
                     )
                 }
                 {
-                    error && 
+                    error &&
                     <li>Error al cargar los casos: {error.message}</li>
+                }
+                {
+                    !loading && searchResults.length === 0 && (
+                        <li>No se encontraron casos con los filtros seleccionados.</li>
+                    )
                 }
                 {
                     !loading && searchResults.map(({ caseData, matches }) => (
