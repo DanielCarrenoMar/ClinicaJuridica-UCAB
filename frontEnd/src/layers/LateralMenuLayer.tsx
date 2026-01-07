@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
 import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clipboard, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
@@ -28,6 +28,7 @@ function LateralMenuLayer() {
     const [defaultSearchText, setDefaultSearchText] = useState("")
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isAssignedCasesOpen, setIsAssignedCasesOpen] = useState(false);
+    const assignedCasesRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
     const location = useLocation()
     const locationId = location.pathname === '/' ? location.pathname : location.pathname.split('/')[1] as LateralmenuPages
@@ -52,6 +53,26 @@ function LateralMenuLayer() {
             })
             .slice(0, 3);
     }, [assignedCases]);
+
+    useEffect(() => {
+        if (!isAssignedCasesOpen) return;
+
+        const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+            const targetNode = event.target as Node | null;
+            if (!assignedCasesRef.current || !targetNode) return;
+            if (!assignedCasesRef.current.contains(targetNode)) {
+                setIsAssignedCasesOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handlePointerDown);
+        document.addEventListener('touchstart', handlePointerDown);
+
+        return () => {
+            document.removeEventListener('mousedown', handlePointerDown);
+            document.removeEventListener('touchstart', handlePointerDown);
+        };
+    }, [isAssignedCasesOpen]);
 
     return (
         <div className="flex gap-6 h-full">
@@ -98,7 +119,7 @@ function LateralMenuLayer() {
                         />
                         {
                             user?.type !== 'coordinator' && (
-                                <div className="relative">
+                                <div ref={assignedCasesRef} className="relative">
                                     <Button
                                         variant={isAssignedCasesOpen ? 'active' : 'filled'}
                                         icon={<Bell />}
@@ -130,7 +151,7 @@ function LateralMenuLayer() {
                                                         <button
                                                             key={caseData.idCase}
                                                             type="button"
-                                                            className="text-left items-start flex flex-col py-2.5 px-4 border border-onSurface/30 hover:border-onSurface/40 h-20 rounded-3xl cursor-pointer bg-surface/70 hover:bg-surface transition-colors"
+                                                            className="text-left items-start flex flex-col py-2.5 px-4 border border-onSurface/20 hover:border-onSurface/40 h-20 rounded-3xl cursor-pointer bg-surface/70 hover:bg-surface transition-colors"
                                                             onClick={() => {
                                                                 setIsAssignedCasesOpen(false);
                                                                 navigate(`/caso/${caseData.idCase}`);
