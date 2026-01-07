@@ -391,6 +391,170 @@ async function main() {
         }
     }
 
+    // Datos de Estados, Municipios y Parroquias
+    const locationData = [
+        {
+            name: 'Bolívar',
+            municipalities: [
+                {
+                    name: 'Angostura',
+                    parishes: ['Sección Capital Raúl Leoni', 'Barceloneta', 'Santa Bárbara', 'San Francisco']
+                },
+                {
+                    name: 'Caroní',
+                    parishes: ['Cachamay', 'Chirica', 'Dalla Costa', 'Once de Abril', 'Simón Bolívar', 'Unare', 'Universidad', 'Vista al Sol', 'Pozo Verde', 'Yocoima', 'Cinco de Julio']
+                },
+                {
+                    name: 'Cedeño',
+                    parishes: ['Altagracia', 'Ascensión Farreras', 'Caicara del Orinoco', 'Guaniamo', 'La Urbana', 'Pijiguaos']
+                },
+                {
+                    name: 'Chien',
+                    parishes: ['El Palmar']
+                },
+                {
+                    name: 'El Callao',
+                    parishes: ['El Callao']
+                },
+                {
+                    name: 'Gran Sabana',
+                    parishes: ['Santa Elena de Uairén', 'Ikabarú']
+                },
+                {
+                    name: 'Angostura del Orinoco',
+                    parishes: ['Agua Salada', 'Catedral', 'José Antonio Páez', 'La Sabanita', 'Vista Hermosa', 'Marhuanta', 'Orinoco', 'Panapana', 'Zea']
+                },
+                {
+                    name: 'Piar',
+                    parishes: ['Andrés Eloy Blanco', 'Pedro Cova', 'Upata']
+                },
+                {
+                    name: 'Roscio',
+                    parishes: ['Salom', 'Seccion Capital Roscio']
+                },
+                {
+                    name: 'Sifontes',
+                    parishes: ['Tumeremo', 'Dalla Costa', 'San Isidro']
+                },
+                {
+                    name: 'Sucre',
+                    parishes: ['Aripao', 'Guarataro', 'Las Majadas', 'Moitaco', 'Sección Capital Sucre']
+                },
+            ]
+        },
+        {
+            name: 'Distrito Capital',
+            municipalities: [
+                {
+                    name: 'Libertador',
+                    parishes: [
+                        'Santa Rosalía', 'El Valle', 'Coche', 'Caricuao', 'Macarao',
+                        'Antímano', 'La Vega', 'El Paraíso', 'El Junquito', 'Sucre',
+                        'San Juan', 'Santa Teresa', '23 de enero', 'La Pastora',
+                        'Altagracia', 'San José', 'San Bernardino', 'Catedral',
+                        'La Candelaria', 'San Agustín', 'El Recreo', 'San Pedro'
+                    ]
+                }
+            ]
+        },
+        {
+            name: 'Miranda',
+            municipalities: [
+                { name: 'Guaicaipuro', parishes: [] },
+                { name: 'Carrizal', parishes: [] },
+                { name: 'Los Salias', parishes: [] },
+                { name: 'Chacao', parishes: [] },
+                { name: 'Sucre', parishes: [] },
+                { name: 'Baruta', parishes: [] },
+                { name: 'El Hatillo', parishes: [] },
+                { name: 'Plaza', parishes: [] },
+                { name: 'Zamora', parishes: [] },
+                { name: 'Acevedo', parishes: [] },
+                { name: 'Brión', parishes: [] },
+                { name: 'Buroz', parishes: [] },
+                { name: 'Andrés Bello', parishes: [] },
+                { name: 'Páez', parishes: [] },
+                { name: 'Pedro Gual', parishes: [] },
+                { name: 'Paz Castillo', parishes: [] },
+                { name: 'Independencia', parishes: [] },
+                { name: 'Simón Bolívar', parishes: [] },
+                { name: 'Tomás Lander', parishes: [] },
+                { name: 'Cristóbal Rojas', parishes: [] },
+                { name: 'Urdaneta', parishes: [] }
+            ]
+        },
+        { name: 'Zulia', municipalities: [] },
+        { name: 'Carabobo', municipalities: [] },
+        { name: 'Lara', municipalities: [] },
+        { name: 'Aragua', municipalities: [] },
+        { name: 'Anzoátegui', municipalities: [] },
+        { name: 'Táchira', municipalities: [] },
+        { name: 'Falcón', municipalities: [] },
+        { name: 'Sucre', municipalities: [] },
+        { name: 'Monagas', municipalities: [] },
+        { name: 'Portuguesa', municipalities: [] },
+        { name: 'Barinas', municipalities: [] },
+        { name: 'Mérida', municipalities: [] },
+        { name: 'Guárico', municipalities: [] },
+        { name: 'Trujillo', municipalities: [] },
+        { name: 'Yaracuy', municipalities: [] },
+        { name: 'Apure', municipalities: [] },
+        { name: 'Nueva Esparta', municipalities: [] },
+        { name: 'La Guaira', municipalities: [] },
+        { name: 'Cojedes', municipalities: [] },
+        { name: 'Delta Amacuro', municipalities: [] },
+        { name: 'Amazonas', municipalities: [] },
+        { name: 'Dependencias Federales', municipalities: [] }
+    ];
+
+    for (const stateItem of locationData) {
+        const state = await prisma.state.upsert({
+            where: { name: stateItem.name },
+            update: {},
+            create: { name: stateItem.name }
+        });
+        console.log('📍 State synced:', state.name);
+
+        let munCounter = 1;
+        for (const munItem of stateItem.municipalities) {
+            const municipality = await prisma.municipality.upsert({
+                where: {
+                    idState_name: {
+                        idState: state.idState,
+                        name: munItem.name
+                    }
+                },
+                update: {},
+                create: {
+                    idState: state.idState,
+                    municipalityNumber: munCounter++,
+                    name: munItem.name
+                }
+            });
+            console.log(`   🏙️ Municipality synced: ${municipality.name}`);
+
+            let parishCounter = 1;
+            for (const parishName of munItem.parishes) {
+                await prisma.parish.upsert({
+                    where: {
+                        idState_municipalityNumber_name: {
+                            idState: municipality.idState,
+                            municipalityNumber: municipality.municipalityNumber,
+                            name: parishName
+                        }
+                    },
+                    update: {},
+                    create: {
+                        idState: municipality.idState,
+                        municipalityNumber: municipality.municipalityNumber,
+                        parishNumber: parishCounter++,
+                        name: parishName
+                    }
+                });
+            }
+        }
+    }
+
 
 }
 main()
