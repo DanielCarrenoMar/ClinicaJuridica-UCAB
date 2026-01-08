@@ -16,7 +16,7 @@ import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import ConfirmDialog from "#components/dialogs/ConfirmDialog.tsx";
 import { useBlocker, useNavigate } from "react-router";
 import DatePicker from "#components/DatePicker.tsx";
-import { activityConditionData, educationLevelData, locationData, servicesData, workConditionData } from "#domain/seedData.ts";
+import { activityConditionData, characteristicsData, educationLevelData, locationData, servicesData, workConditionData } from "#domain/seedData.ts";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
@@ -460,19 +460,144 @@ function CreateCaseApplicantStep() {
         </>
     );
 
+    const housingCharacteristicOptions = (characteristicName: string) =>
+        characteristicsData.find((c) => c.name === characteristicName)?.options ?? [];
+
+    const isHouseOnlyFieldDisabled = isApplicantExisting && !isManualEditEnabled;
+
     const houseInputs = (
         <>
+            {/* Tipo de vivienda | habitaciones para dormir | baños */}
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Tipo de vivienda*"
+                    selectedValue={applicantModel.houseType}
+                    onSelectionChange={(value) => { updateApplicantModel({ houseType: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Tipo de Vivienda').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+            <div className="col-span-1">
+                <TitleTextInput
+                    label="Habitaciones para dormir*"
+                    value={applicantModel.bedroomCount?.toString() ?? ""}
+                    onChange={(text) => {
+                        const num = Number(text);
+                        updateApplicantModel({ bedroomCount: Number.isNaN(num) ? undefined : num });
+                    }}
+                    placeholder=""
+                    disabled={isFieldDisabled('bedroomCount')}
+                />
+            </div>
+            <div className="col-span-1">
+                <TitleTextInput
+                    label="Baños*"
+                    value={applicantModel.bathroomCount?.toString() ?? ""}
+                    onChange={(text) => {
+                        const num = Number(text);
+                        updateApplicantModel({ bathroomCount: Number.isNaN(num) ? undefined : num });
+                    }}
+                    placeholder=""
+                    disabled={isFieldDisabled('bathroomCount')}
+                />
+            </div>
+
+            {/* Material de piso | Material de paredes | material de techo */}
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Material de piso*"
+                    selectedValue={applicantModel.floorMaterial}
+                    onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Material del piso').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Material de paredes*"
+                    selectedValue={applicantModel.wallMaterial}
+                    onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Material de las paredes').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Material de techo*"
+                    selectedValue={applicantModel.roofMaterial}
+                    onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Material del techo').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+
+            {/* Servicio de agua potable | aguas negras | servicio de aseo */}
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Servicio de agua potable*"
+                    selectedValue={applicantModel.potableWaterService}
+                    onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Servicio de agua potable').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Aguas negras*"
+                    selectedValue={applicantModel.sewageService}
+                    onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Eliminacion de excretas (aguas negras)').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Servicio de aseo*"
+                    selectedValue={applicantModel.cleaningService}
+                    onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as string }); }}
+                    disabled={isHouseOnlyFieldDisabled}
+                >
+                    {housingCharacteristicOptions('Servicio de aseo').map((option) => (
+                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+
+            {/* Servicios basicos */}
             <div className="col-span-3">
+                <div className="flex flex-col gap-2">
+                    <header>
+                        <h4 className="text-body-large ">Servicios básicos*</h4>
+                    </header>
                 <DropdownCheck
                     label="Servicios basicos*"
                     selectedValues={applicantModel.servicesIdAvailable ?? []}
                     onSelectionChange={(values) => { updateApplicantModel({ servicesIdAvailable: values as number[] }); }}
                     disabled={isFieldDisabled('servicesIdAvailable')}
-                >
+                    >
                     {servicesData.map((service) => (
                         <DropdownOptionCheck key={service.id} value={service.id}>{service.name}</DropdownOptionCheck>
                     ))}
                 </DropdownCheck>
+                </div>
             </div>
         </>
     );

@@ -6,5 +6,12 @@ export interface ApplicantInfoDAO extends ApplicantDAO {
 	workConditionName?: string;
 	activityConditionName?: string;
 	servicesIdAvailable?: number[];
+	houseType?: string;
+	floorMaterial?: string;
+	wallMaterial?: string;
+	roofMaterial?: string;
+	potableWaterService?: string;
+	sewageService?: string;
+	cleaningService?: string;
 	createdAt: string;
 }

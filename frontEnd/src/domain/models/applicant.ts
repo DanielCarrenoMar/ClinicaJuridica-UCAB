@@ -28,6 +28,13 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'>
 	workConditionName?: string;
 	activityConditionName?: string;
 	servicesIdAvailable?: number[];
+	houseType?: string;
+	floorMaterial?: string;
+	wallMaterial?: string;
+	roofMaterial?: string;
+	potableWaterService?: string;
+	sewageService?: string;
+	cleaningService?: string;
 }
 
 export function daoToApplicantModel(dao: ApplicantInfoDAO): ApplicantModel {
@@ -49,10 +56,13 @@ export function modelToApplicantDao(model: ApplicantModel): ApplicantDAO {
 		activityConditionName,
 		servicesIdAvailable,
 		gender,
+		birthDate,
 		...rest} = model;
+	const daoBase = rest as unknown as Omit<ApplicantDAO, 'gender' | 'maritalStatus' | 'birthDate'>;
 	return {
-		...rest,
+		...daoBase,
+		birthDate: birthDate.toISOString(),
 		gender: typeModelToGenderTypeDao(gender),
 		maritalStatus: maritalStatus ? typeModelToMaritalStatusTypeDao(maritalStatus) : undefined
-	}
+	};
 }
