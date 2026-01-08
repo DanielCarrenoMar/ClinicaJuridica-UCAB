@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { BeneficiaryModel } from '../models/beneficiary';
+import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
 import { getBeneficiaryRepository } from '#database/repositoryImp/BeneficiaryRepositoryImp.ts';
 
 export function useGetBeneficiaryById() {
@@ -55,5 +56,31 @@ export function useGetAllBeneficiaries() {
         loading,
         error,
         refresh: loadBeneficiaries
+    };
+}
+
+export function useCreateBeneficiary() {
+    const { createBeneficiary: createBeneficiaryRepo } = getBeneficiaryRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const createBeneficiary = async (data: BeneficiaryDAO): Promise<BeneficiaryModel | null> => {
+        setLoading(true);
+        try {
+            const created = await createBeneficiaryRepo(data);
+            setError(null);
+            return created;
+        } catch (err) {
+            setError(err as Error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        createBeneficiary,
+        loading,
+        error,
     };
 }

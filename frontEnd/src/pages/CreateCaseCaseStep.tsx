@@ -16,8 +16,10 @@ import { useAuth } from "../context/AuthContext.tsx";
 
 import InBox from "#components/InBox.tsx";
 import PersonSearchDialog from "#components/dialogs/PersonSearchDialog.tsx";
-import { useGetAllBeneficiaries } from "#domain/useCaseHooks/useBeneficiary.ts";
+import CreateBeneficiaryDialog from "#components/dialogs/CreateBeneficiaryDialog.tsx";
+import { useCreateBeneficiary, useGetAllBeneficiaries } from "#domain/useCaseHooks/useBeneficiary.ts";
 import { UserCircle } from "flowbite-react-icons/solid";
+import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
 
 import { subjectsData } from "#domain/seedData.ts";
 
@@ -41,12 +43,14 @@ function CreateCaseCaseStep() {
     const { createApplicant, loading: createApplicantLoading } = useCreateApplicant();
     const { updateApplicant, loading: updateApplicantLoading } = useUpdateApplicant();
     const { setBeneficiariesToCase, loading: setBeneficiariesLoading } = useSetBeneficiariesToCase();
-    const { beneficiaries } = useGetAllBeneficiaries();
+    const { beneficiaries, refresh: refreshBeneficiaries } = useGetAllBeneficiaries();
+    const { createBeneficiary } = useCreateBeneficiary();
     const { user } = useAuth()
 
     const [subjectIndex, setSubjectIndex] = useState<number | null>(null);
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
     const [isBeneficiarySearchDialogOpen, setIsBeneficiarySearchDialogOpen] = useState(false);
+    const [isCreateBeneficiaryDialogOpen, setIsCreateBeneficiaryDialogOpen] = useState(false);
 
     async function handleCreateCase() {
         try {
@@ -233,8 +237,28 @@ function CreateCaseCaseStep() {
                         setCaseBeneficiaries((prev) => [...prev, beneficiary]);
                     }}
                     headerItems={
-                        <Button variant='outlined' >Crear Nuevo</Button>
+                        <Button
+                            variant='outlined'
+                            onClick={() => {
+                                setIsBeneficiarySearchDialogOpen(false);
+                                setIsCreateBeneficiaryDialogOpen(true);
+                            }}
+                        >
+                            Crear Nuevo
+                        </Button>
                     }
+                />
+
+                <CreateBeneficiaryDialog
+                    open={isCreateBeneficiaryDialogOpen}
+                    onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
+                    onCreate={async (data: BeneficiaryDAO) => {
+                        const created = await createBeneficiary(data);
+                        await refreshBeneficiaries();
+                        if (created) {
+                            setCaseBeneficiaries((prev) => [...prev, created]);
+                        }
+                    }}
                 />
                 <article>
                     <header className="flex justify-between items-center w-full">
