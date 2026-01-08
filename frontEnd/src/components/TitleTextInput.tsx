@@ -6,14 +6,16 @@ interface TitleTextInputProps {
   onChange?: (text: string) => void;
   className?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
-export default function TitleTextInput({ 
-  label, 
-  value, 
-  onChange, 
+export default function TitleTextInput({
+  label,
+  value,
+  onChange,
   className = '',
-  placeholder = ""
+  placeholder = "",
+  disabled = false
 }: TitleTextInputProps) {
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
@@ -22,11 +24,12 @@ export default function TitleTextInput({
           {label}
         </p>
       </div>
-      <TextInput 
-        defaultText={value} 
-        onChangeText={onChange} 
+      <TextInput
+        defaultText={value}
+        onChangeText={onChange}
         placeholder={placeholder}
         className="w-full"
+        disabled={disabled}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { createBrowserRouter, RouterProvider, createRoutesFromElements, Navigate, Route } from "react-router";
 import './index.css'
 import DashBoard from '#pages/DashBoard.tsx';
 import CreateCase from '#pages/CreateCase.tsx';
@@ -20,40 +20,44 @@ import Login from '#pages/Login.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
 
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route>
+      <Route path="/login" element={<Login />} />
+
+      <Route element={<ProtectedRoute requiredLevel={3} redirectPath="/login" />}>
+        <Route element={<LateralMenuLayer />}>
+          <Route index element={<DashBoard />} />
+          <Route path="/crearCaso/*" element={<CreateCase />}>
+            <Route index element={<Navigate to="solicitante" replace />} />
+            <Route path="solicitante" element={<CreateCaseApplicantStep />} />
+            <Route path="caso" element={<CreateCaseCaseStep />} />
+          </Route>
+          <Route path="/calendario" element={<Calendar />} />
+          <Route path="/acciones" element={<ActionsHistory />} />
+          <Route path="/reportes" element={<Reports />} />
+
+          <Route element={<ProtectedRoute requiredLevel={2} />}>
+            <Route path="/usuarios" element={<Users />} />
+          </Route>
+
+          <Route element={<ProtectedRoute requiredLevel={1} />}>
+            <Route path="/semestres" element={<Semesters />} />
+            <Route path="/nucleos" element={<Nuclei />} />
+            <Route path="/configuracion" element={<Config />} />
+          </Route>
+
+          <Route path="/busqueda" element={<SearchCases />} />
+          <Route path="/caso/:id" element={<CaseInfo />} />
+          <Route path="/solicitante/:id" element={<ApplicantInfo />} />
+        </Route>
+      </Route>
+    </Route>
+  )
+);
+
 createRoot(document.getElementById('root')!).render(
   <AuthProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        
-        <Route element={<ProtectedRoute requiredLevel={3} redirectPath="/login" />}>
-          <Route element={<LateralMenuLayer />}>
-            <Route index element={<DashBoard />} />
-            <Route path="/crearCaso/*" element={<CreateCase />}>
-              <Route index element={<Navigate to="solicitante" replace />} />
-              <Route path="solicitante" element={<CreateCaseApplicantStep />} />
-              <Route path="caso" element={<CreateCaseCaseStep />} />
-            </Route>
-            <Route path="/calendario" element={<Calendar />} />
-            <Route path="/acciones" element={<ActionsHistory />} />
-            <Route path="/reportes" element={<Reports />} />
-            
-            <Route element={<ProtectedRoute requiredLevel={2} />}>
-              <Route path="/usuarios" element={<Users />} />
-            </Route>
-
-            <Route element={<ProtectedRoute requiredLevel={1} />}>
-              <Route path="/semestres" element={<Semesters />} />
-              <Route path="/nucleos" element={<Nuclei />} />
-              <Route path="/configuracion" element={<Config />} />
-            </Route>
-
-            <Route path="/busqueda" element={<SearchCases />} />
-            <Route path="/caso/:id" element={<CaseInfo />} />
-            <Route path="/solicitante/:id" element={<ApplicantInfo />} />
-          </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </AuthProvider>
 )

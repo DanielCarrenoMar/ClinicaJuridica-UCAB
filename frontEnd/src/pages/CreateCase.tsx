@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useOutletContext } from "react-router";
 import Box from "#components/Box.tsx";
 
@@ -16,6 +16,10 @@ export type CaseOutletContext = {
     updateApplicantModel: (updatedFields: Partial<ApplicantModel>) => void;
     isApplicantExisting: boolean;
     setIsApplicantExisting: Dispatch<SetStateAction<boolean>>;
+    isManualEditEnabled: boolean;
+    setIsManualEditEnabled: Dispatch<SetStateAction<boolean>>;
+    dbOriginalData: Partial<ApplicantModel> | null;
+    setDbOriginalData: Dispatch<SetStateAction<Partial<ApplicantModel> | null>>;
 };
 
 export function useCaseOutletContext() {
@@ -24,8 +28,10 @@ export function useCaseOutletContext() {
 
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
-    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({identityCard: ''} as ApplicantModel);
+    const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({ identityCard: '' } as ApplicantModel);
     const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
+    const [isManualEditEnabled, setIsManualEditEnabled] = useState<boolean>(false);
+    const [dbOriginalData, setDbOriginalData] = useState<Partial<ApplicantModel> | null>(null);
 
     useEffect(() => {
         console.log("applicantModel updated:", applicantModel);
@@ -33,7 +39,7 @@ function CreateCase() {
     useEffect(() => {
         console.log("caseDAO updated:", caseDAO);
     }, [caseDAO]);
-    
+
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
             ...prev,
@@ -50,7 +56,13 @@ function CreateCase() {
 
     return (
         <Box className="p-0!">
-            <Outlet context={{ caseDAO, setCaseDAO, updateCaseDAO, applicantModel, setApplicantModel, updateApplicantModel, isApplicantExisting, setIsApplicantExisting }} />
+            <Outlet context={{
+                caseDAO, setCaseDAO, updateCaseDAO,
+                applicantModel, setApplicantModel, updateApplicantModel,
+                isApplicantExisting, setIsApplicantExisting,
+                isManualEditEnabled, setIsManualEditEnabled,
+                dbOriginalData, setDbOriginalData
+            }} />
             <footer className="h-60"></footer>
         </Box>
     );

@@ -9,6 +9,7 @@ interface DatePickerProps {
   id?: string;
   required?: boolean;
   min?: string;
+  disabled?: boolean;
 }
 
 export default function DatePicker({
@@ -19,7 +20,8 @@ export default function DatePicker({
   name,
   id,
   required = false,
-  min
+  min,
+  disabled = false
 }: DatePickerProps) {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +48,8 @@ export default function DatePicker({
         onChange={handleChange}
         required={required}
         min={min}
-        className="w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 text-onSurface"
+        disabled={disabled}
+        className={`w-full bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 text-onSurface ${disabled ? 'opacity-70 cursor-not-allowed' : ''}`}
       />
     </div>
   );

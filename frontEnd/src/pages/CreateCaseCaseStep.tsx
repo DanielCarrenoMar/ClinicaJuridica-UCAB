@@ -11,218 +11,65 @@ import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
 import { useCreateCase } from "#domain/useCaseHooks/useCase.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
-import { useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
+import { useCreateApplicant, useUpdateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 import { useAuth } from "../context/AuthContext.tsx";
 
-const legalAmbits = [
-    {
-        name: "Materia Civil",
-        categories: [
-            {
-                name: "Personas",
-                areas: [
-                    "Rectificación de Actas",
-                    "Inserción de Actas",
-                    "Solicitud de Naturalización",
-                    "Justificativo de Soltería",
-                    "Justificativo de Concubinato",
-                    "Invitación al país",
-                    "Justificativo de Dependencia Económica / Pobreza",
-                    "Declaración Jurada de No Poseer",
-                    "Declaración Jurada de Ingresos",
-                    "Concubinato Postmortem",
-                    "Declaración Jurada",
-                    "Justificativo de Testigos"
-                ]
-            },
-            {
-                name: "Bienes",
-                areas: [
-                    "Título Supletorio",
-                    "Compra venta bienhechuría",
-                    "Partición de comunidad ordinaria",
-                    "Propiedad Horizontal",
-                    "Cierre de Titularidad",
-                    "Aclaratoria"
-                ]
-            },
-            {
-                name: "Contratos",
-                areas: [
-                    "Arrendamiento / Comodato",
-                    "Compra - venta de bienes inmuebles",
-                    "Compra - venta bienes muebles (vehículos)",
-                    "Opción de Compra Venta",
-                    "Finiquito de compra venta",
-                    "Asociaciones / Fundaciones",
-                    "Cooperativas",
-                    "Poder",
-                    "Cosión de derechos",
-                    "Cobro de Bolívares",
-                    "Constitución y liquidación de hipoteca",
-                    "Servicios / obras"
-                ]
-            },
-            {
-                name: "Familia - Tribunales Ordinarios",
-                areas: [
-                    "Divorcio por separación de hechos (185-A)",
-                    "Separación de Cuerpos (189)",
-                    "Conversión de separación en divorcio",
-                    "Divorcio contencioso",
-                    "Partición de comunidad conyugal",
-                    "Partición de comunidad concubinaria",
-                    "Capitulaciones matrimoniales",
-                    "Divorcio Causal No Taxativa Sentencias"
-                ]
-            },
-            {
-                name: "Familia - Tribunales Protecc. Niños y Adolescentes",
-                areas: [
-                    "Divorcio por separación de hechos (185-A)",
-                    "Separación de Cuerpos (189)",
-                    "Conversión de separación en divorcio",
-                    "Divorcio contencioso",
-                    "Reconocimiento Voluntario Hijo",
-                    "Colocación familiar",
-                    "Curatela",
-                    "Medidas de proteccion (Identidad, salud, educación, otros)",
-                    "Autorización para Viajar",
-                    "Autorización para Vender",
-                    "Autorización para Trabajar",
-                    "Obligación de Manutención / Convivencia Familiar",
-                    "Rectificación de Actas",
-                    "Inserción de Actas",
-                    "Carga Familiar",
-                    "Cambio de Residencia",
-                    "Ejercicio Unilateral de Patria Potestad",
-                    "Divorcio Causal No Taxativa Sentencias",
-                    "Tutela"
-                ]
-            },
-            {
-                name: "Sucesiones",
-                areas: [
-                    "Cesión de derechos sucesorales",
-                    "Justificativo Únicos y Universales herederos",
-                    "Testamento",
-                    "Declaración Sucesoral",
-                    "Partición de comunidad hereditaria"
-                ]
+import { subjectsData } from "#domain/seedData.ts";
+
+function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): number {
+    let id = 0;
+    for (let s = 0; s < subjectsData.length; s++) {
+        for (let c = 0; c < subjectsData[s].categories.length; c++) {
+            if (s === subjectIdx && c === catIdx) {
+                return id + areaIdx + 1;
             }
-        ]
-    },
-    {
-        name: "Materia Penal",
-        categories: [
-            {
-                name: "General",
-                areas: [
-                    "Delitos Contra la Propiedad (Robo, Hurto)",
-                    "Contra las Personas (homicidio, lesiones)",
-                    "Contra las Buenas Costumbres (Violación)",
-                    "Delitos contra el Honor",
-                    "Violencia Doméstica"
-                ]
-            }
-        ]
-    },
-    {
-        name: "Materia Laboral",
-        categories: [
-            {
-                name: "General",
-                areas: [
-                    "Calificación de Despido",
-                    "Prestaciones Sociales",
-                    "Contratos de Trabajo",
-                    "Accidentes de Trabajo",
-                    "Incapacidad Laboral",
-                    "Terminación de Relación Laboral"
-                ]
-            }
-        ]
-    },
-    {
-        name: "Materia Mercantil",
-        categories: [
-            {
-                name: "General",
-                areas: [
-                    "Firma Personal",
-                    "Constitución de Compañías",
-                    "Actas de Asamblea",
-                    "Compra Venta de Fondo de Comercio / Acciones",
-                    "Letras de Cambio"
-                ]
-            }
-        ]
-    },
-    {
-        name: "Materia Administrativa",
-        categories: [
-            {
-                name: "General",
-                areas: [
-                    "Recursos Administrativos"
-                ]
-            }
-        ]
-    },
-    {
-        name: "Otros",
-        categories: [
-            {
-                name: "General",
-                areas: [
-                    "Convivencia Ciudadana",
-                    "Derechos Humanos",
-                    "Tránsito",
-                    "Otros",
-                    "Diligencias Seguimiento"
-                ]
-            }
-        ]
+            id += subjectsData[s].categories[c].legalAreas.length;
+        }
     }
-]
+    return 0;
+}
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
-    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting } = useCaseOutletContext();
+    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting, isManualEditEnabled } = useCaseOutletContext();
     const { createCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
     const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
+    const { updateApplicant, error: updateApplicantError, loading: updateApplicantLoading } = useUpdateApplicant();
     const { user } = useAuth()
 
     const [subjectIndex, setSubjectIndex] = useState<number | null>(null);
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
 
-    function handleCreateCase(){
-        let createdApplicant = applicantModel
-        if (!isApplicantExisting){
-            createApplicant(applicantModel).then((createdApplicant) => {
-                if (!createdApplicant) {
-                    throw new Error("Applicant creation failed. Applicant is null.");
+    async function handleCreateCase() {
+        try {
+            if (isApplicantExisting) {
+                // Solo actualizamos si se habilitó la edición manual
+                if (isManualEditEnabled) {
+                    await updateApplicant(applicantModel.identityCard, applicantModel);
                 }
-                createdApplicant = createdApplicant;
-            })
-            .catch((error) => {
-                console.error("Error creating applicant", error);
-            });
+            } else {
+                const created = await createApplicant(applicantModel as any);
+                if (!created) {
+                    throw new Error("Applicant creation failed.");
+                }
+            }
+
+            const caseToCreate: CaseDAO = {
+                ...caseDAO,
+                applicantId: applicantModel.identityCard,
+                userId: user?.identityCard || "",
+            };
+
+            console.log("Creating case with data:", caseToCreate);
+            const createdCase = await createCase(caseToCreate);
+            if (createdCase) {
+                navigate(`/caso/${createdCase.idCase}`);
+            } else {
+                throw new Error("Case creation failed. Case is null.");
+            }
+        } catch (error) {
+            console.error("Error en el flujo de creación de caso:", error);
         }
-        const caseToCreate: CaseDAO = {
-            ...caseDAO,
-            applicantId: createdApplicant.identityCard,
-            userId: user?.identityCard || "",
-        };
-        console.log("Creating case with data:", caseToCreate);
-        createCase(caseToCreate)
-        .then((createdCase) => {
-            if (createdCase) navigate(`/caso/${createdCase.idCase}`);
-            else throw new Error("Case creation failed. Case is null.");
-        })
-        .catch((error) => {
-            console.error("Error creating case", error);
-        });
     }
 
     useEffect(() => {
@@ -240,7 +87,7 @@ function CreateCaseCaseStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { navigate("/crearCaso/solicitante"); }} variant="outlined" icon={<UserEdit />} className="h-10 w-28">Volver</Button>
-                    <Button onClick={handleCreateCase} variant="resalted" icon={<ChevronRight />} disabled={createCaseLoading || createApplicantLoading} className="w-32">Aceptar</Button>
+                    <Button onClick={handleCreateCase} variant="resalted" icon={<ChevronRight />} disabled={createCaseLoading || createApplicantLoading || updateApplicantLoading} className="w-32">Aceptar</Button>
                 </div>
             </header>
             <div className="px-4 py-2 flex flex-col gap-4">
@@ -295,14 +142,14 @@ function CreateCaseCaseStep() {
                             <div className="flex gap-2">
                                 <span className="text-body-medium self-center w-28">Materia</span>
                                 <Dropdown
-                                    selectedValue={subjectIndex}
+                                    selectedValue={subjectIndex ?? undefined}
                                     onSelectionChange={(value) => {
                                         setSubjectIndex(value as number);
                                         setCategoryIndex(null);
                                         updateCaseDAO({ idLegalArea: 0 });
                                     }}
                                 >
-                                    {legalAmbits.map((subject, index) => (
+                                    {subjectsData.map((subject, index) => (
                                         <DropdownOption key={index} value={index}>{subject.name}</DropdownOption>
                                     ))}
                                 </Dropdown>
@@ -310,11 +157,11 @@ function CreateCaseCaseStep() {
                             <div className="flex gap-2">
                                 <span className="text-body-medium self-center w-28">Categoria</span>
                                 <Dropdown
-                                    selectedValue={categoryIndex}
+                                    selectedValue={categoryIndex ?? undefined}
                                     onSelectionChange={(value) => { setCategoryIndex(value as number); }}
                                     disabled={subjectIndex === null}
                                 >
-                                    {subjectIndex !== null && legalAmbits[subjectIndex].categories.map((category, index) => (
+                                    {subjectIndex !== null && subjectsData[subjectIndex].categories.map((category, index) => (
                                         <DropdownOption key={index} value={index}>{category.name}</DropdownOption>
                                     ))}
                                 </Dropdown>
@@ -322,12 +169,12 @@ function CreateCaseCaseStep() {
                             <div className="flex gap-2">
                                 <span className="text-body-medium self-center w-28">Área</span>
                                 <Dropdown
-                                    selectedValue={caseDAO.idLegalArea}
-                                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: (value as number)+1 }) }}
+                                    selectedValue={caseDAO.idLegalArea || undefined}
+                                    onSelectionChange={(value) => { updateCaseDAO({ idLegalArea: value as number }) }}
                                     disabled={categoryIndex === null}
                                 >
-                                    {subjectIndex !== null && categoryIndex !== null && legalAmbits[subjectIndex].categories[categoryIndex].areas.map((area, index) => (
-                                        <DropdownOption key={index} value={index}>{area}</DropdownOption>
+                                    {subjectIndex !== null && categoryIndex !== null && subjectsData[subjectIndex].categories[categoryIndex].legalAreas.map((area, index) => (
+                                        <DropdownOption key={index} value={getLegalAreaId(subjectIndex!, categoryIndex!, index)}>{area}</DropdownOption>
                                     ))}
                                 </Dropdown>
                             </div>

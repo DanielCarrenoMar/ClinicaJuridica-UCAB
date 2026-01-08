@@ -1,4 +1,5 @@
 import type { ApplicantInfoDAO } from "#database/daos/applicantInfoDAO.ts";
+import type { ApplicantModel } from "#domain/models/applicant.ts";
 import { daoToApplicantModel, modelToApplicantDao } from "#domain/models/applicant.ts";
 import type { ApplicantRepository } from "../../../domain/repositories";
 import {
@@ -31,12 +32,12 @@ export function getApplicantRepository(): ApplicantRepository {
         },
 
         updateApplicant: async (id, data) => {
+            const applicantDAO = modelToApplicantDao(data as ApplicantModel);
             const response = await fetch(`${APPLICANT_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    ...data,
-                    idNacionality: (data as any).idNationality ?? (data as any).idNacionality,
+                    ...applicantDAO,
                 })
             });
             const result = await response.json();

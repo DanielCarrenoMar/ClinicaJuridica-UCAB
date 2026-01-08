@@ -8,6 +8,7 @@ interface TitleDropdownProps {
   onSelectionChange?: (value: string | number) => void;
   className?: string;
   dropdownLabel?: string;
+  disabled?: boolean;
 }
 
 export default function TitleDropdown({
@@ -16,7 +17,8 @@ export default function TitleDropdown({
   selectedValue,
   onSelectionChange,
   className = '',
-  dropdownLabel = "Seleccionar"
+  dropdownLabel = "Seleccionar",
+  disabled = false
 }: TitleDropdownProps) {
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
@@ -30,7 +32,8 @@ export default function TitleDropdown({
           label={dropdownLabel}
           selectedValue={selectedValue}
           onSelectionChange={onSelectionChange}
-          showTitle={!selectedValue}
+          showTitle={selectedValue === undefined}
+          disabled={disabled}
         >
           {children}
         </Dropdown>

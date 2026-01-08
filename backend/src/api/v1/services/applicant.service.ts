@@ -14,7 +14,7 @@ function isMissingRelationError(error: any, relationName: string): boolean {
 }
 
 class ApplicantService {
-  
+
   async getAllApplicants(): Promise<{ success: boolean; data?: ApplicantResponse[]; error?: string }> {
     try {
       const applicants = await prisma.$queryRaw<RawApplicantDB[]>`
@@ -99,15 +99,15 @@ class ApplicantService {
       }
 
       const rawData = applicantRows[0];
-      
+
       const finalData = {
         ...rawData,
         applicantEducationLevel: rawData.applicantEducationLevelId,
         servicesIdAvailable: servicesRows.map(s => s.serviceId)
       } as unknown as ApplicantResponse;
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         data: finalData
       };
     } catch (error: any) {
@@ -204,13 +204,13 @@ class ApplicantService {
         const rawData = result[0];
 
         const finalData = {
-           ...rawData,
-           applicantEducationLevel: rawData.applicantEducationLevelId,
-           servicesIdAvailable: data.servicesIdAvailable || [] 
+          ...rawData,
+          applicantEducationLevel: rawData.applicantEducationLevelId,
+          servicesIdAvailable: data.servicesIdAvailable || []
         } as unknown as ApplicantResponse;
 
-        return { 
-          success: true, 
+        return {
+          success: true,
           data: finalData
         };
       });
@@ -232,6 +232,8 @@ class ApplicantService {
           UPDATE "Beneficiary" SET 
             "fullName" = COALESCE(${data.fullName}, "fullName"), 
             "gender" = COALESCE(${data.gender}, "gender"),
+            "birthDate" = COALESCE(CAST(${data.birthDate} AS DATE), "birthDate"),
+            "idNationality" = COALESCE(${data.idNationality}, "idNationality"),
             "idState" = COALESCE(${data.idState}, "idState"),
             "municipalityNumber" = COALESCE(${data.municipalityNumber}, "municipalityNumber"),
             "parishNumber" = COALESCE(${data.parishNumber}, "parishNumber")
@@ -312,17 +314,17 @@ class ApplicantService {
         `;
 
         if (!result || result.length === 0) throw new Error("Applicant not found");
-        
+
         const rawData = result[0];
 
         const finalData = {
-            ...rawData,
-            applicantEducationLevel: rawData.applicantEducationLevelId,
-            servicesIdAvailable: data.servicesIdAvailable || [] 
+          ...rawData,
+          applicantEducationLevel: rawData.applicantEducationLevelId,
+          servicesIdAvailable: data.servicesIdAvailable || []
         } as unknown as ApplicantResponse;
 
-        return { 
-          success: true, 
+        return {
+          success: true,
           data: finalData
         };
       });

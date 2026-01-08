@@ -22,9 +22,10 @@ interface DropdownCheckProps {
   children: ReactNode;
   selectedValues?: (string | number)[]; // Controlled
   onSelectionChange?: (values: (string | number)[]) => void;
+  disabled?: boolean;
 }
 
-export default function DropdownCheck({ label, children, selectedValues, onSelectionChange }: DropdownCheckProps) {
+export default function DropdownCheck({ label, children, selectedValues, onSelectionChange, disabled = false }: DropdownCheckProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValues, setInternalSelectedValues] = useState<(string | number)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -61,8 +62,9 @@ export default function DropdownCheck({ label, children, selectedValues, onSelec
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="bg-surface border border-onSurface border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl cursor-pointer hover:surface transition-colors"
+          disabled={disabled}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          className={`bg-surface border border-onSurface border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50'}`}
         >
           <p className="font-['Poppins'] text-[13px] text-onSurface text-nowrap">
             {label}
