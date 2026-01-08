@@ -58,7 +58,7 @@ function SearchCases() {
             "teacherId",
             "teacherName",
             "teacherTerm",
-            "idCourt"
+            "idCourt",
         ],
         threshold: 0.35,
         ignoreLocation: true,

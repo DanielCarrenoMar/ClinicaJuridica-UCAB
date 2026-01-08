@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { CaseModel } from "#domain/models/case.ts";
-import { Book, ScaleBalanced, User } from "flowbite-react-icons/solid";
-import { useNavigate } from "react-router";
+import { Book, BookOpen, ScaleBalanced, User } from "flowbite-react-icons/solid";
+import { Link, useNavigate } from "react-router";
 import type { CaseStatusTypeModel } from "#domain/typesModel.ts";
 
 interface CaseCardProps {
@@ -48,7 +48,9 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
         compoundKey,
         caseStatus,
         createdAt,
+        applicantId,
         applicantName,
+        subjectName,
         legalAreaName,
         problemSummary,
         lastActionDate,
@@ -63,7 +65,7 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
     return (
         <div
             onClick={() => navigate(`/caso/${idCase}`)}
-            className="bg-surface/70 flex flex-col gap-1 h-28 overflow-hidden relative rounded-3xl w-full max-w-5xl cursor-pointer hover:bg-surface transition-colors"
+            className="bg-surface/70 flex flex-col gap-1 h-32 overflow-hidden relative rounded-3xl w-full max-w-5xl cursor-pointer hover:bg-surface transition-colors"
         >
             <header className={`flex text-surface justify-between relative ${config.color} px-4 pt-2.5 pb-2`}>
                 <h4 className="text-body-medium ">
@@ -77,8 +79,14 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                 <div className="flex flex-col gap-1 justify-center w-50">
                     <span className="flex gap-1 items-center">
                         <User />
-                        <p className="truncate max-w-32">
+                        <Link to={`/solicitante/${applicantId}`} onClick={(e)=>{e.stopPropagation()}} className="truncate max-w-32 hover:underline">
                             {highlightText(applicantName, matches?.applicantName)}
+                        </Link>
+                    </span>
+                    <span className="flex gap-1 items-center">
+                        <BookOpen />
+                        <p className="truncate max-w-32">
+                            {highlightText(subjectName, matches?.subjectName)}
                         </p>
                     </span>
                     <span className="flex gap-1 items-center">
@@ -91,7 +99,7 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
 
                 <div className="h-full w-px bg-onSurface/20 mx-2"></div>
 
-                <div className="flex flex-col text-body-small gap-1 justify-between h-full min-w-40">
+                <div className="flex flex-1 flex-col text-body-small gap-1 h-full min-w-40">
                     <span className="flex gap-2 items-start">
                         <Book />
                         <span className="flex flex-col items-center">
@@ -100,13 +108,13 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                             </h5>
                         </span>
                     </span>
-                    <p className="font-lighttruncate">
+                    <p className="text-onSurface/70 line-clamp-2 text-ellipsis">
                         {lastActionDescription || "Sin acciones"}
                     </p>
                 </div>
 
-                <div className="flex-1 h-full text-right overflow-hidden text-body-small">
-                    <p className=" line-clamp-3">
+                <div className="flex-1 text-body-small">
+                    <p className="line-clamp-3 text-ellipsis">
                         {highlightText(problemSummary, matches?.problemSummary)}
                     </p>
                 </div>
