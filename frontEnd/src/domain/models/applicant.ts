@@ -31,12 +31,12 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'>
 }
 
 export function daoToApplicantModel(dao: ApplicantInfoDAO): ApplicantModel {
-	const { maritalStatus, createdAt, gender, ...rest } = dao
 	return {
-		maritalStatus: maritalStatus ? typeDaoToMaritalStatusTypeModel(maritalStatus) : undefined,
-		createdAt: new Date(createdAt),
-		gender: typeDaoToGenderTypeModel(gender),
-		...rest,
+		...dao,
+		maritalStatus: dao.maritalStatus ? typeDaoToMaritalStatusTypeModel(dao.maritalStatus) : undefined,
+		createdAt: new Date(dao.createdAt),
+		gender: typeDaoToGenderTypeModel(dao.gender),
+		birthDate: new Date(dao.birthDate)
 	}
 }
 

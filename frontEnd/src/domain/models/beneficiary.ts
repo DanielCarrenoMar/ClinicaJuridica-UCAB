@@ -29,10 +29,10 @@ function beneficiaryTypeDAOtoModel(type: BeneficiaryTypeDAO): BeneficiaryType {
 }
 
 export function daoToBeneficiaryModel(dao: BeneficiaryInfoDAO): BeneficiaryModel {
-    const { type, gender, ...rest } = dao;
     return {
-        type: beneficiaryTypeDAOtoModel(type),
-        gender: typeDaoToGenderTypeModel(gender),
-        ...rest
+        ...dao,
+        type: beneficiaryTypeDAOtoModel(dao.type),
+        gender: typeDaoToGenderTypeModel(dao.gender),
+        birthDate: new Date(dao.birthDate)
     }
 }

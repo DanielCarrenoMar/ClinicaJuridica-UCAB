@@ -20,8 +20,6 @@ export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    if (!id) return <div className="text-error">ID del solicitante no proporcionado en la URL.</div>;
-
     const { getApplicantById, loading, error } = useGetApplicantById();
     const { updateApplicant, loading: updating } = useUpdateApplicant();
 
@@ -32,14 +30,15 @@ export default function ApplicantInfo() {
 
     useEffect(() => {
         const loadApplicant = async () => {
-            const applicant = await getApplicantById(id);
+            const applicantId = id;
+            if (!applicantId) return;
+            const applicant = await getApplicantById(applicantId);
             if (applicant) {
                 setApplicantData(applicant);
                 setLocalApplicantData(applicant);
             }
         };
         loadApplicant();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     useEffect(() => {
@@ -53,9 +52,11 @@ export default function ApplicantInfo() {
     }
 
     async function saveChanges() {
+        const applicantId = id;
+        if (!applicantId) return;
         if (!localApplicantData || !applicantData) return;
-        await updateApplicant(id, localApplicantData);
-        const updatedApplicant = await getApplicantById(id);
+        await updateApplicant(applicantId, localApplicantData);
+        const updatedApplicant = await getApplicantById(applicantId);
         if (updatedApplicant) {
             setApplicantData(updatedApplicant);
             setLocalApplicantData(updatedApplicant);
@@ -66,6 +67,7 @@ export default function ApplicantInfo() {
         setLocalApplicantData((prev: any) => ({ ...prev, ...updateField }));
     };
 
+    if (!id) return <div className="text-error">ID del solicitante no proporcionado en la URL.</div>;
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
     if (error) return <div className="text-error">Error al cargar el solicitante: {error.message}</div>;
     if (!applicantData || !localApplicantData) return <div className="">No se encontró el solicitante</div>;
@@ -93,7 +95,12 @@ export default function ApplicantInfo() {
             <div className="col-span-3">
                 <DatePicker
                     label="Fecha Nacimiento"
-                    value={localApplicantData.birthDate ? localApplicantData.birthDate.toISOString().split('T')[0] : undefined}
+                    value={(() => {
+                        const dateValue = localApplicantData.birthDate instanceof Date
+                            ? localApplicantData.birthDate
+                            : (localApplicantData.birthDate ? new Date(localApplicantData.birthDate as unknown as string) : undefined);
+                        return dateValue ? dateValue.toISOString().split('T')[0] : undefined;
+                    })()}
                     onChange={(text) => { handleChange({ birthDate: new Date(text) }); }}
                 />
             </div>

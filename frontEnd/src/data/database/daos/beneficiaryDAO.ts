@@ -2,7 +2,7 @@ import type { BeneficiaryTypeDAO, GenderTypeDAO, IdNationalityTypeDAO as Nationa
 
 export interface BeneficiaryDAO {
   gender: GenderTypeDAO;
-  birthDate: Date;
+  birthDate: string;
   fullName: string;
   idNationality: NationalityTypeDAO;
   hasId: boolean;
