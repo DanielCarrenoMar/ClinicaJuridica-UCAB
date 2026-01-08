@@ -28,13 +28,13 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'>
 	workConditionName?: string;
 	activityConditionName?: string;
 	servicesIdAvailable?: number[];
-	houseType?: string;
-	floorMaterial?: string;
-	wallMaterial?: string;
-	roofMaterial?: string;
-	potableWaterService?: string;
-	sewageService?: string;
-	cleaningService?: string;
+	houseType?: number;
+	floorMaterial?: number;
+	wallMaterial?: number;
+	roofMaterial?: number;
+	potableWaterService?: number;
+	sewageService?: number;
+	cleaningService?: number;
 }
 
 export function daoToApplicantModel(dao: ApplicantInfoDAO): ApplicantModel {

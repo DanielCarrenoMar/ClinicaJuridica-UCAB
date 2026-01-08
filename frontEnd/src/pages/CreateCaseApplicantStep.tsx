@@ -394,7 +394,7 @@ function CreateCaseApplicantStep() {
                 </TitleDropdown>
             </div>
 
-            {/* Estado Civil | concubinato */}
+            {/* Estadubinato */}
                 <div className="col-span-1">
                     <TitleDropdown
                         label="Estado Civil*"
@@ -477,7 +477,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Tipo de vivienda*"
                     selectedValue={applicantModel.houseType}
-                    onSelectionChange={(value) => { updateApplicantModel({ houseType: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ houseType: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Tipo de Vivienda').map((option) => (
@@ -515,7 +515,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Material de piso*"
                     selectedValue={applicantModel.floorMaterial}
-                    onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Material del piso').map((option) => (
@@ -527,7 +527,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Material de paredes*"
                     selectedValue={applicantModel.wallMaterial}
-                    onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Material de las paredes').map((option) => (
@@ -539,7 +539,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Material de techo*"
                     selectedValue={applicantModel.roofMaterial}
-                    onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Material del techo').map((option) => (
@@ -553,7 +553,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Servicio de agua potable*"
                     selectedValue={applicantModel.potableWaterService}
-                    onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Servicio de agua potable').map((option) => (
@@ -565,7 +565,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Aguas negras*"
                     selectedValue={applicantModel.sewageService}
-                    onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Eliminacion de excretas (aguas negras)').map((option) => (
@@ -577,7 +577,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Servicio de aseo*"
                     selectedValue={applicantModel.cleaningService}
-                    onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
                     {housingCharacteristicOptions('Servicio de aseo').map((option) => (
