@@ -611,6 +611,7 @@ export default function CaseInfo() {
                     open={isCreateBeneficiaryDialogOpen}
                     onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
                     onCreate={async (data: BeneficiaryDAO) => {
+                        console.log("Creating beneficiary:", data);
                         const created = await createBeneficiary(data);
                         await refreshBeneficiaries();
                         if (created) {

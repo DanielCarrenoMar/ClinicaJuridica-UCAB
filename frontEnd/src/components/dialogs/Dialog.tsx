@@ -8,6 +8,7 @@ interface DialogProps {
     headerItems?: ReactNode;
     children: ReactNode;
     onClose: () => void;
+    closeOnOutsideClick?: boolean;
     className?: string;
     id?: string;
 }
@@ -18,6 +19,7 @@ export default function Dialog({
     headerItems,
     children,
     onClose,
+    closeOnOutsideClick = true,
     className = "",
     id
 }: DialogProps) {
@@ -26,7 +28,7 @@ export default function Dialog({
     const dialogId = id ?? (typeof title === "string" ? title : undefined);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={closeOnOutsideClick ? onClose : undefined}>
             <div id={dialogId}
                 className={`w-full max-w-lg rounded-xl bg-surface shadow-xl border border-onSurface/10 p-6 flex flex-col gap-6 ${className}`}
                 onClick={e => e.stopPropagation()}
