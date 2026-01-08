@@ -80,7 +80,6 @@ export default function SupportDocumentDetailsDialog({
                         variant="outlined"
                         onClick={() => setShowDeleteConfirmation(true)}
                         icon={<TrashBin className="w-4 h-4" />}
-                        className="!bg-error !text-surface"
                     >
                         Eliminar
                     </Button>

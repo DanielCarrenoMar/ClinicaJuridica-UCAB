@@ -73,7 +73,7 @@ export default function DropdownCheck({ label, children, selectedValues, onSelec
         </button>
 
         {isOpen && (
-          <div className="absolute left-0 mt-2 min-w-[14rem] w-max max-w-[20rem] origin-top-right rounded-md bg-surface border border-onSurface focus:outline-none z-10 overflow-hidden shadow-lg">
+          <div className="absolute left-0 mt-2 min-w-56 w-max max-w-[20rem] origin-top-right rounded-md bg-surface border border-onSurface focus:outline-none z-10 overflow-hidden shadow-lg">
             <div className="py-1 max-h-60 overflow-y-auto" role="none">
               {children}
             </div>
