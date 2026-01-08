@@ -590,6 +590,9 @@ export default function CaseInfo() {
                     onSelect={(beneficiary) => {
                         setLocalBeneficiaries((prev) => [...prev, beneficiary]);
                     }}
+                    headerItems={
+                        <Button variant='outlined' >Crear Nuevo</Button>
+                    }
                 />
             </section>
         </div>

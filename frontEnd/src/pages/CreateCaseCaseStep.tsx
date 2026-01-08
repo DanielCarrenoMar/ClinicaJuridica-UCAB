@@ -5,14 +5,19 @@ import TextInput from "#components/TextInput.tsx";
 import Button from "#components/Button.tsx";
 import Dropdown from "#components/Dropdown/Dropdown.tsx";
 import { useNavigate } from "react-router";
-import { ChevronRight } from "flowbite-react-icons/outline";
+import { ChevronRight, Close } from "flowbite-react-icons/outline";
 import { useEffect, useState } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
-import { useCreateCase } from "#domain/useCaseHooks/useCase.ts";
+import { useCreateCase, useSetBeneficiariesToCase } from "#domain/useCaseHooks/useCase.ts";
 import type { CaseDAO } from "#database/daos/caseDAO.ts";
 import { useCreateApplicant, useUpdateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 import { useAuth } from "../context/AuthContext.tsx";
+
+import InBox from "#components/InBox.tsx";
+import PersonSearchDialog from "#components/dialogs/PersonSearchDialog.tsx";
+import { useGetAllBeneficiaries } from "#domain/useCaseHooks/useBeneficiary.ts";
+import { UserCircle } from "flowbite-react-icons/solid";
 
 import { subjectsData } from "#domain/seedData.ts";
 
@@ -31,19 +36,21 @@ function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): nu
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
-    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting, isManualEditEnabled } = useCaseOutletContext();
-    const { createCase, error: createCaseError, loading: createCaseLoading } = useCreateCase();
-    const { createApplicant, error: createApplicantError, loading: createApplicantLoading } = useCreateApplicant();
-    const { updateApplicant, error: updateApplicantError, loading: updateApplicantLoading } = useUpdateApplicant();
+    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting, isManualEditEnabled, caseBeneficiaries, setCaseBeneficiaries } = useCaseOutletContext();
+    const { createCase, loading: createCaseLoading } = useCreateCase();
+    const { createApplicant, loading: createApplicantLoading } = useCreateApplicant();
+    const { updateApplicant, loading: updateApplicantLoading } = useUpdateApplicant();
+    const { setBeneficiariesToCase, loading: setBeneficiariesLoading } = useSetBeneficiariesToCase();
+    const { beneficiaries } = useGetAllBeneficiaries();
     const { user } = useAuth()
 
     const [subjectIndex, setSubjectIndex] = useState<number | null>(null);
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
+    const [isBeneficiarySearchDialogOpen, setIsBeneficiarySearchDialogOpen] = useState(false);
 
     async function handleCreateCase() {
         try {
             if (isApplicantExisting) {
-                // Solo actualizamos si se habilitó la edición manual
                 if (isManualEditEnabled) {
                     await updateApplicant(applicantModel.identityCard, applicantModel);
                 }
@@ -63,6 +70,9 @@ function CreateCaseCaseStep() {
             console.log("Creating case with data:", caseToCreate);
             const createdCase = await createCase(caseToCreate);
             if (createdCase) {
+                if (caseBeneficiaries.length > 0) {
+                    await setBeneficiariesToCase(createdCase.idCase, caseBeneficiaries.map((b) => b.identityCard));
+                }
                 navigate(`/caso/${createdCase.idCase}`);
             } else {
                 throw new Error("Case creation failed. Case is null.");
@@ -87,7 +97,7 @@ function CreateCaseCaseStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { navigate("/crearCaso/solicitante"); }} variant="outlined" icon={<UserEdit />} className="h-10 w-28">Volver</Button>
-                    <Button onClick={handleCreateCase} variant="resalted" icon={<ChevronRight />} disabled={createCaseLoading || createApplicantLoading || updateApplicantLoading} className="w-32">Aceptar</Button>
+                    <Button onClick={handleCreateCase} variant="resalted" icon={<ChevronRight />} disabled={createCaseLoading || createApplicantLoading || updateApplicantLoading || setBeneficiariesLoading} className="w-32">Aceptar</Button>
                 </div>
             </header>
             <div className="px-4 py-2 flex flex-col gap-4">
@@ -109,11 +119,31 @@ function CreateCaseCaseStep() {
                             <h3 className="text-label-small mb-2">
                                 Beneficiarios
                             </h3>
-                            <Button variant="outlined" className="h-10">Añadir</Button>
+                            <Button variant="outlined" className="h-10" onClick={() => setIsBeneficiarySearchDialogOpen(true)}>Añadir</Button>
                         </header>
-                        <div className="bg-surface rounded-xl border border-onSurface flex-1">
-
-                        </div>
+                        <InBox className="flex-1">
+                            <ul className='flex flex-col gap-3'>
+                                {caseBeneficiaries.length === 0 && (
+                                    <p className="text-body-small">Sin Beneficiarios Asignados</p>
+                                )}
+                                {caseBeneficiaries.map((beneficiary) => (
+                                    <li key={beneficiary.identityCard}>
+                                        <span className="flex items-center justify-between">
+                                            <div className='flex gap-3'>
+                                                <UserCircle />
+                                                <p className="text-body-medium">{beneficiary.fullName}</p>
+                                            </div>
+                                            <Button
+                                                onClick={() => setCaseBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
+                                                icon={<Close />}
+                                                className='p-2!'
+                                                variant='outlined'
+                                            />
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </InBox>
                     </section>
                     <section className="flex gap-3 col-span-2">
                         <TitleDropdown
@@ -192,6 +222,20 @@ function CreateCaseCaseStep() {
                         </div>
                     </section>
                 </article>
+
+                <PersonSearchDialog
+                    open={isBeneficiarySearchDialogOpen}
+                    title="Buscar Beneficiario"
+                    placeholder="Buscar por nombre o cédula..."
+                    onClose={() => setIsBeneficiarySearchDialogOpen(false)}
+                    users={beneficiaries.filter(b => !caseBeneficiaries.some(cb => cb.identityCard === b.identityCard) && b.identityCard !== applicantModel.identityCard)}
+                    onSelect={(beneficiary) => {
+                        setCaseBeneficiaries((prev) => [...prev, beneficiary]);
+                    }}
+                    headerItems={
+                        <Button variant='outlined' >Crear Nuevo</Button>
+                    }
+                />
                 <article>
                     <header className="flex justify-between items-center w-full">
                         <h3 className="text-label-small mb-2">

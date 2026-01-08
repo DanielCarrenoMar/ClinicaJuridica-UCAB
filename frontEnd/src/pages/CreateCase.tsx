@@ -6,11 +6,14 @@ import Box from "#components/Box.tsx";
 
 import { defaultCaseDAO, type CaseDAO } from "#database/daos/caseDAO.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
+import type { PersonModel } from "#domain/models/person.ts";
 
 export type CaseOutletContext = {
     caseDAO: CaseDAO;
     setCaseDAO: Dispatch<SetStateAction<CaseDAO>>;
     updateCaseDAO: (updatedFields: Partial<CaseDAO>) => void;
+    caseBeneficiaries: PersonModel[];
+    setCaseBeneficiaries: Dispatch<SetStateAction<PersonModel[]>>;
     applicantModel: ApplicantModel;
     setApplicantModel: Dispatch<SetStateAction<ApplicantModel>>;
     updateApplicantModel: (updatedFields: Partial<ApplicantModel>) => void;
@@ -28,6 +31,7 @@ export function useCaseOutletContext() {
 
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
+    const [caseBeneficiaries, setCaseBeneficiaries] = useState<PersonModel[]>([]);
     const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({ identityCard: '' } as ApplicantModel);
     const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
     const [isManualEditEnabled, setIsManualEditEnabled] = useState<boolean>(false);
@@ -58,6 +62,7 @@ function CreateCase() {
         <Box className="p-0!">
             <Outlet context={{
                 caseDAO, setCaseDAO, updateCaseDAO,
+                caseBeneficiaries, setCaseBeneficiaries,
                 applicantModel, setApplicantModel, updateApplicantModel,
                 isApplicantExisting, setIsApplicantExisting,
                 isManualEditEnabled, setIsManualEditEnabled,
