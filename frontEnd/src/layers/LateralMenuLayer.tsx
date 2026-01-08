@@ -134,7 +134,7 @@ function LateralMenuLayer() {
                             {isAssignedCasesOpen && (
                                 <InBox className="absolute right-0 mt-2 w-96 z-50 gap-2">
                                     <header className="flex items-center justify-between gap-4">
-                                        <h4 className="text-body-large">Últimos casos asignados</h4>
+                                        <h4 className="text-body-large">Te han asignado a los siguientes casos</h4>
                                         {assignedCasesLoading && <LoadingSpinner />}
                                     </header>
 
