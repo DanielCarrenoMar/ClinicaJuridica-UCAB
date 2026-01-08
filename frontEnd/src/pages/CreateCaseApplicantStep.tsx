@@ -480,8 +480,8 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ houseType: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Tipo de Vivienda').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Tipo de Vivienda').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
@@ -518,8 +518,8 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Material del piso').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Material del piso').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
@@ -530,8 +530,8 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Material de las paredes').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Material de las paredes').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
@@ -542,13 +542,12 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Material del techo').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Material del techo').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
 
-            {/* Servicio de agua potable | aguas negras | servicio de aseo */}
             <div className="col-span-1">
                 <TitleDropdown
                     label="Servicio de agua potable*"
@@ -556,8 +555,8 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Servicio de agua potable').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Servicio de agua potable').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
@@ -568,8 +567,8 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Eliminacion de excretas (aguas negras)').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Eliminacion de excretas (aguas negras)').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
@@ -580,13 +579,12 @@ function CreateCaseApplicantStep() {
                     onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as number}); }}
                     disabled={isHouseOnlyFieldDisabled}
                 >
-                    {housingCharacteristicOptions('Servicio de aseo').map((option) => (
-                        <DropdownOption key={option} value={option}>{option}</DropdownOption>
+                    {housingCharacteristicOptions('Servicio de aseo').map((option, index) => (
+                        <DropdownOption key={option} value={index}>{option}</DropdownOption>
                     ))}
                 </TitleDropdown>
             </div>
 
-            {/* Servicios basicos */}
             <div className="col-span-3">
                 <div className="flex flex-col gap-2">
                     <header>
