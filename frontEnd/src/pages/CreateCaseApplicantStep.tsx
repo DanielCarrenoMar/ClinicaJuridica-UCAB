@@ -263,7 +263,7 @@ function CreateCaseApplicantStep() {
                         label="Cédula"
                         value={applicantModel.identityCard}
                         onChange={handleIdentityCardChange}
-                        placeholder="V-12345678"
+                        
                         disabled={isFieldDisabled('identityCard')}
                     />
                 </div>
@@ -272,7 +272,7 @@ function CreateCaseApplicantStep() {
                         label="Nombre y apellido"
                         value={applicantModel.fullName}
                         onChange={(text) => { updateApplicantModel({ fullName: text }); }}
-                        placeholder="Juan Perez"
+                        
                         disabled={isFieldDisabled('fullName')}
                     />
                 </div>
@@ -315,7 +315,7 @@ function CreateCaseApplicantStep() {
                     label="Teléfono local*"
                     value={applicantModel.homePhone}
                     onChange={(text) => { updateApplicantModel({ homePhone: text }); }}
-                    placeholder="0212-1234567"
+                    
                     disabled={isFieldDisabled('homePhone')}
                 />
             </div>
@@ -324,7 +324,7 @@ function CreateCaseApplicantStep() {
                     label="Teléfono celular*"
                     value={applicantModel.cellPhone}
                     onChange={(text) => { updateApplicantModel({ cellPhone: text }); }}
-                    placeholder="0414-1234567"
+                    
                     disabled={isFieldDisabled('cellPhone')}
                 />
             </div>
@@ -333,7 +333,7 @@ function CreateCaseApplicantStep() {
                     label="Correo electrónico*"
                     value={applicantModel.email}
                     onChange={(text) => { updateApplicantModel({ email: text }); }}
-                    placeholder="ejemplo@correo.com"
+                    
                     disabled={isFieldDisabled('email')}
                 />
             </div>
@@ -492,7 +492,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ bedroomCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    placeholder=""
+                    
                     disabled={isFieldDisabled('bedroomCount')}
                 />
             </div>
@@ -504,7 +504,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ bathroomCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    placeholder=""
+                    
                     disabled={isFieldDisabled('bathroomCount')}
                 />
             </div>
@@ -614,7 +614,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ memberCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    placeholder=""
+                    
                     disabled={isFieldDisabled('memberCount')}
                 />
             </div>
@@ -626,7 +626,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ workingMemberCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    placeholder=""
+                    
                     disabled={isFieldDisabled('workingMemberCount')}
                 />
             </div>
@@ -641,7 +641,7 @@ function CreateCaseApplicantStep() {
                             const num = Number(text);
                             updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
                         }}
-                        placeholder=""
+                        
                         disabled={isFieldDisabled('children7to12Count')}
                     />
                 </div>
@@ -653,7 +653,7 @@ function CreateCaseApplicantStep() {
                             const num = Number(text);
                             updateApplicantModel({ studentChildrenCount: Number.isNaN(num) ? undefined : num });
                         }}
-                        placeholder=""
+                        
                         disabled={isFieldDisabled('studentChildrenCount')}
                     />
                 </div>
@@ -665,7 +665,7 @@ function CreateCaseApplicantStep() {
                     label="Ingresos mensuales del hogar*"
                     value={applicantModel.monthlyIncome ?? ""}
                     onChange={(text) => { updateApplicantModel({ monthlyIncome: text }); }}
-                    placeholder=""
+                    
                     disabled={isFieldDisabled('monthlyIncome')}
                 />
             </div>
