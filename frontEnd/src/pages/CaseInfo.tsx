@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { useGetBeneficiariesByCaseId, useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetBeneficiariesToCase, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
@@ -463,7 +463,7 @@ export default function CaseInfo() {
                     <h4 className="text-label-small mb-2">Solicitante</h4>
                     <span className="flex items-center gap-3">
                         <User />
-                        <p className="text-body-medium">{caseData.applicantName}</p>
+                        <Link to={`/solicitante/${caseData.applicantId}`} className="text-body-medium hover:underline">{caseData.applicantName}</Link>
                     </span>
                 </article>
 
