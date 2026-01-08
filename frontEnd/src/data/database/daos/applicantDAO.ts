@@ -17,8 +17,16 @@ export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type'> {
 	memberCount?: number;
 	workingMemberCount?: number;
 	children7to12Count?: number;
+	servicesIdAvailable?: number[];
 	studentChildrenCount?: number;
 	monthlyIncome?: string;
 	bathroomCount?: number;
 	bedroomCount?: number;
+	houseType?: number;
+	floorMaterial?: number;
+	wallMaterial?: number;
+	roofMaterial?: number;
+	potableWaterService?: number;
+	sewageService?: number;
+	cleaningService?: number;
 }
