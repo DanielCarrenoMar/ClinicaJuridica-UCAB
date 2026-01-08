@@ -36,7 +36,7 @@ function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): nu
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
-    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting, isManualEditEnabled, caseBeneficiaries, setCaseBeneficiaries } = useCaseOutletContext();
+    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting, caseBeneficiaries, setCaseBeneficiaries } = useCaseOutletContext();
     const { createCase, loading: createCaseLoading } = useCreateCase();
     const { createApplicant, loading: createApplicantLoading } = useCreateApplicant();
     const { updateApplicant, loading: updateApplicantLoading } = useUpdateApplicant();
@@ -51,9 +51,7 @@ function CreateCaseCaseStep() {
     async function handleCreateCase() {
         try {
             if (isApplicantExisting) {
-                if (isManualEditEnabled) {
-                    await updateApplicant(applicantModel.identityCard, applicantModel);
-                }
+                await updateApplicant(applicantModel.identityCard, applicantModel);
             } else {
                 const created = await createApplicant(applicantModel as any);
                 if (!created) {

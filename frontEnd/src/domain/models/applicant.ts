@@ -13,7 +13,7 @@ export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'>
 	isHeadOfHousehold?: boolean;
 	headEducationLevelId?: number;
 	headStudyTime?: string;
-	applicantEducationLevel?: string;
+	applicantEducationLevel?: number;
 	applicantStudyTime?: string;
 	workConditionId?: number;
 	activityConditionId?: number;
@@ -57,7 +57,7 @@ export function modelToApplicantDao(model: ApplicantModel): ApplicantDAO {
 		servicesIdAvailable,
 		gender,
 		birthDate,
-		...rest} = model;
+		...rest } = model;
 	const daoBase = rest as unknown as Omit<ApplicantDAO, 'gender' | 'maritalStatus' | 'birthDate'>;
 	return {
 		...daoBase,

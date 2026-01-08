@@ -19,8 +19,6 @@ export type CaseOutletContext = {
     updateApplicantModel: (updatedFields: Partial<ApplicantModel>) => void;
     isApplicantExisting: boolean;
     setIsApplicantExisting: Dispatch<SetStateAction<boolean>>;
-    isManualEditEnabled: boolean;
-    setIsManualEditEnabled: Dispatch<SetStateAction<boolean>>;
     dbOriginalData: Partial<ApplicantModel> | null;
     setDbOriginalData: Dispatch<SetStateAction<Partial<ApplicantModel> | null>>;
 };
@@ -34,7 +32,6 @@ function CreateCase() {
     const [caseBeneficiaries, setCaseBeneficiaries] = useState<PersonModel[]>([]);
     const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({ identityCard: '' } as ApplicantModel);
     const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
-    const [isManualEditEnabled, setIsManualEditEnabled] = useState<boolean>(false);
     const [dbOriginalData, setDbOriginalData] = useState<Partial<ApplicantModel> | null>(null);
 
     useEffect(() => {
@@ -65,7 +62,6 @@ function CreateCase() {
                 caseBeneficiaries, setCaseBeneficiaries,
                 applicantModel, setApplicantModel, updateApplicantModel,
                 isApplicantExisting, setIsApplicantExisting,
-                isManualEditEnabled, setIsManualEditEnabled,
                 dbOriginalData, setDbOriginalData
             }} />
             <footer className="h-60"></footer>

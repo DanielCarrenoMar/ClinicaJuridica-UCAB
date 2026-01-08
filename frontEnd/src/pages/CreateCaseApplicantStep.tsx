@@ -6,7 +6,7 @@ import Tabs from "#components/Tabs.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
 import Button from "#components/Button.tsx";
-import { CaretDown, ChevronRight, Close, Edit, Home, Users } from "flowbite-react-icons/outline";
+import { CaretDown, ChevronRight, Close, Home, Users } from "flowbite-react-icons/outline";
 import { CheckCircle, InfoCircle, UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { useCaseOutletContext } from "./CreateCase.tsx";
 import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel } from "#domain/typesModel.ts";
@@ -25,7 +25,6 @@ function CreateCaseApplicantStep() {
     const navigate = useNavigate();
     const {
         applicantModel, updateApplicantModel, setIsApplicantExisting, isApplicantExisting,
-        isManualEditEnabled, setIsManualEditEnabled,
         dbOriginalData, setDbOriginalData,
     } = useCaseOutletContext();
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
@@ -52,13 +51,9 @@ function CreateCaseApplicantStep() {
     const [haveMinDataToNextStep, setHaveMinDataToNextStep] = useState(false);
 
     const isFieldDisabled = (fieldName: keyof ApplicantModel) => {
-        if (!isApplicantExisting || isManualEditEnabled || !dbOriginalData) return false;
+        if (!isApplicantExisting || !dbOriginalData) return false;
         const dbValue = (dbOriginalData as any)[fieldName];
         return dbValue !== undefined && dbValue !== null && dbValue !== "";
-    };
-
-    const handleToggleEdit = () => {
-        setIsManualEditEnabled(!isManualEditEnabled);
     };
 
     const lookupDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,25 +72,29 @@ function CreateCaseApplicantStep() {
         );
 
         if (isApplicantExisting && dbOriginalData) {
-            if (isManualEditEnabled) return true;
-
             // Detectar si campos que estaban vacíos en la BD ahora tienen información
             const relevantFields: (keyof ApplicantModel)[] = [
                 'email', 'cellPhone', 'homePhone', 'maritalStatus',
-                'isConcubine', 'idState', 'municipalityName', 'parishName'
+                'isConcubine', 'idState', 'municipalityName', 'parishName',
+                'applicantEducationLevel', 'workConditionId', 'activityConditionId',
+                'houseType', 'floorMaterial', 'wallMaterial', 'roofMaterial',
+                'potableWaterService', 'sewageService', 'cleaningService',
+                'servicesIdAvailable', 'memberCount', 'workingMemberCount',
+                'children7to12Count', 'studentChildrenCount', 'monthlyIncome',
+                'isHeadOfHousehold', 'headEducationLevelId', 'bedroomCount', 'bathroomCount'
             ];
 
             return relevantFields.some(field => {
                 const current = applicantModel[field];
                 const original = (dbOriginalData as any)[field];
-                const isEmpty = (val: any) => val === undefined || val === null || val === "";
+                const isEmptyValue = (val: any) => val === undefined || val === null || val === "";
 
-                return isEmpty(original) && !isEmpty(current);
+                return isEmptyValue(original) && !isEmptyValue(current);
             });
         }
 
         return hasDataEntered;
-    }, [applicantModel, isApplicantExisting, isManualEditEnabled, dbOriginalData]);
+    }, [applicantModel, isApplicantExisting, dbOriginalData]);
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -125,7 +124,7 @@ function CreateCaseApplicantStep() {
 
     const sanitizedIdentityCard = applicantModel.identityCard.trim();
     const shouldShowAutoFillToast = showAutoFillToast && Boolean(foundApplicant);
-    const toastApplicantName = foundApplicant?.fullName ?? foundApplicant?.fullName ?? "el registro existente";
+    const toastApplicantName = foundApplicant?.fullName ?? "el registro existente";
     const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
     const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
 
@@ -214,7 +213,6 @@ function CreateCaseApplicantStep() {
         }
 
         setDbOriginalData({ ...foundApplicant });
-        setIsManualEditEnabled(false);
 
         const normalizedBirthDate = foundApplicant.birthDate instanceof Date
             ? foundApplicant.birthDate
@@ -263,7 +261,7 @@ function CreateCaseApplicantStep() {
                         label="Cédula"
                         value={applicantModel.identityCard}
                         onChange={handleIdentityCardChange}
-                        
+
                         disabled={isFieldDisabled('identityCard')}
                     />
                 </div>
@@ -272,7 +270,7 @@ function CreateCaseApplicantStep() {
                         label="Nombre y apellido"
                         value={applicantModel.fullName}
                         onChange={(text) => { updateApplicantModel({ fullName: text }); }}
-                        
+
                         disabled={isFieldDisabled('fullName')}
                     />
                 </div>
@@ -315,7 +313,7 @@ function CreateCaseApplicantStep() {
                     label="Teléfono local*"
                     value={applicantModel.homePhone}
                     onChange={(text) => { updateApplicantModel({ homePhone: text }); }}
-                    
+
                     disabled={isFieldDisabled('homePhone')}
                 />
             </div>
@@ -324,7 +322,7 @@ function CreateCaseApplicantStep() {
                     label="Teléfono celular*"
                     value={applicantModel.cellPhone}
                     onChange={(text) => { updateApplicantModel({ cellPhone: text }); }}
-                    
+
                     disabled={isFieldDisabled('cellPhone')}
                 />
             </div>
@@ -333,7 +331,7 @@ function CreateCaseApplicantStep() {
                     label="Correo electrónico*"
                     value={applicantModel.email}
                     onChange={(text) => { updateApplicantModel({ email: text }); }}
-                    
+
                     disabled={isFieldDisabled('email')}
                 />
             </div>
@@ -394,36 +392,36 @@ function CreateCaseApplicantStep() {
             </div>
 
             {/* Estadubinato */}
-                <div className="col-span-1">
-                    <TitleDropdown
-                        label="Estado Civil*"
-                        selectedValue={applicantModel.maritalStatus || undefined}
-                        onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
-                        disabled={isFieldDisabled('maritalStatus')}
-                    >
-                        <DropdownOption value="Soltero">Soltero/a</DropdownOption>
-                        <DropdownOption value="Casado">Casado/a</DropdownOption>
-                        <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
-                        <DropdownOption value="Viudo">Viudo/a</DropdownOption>
-                    </TitleDropdown>
-                </div>
-                <div className="col-span-2">
-                    <TitleDropdown
-                        label="Concubinato*"
-                        selectedValue={applicantModel.isConcubine !== undefined ? (applicantModel.isConcubine ? 1 : 0) : undefined}
-                        onSelectionChange={(value) => { updateApplicantModel({ isConcubine: (value as number) === 1 }); }}
-                        disabled={isFieldDisabled('isConcubine')}
-                    >
-                        <DropdownOption value={1}>Si</DropdownOption>
-                        <DropdownOption value={0}>No</DropdownOption>
-                    </TitleDropdown>
-                </div>
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Estado Civil*"
+                    selectedValue={applicantModel.maritalStatus || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
+                    disabled={isFieldDisabled('maritalStatus')}
+                >
+                    <DropdownOption value="Soltero">Soltero/a</DropdownOption>
+                    <DropdownOption value="Casado">Casado/a</DropdownOption>
+                    <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
+                    <DropdownOption value="Viudo">Viudo/a</DropdownOption>
+                </TitleDropdown>
+            </div>
+            <div className="col-span-2">
+                <TitleDropdown
+                    label="Concubinato*"
+                    selectedValue={applicantModel.isConcubine !== undefined ? (applicantModel.isConcubine ? 1 : 0) : undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ isConcubine: (value as number) === 1 }); }}
+                    disabled={isFieldDisabled('isConcubine')}
+                >
+                    <DropdownOption value={1}>Si</DropdownOption>
+                    <DropdownOption value={0}>No</DropdownOption>
+                </TitleDropdown>
+            </div>
 
             <div className="col-span-3">
                 <TitleDropdown
                     label="Educación alcanzada*"
                     selectedValue={applicantModel.applicantEducationLevel || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as string }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as number }); }}
                     disabled={isFieldDisabled('applicantEducationLevel')}
                 >
                     {educationLevelData.map((level, index) => (
@@ -462,13 +460,6 @@ function CreateCaseApplicantStep() {
     const housingCharacteristicOptions = (characteristicName: string) =>
         characteristicsData.find((c) => c.name === characteristicName)?.options ?? [];
 
-    const isHouseOnlyFieldDisabled = isApplicantExisting && !isManualEditEnabled;
-
-    const nonWorkingMemberCount =
-        typeof applicantModel.memberCount === "number" && typeof applicantModel.workingMemberCount === "number"
-            ? Math.max(applicantModel.memberCount - applicantModel.workingMemberCount, 0)
-            : undefined;
-
     const houseInputs = (
         <>
             {/* Tipo de vivienda | habitaciones para dormir | baños */}
@@ -476,8 +467,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Tipo de vivienda*"
                     selectedValue={applicantModel.houseType}
-                    onSelectionChange={(value) => { updateApplicantModel({ houseType: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ houseType: value as number }); }}
+                    disabled={isFieldDisabled('houseType')}
                 >
                     {housingCharacteristicOptions('Tipo de Vivienda').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -492,7 +483,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ bedroomCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    
+
                     disabled={isFieldDisabled('bedroomCount')}
                 />
             </div>
@@ -504,7 +495,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ bathroomCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    
+
                     disabled={isFieldDisabled('bathroomCount')}
                 />
             </div>
@@ -514,8 +505,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Material de piso*"
                     selectedValue={applicantModel.floorMaterial}
-                    onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as number }); }}
+                    disabled={isFieldDisabled('floorMaterial')}
                 >
                     {housingCharacteristicOptions('Material del piso').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -526,8 +517,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Material de paredes*"
                     selectedValue={applicantModel.wallMaterial}
-                    onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as number }); }}
+                    disabled={isFieldDisabled('wallMaterial')}
                 >
                     {housingCharacteristicOptions('Material de las paredes').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -538,8 +529,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Material de techo*"
                     selectedValue={applicantModel.roofMaterial}
-                    onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as number }); }}
+                    disabled={isFieldDisabled('roofMaterial')}
                 >
                     {housingCharacteristicOptions('Material del techo').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -551,8 +542,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Servicio de agua potable*"
                     selectedValue={applicantModel.potableWaterService}
-                    onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as number }); }}
+                    disabled={isFieldDisabled('potableWaterService')}
                 >
                     {housingCharacteristicOptions('Servicio de agua potable').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -563,8 +554,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Aguas negras*"
                     selectedValue={applicantModel.sewageService}
-                    onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as number }); }}
+                    disabled={isFieldDisabled('sewageService')}
                 >
                     {housingCharacteristicOptions('Eliminacion de excretas (aguas negras)').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -575,8 +566,8 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Servicio de aseo*"
                     selectedValue={applicantModel.cleaningService}
-                    onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as number}); }}
-                    disabled={isHouseOnlyFieldDisabled}
+                    onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as number }); }}
+                    disabled={isFieldDisabled('cleaningService')}
                 >
                     {housingCharacteristicOptions('Servicio de aseo').map((option, index) => (
                         <DropdownOption key={option} value={index}>{option}</DropdownOption>
@@ -589,16 +580,16 @@ function CreateCaseApplicantStep() {
                     <header>
                         <h4 className="text-body-large ">Servicios básicos*</h4>
                     </header>
-                <DropdownCheck
-                    label="Servicios basicos*"
-                    selectedValues={applicantModel.servicesIdAvailable ?? []}
-                    onSelectionChange={(values) => { updateApplicantModel({ servicesIdAvailable: values as number[] }); }}
-                    disabled={isFieldDisabled('servicesIdAvailable')}
+                    <DropdownCheck
+                        label="Servicios basicos*"
+                        selectedValues={applicantModel.servicesIdAvailable ?? []}
+                        onSelectionChange={(values) => { updateApplicantModel({ servicesIdAvailable: values as number[] }); }}
+                        disabled={isFieldDisabled('servicesIdAvailable')}
                     >
-                    {servicesData.map((service) => (
-                        <DropdownOptionCheck key={service.id} value={service.id}>{service.name}</DropdownOptionCheck>
-                    ))}
-                </DropdownCheck>
+                        {servicesData.map((service) => (
+                            <DropdownOptionCheck key={service.id} value={service.id}>{service.name}</DropdownOptionCheck>
+                        ))}
+                    </DropdownCheck>
                 </div>
             </div>
         </>
@@ -614,7 +605,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ memberCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    
+
                     disabled={isFieldDisabled('memberCount')}
                 />
             </div>
@@ -626,7 +617,7 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ workingMemberCount: Number.isNaN(num) ? undefined : num });
                     }}
-                    
+
                     disabled={isFieldDisabled('workingMemberCount')}
                 />
             </div>
@@ -641,7 +632,7 @@ function CreateCaseApplicantStep() {
                             const num = Number(text);
                             updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
                         }}
-                        
+
                         disabled={isFieldDisabled('children7to12Count')}
                     />
                 </div>
@@ -653,7 +644,7 @@ function CreateCaseApplicantStep() {
                             const num = Number(text);
                             updateApplicantModel({ studentChildrenCount: Number.isNaN(num) ? undefined : num });
                         }}
-                        
+
                         disabled={isFieldDisabled('studentChildrenCount')}
                     />
                 </div>
@@ -665,7 +656,7 @@ function CreateCaseApplicantStep() {
                     label="Ingresos mensuales del hogar*"
                     value={applicantModel.monthlyIncome ?? ""}
                     onChange={(text) => { updateApplicantModel({ monthlyIncome: text }); }}
-                    
+
                     disabled={isFieldDisabled('monthlyIncome')}
                 />
             </div>
@@ -688,7 +679,7 @@ function CreateCaseApplicantStep() {
                         label="Educación alcanzada por jefe del hogar*"
                         selectedValue={applicantModel.headEducationLevelId || undefined}
                         onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
-                        disabled={isFieldDisabled('headEducationLevelId') || !applicantModel.isHeadOfHousehold || applicantModel.isHeadOfHousehold === true}
+                        disabled={isFieldDisabled('headEducationLevelId') || applicantModel.isHeadOfHousehold !== false}
                     >
                         {educationLevelData.map((level, index) => (
                             <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
@@ -720,16 +711,6 @@ function CreateCaseApplicantStep() {
             </section>
             <section className="px-4 pb-6">
                 <header className="flex justify-between items-center w-full mb-6">
-                    {isApplicantExisting && (
-                        <Button
-                            onClick={handleToggleEdit}
-                            variant="outlined"
-                            icon={<Edit className="size-4" />}
-                            className="h-10 text-primary border-primary hover:bg-primary/10"
-                        >
-                            Editar información
-                        </Button>
-                    )}
                 </header>
                 <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
                     {activeSection === "identificacion" && identificationInputs}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Fuse from "fuse.js";
 import Dialog from "./Dialog";
 import SearchBar from "#components/SearchBar.tsx";
@@ -12,6 +12,7 @@ interface UserSearchDialogProps {
   onSelect?: (user: PersonModel) => void;
   title?: string;
   placeholder?: string;
+  headerItems?: ReactNode;
 }
 
 export default function PersonSearchDialog({
@@ -21,6 +22,7 @@ export default function PersonSearchDialog({
   onSelect,
   title = "Buscar usuario",
   placeholder = "Buscar por nombre o cédula...",
+  headerItems,
 }: UserSearchDialogProps) {
   const [query, setQuery] = useState("");
 
@@ -64,6 +66,7 @@ export default function PersonSearchDialog({
       open={open}
       title={title}
       onClose={onClose}
+      headerItems={headerItems}
     >
       <SearchBar
         variant="outline"
