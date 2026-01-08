@@ -54,7 +54,8 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
         legalAreaName,
         problemSummary,
         lastActionDate,
-        lastActionDescription
+        lastActionDescription,
+        courtName
     } = caseData;
 
     const navigate = useNavigate();
@@ -71,9 +72,14 @@ export default function CaseCard({ caseData, matches }: CaseCardProps) {
                 <h4 className="text-body-medium ">
                     {highlightText(compoundKey, matches?.compoundKey)}
                 </h4>
-                <h5 className="text-body-small">
-                    {formattedDate}
-                </h5>
+                <span className="flex gap-4 items-end">
+                    {courtName && <h5 className="text-body-small">
+                        En tribunal <strong className="text-body-medium">{courtName}</strong>
+                    </h5>}
+                    <h5 className="text-body-small">
+                        {formattedDate}
+                    </h5>
+                </span>
             </header>
             <div className="flex gap-2.5 items-start relative text-body-small w-full px-4 py-2">
                 <div className="flex flex-col gap-1 justify-center w-50">
