@@ -53,3 +53,30 @@ export function useCreateApplicant() {
         error
     };
 }
+
+export function useUpdateApplicant() {
+    const { updateApplicant } = getApplicantRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const updateApplicantData = async (id: string, data: Partial<ApplicantModel>): Promise<ApplicantModel | null> => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const applicant = await updateApplicant(id, data);
+            return applicant;
+        } catch (err) {
+            setError(err as Error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        updateApplicant: updateApplicantData,
+        loading,
+        error
+    };
+}

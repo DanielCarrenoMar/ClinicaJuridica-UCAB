@@ -15,6 +15,7 @@ import Config from '#pages/Config.tsx';
 import SearchCases from '#pages/SearchCases.tsx';
 import LateralMenuLayer from '#layers/LateralMenuLayer.tsx';
 import CaseInfo from '#pages/CaseInfo.tsx';
+import ApplicantInfo from '#pages/ApplicantInfo.tsx';
 import Login from '#pages/Login.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
@@ -49,6 +50,7 @@ createRoot(document.getElementById('root')!).render(
 
             <Route path="/busqueda" element={<SearchCases />} />
             <Route path="/caso/:id" element={<CaseInfo />} />
+            <Route path="/solicitante/:id" element={<ApplicantInfo />} />
           </Route>
         </Route>
       </Routes>
