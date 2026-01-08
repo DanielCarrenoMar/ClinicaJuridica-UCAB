@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clipboard, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, User, UsersGroup } from "flowbite-react-icons/outline";
+import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clipboard, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, UsersGroup } from "flowbite-react-icons/outline";
+import { User } from "flowbite-react-icons/solid";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
