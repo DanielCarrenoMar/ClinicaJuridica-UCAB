@@ -27,7 +27,6 @@ function CreateCaseApplicantStep() {
         applicantModel, updateApplicantModel, setIsApplicantExisting, isApplicantExisting,
         isManualEditEnabled, setIsManualEditEnabled,
         dbOriginalData, setDbOriginalData,
-        setApplicantModel
     } = useCaseOutletContext();
     const { getApplicantOrBeneficiaryById, loading: loadingApplicantOrBeneficiary } = useGetApplicantOrBeneficiaryById();
     const [identityCardInput, setIdentityCardInput] = useState(applicantModel.identityCard);
@@ -258,34 +257,29 @@ function CreateCaseApplicantStep() {
 
     const identificationInputs = (
         <>
-            <div className="col-span-5">
-                <TitleTextInput
-                    label="Cedula"
-                    value={applicantModel.identityCard}
-                    onChange={handleIdentityCardChange}
-                    placeholder="V-12345678"
-                    disabled={isFieldDisabled('identityCard')}
-                />
-            </div>
-            <div className="col-span-7">
-                <TitleTextInput
-                    label="Nombres y Apellidos"
-                    value={applicantModel.fullName}
-                    onChange={(text) => { updateApplicantModel({ fullName: text }); }}
-                    placeholder="Juan Perez"
-                    disabled={isFieldDisabled('fullName')}
-                />
+            {/* Nombre y apellido | Cedula */}
+            <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
+                <div>
+                    <TitleTextInput
+                        label="Nombre y apellido"
+                        value={applicantModel.fullName}
+                        onChange={(text) => { updateApplicantModel({ fullName: text }); }}
+                        placeholder="Juan Perez"
+                        disabled={isFieldDisabled('fullName')}
+                    />
+                </div>
+                <div>
+                    <TitleTextInput
+                        label="Cédula"
+                        value={applicantModel.identityCard}
+                        onChange={handleIdentityCardChange}
+                        placeholder="V-12345678"
+                        disabled={isFieldDisabled('identityCard')}
+                    />
+                </div>
             </div>
 
-            <div className="col-span-3">
-                <DatePicker
-                    label="Fecha Nacimiento"
-                    value={applicantModel.birthDate ? applicantModel.birthDate.toISOString().split('T')[0] : undefined}
-                    onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
-                    disabled={isFieldDisabled('birthDate')}
-                />
-            </div>
-            <div className="col-span-2">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Sexo"
                     selectedValue={applicantModel.gender || undefined}
@@ -296,7 +290,15 @@ function CreateCaseApplicantStep() {
                     <DropdownOption value="Femenino">Femenino</DropdownOption>
                 </TitleDropdown>
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1">
+                <DatePicker
+                    label="Fecha Nacimiento"
+                    value={applicantModel.birthDate ? applicantModel.birthDate.toISOString().split('T')[0] : undefined}
+                    onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
+                    disabled={isFieldDisabled('birthDate')}
+                />
+            </div>
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Nacionalidad"
                     selectedValue={applicantModel.idNationality || undefined}
@@ -308,52 +310,28 @@ function CreateCaseApplicantStep() {
                     <DropdownOption value="J">Juridica</DropdownOption>
                 </TitleDropdown>
             </div>
-            <div className="col-span-2">
-                <TitleDropdown
-                    label="Estado Civil*"
-                    selectedValue={applicantModel.maritalStatus || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
-                    disabled={isFieldDisabled('maritalStatus')}
-                >
-                    <DropdownOption value="Soltero">Soltero/a</DropdownOption>
-                    <DropdownOption value="Casado">Casado/a</DropdownOption>
-                    <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
-                    <DropdownOption value="Viudo">Viudo/a</DropdownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-2">
-                <TitleDropdown
-                    label="Concubinato*"
-                    selectedValue={applicantModel.isConcubine !== undefined ? (applicantModel.isConcubine ? 1 : 0) : undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ isConcubine: (value as number) === 1 }); }}
-                    disabled={isFieldDisabled('isConcubine')}
-                >
-                    <DropdownOption value={1}>Si</DropdownOption>
-                    <DropdownOption value={0}>No</DropdownOption>
-                </TitleDropdown>
-            </div>
 
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleTextInput
-                    label="Telefono Local*"
+                    label="Teléfono local*"
                     value={applicantModel.homePhone}
                     onChange={(text) => { updateApplicantModel({ homePhone: text }); }}
                     placeholder="0212-1234567"
                     disabled={isFieldDisabled('homePhone')}
                 />
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleTextInput
-                    label="Telefono Celular*"
+                    label="Teléfono celular*"
                     value={applicantModel.cellPhone}
                     onChange={(text) => { updateApplicantModel({ cellPhone: text }); }}
                     placeholder="0414-1234567"
                     disabled={isFieldDisabled('cellPhone')}
                 />
             </div>
-            <div className="col-span-6">
+            <div className="col-span-1">
                 <TitleTextInput
-                    label="Correo Electronico*"
+                    label="Correo electrónico*"
                     value={applicantModel.email}
                     onChange={(text) => { updateApplicantModel({ email: text }); }}
                     placeholder="ejemplo@correo.com"
@@ -361,57 +339,7 @@ function CreateCaseApplicantStep() {
                 />
             </div>
 
-            <div className="col-span-4">
-                <TitleTextInput
-                    label="Periodo Educativo*"
-                    value={applicantModel.applicantStudyTime}
-                    onChange={(text) => { updateApplicantModel({ applicantStudyTime: text }); }}
-                    placeholder="2024-2025"
-                    disabled={isFieldDisabled('applicantStudyTime')}
-                />
-            </div>
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Nivel de educacion*"
-                    selectedValue={applicantModel.applicantEducationLevel || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as string }); }}
-                    disabled={isFieldDisabled('applicantEducationLevel')}
-                >
-                    {educationLevelData.map((level, index) => (
-                        <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Condicion de Trabajo*"
-                    selectedValue={applicantModel.workConditionId || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number }); }}
-                    disabled={isFieldDisabled('workConditionId')}
-                >
-                    {workConditionData.map((condition, index) => (
-                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
-            <div className="col-span-4">
-                <TitleDropdown
-                    label="Condicion de Actividad*"
-                    selectedValue={applicantModel.activityConditionId || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number }); }}
-                    disabled={isFieldDisabled('activityConditionId')}
-                >
-                    {activityConditionData.map((condition, index) => (
-                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
-        </>
-    );
-
-    const houseInputs = (
-        <>
-            <div className="col-span-4">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Estado*"
                     selectedValue={stateIndex !== null ? stateIndex : undefined}
@@ -432,7 +360,7 @@ function CreateCaseApplicantStep() {
                     ))}
                 </TitleDropdown>
             </div>
-            <div className="col-span-4">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Municipio*"
                     selectedValue={munIndex !== null ? munIndex : undefined}
@@ -451,7 +379,7 @@ function CreateCaseApplicantStep() {
                     ))}
                 </TitleDropdown>
             </div>
-            <div className="col-span-4">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Parroquia*"
                     selectedValue={applicantModel.parishName || undefined}
@@ -465,7 +393,76 @@ function CreateCaseApplicantStep() {
                     ))}
                 </TitleDropdown>
             </div>
-            <div className="col-span-6">
+
+            {/* Estado Civil | concubinato */}
+                <div className="col-span-1">
+                    <TitleDropdown
+                        label="Estado Civil*"
+                        selectedValue={applicantModel.maritalStatus || undefined}
+                        onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
+                        disabled={isFieldDisabled('maritalStatus')}
+                    >
+                        <DropdownOption value="Soltero">Soltero/a</DropdownOption>
+                        <DropdownOption value="Casado">Casado/a</DropdownOption>
+                        <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
+                        <DropdownOption value="Viudo">Viudo/a</DropdownOption>
+                    </TitleDropdown>
+                </div>
+                <div className="col-span-2">
+                    <TitleDropdown
+                        label="Concubinato*"
+                        selectedValue={applicantModel.isConcubine !== undefined ? (applicantModel.isConcubine ? 1 : 0) : undefined}
+                        onSelectionChange={(value) => { updateApplicantModel({ isConcubine: (value as number) === 1 }); }}
+                        disabled={isFieldDisabled('isConcubine')}
+                    >
+                        <DropdownOption value={1}>Si</DropdownOption>
+                        <DropdownOption value={0}>No</DropdownOption>
+                    </TitleDropdown>
+                </div>
+
+            <div className="col-span-3">
+                <TitleDropdown
+                    label="Educación alcanzada*"
+                    selectedValue={applicantModel.applicantEducationLevel || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as string }); }}
+                    disabled={isFieldDisabled('applicantEducationLevel')}
+                >
+                    {educationLevelData.map((level, index) => (
+                        <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+
+            <div className="col-span-1">
+                <TitleDropdown
+                    label="Condición Trabajo*"
+                    selectedValue={applicantModel.workConditionId || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number }); }}
+                    disabled={isFieldDisabled('workConditionId')}
+                >
+                    {workConditionData.map((condition, index) => (
+                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+            <div className="col-span-2">
+                <TitleDropdown
+                    label="Condición Actividad*"
+                    selectedValue={applicantModel.activityConditionId || undefined}
+                    onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number }); }}
+                    disabled={isFieldDisabled('activityConditionId')}
+                >
+                    {activityConditionData.map((condition, index) => (
+                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
+                    ))}
+                </TitleDropdown>
+            </div>
+        </>
+    );
+
+    const houseInputs = (
+        <>
+            <div className="col-span-3">
                 <DropdownCheck
                     label="Servicios basicos*"
                     selectedValues={applicantModel.servicesIdAvailable ?? []}
@@ -482,7 +479,7 @@ function CreateCaseApplicantStep() {
 
     const familyInputs = (
         <>
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Jefe de hogar*"
                     selectedValue={(applicantModel.isHeadOfHousehold ?? false).toString()}
@@ -493,7 +490,7 @@ function CreateCaseApplicantStep() {
                     <DropdownOption value="false">No</DropdownOption>
                 </TitleDropdown>
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Nivel educativo jefe*"
                     selectedValue={applicantModel.headEducationLevelId || undefined}
@@ -505,7 +502,7 @@ function CreateCaseApplicantStep() {
                     ))}
                 </TitleDropdown>
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleTextInput
                     label="Periodo educativo jefe*"
                     value={applicantModel.headStudyTime ?? ""}
@@ -514,7 +511,7 @@ function CreateCaseApplicantStep() {
                     disabled={isFieldDisabled('headStudyTime')}
                 />
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleTextInput
                     label="Integrantes del hogar que trabajan*"
                     value={applicantModel.workingMemberCount?.toString() ?? ""}
@@ -527,7 +524,7 @@ function CreateCaseApplicantStep() {
                 />
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleTextInput
                     label="Ninos entre 7 y 12 años en el hogar*"
                     value={applicantModel.children7to12Count?.toString() ?? ""}
@@ -539,7 +536,7 @@ function CreateCaseApplicantStep() {
                     disabled={isFieldDisabled('children7to12Count')}
                 />
             </div>
-            <div className="col-span-4">
+            <div className="col-span-1">
                 <TitleTextInput
                     label="Ingreso mensual del hogar*"
                     value={applicantModel.monthlyIncome ?? ""}
@@ -586,7 +583,7 @@ function CreateCaseApplicantStep() {
                         </Button>
                     )}
                 </header>
-                <div className="grid grid-cols-12 gap-x-6 gap-y-6">
+                <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
                     {activeSection === "identificacion" && identificationInputs}
                     {activeSection === "vivienda" && houseInputs}
                     {activeSection === "familia" && familyInputs}
