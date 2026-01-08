@@ -257,17 +257,7 @@ function CreateCaseApplicantStep() {
 
     const identificationInputs = (
         <>
-            {/* Nombre y apellido | Cedula */}
             <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
-                <div>
-                    <TitleTextInput
-                        label="Nombre y apellido"
-                        value={applicantModel.fullName}
-                        onChange={(text) => { updateApplicantModel({ fullName: text }); }}
-                        placeholder="Juan Perez"
-                        disabled={isFieldDisabled('fullName')}
-                    />
-                </div>
                 <div>
                     <TitleTextInput
                         label="Cédula"
@@ -275,6 +265,15 @@ function CreateCaseApplicantStep() {
                         onChange={handleIdentityCardChange}
                         placeholder="V-12345678"
                         disabled={isFieldDisabled('identityCard')}
+                    />
+                </div>
+                <div>
+                    <TitleTextInput
+                        label="Nombre y apellido"
+                        value={applicantModel.fullName}
+                        onChange={(text) => { updateApplicantModel({ fullName: text }); }}
+                        placeholder="Juan Perez"
+                        disabled={isFieldDisabled('fullName')}
                     />
                 </div>
             </div>
