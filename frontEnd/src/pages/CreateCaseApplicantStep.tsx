@@ -465,6 +465,11 @@ function CreateCaseApplicantStep() {
 
     const isHouseOnlyFieldDisabled = isApplicantExisting && !isManualEditEnabled;
 
+    const nonWorkingMemberCount =
+        typeof applicantModel.memberCount === "number" && typeof applicantModel.workingMemberCount === "number"
+            ? Math.max(applicantModel.memberCount - applicantModel.workingMemberCount, 0)
+            : undefined;
+
     const houseInputs = (
         <>
             {/* Tipo de vivienda | habitaciones para dormir | baños */}
@@ -605,40 +610,20 @@ function CreateCaseApplicantStep() {
     const familyInputs = (
         <>
             <div className="col-span-1">
-                <TitleDropdown
-                    label="Jefe de hogar*"
-                    selectedValue={(applicantModel.isHeadOfHousehold ?? false).toString()}
-                    onSelectionChange={(value) => { updateApplicantModel({ isHeadOfHousehold: value === "true" }); }}
-                    disabled={isFieldDisabled('isHeadOfHousehold')}
-                >
-                    <DropdownOption value="true">Si</DropdownOption>
-                    <DropdownOption value="false">No</DropdownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-1">
-                <TitleDropdown
-                    label="Nivel educativo jefe*"
-                    selectedValue={applicantModel.headEducationLevelId || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
-                    disabled={isFieldDisabled('headEducationLevelId')}
-                >
-                    {educationLevelData.map((level, index) => (
-                        <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
-            <div className="col-span-1">
                 <TitleTextInput
-                    label="Periodo educativo jefe*"
-                    value={applicantModel.headStudyTime ?? ""}
-                    onChange={(text) => { updateApplicantModel({ headStudyTime: text }); }}
-                    placeholder="2024-2025"
-                    disabled={isFieldDisabled('headStudyTime')}
+                    label="Personas que viven en la vivienda*"
+                    value={applicantModel.memberCount?.toString() ?? ""}
+                    onChange={(text) => {
+                        const num = Number(text);
+                        updateApplicantModel({ memberCount: Number.isNaN(num) ? undefined : num });
+                    }}
+                    placeholder=""
+                    disabled={isFieldDisabled('memberCount')}
                 />
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Integrantes del hogar que trabajan*"
+                    label="Personas que trabajan*"
                     value={applicantModel.workingMemberCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -649,26 +634,70 @@ function CreateCaseApplicantStep() {
                 />
             </div>
 
-            <div className="col-span-1">
-                <TitleTextInput
-                    label="Ninos entre 7 y 12 años en el hogar*"
-                    value={applicantModel.children7to12Count?.toString() ?? ""}
-                    onChange={(text) => {
-                        const num = Number(text);
-                        updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
-                    }}
-                    placeholder=""
-                    disabled={isFieldDisabled('children7to12Count')}
-                />
+            {/* Numero de niños entre 7 y 12 años | Cuantos niños estudian */}
+            <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
+                <div>
+                    <TitleTextInput
+                        label="Número de niños entre 7 y 12 años*"
+                        value={applicantModel.children7to12Count?.toString() ?? ""}
+                        onChange={(text) => {
+                            const num = Number(text);
+                            updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
+                        }}
+                        placeholder=""
+                        disabled={isFieldDisabled('children7to12Count')}
+                    />
+                </div>
+                <div>
+                    <TitleTextInput
+                        label="Cuántos niños estudian*"
+                        value={applicantModel.studentChildrenCount?.toString() ?? ""}
+                        onChange={(text) => {
+                            const num = Number(text);
+                            updateApplicantModel({ studentChildrenCount: Number.isNaN(num) ? undefined : num });
+                        }}
+                        placeholder=""
+                        disabled={isFieldDisabled('studentChildrenCount')}
+                    />
+                </div>
             </div>
-            <div className="col-span-1">
+
+            {/* Ingresos mensuales del hogar */}
+            <div className="col-span-3">
                 <TitleTextInput
-                    label="Ingreso mensual del hogar*"
+                    label="Ingresos mensuales del hogar*"
                     value={applicantModel.monthlyIncome ?? ""}
                     onChange={(text) => { updateApplicantModel({ monthlyIncome: text }); }}
                     placeholder=""
                     disabled={isFieldDisabled('monthlyIncome')}
                 />
+            </div>
+
+            {/* Es jefe de hogar | Educación alcanzada por jefe del hogar */}
+            <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
+                <div>
+                    <TitleDropdown
+                        label="Es jefe de hogar*"
+                        selectedValue={(applicantModel.isHeadOfHousehold ?? "").toString()}
+                        onSelectionChange={(value) => { updateApplicantModel({ isHeadOfHousehold: value === "true" }); }}
+                        disabled={isFieldDisabled('isHeadOfHousehold')}
+                    >
+                        <DropdownOption value="true">Si</DropdownOption>
+                        <DropdownOption value="false">No</DropdownOption>
+                    </TitleDropdown>
+                </div>
+                <div>
+                    <TitleDropdown
+                        label="Educación alcanzada por jefe del hogar*"
+                        selectedValue={applicantModel.headEducationLevelId || undefined}
+                        onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
+                        disabled={isFieldDisabled('headEducationLevelId') || !applicantModel.isHeadOfHousehold || applicantModel.isHeadOfHousehold === true}
+                    >
+                        {educationLevelData.map((level, index) => (
+                            <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
+                        ))}
+                    </TitleDropdown>
+                </div>
             </div>
         </>
     );
@@ -694,9 +723,6 @@ function CreateCaseApplicantStep() {
             </section>
             <section className="px-4 pb-6">
                 <header className="flex justify-between items-center w-full mb-6">
-                    <h2 className="text-display-small text-onSurface">
-                        {activeSection === "identificacion" ? "Identificación" : activeSection === "vivienda" ? "Vivienda y Servicios" : "Familia y Hogar"}
-                    </h2>
                     {isApplicantExisting && (
                         <Button
                             onClick={handleToggleEdit}
