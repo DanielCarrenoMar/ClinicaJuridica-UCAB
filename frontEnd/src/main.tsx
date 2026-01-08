@@ -17,12 +17,13 @@ import LateralMenuLayer from '#layers/LateralMenuLayer.tsx';
 import CaseInfo from '#pages/CaseInfo.tsx';
 import ApplicantInfo from '#pages/ApplicantInfo.tsx';
 import Login from '#pages/Login.tsx';
+import ErrorPage from '#pages/ErrorPage.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route>
+    <Route errorElement={<ErrorPage />}>
       <Route path="/login" element={<Login />} />
 
       <Route element={<ProtectedRoute requiredLevel={3} redirectPath="/login" />}>
