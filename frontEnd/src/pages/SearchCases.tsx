@@ -1,4 +1,5 @@
 import CaseCard from "#components/CaseCard.tsx";
+import Button from "#components/Button.tsx";
 import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
 import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Fuse from "fuse.js";
@@ -6,6 +7,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { useGetCases } from "#domain/useCaseHooks/useCase.ts";
 import { useLateralMenuContext } from "#layers/LateralMenuLayer.tsx";
+import { Close } from "flowbite-react-icons/outline";
 
 function SearchCases() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -26,6 +28,12 @@ function SearchCases() {
     const caseTypeFilters = getFilterValues('caseType');
     const courtFilters = getFilterValues('court');
     const termFilters = getFilterValues('term');
+
+    const hasAnyFilters =
+        statusFilters.length > 0 ||
+        caseTypeFilters.length > 0 ||
+        courtFilters.length > 0 ||
+        termFilters.length > 0;
 
     const { cases: realCases, loading, error } = useGetCases();
 
@@ -92,6 +100,15 @@ function SearchCases() {
         setSearchParams(newParams);
     }, [searchParams, setSearchParams]);
 
+    const handleClearFilters = useCallback(() => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('status');
+        newParams.delete('caseType');
+        newParams.delete('court');
+        newParams.delete('term');
+        setSearchParams(newParams);
+    }, [searchParams, setSearchParams]);
+
     return (
         <>
             <div className="mb-3">
@@ -150,6 +167,18 @@ function SearchCases() {
                                 <DropdownOptionCheck value="2024-15">2024-15</DropdownOptionCheck>
                                 <DropdownOptionCheck value="2025-15">2025-15</DropdownOptionCheck>
                             </DropdownCheck>
+                        </li>
+                        <li>
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                icon={<Close />}
+                                className={`h-10 ${hasAnyFilters ? '' : 'hidden'}`}
+                                onClick={handleClearFilters}
+                                disabled={!hasAnyFilters}
+                            >
+                                Borrar filtros
+                            </Button>
                         </li>
                     </ul>
                 </span>
