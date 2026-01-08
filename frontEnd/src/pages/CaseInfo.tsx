@@ -534,8 +534,8 @@ export default function CaseInfo() {
                             title="Buscar Estudiante"
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsStudentSearchDialogOpen(false)}
-                            users={students}
-                            onSelect={(student) => { if (!localCaseStudents.some(s => s.identityCard === student.identityCard)) setLocalStudents((prev) => [...prev, student]); }}
+                            users={students.filter(s => !localCaseStudents.some(ls => ls.identityCard === s.identityCard))}
+                            onSelect={(student) => { setLocalStudents((prev) => [...prev, student]) }}
                         />
 
                         <PersonSearchDialog
@@ -543,7 +543,7 @@ export default function CaseInfo() {
                             title="Buscar Profesor"
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsTeacherSearchDialogOpen(false)}
-                            users={teachers}
+                            users={teachers.filter(t => t.identityCard !== localCaseData?.teacherId)}
                             onSelect={(teacher) => { handleChange({ teacherId: teacher.identityCard }); handleChange({ teacherName: teacher.fullName }); }}
                         />
                     </div>
@@ -586,11 +586,9 @@ export default function CaseInfo() {
                     title="Buscar Beneficiario"
                     placeholder="Buscar por nombre o cédula..."
                     onClose={() => setIsBeneficiarySearchDialogOpen(false)}
-                    users={beneficiaries}
+                    users={beneficiaries.filter(b => !localCaseBeneficiaries.some(lb => lb.identityCard === b.identityCard) && b.identityCard !== caseData.applicantId)}
                     onSelect={(beneficiary) => {
-                        if (!localCaseBeneficiaries.some(b => b.identityCard === beneficiary.identityCard)) {
-                            setLocalBeneficiaries((prev) => [...prev, beneficiary]);
-                        }
+                        setLocalBeneficiaries((prev) => [...prev, beneficiary]);
                     }}
                 />
             </section>
