@@ -23,9 +23,17 @@ interface DropdownCheckProps {
   selectedValues?: (string | number)[]; // Controlled
   onSelectionChange?: (values: (string | number)[]) => void;
   disabled?: boolean;
+  showSelectedCountBadge?: boolean;
 }
 
-export default function DropdownCheck({ label, children, selectedValues, onSelectionChange, disabled = false }: DropdownCheckProps) {
+export default function DropdownCheck({
+  label,
+  children,
+  selectedValues,
+  onSelectionChange,
+  disabled = false,
+  showSelectedCountBadge = false,
+}: DropdownCheckProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValues, setInternalSelectedValues] = useState<(string | number)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -44,7 +52,6 @@ export default function DropdownCheck({ label, children, selectedValues, onSelec
     }
   };
 
-  // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -69,6 +76,18 @@ export default function DropdownCheck({ label, children, selectedValues, onSelec
           <p className="font-['Poppins'] text-[13px] text-onSurface text-nowrap">
             {label}
           </p>
+
+          {showSelectedCountBadge && (
+            <span
+              className={`text-surface text-body-small leading-none rounded-full h-5 min-w-5 px-1 flex items-center justify-center transition-colors duration-200 ${
+                currentSelectedValues.length > 0 ? 'bg-success' : 'bg-onSurface/30 opacity-70'
+              }`}
+              aria-label={`${currentSelectedValues.length} opciones activas`}
+            >
+              {currentSelectedValues.length}
+            </span>
+          )}
+
           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 

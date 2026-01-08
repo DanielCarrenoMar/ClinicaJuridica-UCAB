@@ -100,6 +100,7 @@ function SearchCases() {
                         <li>
                             <DropdownCheck
                                 label="Estatus"
+                                showSelectedCountBadge
                                 selectedValues={getFilterValues('status')}
                                 onSelectionChange={(values) => handleFilterChange('status', values)}
                             >
@@ -112,6 +113,7 @@ function SearchCases() {
                         <li>
                             <DropdownCheck
                                 label="Tipo de Caso"
+                                showSelectedCountBadge
                                 selectedValues={getFilterValues('caseType')}
                                 onSelectionChange={(values) => handleFilterChange('caseType', values)}
                             >
@@ -126,6 +128,7 @@ function SearchCases() {
                         <li>
                             <DropdownCheck
                                 label="Tribunal"
+                                showSelectedCountBadge
                                 selectedValues={getFilterValues('court')}
                                 onSelectionChange={(values) => handleFilterChange('court', values)}
                             >
@@ -140,6 +143,7 @@ function SearchCases() {
                         <li>
                             <DropdownCheck
                                 label="Periodo Academico"
+                                showSelectedCountBadge
                                 selectedValues={getFilterValues('term')}
                                 onSelectionChange={(values) => handleFilterChange('term', values)}
                             >
