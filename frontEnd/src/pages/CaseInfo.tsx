@@ -39,7 +39,9 @@ import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import type { PersonModel } from '#domain/models/person.ts';
-import { useGetAllBeneficiaries } from '#domain/useCaseHooks/useBeneficiary.ts';
+import { useCreateBeneficiary, useGetAllBeneficiaries } from '#domain/useCaseHooks/useBeneficiary.ts';
+import CreateBeneficiaryDialog from '#components/dialogs/CreateBeneficiaryDialog.tsx';
+import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
 import Fuse from 'fuse.js';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
@@ -73,7 +75,8 @@ export default function CaseInfo() {
 
     const { students } = useGetAllStudents();
     const { teachers } = useGetAllTeachers();
-    const { beneficiaries} = useGetAllBeneficiaries();
+    const { beneficiaries, refresh: refreshBeneficiaries } = useGetAllBeneficiaries();
+    const { createBeneficiary } = useCreateBeneficiary();
 
     // Support Document Hooks
     const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
@@ -106,6 +109,7 @@ export default function CaseInfo() {
     const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
     const [isBeneficiarySearchDialogOpen, setIsBeneficiarySearchDialogOpen] = useState(false);
+    const [isCreateBeneficiaryDialogOpen, setIsCreateBeneficiaryDialogOpen] = useState(false);
     const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
@@ -591,8 +595,29 @@ export default function CaseInfo() {
                         setLocalBeneficiaries((prev) => [...prev, beneficiary]);
                     }}
                     headerItems={
-                        <Button variant='outlined' >Crear Nuevo</Button>
+                        <Button
+                            variant='outlined'
+                            onClick={() => {
+                                setIsBeneficiarySearchDialogOpen(false);
+                                setIsCreateBeneficiaryDialogOpen(true);
+                            }}
+                        >
+                            Crear Nuevo
+                        </Button>
                     }
+                />
+
+                <CreateBeneficiaryDialog
+                    open={isCreateBeneficiaryDialogOpen}
+                    onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
+                    onCreate={async (data: BeneficiaryDAO) => {
+                        console.log("Creating beneficiary:", data);
+                        const created = await createBeneficiary(data);
+                        await refreshBeneficiaries();
+                        if (created) {
+                            setLocalBeneficiaries((prev) => [...prev, created]);
+                        }
+                    }}
                 />
             </section>
         </div>

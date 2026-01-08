@@ -5,6 +5,7 @@ import type { AppointmentDAO } from "#database/daos/appointmentDAO.ts";
 import type { SupportDocumentDAO } from "#database/daos/supportDocumentDAO.ts";
 import type { ApplicantModel } from "./models/applicant"
 import type { BeneficiaryModel } from "./models/beneficiary";
+import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
 import type { CaseModel } from "./models/case";
 import type { CaseActionModel } from "./models/caseAction";
 import type { CaseStatusModel } from "./models/caseStatus";
@@ -17,7 +18,7 @@ import type { TeacherModel } from "./models/teacher";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
-    createBeneficiary(data: BeneficiaryModel): Promise<BeneficiaryModel>;
+    createBeneficiary(data: BeneficiaryDAO): Promise<BeneficiaryModel>;
     updateBeneficiary(id: string, data: Partial<BeneficiaryModel>): Promise<BeneficiaryModel>;
     deleteBeneficiary(id: string): Promise<void>;
 }

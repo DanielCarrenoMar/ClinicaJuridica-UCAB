@@ -65,6 +65,7 @@ export default function PersonSearchDialog({
     <Dialog
       open={open}
       title={title}
+      headerItems={headerItems}
       onClose={onClose}
       headerItems={headerItems}
     >
