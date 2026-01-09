@@ -29,6 +29,7 @@ import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
 import EditSupportDocumentDialog from '#components/dialogs/EditSupportDocumentDialog.tsx';
 import PersonSearchDialog from '#components/dialogs/PersonSearchDialog.tsx';
+import PersonCard from '#components/PersonCard.tsx';
 import { useGetAllStudents } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetAllTeachers } from '#domain/useCaseHooks/useTeacher.ts';
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
@@ -465,10 +466,11 @@ export default function CaseInfo() {
             <section className="flex-1 flex flex-col gap-8">
                 <article>
                     <h4 className="text-label-small mb-2">Solicitante</h4>
-                    <span className="flex items-center gap-3">
-                        <User />
-                        <Link to={`/solicitante/${caseData.applicantId}`} className="text-body-medium hover:underline">{caseData.applicantName}</Link>
-                    </span>
+                    <PersonCard
+                        icon={<User />}
+                        person={{ identityCard: String(caseData.applicantId), fullName: caseData.applicantName }}
+                        to={`/solicitante/${caseData.applicantId}`}
+                    />
                 </article>
 
                 <article>
@@ -484,10 +486,13 @@ export default function CaseInfo() {
                                 )}
                             </header>
                             {localCaseData?.teacherName ? (
-                                <span className="flex items-center gap-3">
-                                    <UserCircle />
-                                    <p className="text-body-medium">{localCaseData.teacherName}</p>
-                                </span>
+                                <PersonCard
+                                    icon={<UserCircle />}
+                                    person={{
+                                        identityCard: String(localCaseData.teacherId ?? ''),
+                                        fullName: localCaseData.teacherName,
+                                    }}
+                                />
                             ) : (
                                 <p className="text-body-small">Sin Profesor Asignado</p>
                             )}
@@ -508,10 +513,7 @@ export default function CaseInfo() {
                                             {localCaseStudents.map((student) => (
                                                 <li key={student.identityCard}>
                                                     <span className="flex items-center justify-between">
-                                                        <div className='flex gap-3'>
-                                                            <UserCircle />
-                                                            <p className="text-body-medium">{student.fullName}</p>
-                                                        </div>
+                                                        <PersonCard icon={<UserCircle />} person={student} />
                                                         <Button onClick={() => setLocalStudents((prev) => prev.filter(s => s.identityCard !== student.identityCard))} icon={<Close />} className='p-2!' variant='outlined'></Button>
                                                     </span>
                                                 </li>
@@ -523,9 +525,8 @@ export default function CaseInfo() {
                                         {localCaseStudents.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
                                         <ul>
                                             {localCaseStudents.map((student) => (
-                                                <li key={student.identityCard} className="flex items-center gap-3 mb-2">
-                                                    <UserCircle />
-                                                    <p className="text-body-medium">{student.fullName}</p>
+                                                <li key={student.identityCard} className="mb-2">
+                                                    <PersonCard icon={<UserCircle />} person={student} />
                                                 </li>
                                             ))}
                                         </ul>
@@ -569,10 +570,7 @@ export default function CaseInfo() {
                         {localCaseBeneficiaries.map((beneficiary) => (
                             <li key={beneficiary.identityCard}>
                                 <span className="flex items-center justify-between">
-                                    <div className='flex gap-3'>
-                                        <UserCircle />
-                                        <p className="text-body-medium">{beneficiary.fullName}</p>
-                                    </div>
+                                    <PersonCard icon={<UserCircle />} person={beneficiary} />
                                     <Button
                                         onClick={() => setLocalBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
                                         icon={<Close />}

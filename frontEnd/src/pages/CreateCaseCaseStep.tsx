@@ -22,6 +22,7 @@ import { UserCircle } from "flowbite-react-icons/solid";
 import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
 
 import { subjectsData } from "#domain/seedData.ts";
+import PersonCard from "#components/PersonCard.tsx";
 
 function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): number {
     let id = 0;
@@ -109,11 +110,7 @@ function CreateCaseCaseStep() {
                             Solicitante
                         </h3>
                         <span className="flex items-center gap-2">
-                            <User />
-                            <p className="text-body-small">
-                                <strong className="text-body-medium">{applicantModel.fullName} </strong>
-                                {`${applicantModel.idNationality}-${applicantModel.identityCard}`}
-                            </p>
+                            <PersonCard person={applicantModel} icon={<User />} />
                         </span>
                     </section>
                     <section className="col-span-2 row-span-2 flex flex-col">
@@ -131,10 +128,7 @@ function CreateCaseCaseStep() {
                                 {caseBeneficiaries.map((beneficiary) => (
                                     <li key={beneficiary.identityCard}>
                                         <span className="flex items-center justify-between">
-                                            <div className='flex gap-3'>
-                                                <UserCircle />
-                                                <p className="text-body-medium">{beneficiary.fullName}</p>
-                                            </div>
+                                            <PersonCard person={beneficiary} icon={<UserCircle />} />
                                             <Button
                                                 onClick={() => setCaseBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
                                                 icon={<Close />}
