@@ -39,6 +39,7 @@ export default function ApplicantInfo() {
             if (!applicantId) return;
             const applicant = await getApplicantById(applicantId);
             if (applicant) {
+<<<<<<< HEAD
                 setApplicantData(applicant);
                 setLocalApplicantData(applicant);
 
@@ -48,30 +49,96 @@ export default function ApplicantInfo() {
                     const mIdx = locationData[sIdx].municipalities.findIndex(m => m.name === applicant.municipalityName);
                     if (mIdx !== -1) setMunIndex(mIdx);
                 }
+=======
+                // Clonar el objeto profundamente, especialmente las fechas
+                const clonedApplicant = {
+                    ...applicant,
+                    birthDate: applicant.birthDate ? (applicant.birthDate instanceof Date ? new Date(applicant.birthDate) : new Date(applicant.birthDate)) : undefined,
+                    createdAt: applicant.createdAt ? (applicant.createdAt instanceof Date ? new Date(applicant.createdAt) : new Date(applicant.createdAt)) : applicant.createdAt,
+                    servicesIdAvailable: applicant.servicesIdAvailable ? [...applicant.servicesIdAvailable] : undefined
+                };
+                setApplicantData(clonedApplicant);
+                setLocalApplicantData({ ...clonedApplicant });
+>>>>>>> c2ade96 (feat: implementar ediciÃ³n de solicitante y mensaje de no se guardan los cambios)
             }
         };
         loadApplicant();
     }, [id]);
 
     useEffect(() => {
-        if (!localApplicantData || !applicantData) return;
-        const hasChanges = JSON.stringify(localApplicantData) !== JSON.stringify(applicantData);
+        if (!localApplicantData || !applicantData) {
+            setIsDataModified(false);
+            return;
+        }
+        
+        // Función auxiliar para normalizar objetos antes de comparar
+        const normalizeForComparison = (obj: ApplicantModel): any => {
+            const normalized: any = { ...obj };
+            // Normalizar fechas a strings
+            if (normalized.birthDate) {
+                normalized.birthDate = normalized.birthDate instanceof Date 
+                    ? normalized.birthDate.toISOString().split('T')[0] 
+                    : new Date(normalized.birthDate).toISOString().split('T')[0];
+            } else {
+                normalized.birthDate = null;
+            }
+            if (normalized.createdAt) {
+                const createdAtStr = normalized.createdAt instanceof Date 
+                    ? normalized.createdAt.toISOString() 
+                    : new Date(normalized.createdAt).toISOString();
+                normalized.createdAt = createdAtStr;
+            }
+            // Normalizar arrays
+            normalized.servicesIdAvailable = (normalized.servicesIdAvailable || []).sort();
+            // Normalizar valores undefined a null para comparación consistente
+            Object.keys(normalized).forEach(key => {
+                if (normalized[key] === undefined) {
+                    normalized[key] = null;
+                }
+            });
+            return normalized;
+        };
+
+        const localNormalized = normalizeForComparison(localApplicantData);
+        const originalNormalized = normalizeForComparison(applicantData);
+        
+        const hasChanges = JSON.stringify(localNormalized) !== JSON.stringify(originalNormalized);
         setIsDataModified(hasChanges);
     }, [localApplicantData, applicantData]);
 
     function discardChanges() {
-        setLocalApplicantData(applicantData || undefined);
+        if (!applicantData) return;
+        // Clonar profundamente el objeto para que React detecte el cambio
+        const cloned = {
+            ...applicantData,
+            birthDate: applicantData.birthDate ? (applicantData.birthDate instanceof Date ? new Date(applicantData.birthDate) : new Date(applicantData.birthDate)) : undefined,
+            createdAt: applicantData.createdAt ? (applicantData.createdAt instanceof Date ? new Date(applicantData.createdAt) : new Date(applicantData.createdAt)) : applicantData.createdAt,
+            servicesIdAvailable: applicantData.servicesIdAvailable ? [...applicantData.servicesIdAvailable] : undefined
+        };
+        setLocalApplicantData(cloned);
     }
 
     async function saveChanges() {
         const applicantId = id;
         if (!applicantId) return;
         if (!localApplicantData || !applicantData) return;
-        await updateApplicant(applicantId, localApplicantData);
-        const updatedApplicant = await getApplicantById(applicantId);
-        if (updatedApplicant) {
-            setApplicantData(updatedApplicant);
-            setLocalApplicantData(updatedApplicant);
+        
+        try {
+            await updateApplicant(applicantId, localApplicantData);
+            // Recargar los datos actualizados
+            const updatedApplicant = await getApplicantById(applicantId);
+            if (updatedApplicant) {
+                const cloned = {
+                    ...updatedApplicant,
+                    birthDate: updatedApplicant.birthDate ? (updatedApplicant.birthDate instanceof Date ? new Date(updatedApplicant.birthDate) : new Date(updatedApplicant.birthDate)) : undefined,
+                    createdAt: updatedApplicant.createdAt ? (updatedApplicant.createdAt instanceof Date ? new Date(updatedApplicant.createdAt) : new Date(updatedApplicant.createdAt)) : updatedApplicant.createdAt,
+                    servicesIdAvailable: updatedApplicant.servicesIdAvailable ? [...updatedApplicant.servicesIdAvailable] : undefined
+                };
+                setApplicantData(cloned);
+                setLocalApplicantData({ ...cloned });
+            }
+        } catch (error) {
+            console.error('Error al guardar cambios:', error);
         }
     }
 
@@ -107,12 +174,16 @@ export default function ApplicantInfo() {
             <div className="col-span-3">
                 <DatePicker
                     label="Fecha Nacimiento"
+<<<<<<< HEAD
                     value={(() => {
                         const dateValue = localApplicantData.birthDate instanceof Date
                             ? localApplicantData.birthDate
                             : (localApplicantData.birthDate ? new Date(localApplicantData.birthDate as unknown as string) : undefined);
                         return dateValue ? dateValue.toISOString().split('T')[0] : undefined;
                     })()}
+=======
+                    value={localApplicantData.birthDate ? (localApplicantData.birthDate instanceof Date ? localApplicantData.birthDate.toISOString().split('T')[0] : new Date(localApplicantData.birthDate).toISOString().split('T')[0]) : undefined}
+>>>>>>> c2ade96 (feat: implementar ediciÃ³n de solicitante y mensaje de no se guardan los cambios)
                     onChange={(text) => { handleChange({ birthDate: new Date(text) }); }}
                 />
             </div>

@@ -38,8 +38,12 @@ export function getApplicantRepository(): ApplicantRepository {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...applicantDAO,
+                    idNacionality: applicantDAO.idNationality ?? (applicantDAO as any).idNacionality,
                 })
             });
+            if (!response.ok) {
+                throw new Error('Error al actualizar solicitante');
+            }
             const result = await response.json();
             return daoToApplicantModel(result.data as ApplicantInfoDAO);
         },
