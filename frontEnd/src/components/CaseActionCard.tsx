@@ -36,7 +36,7 @@ export default function CaseActionCard({
                 >
                   {caseAction.caseCompoundKey}
                 </Link>
-                  &nbsp; por
+                  &nbsp; responsable
               </p>
           }
 
