@@ -549,7 +549,7 @@ export default function CaseInfo() {
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsTeacherSearchDialogOpen(false)}
                             users={teachers.filter(t => t.identityCard !== localCaseData?.teacherId)}
-                            onSelect={(teacher) => { handleChange({ teacherId: teacher.identityCard }); handleChange({ teacherName: teacher.fullName }); }}
+                            onSelect={(teacher) => { handleChange({ teacherId: teacher.identityCard }); handleChange({ teacherName: teacher.fullName }); setIsTeacherSearchDialogOpen(false); }}
                         />
                     </div>
                 </article>
