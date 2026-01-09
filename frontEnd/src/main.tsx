@@ -20,8 +20,8 @@ import Login from '#pages/Login.tsx';
 import ErrorPage from '#pages/ErrorPage.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
-import CasosAsociados from '#pages/CasosAsociados.tsx';
-import AccionesRealizadas from '#pages/AccionesRealizadas.tsx';
+import CasosAsociados from '#pages/AsociatedCases.tsx';
+import AccionesRealizadas from '#pages/RealizedActions.tsx';
 import General from '#pages/General.tsx';
 
 const router = createBrowserRouter(
