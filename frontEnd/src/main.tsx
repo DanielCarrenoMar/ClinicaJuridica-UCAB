@@ -20,6 +20,9 @@ import Login from '#pages/Login.tsx';
 import ErrorPage from '#pages/ErrorPage.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
+import CasosAsociados from '#pages/AsociatedCases.tsx';
+import AccionesRealizadas from '#pages/RealizedActions.tsx';
+import General from '#pages/General.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -40,6 +43,9 @@ const router = createBrowserRouter(
 
           <Route element={<ProtectedRoute requiredLevel={2} />}>
             <Route path="/usuarios" element={<Users />} />
+            <Route path="/usuario/:userId/casos-asociados" element={<CasosAsociados />} />
+            <Route path="/usuario/:userId/acciones-realizadas" element={<AccionesRealizadas />} />
+            <Route path="/usuario/:userId/general" element={<General />} />
           </Route>
 
           <Route element={<ProtectedRoute requiredLevel={1} />}>
