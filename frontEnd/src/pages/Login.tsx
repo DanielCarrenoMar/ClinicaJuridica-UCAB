@@ -31,8 +31,8 @@ export default function Login() {
     };
 
     return (
-        <div className="flex h-full w-full items-center justify-center rounded-xl bg-[var(--surface)]">
-            <div className="flex w-full max-w-md flex-col items-center gap-8 bg-white p-8">
+        <div className="flex h-full w-full items-center justify-center bg-[var(--surface)]">
+            <div className="flex w-full max-w-md flex-col items-center rounded-xl gap-8 bg-white p-8">
                 <div className="flex flex-col items-center gap-4">
                     <Logo variant="logotype" />
                     <h1 className="text-label-medium">Iniciar Sesión</h1>
