@@ -67,7 +67,6 @@ export default function PersonSearchDialog({
       title={title}
       headerItems={headerItems}
       onClose={onClose}
-      headerItems={headerItems}
     >
       <SearchBar
         variant="outline"

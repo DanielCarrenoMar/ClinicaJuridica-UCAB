@@ -10,7 +10,7 @@ export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type'> {
 	isHeadOfHousehold?: boolean;
 	headEducationLevelId?: number;
 	headStudyTime?: string;
-	applicantEducationLevel?: string;
+	applicantEducationLevel?: number;
 	applicantStudyTime?: string;
 	workConditionId?: number;
 	activityConditionId?: number;

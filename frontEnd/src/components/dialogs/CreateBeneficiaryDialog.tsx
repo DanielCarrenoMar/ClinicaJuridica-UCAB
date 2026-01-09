@@ -75,7 +75,7 @@ export default function CreateBeneficiaryDialog({
 
   function handleClose() {
     if (window.confirm("¿Cerrar el diálogo? Se perderán los datos no guardados."))
-    onClose();
+      onClose();
   }
 
   return (
@@ -125,7 +125,7 @@ export default function CreateBeneficiaryDialog({
             selectedValue={idState}
             onSelectionChange={(value) => {
               const idx = value as number;
-              setIdState(idx+1);
+              setIdState(idx + 1);
               setMunicipalityNumber(undefined);
               setParishNumber(undefined);
             }}
@@ -139,12 +139,12 @@ export default function CreateBeneficiaryDialog({
             selectedValue={municipalityNumber}
             onSelectionChange={(value) => {
               const idx = value as number;
-              setMunicipalityNumber(idx+1);
+              setMunicipalityNumber(idx + 1);
               setParishNumber(undefined);
             }}
             disabled={idState === undefined}
           >
-            {idState !== undefined && locationData[idState-1].municipalities.map((mun, index) => (
+            {idState !== undefined && locationData[idState - 1].municipalities.map((mun, index) => (
               <DropdownOption key={index} value={index}>{mun.name}</DropdownOption>
             ))}
           </TitleDropdown>
@@ -153,11 +153,11 @@ export default function CreateBeneficiaryDialog({
             selectedValue={parishNumber}
             onSelectionChange={(value) => {
               const idx = value as number;
-              setParishNumber(idx);
+              setParishNumber(idx + 1);
             }}
             disabled={municipalityNumber === undefined}
           >
-            {idState !== undefined && municipalityNumber !== undefined && locationData[idState-1].municipalities[municipalityNumber-1].parishes.map((parish, index) => (
+            {idState !== undefined && municipalityNumber !== undefined && locationData[idState - 1].municipalities[municipalityNumber - 1].parishes.map((parish, index) => (
               <DropdownOption key={index} value={index + 1}>{parish}</DropdownOption>
             ))}
           </TitleDropdown>

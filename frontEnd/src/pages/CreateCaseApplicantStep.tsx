@@ -346,8 +346,11 @@ function CreateCaseApplicantStep() {
                         setMunIndex(null);
                         updateApplicantModel({
                             stateName: locationData[idx].name,
+                            idState: idx + 1,
                             municipalityName: undefined,
-                            parishName: undefined
+                            municipalityNumber: undefined,
+                            parishName: undefined,
+                            parishNumber: undefined
                         });
                     }}
                     disabled={isFieldDisabled('stateName')}
@@ -366,7 +369,9 @@ function CreateCaseApplicantStep() {
                         setMunIndex(idx);
                         updateApplicantModel({
                             municipalityName: locationData[stateIndex!].municipalities[idx].name,
-                            parishName: undefined
+                            municipalityNumber: idx + 1,
+                            parishName: undefined,
+                            parishNumber: undefined
                         });
                     }}
                     disabled={stateIndex === null || isFieldDisabled('municipalityName')}
@@ -381,7 +386,12 @@ function CreateCaseApplicantStep() {
                     label="Parroquia*"
                     selectedValue={applicantModel.parishName || undefined}
                     onSelectionChange={(value) => {
-                        updateApplicantModel({ parishName: value as string });
+                        const parishList = stateIndex !== null && munIndex !== null ? locationData[stateIndex].municipalities[munIndex].parishes : [];
+                        const pIdx = parishList.indexOf(value as string);
+                        updateApplicantModel({
+                            parishName: value as string,
+                            parishNumber: pIdx !== -1 ? pIdx + 1 : undefined
+                        });
                     }}
                     disabled={munIndex === null || isFieldDisabled('parishName')}
                 >

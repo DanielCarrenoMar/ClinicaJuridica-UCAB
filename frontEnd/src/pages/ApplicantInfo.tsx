@@ -15,6 +15,8 @@ import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.t
 import DatePicker from "#components/DatePicker.tsx";
 import { CaretDown, Close, Home, Users } from "flowbite-react-icons/outline";
 import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
+import { locationData } from "#domain/seedData.ts";
+import { educationLevelData, workConditionData, activityConditionData, servicesData } from "#domain/seedData.ts";
 
 export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
@@ -28,6 +30,9 @@ export default function ApplicantInfo() {
     const [isDataModified, setIsDataModified] = useState(false);
     const [activeSection, setActiveSection] = useState("identificacion");
 
+    const [stateIndex, setStateIndex] = useState<number | null>(null);
+    const [munIndex, setMunIndex] = useState<number | null>(null);
+
     useEffect(() => {
         const loadApplicant = async () => {
             const applicantId = id;
@@ -36,6 +41,13 @@ export default function ApplicantInfo() {
             if (applicant) {
                 setApplicantData(applicant);
                 setLocalApplicantData(applicant);
+
+                const sIdx = locationData.findIndex(s => s.name === applicant.stateName);
+                if (sIdx !== -1) {
+                    setStateIndex(sIdx);
+                    const mIdx = locationData[sIdx].municipalities.findIndex(m => m.name === applicant.municipalityName);
+                    if (mIdx !== -1) setMunIndex(mIdx);
+                }
             }
         };
         loadApplicant();
@@ -78,7 +90,7 @@ export default function ApplicantInfo() {
                 <TitleTextInput
                     label="Cedula"
                     value={localApplicantData.identityCard}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     placeholder="V-12345678"
                     disabled
                 />
@@ -185,23 +197,11 @@ export default function ApplicantInfo() {
                 <TitleDropdown
                     label="Nivel de educacion*"
                     selectedValue={localApplicantData.applicantEducationLevel || undefined}
-                    onSelectionChange={(value) => { handleChange({ applicantEducationLevel: value as string }); }}
+                    onSelectionChange={(value) => { handleChange({ applicantEducationLevel: value as number }); }}
                 >
-                    <DropdownOption value={1}>Sin nivel</DropdownOption>
-                    <DropdownOption value={2}>Primaria (primer grado)</DropdownOption>
-                    <DropdownOption value={3}>Primaria (segundo grado)</DropdownOption>
-                    <DropdownOption value={4}>Primaria (tercer grado)</DropdownOption>
-                    <DropdownOption value={5}>Primaria (cuarto grado)</DropdownOption>
-                    <DropdownOption value={6}>Primaria (quinto grado)</DropdownOption>
-                    <DropdownOption value={7}>Primaria (sexto grado)</DropdownOption>
-                    <DropdownOption value={8}>Básica (1er año / 7mo grado)</DropdownOption>
-                    <DropdownOption value={9}>Básica (2do año / 8mo grado)</DropdownOption>
-                    <DropdownOption value={10}>Básica (3er año / 9no grado)</DropdownOption>
-                    <DropdownOption value={11}>Media Diversificada (4to año)</DropdownOption>
-                    <DropdownOption value={12}>Media Diversificada (5to año)</DropdownOption>
-                    <DropdownOption value={13}>Técnico Medio</DropdownOption>
-                    <DropdownOption value={14}>Técnico Superior</DropdownOption>
-                    <DropdownOption value={15}>Universitaria</DropdownOption>
+                    {educationLevelData.map((level, index) => (
+                        <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
+                    ))}
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -210,10 +210,9 @@ export default function ApplicantInfo() {
                     selectedValue={localApplicantData.workConditionId || undefined}
                     onSelectionChange={(value) => { handleChange({ workConditionId: value as number }); }}
                 >
-                    <DropdownOption value={1}>Patrono</DropdownOption>
-                    <DropdownOption value={2}>Empleado</DropdownOption>
-                    <DropdownOption value={3}>Obrero</DropdownOption>
-                    <DropdownOption value={4}>Cuenta Propia</DropdownOption>
+                    {workConditionData.map((condition, index) => (
+                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
+                    ))}
                 </TitleDropdown>
             </div>
             <div className="col-span-4">
@@ -222,10 +221,9 @@ export default function ApplicantInfo() {
                     selectedValue={localApplicantData.activityConditionId || undefined}
                     onSelectionChange={(value) => { handleChange({ activityConditionId: value as number }); }}
                 >
-                    <DropdownOption value={1}>Ama de casa</DropdownOption>
-                    <DropdownOption value={2}>Estudiante</DropdownOption>
-                    <DropdownOption value={3}>Pensionado / Jubilado</DropdownOption>
-                    <DropdownOption value={4}>Otra</DropdownOption>
+                    {activityConditionData.map((condition, index) => (
+                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
+                    ))}
                 </TitleDropdown>
             </div>
         </>
@@ -234,28 +232,67 @@ export default function ApplicantInfo() {
     const houseInputs = (
         <>
             <div className="col-span-4">
-                <TitleTextInput
+                <TitleDropdown
                     label="Estado*"
-                    value={localApplicantData.stateName ?? ""}
-                    onChange={(text) => { handleChange({ stateName: text }); }}
-                    placeholder="Bolivar"
-                />
+                    selectedValue={stateIndex ?? undefined}
+                    onSelectionChange={(value) => {
+                        const idx = value as number;
+                        setStateIndex(idx);
+                        setMunIndex(null);
+                        handleChange({
+                            stateName: locationData[idx].name,
+                            idState: idx + 1,
+                            municipalityName: undefined,
+                            municipalityNumber: undefined,
+                            parishName: undefined,
+                            parishNumber: undefined
+                        });
+                    }}
+                >
+                    {locationData.map((state, index) => (
+                        <DropdownOption key={index} value={index}>{state.name}</DropdownOption>
+                    ))}
+                </TitleDropdown>
             </div>
             <div className="col-span-4">
-                <TitleTextInput
+                <TitleDropdown
                     label="Municipio*"
-                    value={localApplicantData.municipalityName ?? ""}
-                    onChange={(text) => { handleChange({ municipalityName: text }); }}
-                    placeholder="Caroni"
-                />
+                    selectedValue={munIndex ?? undefined}
+                    onSelectionChange={(value) => {
+                        const idx = value as number;
+                        setMunIndex(idx);
+                        handleChange({
+                            municipalityName: locationData[stateIndex!].municipalities[idx].name,
+                            municipalityNumber: idx + 1,
+                            parishName: undefined,
+                            parishNumber: undefined
+                        });
+                    }}
+                    disabled={stateIndex === null}
+                >
+                    {stateIndex !== null && locationData[stateIndex].municipalities.map((mun, index) => (
+                        <DropdownOption key={index} value={index}>{mun.name}</DropdownOption>
+                    ))}
+                </TitleDropdown>
             </div>
             <div className="col-span-4">
-                <TitleTextInput
+                <TitleDropdown
                     label="Parroquia*"
-                    value={localApplicantData.parishName ?? ""}
-                    onChange={(text) => { handleChange({ parishName: text }); }}
-                    placeholder="Unare"
-                />
+                    selectedValue={localApplicantData.parishName || undefined}
+                    onSelectionChange={(value) => {
+                        const parishList = stateIndex !== null && munIndex !== null ? locationData[stateIndex].municipalities[munIndex].parishes : [];
+                        const pIdx = parishList.indexOf(value as string);
+                        handleChange({
+                            parishName: value as string,
+                            parishNumber: pIdx !== -1 ? pIdx + 1 : undefined
+                        });
+                    }}
+                    disabled={munIndex === null}
+                >
+                    {stateIndex !== null && munIndex !== null && locationData[stateIndex].municipalities[munIndex].parishes.map((parish, index) => (
+                        <DropdownOption key={index} value={parish}>{parish}</DropdownOption>
+                    ))}
+                </TitleDropdown>
             </div>
             <div className="col-span-6">
                 <DropdownCheck
@@ -263,13 +300,9 @@ export default function ApplicantInfo() {
                     selectedValues={localApplicantData.servicesIdAvailable ?? []}
                     onSelectionChange={(values) => { handleChange({ servicesIdAvailable: values as number[] }); }}
                 >
-                    <DropdownOptionCheck value={1}>Agua</DropdownOptionCheck>
-                    <DropdownOptionCheck value={2}>Electricidad</DropdownOptionCheck>
-                    <DropdownOptionCheck value={3}>Gas</DropdownOptionCheck>
-                    <DropdownOptionCheck value={4}>Aseo</DropdownOptionCheck>
-                    <DropdownOptionCheck value={5}>Internet</DropdownOptionCheck>
-                    <DropdownOptionCheck value={6}>Telefono</DropdownOptionCheck>
-                    <DropdownOptionCheck value={7}>Cloacas</DropdownOptionCheck>
+                    {servicesData.map((service) => (
+                        <DropdownOptionCheck key={service.id} value={service.id}>{service.name}</DropdownOptionCheck>
+                    ))}
                 </DropdownCheck>
             </div>
         </>
@@ -293,21 +326,9 @@ export default function ApplicantInfo() {
                     selectedValue={localApplicantData.headEducationLevelId || undefined}
                     onSelectionChange={(value) => { handleChange({ headEducationLevelId: value as number }); }}
                 >
-                    <DropdownOption value={1}>Sin nivel</DropdownOption>
-                    <DropdownOption value={2}>Primaria (primer grado)</DropdownOption>
-                    <DropdownOption value={3}>Primaria (segundo grado)</DropdownOption>
-                    <DropdownOption value={4}>Primaria (tercer grado)</DropdownOption>
-                    <DropdownOption value={5}>Primaria (cuarto grado)</DropdownOption>
-                    <DropdownOption value={6}>Primaria (quinto grado)</DropdownOption>
-                    <DropdownOption value={7}>Primaria (sexto grado)</DropdownOption>
-                    <DropdownOption value={8}>Básica (1er año / 7mo grado)</DropdownOption>
-                    <DropdownOption value={9}>Básica (2do año / 8mo grado)</DropdownOption>
-                    <DropdownOption value={10}>Básica (3er año / 9no grado)</DropdownOption>
-                    <DropdownOption value={11}>Media Diversificada (4to año)</DropdownOption>
-                    <DropdownOption value={12}>Media Diversificada (5to año)</DropdownOption>
-                    <DropdownOption value={13}>Técnico Medio</DropdownOption>
-                    <DropdownOption value={14}>Técnico Superior</DropdownOption>
-                    <DropdownOption value={15}>Universitaria</DropdownOption>
+                    {educationLevelData.map((level, index) => (
+                        <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
+                    ))}
                 </TitleDropdown>
             </div>
             <div className="col-span-3">
