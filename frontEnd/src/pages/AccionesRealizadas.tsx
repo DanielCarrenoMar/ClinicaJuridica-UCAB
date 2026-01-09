@@ -79,7 +79,15 @@ function AccionesRealizadas() {
                 <div className="flex items-center gap-5">
                   <div className="text-[13px] font-medium text-[#10141A]">Cedula</div>
                   <div className="text-[13px] font-normal text-[#10141A]">{userId || '31552270'}</div>
+                  <div className="text-[13px] font-medium text-[#10141A]">Rol</div>
+                  <div className="text-[13px] font-normal text-[#10141A]">Profesor</div>
                 </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-[13px] font-medium text-[#10141A]">Estado:</div>
+              <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-[13px] font-medium">
+                Activo
               </div>
             </div>
           </div>
