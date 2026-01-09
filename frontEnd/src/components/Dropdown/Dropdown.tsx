@@ -92,43 +92,22 @@ export default function Dropdown({
     };
   }, [dropdownRef, contentRef]);
 
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const getDropdownPosition = () => {
+    if (!dropdownRef.current) return { top: 0, left: 0 };
 
-  useEffect(() => {
-    if (isOpen && dropdownRef.current) {
-      const updatePosition = () => {
-        if (!dropdownRef.current) return;
-        
-        const rect = dropdownRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + 8,
-          left: rect.left,
-          width: rect.width
-        });
-      };
-
-      updatePosition();
-      window.addEventListener('scroll', updatePosition, true);
-      window.addEventListener('resize', updatePosition);
-
-      return () => {
-        window.removeEventListener('scroll', updatePosition, true);
-        window.removeEventListener('resize', updatePosition);
-      };
-    }
-  }, [isOpen]);
+    const rect = dropdownRef.current.getBoundingClientRect();
+    return {
+      top: rect.bottom + window.scrollY + 8,
+      left: rect.left + window.scrollX
+    };
+  };
 
   const dropdownContent = isOpen ? createPortal(
     <div className="fixed inset-0 z-50 pointer-events-none">
       <div
         ref={contentRef}
-        className="absolute origin-top-left rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
-        style={{
-          top: `${dropdownPosition.top}px`,
-          left: `${dropdownPosition.left}px`,
-          width: `${dropdownPosition.width || 'auto'}px`,
-          minWidth: '200px'
-        }}
+        className="absolute mt-2 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
+        style={getDropdownPosition()}
       >
         {children}
       </div>

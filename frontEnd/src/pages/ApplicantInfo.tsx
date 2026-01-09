@@ -62,79 +62,24 @@ export default function ApplicantInfo() {
     }, [id]);
 
     useEffect(() => {
-        if (!localApplicantData || !applicantData) {
-            setIsDataModified(false);
-            return;
-        }
-        
-        // Función auxiliar para normalizar objetos antes de comparar
-        const normalizeForComparison = (obj: ApplicantModel): any => {
-            const normalized: any = { ...obj };
-            // Normalizar fechas a strings
-            if (normalized.birthDate) {
-                normalized.birthDate = normalized.birthDate instanceof Date 
-                    ? normalized.birthDate.toISOString().split('T')[0] 
-                    : new Date(normalized.birthDate).toISOString().split('T')[0];
-            } else {
-                normalized.birthDate = null;
-            }
-            if (normalized.createdAt) {
-                const createdAtStr = normalized.createdAt instanceof Date 
-                    ? normalized.createdAt.toISOString() 
-                    : new Date(normalized.createdAt).toISOString();
-                normalized.createdAt = createdAtStr;
-            }
-            // Normalizar arrays
-            normalized.servicesIdAvailable = (normalized.servicesIdAvailable || []).sort();
-            // Normalizar valores undefined a null para comparación consistente
-            Object.keys(normalized).forEach(key => {
-                if (normalized[key] === undefined) {
-                    normalized[key] = null;
-                }
-            });
-            return normalized;
-        };
-
-        const localNormalized = normalizeForComparison(localApplicantData);
-        const originalNormalized = normalizeForComparison(applicantData);
-        
-        const hasChanges = JSON.stringify(localNormalized) !== JSON.stringify(originalNormalized);
+        if (!localApplicantData || !applicantData) return;
+        const hasChanges = JSON.stringify(localApplicantData) !== JSON.stringify(applicantData);
         setIsDataModified(hasChanges);
     }, [localApplicantData, applicantData]);
 
     function discardChanges() {
-        if (!applicantData) return;
-        // Clonar profundamente el objeto para que React detecte el cambio
-        const cloned = {
-            ...applicantData,
-            birthDate: applicantData.birthDate ? (applicantData.birthDate instanceof Date ? new Date(applicantData.birthDate) : new Date(applicantData.birthDate)) : undefined,
-            createdAt: applicantData.createdAt ? (applicantData.createdAt instanceof Date ? new Date(applicantData.createdAt) : new Date(applicantData.createdAt)) : applicantData.createdAt,
-            servicesIdAvailable: applicantData.servicesIdAvailable ? [...applicantData.servicesIdAvailable] : undefined
-        };
-        setLocalApplicantData(cloned);
+        setLocalApplicantData(applicantData || undefined);
     }
 
     async function saveChanges() {
         const applicantId = id;
         if (!applicantId) return;
         if (!localApplicantData || !applicantData) return;
-        
-        try {
-            await updateApplicant(applicantId, localApplicantData);
-            // Recargar los datos actualizados
-            const updatedApplicant = await getApplicantById(applicantId);
-            if (updatedApplicant) {
-                const cloned = {
-                    ...updatedApplicant,
-                    birthDate: updatedApplicant.birthDate ? (updatedApplicant.birthDate instanceof Date ? new Date(updatedApplicant.birthDate) : new Date(updatedApplicant.birthDate)) : undefined,
-                    createdAt: updatedApplicant.createdAt ? (updatedApplicant.createdAt instanceof Date ? new Date(updatedApplicant.createdAt) : new Date(updatedApplicant.createdAt)) : updatedApplicant.createdAt,
-                    servicesIdAvailable: updatedApplicant.servicesIdAvailable ? [...updatedApplicant.servicesIdAvailable] : undefined
-                };
-                setApplicantData(cloned);
-                setLocalApplicantData({ ...cloned });
-            }
-        } catch (error) {
-            console.error('Error al guardar cambios:', error);
+        await updateApplicant(applicantId, localApplicantData);
+        const updatedApplicant = await getApplicantById(applicantId);
+        if (updatedApplicant) {
+            setApplicantData(updatedApplicant);
+            setLocalApplicantData(updatedApplicant);
         }
     }
 

@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
 import { ChevronDown } from 'flowbite-react-icons/outline';
 
 // Context definition
@@ -38,8 +37,6 @@ export default function DropdownCheck({
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedValues, setInternalSelectedValues] = useState<(string | number)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   const currentSelectedValues = selectedValues ?? internalSelectedValues;
 
@@ -55,39 +52,9 @@ export default function DropdownCheck({
     }
   };
 
-  // Update position when opened
-  useEffect(() => {
-    if (isOpen && dropdownRef.current) {
-      const updatePosition = () => {
-        if (!dropdownRef.current) return;
-        
-        const rect = dropdownRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + 8,
-          left: rect.left,
-          width: rect.width
-        });
-      };
-
-      updatePosition();
-      window.addEventListener('scroll', updatePosition, true);
-      window.addEventListener('resize', updatePosition);
-
-      return () => {
-        window.removeEventListener('scroll', updatePosition, true);
-        window.removeEventListener('resize', updatePosition);
-      };
-    }
-  }, [isOpen]);
-
-  // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        (!contentRef.current || !contentRef.current.contains(event.target as Node))
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -95,7 +62,7 @@ export default function DropdownCheck({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownRef, contentRef]);
+  }, [dropdownRef]);
 
   return (
     <DropdownContext.Provider value={{ selectedValues: currentSelectedValues, toggleOption }}>
@@ -124,25 +91,12 @@ export default function DropdownCheck({
           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {isOpen && createPortal(
-          <div className="fixed inset-0 z-50 pointer-events-none">
-            <div
-              ref={contentRef}
-              className="absolute origin-top-left rounded-xl bg-surface border border-onSurface focus:outline-none overflow-hidden shadow-lg pointer-events-auto"
-              style={{
-                top: `${dropdownPosition.top}px`,
-                left: `${dropdownPosition.left}px`,
-                width: `${dropdownPosition.width || 'auto'}px`,
-                minWidth: '14rem',
-                maxWidth: '20rem'
-              }}
-            >
-              <div className="py-1 max-h-60 overflow-y-auto" role="none">
-                {children}
-              </div>
+        {isOpen && (
+          <div className="absolute left-0 mt-2 min-w-56 w-max max-w-[20rem] origin-top-right rounded-md bg-surface border border-onSurface focus:outline-none z-10 overflow-hidden shadow-lg">
+            <div className="py-1 max-h-60 overflow-y-auto" role="none">
+              {children}
             </div>
-          </div>,
-          document.body
+          </div>
         )}
       </div>
     </DropdownContext.Provider>
