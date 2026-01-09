@@ -24,35 +24,37 @@ export default function CaseActionCard({
       className={`flex flex-col gap-1 items-start w-full px-4 py-2.5 rounded-3xl hover:bg-surface bg-surface/70 ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
       <header className='flex items-end justify-between w-full'>
-        <div className='flex gap-2'>
+        <span className='flex flex-wrap text-body-small'>
           {
-            caseAction.caseCompoundKey && 
-              <p className='text-body-medium'>
-                Caso &nbsp;
-                <Link
-                  to={`/caso/${caseAction.idCase}`}
-                  className="text-body-large hover:underline"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {caseAction.caseCompoundKey}
-                </Link>
-                  &nbsp; responsable
-              </p>
+            caseAction.caseCompoundKey &&
+            <p>
+              Caso &nbsp;
+              <Link
+                to={`/caso/${caseAction.idCase}`}
+                className="text-body-large truncate hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {caseAction.caseCompoundKey}
+              </Link>
+              &nbsp;
+            </p>
           }
-
-          <Link
-            to={`/usuario/${caseAction.userId}`}
-            className="text-body-large hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {caseAction.userName}
-          </Link>
-        </div>
+          <p>
+            responsable &nbsp;
+            <Link
+              to={`/usuario/${caseAction.userId}`}
+              className="text-body-large truncate hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {caseAction.userName}
+            </Link>
+          </p>
+        </span>
         <span className="text-body-medium">
           {dateString}
         </span>
       </header>
-      <p className="text-body-small indent-1 text-onSurface/70 line-clamp-3 text-ellipsis max-w-full">
+      <p className="text-body-small pl-2 text-onSurface/70 line-clamp-3 text-ellipsis max-w-full">
         {caseAction.description}
       </p>
     </span>
