@@ -1,6 +1,7 @@
 
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { UserCircle, Plus } from "flowbite-react-icons/outline"
 import { Upload } from "flowbite-react-icons/solid"
 import SearchBar from '#components/SearchBar.tsx'
@@ -25,6 +26,7 @@ const mockUsers: User[] = [
 function Users() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
+  const navigate = useNavigate()
 
   const handleLoadUsers = () => {
     console.log('Loading users...')
@@ -32,6 +34,10 @@ function Users() {
 
   const handleAddUser = () => {
     console.log('Adding new user...')
+  }
+
+  const handleUserClick = (userId: string) => {
+    navigate(`/usuario/${userId}/casos-asociados`)
   }
 
   return (
@@ -77,9 +83,10 @@ function Users() {
             {mockUsers.map((user) => (
               <div
                 key={user.id}
-                className={`w-full p-4 bg-white/70 rounded-2xl flex items-center justify-between ${
+                className={`w-full p-4 bg-white/70 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-white/80 transition-colors ${
                   user.status === 'disabled' ? 'opacity-90' : ''
                 }`}
+                onClick={() => handleUserClick(user.id)}
               >
                 <div className="flex items-center gap-3">
                   <UserCircle className="w-7 h-7 text-[#10141A]" />
