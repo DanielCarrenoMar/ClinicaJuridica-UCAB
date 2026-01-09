@@ -1,5 +1,57 @@
 import prisma from '#src/config/database.js';
-import type { ApplicantResponse, RawApplicantDB } from '../interfaces/Applicant.js';
+
+type ApplicantDAO = {
+  identityCard: string;
+  fullName: string;
+  gender: unknown;
+  birthDate: string | Date;
+  idNationality: unknown;
+
+  idState?: number | null;
+  municipalityNumber?: number | null;
+  parishNumber?: number | null;
+
+  email?: string | null;
+  cellPhone?: string | null;
+  homePhone?: string | null;
+  maritalStatus?: unknown;
+  isConcubine?: boolean | null;
+  isHeadOfHousehold?: boolean | null;
+
+  headEducationLevelId?: number | null;
+  headStudyTime?: string | null;
+  applicantEducationLevel?: number | string | null;
+  applicantStudyTime?: string | null;
+
+  workConditionId?: number | null;
+  activityConditionId?: number | null;
+
+  memberCount?: number | null;
+  workingMemberCount?: number | null;
+  children7to12Count?: number | null;
+  studentChildrenCount?: number | null;
+  monthlyIncome?: number | string | null;
+
+  bathroomCount?: number | null;
+  bedroomCount?: number | null;
+
+  servicesIdAvailable?: number[];
+};
+
+type ApplicantInfoDAO = ApplicantDAO & {
+  createdAt: Date;
+  headEducationLevelName?: string | null;
+  workConditionName?: string | null;
+  activityConditionName?: string | null;
+
+  stateName?: string | null;
+  municipalityName?: string | null;
+  parishName?: string | null;
+};
+
+type ApplicantJoinedRow = Omit<ApplicantInfoDAO, 'applicantEducationLevel' | 'servicesIdAvailable'> & {
+  applicantEducationLevelId?: number | null;
+};
 
 function coerceNumber(value: any): number | null {
   if (value === undefined || value === null || value === '') return null;
@@ -13,109 +65,163 @@ function isMissingRelationError(error: any, relationName: string): boolean {
   return (msg.includes('does not exist') || msg.includes('no existe')) && msg.includes(relationName.toLowerCase());
 }
 
+function mapApplicantRow(row: ApplicantJoinedRow, servicesIdAvailable: number[]): ApplicantInfoDAO {
+  const { applicantEducationLevelId, ...rest } = row;
+
+  return {
+    ...(rest as ApplicantInfoDAO),
+    applicantEducationLevel: applicantEducationLevelId ?? null,
+    servicesIdAvailable,
+  };
+}
+
+async function fetchServicesIdAvailable(db: any, applicantId: number | string): Promise<number[]> {
+  try {
+    const rows = await db.$queryRaw<{ serviceId: number }[]>`
+      SELECT "serviceId"
+      FROM "ApplicantServiceAvailability"
+      WHERE "applicantId" = ${applicantId}
+    `;
+    return rows.map((r: { serviceId: number }) => r.serviceId);
+  } catch (error: any) {
+    if (isMissingRelationError(error, 'ApplicantServiceAvailability')) return [];
+    throw error;
+  }
+}
+
+async function fetchApplicantInfo(db: any, applicantId: number | string): Promise<ApplicantInfoDAO | null> {
+  const rows = await db.$queryRaw<ApplicantJoinedRow[]>`
+    SELECT
+      a.*,
+      b."fullName", b."gender", b."birthDate", b."idNationality",
+      b."idState", b."municipalityNumber", b."parishNumber",
+      s."name" AS "stateName",
+      m."name" AS "municipalityName",
+      p."name" AS "parishName",
+      he."name" AS "headEducationLevelName",
+      wc."name" AS "workConditionName",
+      ac."name" AS "activityConditionName",
+      fh."memberCount", fh."workingMemberCount", fh."children7to12Count",
+      fh."studentChildrenCount", fh."monthlyIncome",
+      h."bathroomCount", h."bedroomCount"
+    FROM "Applicant" a
+    INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+    LEFT JOIN "State" s ON b."idState" = s."idState"
+    LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+    LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+    LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+    LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+    LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
+    LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
+    LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+    WHERE a."identityCard" = ${applicantId}
+    LIMIT 1
+  `;
+
+  if (!rows[0]) return null;
+
+  const servicesIdAvailable = await fetchServicesIdAvailable(db, applicantId);
+  return mapApplicantRow(rows[0], servicesIdAvailable);
+}
+
+async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
+  try {
+    const rows = await db.$queryRaw<ApplicantJoinedRow[]>`
+      SELECT
+        a.*,
+        b."fullName", b."gender", b."birthDate", b."idNationality",
+        b."idState", b."municipalityNumber", b."parishNumber",
+        s."name" AS "stateName",
+        m."name" AS "municipalityName",
+        p."name" AS "parishName",
+        he."name" AS "headEducationLevelName",
+        wc."name" AS "workConditionName",
+        ac."name" AS "activityConditionName",
+        fh."memberCount", fh."workingMemberCount", fh."children7to12Count",
+        fh."studentChildrenCount", fh."monthlyIncome",
+        h."bathroomCount", h."bedroomCount",
+        COALESCE(
+          (
+            SELECT ARRAY_AGG(asa."serviceId")
+            FROM "ApplicantServiceAvailability" asa
+            WHERE asa."applicantId" = a."identityCard"
+          ),
+          ARRAY[]::INTEGER[]
+        ) AS "servicesIdAvailable"
+      FROM "Applicant" a
+      INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+      LEFT JOIN "State" s ON b."idState" = s."idState"
+      LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+      LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+      LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+      LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+      LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
+      LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
+      LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+      ORDER BY a."createdAt" DESC
+    `;
+
+    return rows.map((row: any) => {
+      const servicesIdAvailable = Array.isArray(row.servicesIdAvailable) ? row.servicesIdAvailable : [];
+      const { servicesIdAvailable: _svc, ...rest } = row;
+      return mapApplicantRow(rest as ApplicantJoinedRow, servicesIdAvailable);
+    });
+  } catch (error: any) {
+    if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) throw error;
+
+    const rows = await db.$queryRaw<ApplicantJoinedRow[]>`
+      SELECT
+        a.*,
+        b."fullName", b."gender", b."birthDate", b."idNationality",
+        b."idState", b."municipalityNumber", b."parishNumber",
+        s."name" AS "stateName",
+        m."name" AS "municipalityName",
+        p."name" AS "parishName",
+        he."name" AS "headEducationLevelName",
+        wc."name" AS "workConditionName",
+        ac."name" AS "activityConditionName",
+        fh."memberCount", fh."workingMemberCount", fh."children7to12Count",
+        fh."studentChildrenCount", fh."monthlyIncome",
+        h."bathroomCount", h."bedroomCount"
+      FROM "Applicant" a
+      INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+      LEFT JOIN "State" s ON b."idState" = s."idState"
+      LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+      LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+      LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+      LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+      LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
+      LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
+      LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+      ORDER BY a."createdAt" DESC
+    `;
+
+    return rows.map((row: ApplicantJoinedRow) => mapApplicantRow(row, []));
+  }
+}
+
 class ApplicantService {
 
-  async getAllApplicants(): Promise<{ success: boolean; data?: ApplicantResponse[]; error?: string }> {
+  async getAllApplicants(): Promise<{ success: boolean; data?: ApplicantInfoDAO[]; error?: string }> {
     try {
-      const applicants = await prisma.$queryRaw<RawApplicantDB[]>`
-        SELECT 
-          a.*, 
-          b."fullName", b."gender", b."birthDate", b."idNationality", b."idState", b."municipalityNumber", b."parishNumber",
-          s."name" AS "stateName",
-          m."name" AS "municipalityName",
-          p."name" AS "parishName",
-          he."name" AS "headEducationLevelName",
-          wc."name" AS "workConditionName",
-          ac."name" AS "activityConditionName",
-          fh."memberCount", fh."workingMemberCount", fh."children7to12Count", fh."studentChildrenCount", fh."monthlyIncome",
-          h."bathroomCount", h."bedroomCount"
-        FROM "Applicant" a
-        INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-        LEFT JOIN "State" s ON b."idState" = s."idState"
-        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
-        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
-        LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
-        LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
-        LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
-        LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
-        LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
-        ORDER BY a."createdAt" DESC
-      `;
-
-      const mappedApplicants = applicants.map(app => ({
-        ...app,
-        applicantEducationLevel: app.applicantEducationLevelId,
-      } as unknown as ApplicantResponse));
-
-      return { success: true, data: mappedApplicants };
+      const applicants = await fetchApplicantsList(prisma);
+      return { success: true, data: applicants };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  async getApplicantById(id: number | string): Promise<{ success: boolean; data?: ApplicantResponse; message?: string; error?: string }> {
+  async getApplicantById(id: number | string): Promise<{ success: boolean; data?: ApplicantInfoDAO; message?: string; error?: string }> {
     try {
-      const applicantRows = await prisma.$queryRaw<RawApplicantDB[]>`
-        SELECT
-          a.*,
-          b."fullName", b."gender", b."birthDate", b."idNationality",
-          b."idState", b."municipalityNumber", b."parishNumber",
-          s."name" AS "stateName",
-          m."name" AS "municipalityName",
-          p."name" AS "parishName",
-          he."name" AS "headEducationLevelName",
-          wc."name" AS "workConditionName",
-          ac."name" AS "activityConditionName",
-          fh."memberCount", fh."workingMemberCount", fh."children7to12Count", 
-          fh."studentChildrenCount", fh."monthlyIncome",
-          h."bathroomCount", h."bedroomCount"
-        FROM "Applicant" a
-        INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-        LEFT JOIN "State" s ON b."idState" = s."idState"
-        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
-        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
-        LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
-        LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
-        LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
-        LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
-        LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
-        WHERE a."identityCard" = ${id}
-        LIMIT 1
-      `;
-
-      if (!applicantRows[0]) return { success: false, message: 'No encontrado' };
-
-      let servicesRows: { serviceId: number }[] = [];
-      try {
-        servicesRows = await prisma.$queryRaw<{ serviceId: number }[]>`
-          SELECT "serviceId" 
-          FROM "ApplicantServiceAvailability" 
-          WHERE "applicantId" = ${id}
-        `;
-      } catch (error: any) {
-        if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) {
-          throw error;
-        }
-      }
-
-      const rawData = applicantRows[0];
-
-      const finalData = {
-        ...rawData,
-        applicantEducationLevel: rawData.applicantEducationLevelId,
-        servicesIdAvailable: servicesRows.map(s => s.serviceId)
-      } as unknown as ApplicantResponse;
-
-      return {
-        success: true,
-        data: finalData
-      };
+      const applicant = await fetchApplicantInfo(prisma, id);
+      if (!applicant) return { success: false, message: 'No encontrado' };
+      return { success: true, data: applicant };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  async createApplicant(data: ApplicantResponse): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
+  async createApplicant(data: ApplicantDAO): Promise<{ success: boolean; data?: ApplicantInfoDAO; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
         let applicantEducationLevelId = coerceNumber(data.applicantEducationLevel);
@@ -153,14 +259,14 @@ class ApplicantService {
           ("applicantId", "memberCount", "workingMemberCount", "children7to12Count", "studentChildrenCount", "monthlyIncome")
           VALUES (
             ${data.identityCard}, 
-            ${data.memberCount || 0}, ${data.workingMemberCount || 0}, 
-            ${data.children7to12Count || 0}, ${data.studentChildrenCount || 0}, 
-            ${data.monthlyIncome || 0}
+            ${coerceNumber(data.memberCount) ?? 0}, ${coerceNumber(data.workingMemberCount) ?? 0}, 
+            ${coerceNumber(data.children7to12Count) ?? 0}, ${coerceNumber(data.studentChildrenCount) ?? 0}, 
+            ${coerceNumber(data.monthlyIncome) ?? 0}
           )
         `;
         await tx.$executeRaw`
           INSERT INTO "Housing" ("applicantId", "bathroomCount", "bedroomCount")
-          VALUES (${data.identityCard}, ${data.bathroomCount || 0}, ${data.bedroomCount || 0})
+          VALUES (${data.identityCard}, ${coerceNumber(data.bathroomCount) ?? 0}, ${coerceNumber(data.bedroomCount) ?? 0})
         `;
         if (data.servicesIdAvailable && data.servicesIdAvailable.length > 0) {
           try {
@@ -176,43 +282,10 @@ class ApplicantService {
             }
           }
         }
-        const result = await tx.$queryRaw<RawApplicantDB[]>`
-          SELECT 
-            a.*, 
-            b."fullName", b."gender", b."birthDate", b."idNationality", b."idState", b."municipalityNumber", b."parishNumber",
-            s."name" AS "stateName",
-            m."name" AS "municipalityName",
-            p."name" AS "parishName",
-            he."name" AS "headEducationLevelName",
-            wc."name" AS "workConditionName",
-            ac."name" AS "activityConditionName",
-            fh."memberCount", fh."workingMemberCount", fh."children7to12Count", fh."studentChildrenCount", fh."monthlyIncome",
-            h."bathroomCount", h."bedroomCount"
-          FROM "Applicant" a 
-          INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-          LEFT JOIN "State" s ON b."idState" = s."idState"
-          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
-          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
-          LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
-          LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
-          LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
-          LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
-          LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
-          WHERE a."identityCard" = ${data.identityCard}
-        `;
+        const created = await fetchApplicantInfo(tx, data.identityCard);
+        if (!created) throw new Error('Applicant not found after create');
 
-        const rawData = result[0];
-
-        const finalData = {
-          ...rawData,
-          applicantEducationLevel: rawData.applicantEducationLevelId,
-          servicesIdAvailable: data.servicesIdAvailable || []
-        } as unknown as ApplicantResponse;
-
-        return {
-          success: true,
-          data: finalData
-        };
+        return { success: true, data: created };
       });
     } catch (error: any) {
       console.error(error);
@@ -220,7 +293,7 @@ class ApplicantService {
     }
   }
 
-  async updateApplicant(id: number | string, data: Partial<ApplicantResponse>): Promise<{ success: boolean; data?: ApplicantResponse; error?: string }> {
+  async updateApplicant(id: number | string, data: Partial<ApplicantDAO>): Promise<{ success: boolean; data?: ApplicantInfoDAO; error?: string }> {
     try {
       return await prisma.$transaction(async (tx) => {
         let applicantEducationLevelId = coerceNumber(data.applicantEducationLevel);
@@ -228,6 +301,15 @@ class ApplicantService {
           const level = await tx.educationLevel.findUnique({ where: { name: data.applicantEducationLevel } });
           applicantEducationLevelId = level?.idLevel ?? null;
         }
+
+        const memberCount = coerceNumber(data.memberCount);
+        const workingMemberCount = coerceNumber(data.workingMemberCount);
+        const children7to12Count = coerceNumber(data.children7to12Count);
+        const studentChildrenCount = coerceNumber(data.studentChildrenCount);
+        const monthlyIncome = coerceNumber(data.monthlyIncome);
+        const bathroomCount = coerceNumber(data.bathroomCount);
+        const bedroomCount = coerceNumber(data.bedroomCount);
+
         await tx.$executeRaw`
           UPDATE "Beneficiary" SET 
             "fullName" = COALESCE(${data.fullName}, "fullName"), 
@@ -257,17 +339,17 @@ class ApplicantService {
         `;
         await tx.$executeRaw`
           UPDATE "FamilyHome" SET
-            "memberCount" = COALESCE(${data.memberCount}, "memberCount"),
-            "workingMemberCount" = COALESCE(${data.workingMemberCount}, "workingMemberCount"),
-            "children7to12Count" = COALESCE(${data.children7to12Count}, "children7to12Count"),
-            "studentChildrenCount" = COALESCE(${data.studentChildrenCount}, "studentChildrenCount"),
-            "monthlyIncome" = COALESCE(${data.monthlyIncome}, "monthlyIncome")
+            "memberCount" = COALESCE(${memberCount}, "memberCount"),
+            "workingMemberCount" = COALESCE(${workingMemberCount}, "workingMemberCount"),
+            "children7to12Count" = COALESCE(${children7to12Count}, "children7to12Count"),
+            "studentChildrenCount" = COALESCE(${studentChildrenCount}, "studentChildrenCount"),
+            "monthlyIncome" = COALESCE(${monthlyIncome}, "monthlyIncome")
           WHERE "applicantId" = ${id}
         `;
         await tx.$executeRaw`
           UPDATE "Housing" SET
-            "bathroomCount" = COALESCE(${data.bathroomCount}, "bathroomCount"),
-            "bedroomCount" = COALESCE(${data.bedroomCount}, "bedroomCount")
+            "bathroomCount" = COALESCE(${bathroomCount}, "bathroomCount"),
+            "bedroomCount" = COALESCE(${bedroomCount}, "bedroomCount")
           WHERE "applicantId" = ${id}
         `;
         if (Array.isArray(data.servicesIdAvailable)) {
@@ -286,47 +368,9 @@ class ApplicantService {
           }
         }
 
-        const result = await tx.$queryRaw<RawApplicantDB[]>`
-          SELECT 
-            a.*, 
-            b."fullName", b."gender", b."birthDate", b."idNationality", 
-            b."idState", b."municipalityNumber", b."parishNumber",
-            s."name" AS "stateName",
-            m."name" AS "municipalityName",
-            p."name" AS "parishName",
-            he."name" AS "headEducationLevelName",
-            wc."name" AS "workConditionName",
-            ac."name" AS "activityConditionName",
-            fh."memberCount", fh."workingMemberCount", fh."children7to12Count", fh."studentChildrenCount", fh."monthlyIncome",
-            h."bathroomCount", h."bedroomCount"
-          FROM "Applicant" a 
-          JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-          LEFT JOIN "State" s ON b."idState" = s."idState"
-          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
-          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
-          LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
-          LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
-          LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
-          LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
-          LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
-          WHERE a."identityCard" = ${id}
-          LIMIT 1
-        `;
-
-        if (!result || result.length === 0) throw new Error("Applicant not found");
-
-        const rawData = result[0];
-
-        const finalData = {
-          ...rawData,
-          applicantEducationLevel: rawData.applicantEducationLevelId,
-          servicesIdAvailable: data.servicesIdAvailable || []
-        } as unknown as ApplicantResponse;
-
-        return {
-          success: true,
-          data: finalData
-        };
+        const updated = await fetchApplicantInfo(tx, id);
+        if (!updated) throw new Error('Applicant not found');
+        return { success: true, data: updated };
       });
     } catch (error: any) {
       return { success: false, error: error.message };
