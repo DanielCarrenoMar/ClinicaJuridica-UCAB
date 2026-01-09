@@ -39,17 +39,6 @@ export default function ApplicantInfo() {
             if (!applicantId) return;
             const applicant = await getApplicantById(applicantId);
             if (applicant) {
-<<<<<<< HEAD
-                setApplicantData(applicant);
-                setLocalApplicantData(applicant);
-
-                const sIdx = locationData.findIndex(s => s.name === applicant.stateName);
-                if (sIdx !== -1) {
-                    setStateIndex(sIdx);
-                    const mIdx = locationData[sIdx].municipalities.findIndex(m => m.name === applicant.municipalityName);
-                    if (mIdx !== -1) setMunIndex(mIdx);
-                }
-=======
                 // Clonar el objeto profundamente, especialmente las fechas
                 const clonedApplicant = {
                     ...applicant,
@@ -59,7 +48,14 @@ export default function ApplicantInfo() {
                 };
                 setApplicantData(clonedApplicant);
                 setLocalApplicantData({ ...clonedApplicant });
->>>>>>> c2ade96 (feat: implementar ediciÃ³n de solicitante y mensaje de no se guardan los cambios)
+
+                // Establecer índices de ubicación si existen
+                const sIdx = locationData.findIndex(s => s.name === applicant.stateName);
+                if (sIdx !== -1) {
+                    setStateIndex(sIdx);
+                    const mIdx = locationData[sIdx].municipalities.findIndex(m => m.name === applicant.municipalityName);
+                    if (mIdx !== -1) setMunIndex(mIdx);
+                }
             }
         };
         loadApplicant();
@@ -174,16 +170,13 @@ export default function ApplicantInfo() {
             <div className="col-span-3">
                 <DatePicker
                     label="Fecha Nacimiento"
-<<<<<<< HEAD
                     value={(() => {
-                        const dateValue = localApplicantData.birthDate instanceof Date
-                            ? localApplicantData.birthDate
-                            : (localApplicantData.birthDate ? new Date(localApplicantData.birthDate as unknown as string) : undefined);
-                        return dateValue ? dateValue.toISOString().split('T')[0] : undefined;
+                        if (!localApplicantData?.birthDate) return undefined;
+                        const date = localApplicantData.birthDate instanceof Date 
+                            ? localApplicantData.birthDate 
+                            : new Date(localApplicantData.birthDate);
+                        return date.toISOString().split('T')[0];
                     })()}
-=======
-                    value={localApplicantData.birthDate ? (localApplicantData.birthDate instanceof Date ? localApplicantData.birthDate.toISOString().split('T')[0] : new Date(localApplicantData.birthDate).toISOString().split('T')[0]) : undefined}
->>>>>>> c2ade96 (feat: implementar ediciÃ³n de solicitante y mensaje de no se guardan los cambios)
                     onChange={(text) => { handleChange({ birthDate: new Date(text) }); }}
                 />
             </div>
