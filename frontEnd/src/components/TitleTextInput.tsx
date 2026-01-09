@@ -18,8 +18,8 @@ export default function TitleTextInput({
   disabled = false
 }: TitleTextInputProps) {
   return (
-    <div className={`flex flex-col gap-2 items-start ${className}`}>
-      <div className="flex items-center px-1.5 w-full">
+    <div className={`flex flex-col gap-2 items-start`}>
+      <div className={`flex items-center px-1.5 w-full ${className} ${disabled ? 'opacity-70' : ''}`}>
         <p className="text-body-large text-onSurface">
           {label}
         </p>

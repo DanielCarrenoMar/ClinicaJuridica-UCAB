@@ -35,7 +35,7 @@ export default function DatePicker({
       {label && (
         <label
           htmlFor={id || name}
-          className="flex items-center px-1.5 w-full text-body-large text-onSurface"
+          className={`flex items-center px-1.5 w-full text-body-large ${className} ${disabled ? 'opacity-70' : ''}`}
         >
           {label}
         </label>

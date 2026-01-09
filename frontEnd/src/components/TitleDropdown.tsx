@@ -22,8 +22,8 @@ export default function TitleDropdown({
 }: TitleDropdownProps) {
   return (
     <div className={`flex flex-col gap-2 items-start ${className}`}>
-      <div className="flex items-center w-full">
-        <h4 className="text-body-large text-onSurface">
+      <div className={`flex items-center w-full ${className} ${disabled ? 'opacity-70' : ''}`}>
+        <h4 className="text-body-large">
           {label}
         </h4>
       </div>
