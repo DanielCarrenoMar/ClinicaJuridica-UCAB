@@ -51,7 +51,7 @@ export default function BeneficiaryRelationshipDialog({
     onCreate({
       type,
       relationship: relationship.trim(),
-      description: description.trim(),
+      description: "",
     });
 
     onClose();
@@ -87,19 +87,19 @@ export default function BeneficiaryRelationshipDialog({
           placeholder="Ej: Hijo, cónyuge, representante..."
         />
 
-        <TitleTextInput
+        {/*<TitleTextInput
           label="Descripción"
           value={description}
           onChange={setDescription}
           placeholder="Ej: Hijo del solicitante"
-        />
+        />*/}
       </div>
 
       <div className="flex justify-end gap-3 mt-2">
         <Button
           variant="resalted"
           onClick={handleSubmit}
-          disabled={!type || relationship.trim().length === 0 || description.trim().length === 0}
+          disabled={!type || relationship.trim().length === 0}
         >
           Guardar
         </Button>
