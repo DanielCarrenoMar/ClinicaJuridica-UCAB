@@ -386,7 +386,6 @@ export function useSetBeneficiariesToCase() {
 
     async function setBeneficiariesToCase(idCase: number, caseBene: CaseBeneficiaryDAO[]) {
         setLoading(true);
-        console.log("Setting beneficiaries to case:", { idCase, caseBene });
         try {
             const currentBeneficiaries = await findBeneficiariesByCaseId(idCase);
             const currentBeneficiaryIds = currentBeneficiaries.map(b => b.identityCard);
