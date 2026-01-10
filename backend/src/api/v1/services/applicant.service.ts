@@ -60,6 +60,10 @@ function coerceNumber(value: any): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function toDbValue<T>(value: T | null | undefined): T | null {
+  return value === undefined ? null : value;
+}
+
 function isMissingRelationError(error: any, relationName: string): boolean {
   const msg = error?.message ? String(error.message).toLowerCase() : '';
   return (msg.includes('does not exist') || msg.includes('no existe')) && msg.includes(relationName.toLowerCase());
@@ -78,13 +82,13 @@ function mapApplicantRow(row: ApplicantJoinedRow, servicesIdAvailable: number[])
 async function fetchServicesIdAvailable(db: any, applicantId: number | string): Promise<number[]> {
   try {
     const rows = await db.$queryRaw<{ serviceId: number }[]>`
-      SELECT "serviceId"
-      FROM "ApplicantServiceAvailability"
+      SELECT "detailNumber" as "serviceId"
+      FROM "HousingDetail"
       WHERE "applicantId" = ${applicantId}
     `;
     return rows.map((r: { serviceId: number }) => r.serviceId);
   } catch (error: any) {
-    if (isMissingRelationError(error, 'ApplicantServiceAvailability')) return [];
+    if (isMissingRelationError(error, 'HousingDetail')) return [];
     throw error;
   }
 }
@@ -142,8 +146,8 @@ async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
         h."bathroomCount", h."bedroomCount",
         COALESCE(
           (
-            SELECT ARRAY_AGG(asa."serviceId")
-            FROM "ApplicantServiceAvailability" asa
+            SELECT ARRAY_AGG(asa."detailNumber")
+            FROM "HousingDetail" asa
             WHERE asa."applicantId" = a."identityCard"
           ),
           ARRAY[]::INTEGER[]
@@ -167,7 +171,7 @@ async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
       return mapApplicantRow(rest as ApplicantJoinedRow, servicesIdAvailable);
     });
   } catch (error: any) {
-    if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) throw error;
+    if (!isMissingRelationError(error, 'HousingDetail')) throw error;
 
     const rows = await db.$queryRaw<ApplicantJoinedRow[]>`
       SELECT
@@ -236,7 +240,7 @@ class ApplicantService {
           VALUES (
             ${data.identityCard}, ${data.fullName}, ${data.gender}, 
             CAST(${data.birthDate} AS DATE), ${data.idNationality}, 
-            true, 'S', ${data.idState}, ${data.municipalityNumber}, ${data.parishNumber}
+            true, 'S', ${toDbValue(data.idState)}, ${toDbValue(data.municipalityNumber)}, ${toDbValue(data.parishNumber)}
           )
         `;
         await tx.$executeRaw`
@@ -247,11 +251,11 @@ class ApplicantService {
             "applicantEducationLevelId", "applicantStudyTime", "workConditionId", "activityConditionId"
           )
           VALUES (
-            ${data.identityCard}, ${data.email}, ${data.cellPhone}, ${data.homePhone}, 
-            ${data.maritalStatus}, ${data.isConcubine || false}, ${data.isHeadOfHousehold || false},
-            ${data.headEducationLevelId}, ${data.headStudyTime}, 
+            ${data.identityCard}, ${toDbValue(data.email)}, ${toDbValue(data.cellPhone)}, ${toDbValue(data.homePhone)}, 
+            ${toDbValue(data.maritalStatus)}, ${data.isConcubine ?? false}, ${data.isHeadOfHousehold ?? false},
+            ${toDbValue(data.headEducationLevelId)}, ${toDbValue(data.headStudyTime)}, 
             ${applicantEducationLevelId}, 
-            ${data.applicantStudyTime}, ${data.workConditionId}, ${data.activityConditionId}
+            ${toDbValue(data.applicantStudyTime)}, ${toDbValue(data.workConditionId)}, ${toDbValue(data.activityConditionId)}
           )
         `;
         await tx.$executeRaw`
@@ -272,12 +276,12 @@ class ApplicantService {
           try {
             for (const serviceId of data.servicesIdAvailable) {
               await tx.$executeRaw`
-                INSERT INTO "ApplicantServiceAvailability" ("applicantId", "serviceId")
+                INSERT INTO "HousingDetail" ("applicantId", "detailNumber")
                 VALUES (${data.identityCard}, ${serviceId})
               `;
             }
           } catch (error: any) {
-            if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) {
+            if (!isMissingRelationError(error, 'HousingDetail')) {
               throw error;
             }
           }
@@ -354,15 +358,15 @@ class ApplicantService {
         `;
         if (Array.isArray(data.servicesIdAvailable)) {
           try {
-            await tx.$executeRaw`DELETE FROM "ApplicantServiceAvailability" WHERE "applicantId" = ${id}`;
+            await tx.$executeRaw`DELETE FROM "HousingDetail" WHERE "applicantId" = ${id}`;
             for (const serviceId of data.servicesIdAvailable) {
               await tx.$executeRaw`
-                INSERT INTO "ApplicantServiceAvailability" ("applicantId", "serviceId")
+                INSERT INTO "HousingDetail" ("applicantId", "detailNumber")
                 VALUES (${id}, ${serviceId})
               `;
             }
           } catch (error: any) {
-            if (!isMissingRelationError(error, 'ApplicantServiceAvailability')) {
+            if (!isMissingRelationError(error, 'HousingDetail')) {
               throw error;
             }
           }

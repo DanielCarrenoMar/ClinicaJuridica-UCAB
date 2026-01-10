@@ -44,10 +44,22 @@ export async function createApplicant(req: Request, res: Response): Promise<void
   try {
     const data = req.body;
 
-    if (!data.identityCard || !data.fullName) {
-       res.status(400).json({ success: false, message: 'Faltan campos requeridos: identityCard y fullName son obligatorios.' });
-       return;
+    const missing: string[] = [];
+    if (!data.identityCard) missing.push('identityCard');
+    if (!data.fullName) missing.push('fullName');
+    if (!data.gender) missing.push('gender');
+    if (!data.birthDate) missing.push('birthDate');
+    if (!data.idNationality) missing.push('idNationality');
+
+    if (missing.length > 0) {
+      res.status(400).json({
+        success: false,
+        message: `Faltan campos requeridos: ${missing.join(', ')}`
+      });
+      return;
     }
+
+    console.log("Creating applicant with identityCard:", data);
 
     const result = await applicantService.createApplicant(data);
 
