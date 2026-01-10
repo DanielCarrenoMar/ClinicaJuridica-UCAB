@@ -18,15 +18,6 @@ import type { CaseBeneficiaryInfoDAO } from "#database/daos/caseBeneficiaryInfoD
 import { daoToCaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
 
 export function getCaseRepository(): CaseRepository {
-    async function getCaseTerm(idCase: number): Promise<string> {
-        const responseCase = await fetch(`${CASE_URL}/${idCase}`);
-        if (!responseCase.ok) throw new Error('Error fetching case term');
-        const casesData = await responseCase.json();
-        const caseDAO: CaseInfoDAO = casesData.data;
-        // Backend returns term as string on Case
-        return (caseDAO as any).term;
-    }
-
     return {
         findAllCases: async () => {
             const responseCase = await fetch(CASE_URL);
