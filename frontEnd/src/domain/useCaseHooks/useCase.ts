@@ -10,6 +10,8 @@ import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts'
 import { typeModelToCaseStatusTypeDao } from '#domain/typesModel.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
+import type { CaseBeneficiaryDAO } from '#database/daos/caseBeneficiaryDAO.ts';
+import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
@@ -383,17 +385,17 @@ export function useSetBeneficiariesToCase() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    async function setBeneficiariesToCase(idCase: number, beneficiaryIds: string[]) {
+    async function setBeneficiariesToCase(idCase: number, beneficiaryIds: Pick<CaseBeneficiaryDAO, "identityCard" | "caseType" | "relationship" | "description">[]) {
         setLoading(true);
         try {
             const currentBeneficiaries = await findBeneficiariesByCaseId(idCase);
             const currentBeneficiaryIds = currentBeneficiaries.map(b => b.identityCard);
 
-            const toAdd = beneficiaryIds.filter(id => !currentBeneficiaryIds.includes(id));
-            const toRemove = currentBeneficiaryIds.filter(id => !beneficiaryIds.includes(id));
+            const toAdd = beneficiaryIds.filter(id => !currentBeneficiaryIds.includes(id.identityCard));
+            const toRemove = currentBeneficiaryIds.filter(id => !beneficiaryIds.map(b => b.identityCard).includes(id));
 
             await Promise.all([
-                ...toAdd.map(id => addBeneficiaryToCase(idCase, id)),
+                ...toAdd.map(b => addBeneficiaryToCase(idCase, b.identityCard, b.caseType, b.relationship, b.description)),
                 ...toRemove.map(id => removeBeneficiaryFromCase(idCase, id))
             ]);
             setError(null);
