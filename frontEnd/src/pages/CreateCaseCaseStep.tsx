@@ -23,6 +23,11 @@ import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
 
 import { subjectsData } from "#domain/seedData.ts";
 import PersonCard from "#components/PersonCard.tsx";
+import BeneficiaryRelationshipDialog from "#components/dialogs/BeneficiaryRelationshipDialog.tsx";
+import type { PersonModel } from "#domain/models/person.ts";
+import type { CaseBeneficiaryTypeModel } from "#domain/typesModel.ts";
+import { caseBeneficiaryModelToDao, type CaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
+import BeneficiaryCard from "#components/BeneficiaryCard.tsx";
 
 function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): number {
     let id = 0;
@@ -52,6 +57,30 @@ function CreateCaseCaseStep() {
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
     const [isBeneficiarySearchDialogOpen, setIsBeneficiarySearchDialogOpen] = useState(false);
     const [isCreateBeneficiaryDialogOpen, setIsCreateBeneficiaryDialogOpen] = useState(false);
+    const [isBeneficiaryRelationshipDialogOpen, setIsBeneficiaryRelationshipDialogOpen] = useState(false);
+    const [pendingCaseBeneficiary, setPendingCaseBeneficiary] = useState<PersonModel | null>(null);
+
+    function handleSelectCaseBeneficiary(person: PersonModel) {
+        setPendingCaseBeneficiary(person);
+        setIsBeneficiarySearchDialogOpen(false);
+        setIsBeneficiaryRelationshipDialogOpen(true);
+    }
+
+    function handleAddCaseBeneficiary(type: CaseBeneficiaryTypeModel, relationship: string, description: string) {
+        if (!pendingCaseBeneficiary) return;
+
+        const newCaseBeneficiary: CaseBeneficiaryModel = {
+            ...pendingCaseBeneficiary,
+            idCase: 0,
+            caseType: type,
+            relationship: relationship.trim(),
+            description: description.trim(),
+        };
+
+        setCaseBeneficiaries((prev) => [...prev, newCaseBeneficiary]);
+        setPendingCaseBeneficiary(null);
+        setIsBeneficiaryRelationshipDialogOpen(false);
+    }
 
     async function handleCreateCase() {
         try {
@@ -74,7 +103,10 @@ function CreateCaseCaseStep() {
             const createdCase = await createCase(caseToCreate);
             if (createdCase) {
                 if (caseBeneficiaries.length > 0) {
-                    await setBeneficiariesToCase(createdCase.idCase, caseBeneficiaries.map((b) => b.identityCard));
+                    await setBeneficiariesToCase(
+                        createdCase.idCase,
+                        caseBeneficiaries.map((b) => caseBeneficiaryModelToDao({ ...b, idCase: createdCase.idCase }))
+                    );
                 }
                 navigate(`/caso/${createdCase.idCase}`);
             } else {
@@ -128,7 +160,7 @@ function CreateCaseCaseStep() {
                                 {caseBeneficiaries.map((beneficiary) => (
                                     <li key={beneficiary.identityCard}>
                                         <span className="flex items-center justify-between">
-                                            <PersonCard person={beneficiary} icon={<UserCircle />} />
+                                            <BeneficiaryCard beneficiary={beneficiary} icon={<UserCircle />} />
                                             <Button
                                                 onClick={() => setCaseBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
                                                 icon={<Close />}
@@ -214,9 +246,7 @@ function CreateCaseCaseStep() {
                     placeholder="Buscar por nombre o cédula..."
                     onClose={() => setIsBeneficiarySearchDialogOpen(false)}
                     users={beneficiaries.filter(b => !caseBeneficiaries.some(cb => cb.identityCard === b.identityCard) && b.identityCard !== applicantModel.identityCard)}
-                    onSelect={(beneficiary) => {
-                        setCaseBeneficiaries((prev) => [...prev, beneficiary]);
-                    }}
+                    onSelect={handleSelectCaseBeneficiary}
                     headerItems={
                         <Button
                             variant='outlined'
@@ -237,8 +267,19 @@ function CreateCaseCaseStep() {
                         const created = await createBeneficiary(data);
                         await refreshBeneficiaries();
                         if (created) {
-                            setCaseBeneficiaries((prev) => [...prev, created]);
+                            handleSelectCaseBeneficiary(created);
                         }
+                    }}
+                />
+
+                <BeneficiaryRelationshipDialog
+                    open={isBeneficiaryRelationshipDialogOpen}
+                    onClose={() => {
+                        setIsBeneficiaryRelationshipDialogOpen(false);
+                        setPendingCaseBeneficiary(null);
+                    }}
+                    onCreate={(data) => {
+                        handleAddCaseBeneficiary(data.type, data.relationship, data.description);
                     }}
                 />
                 <article>

@@ -6,14 +6,14 @@ import Box from "#components/Box.tsx";
 
 import { defaultCaseDAO, type CaseDAO } from "#database/daos/caseDAO.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
-import type { PersonModel } from "#domain/models/person.ts";
+import type { CaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
 
 export type CaseOutletContext = {
     caseDAO: CaseDAO;
     setCaseDAO: Dispatch<SetStateAction<CaseDAO>>;
     updateCaseDAO: (updatedFields: Partial<CaseDAO>) => void;
-    caseBeneficiaries: PersonModel[];
-    setCaseBeneficiaries: Dispatch<SetStateAction<PersonModel[]>>;
+    caseBeneficiaries: CaseBeneficiaryModel[];
+    setCaseBeneficiaries: Dispatch<SetStateAction<CaseBeneficiaryModel[]>>;
     applicantModel: ApplicantModel;
     setApplicantModel: Dispatch<SetStateAction<ApplicantModel>>;
     updateApplicantModel: (updatedFields: Partial<ApplicantModel>) => void;
@@ -29,7 +29,7 @@ export function useCaseOutletContext() {
 
 function CreateCase() {
     const [caseDAO, setCaseDAO] = useState<CaseDAO>(defaultCaseDAO);
-    const [caseBeneficiaries, setCaseBeneficiaries] = useState<PersonModel[]>([]);
+    const [caseBeneficiaries, setCaseBeneficiaries] = useState<CaseBeneficiaryModel[]>([]);
     const [applicantModel, setApplicantModel] = useState<Partial<ApplicantModel>>({ identityCard: '' } as ApplicantModel);
     const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
     const [dbOriginalData, setDbOriginalData] = useState<Partial<ApplicantModel> | null>(null);
