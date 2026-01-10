@@ -54,6 +54,11 @@ class AppointmentService {
           data.appointmentNumber = currentMax + 1;
         }
 
+        let status = data.status;
+        if (data.executionDate && (!data.plannedDate || data.plannedDate === '' || data.plannedDate === null)) {
+          status = 'R';
+        }
+
         await tx.$executeRaw`
           INSERT INTO "Appointment" (
             "idCase", "appointmentNumber", "plannedDate", "executionDate", 
@@ -61,7 +66,7 @@ class AppointmentService {
           ) VALUES (
             ${data.idCase}, ${data.appointmentNumber}, CAST(${data.plannedDate} AS DATE), 
             ${data.executionDate ? data.executionDate : null}, 
-            ${data.status}, ${data.guidance}, ${data.userId}, ${new Date()}
+            ${status}, ${data.guidance}, ${data.userId}, ${new Date()}
           )
         `;
 

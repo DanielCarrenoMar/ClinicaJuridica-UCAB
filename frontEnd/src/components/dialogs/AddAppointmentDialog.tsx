@@ -7,7 +7,7 @@ import Dialog from '#components/dialogs/Dialog.tsx';
 interface AddAppointmentDialogProps {
     open: boolean;
     onClose: () => void;
-    onAdd: (appointment: { plannedDate: Date; executionDate?: Date; guidance?: string }) => void;
+    onAdd: (appointment: { plannedDate?: Date | null; executionDate?: Date; guidance?: string; status: string }) => void;
 }
 
 export default function AddAppointmentDialog({
@@ -22,12 +22,18 @@ export default function AddAppointmentDialog({
     if (!open) return null;
 
     const handleSubmit = () => {
-        if (!plannedDate) return;
+        if (!plannedDate && !executionDate) return;
+
+        let status = "P";
+        if (executionDate && !plannedDate) {
+            status = "R";
+        }
 
         onAdd({
-            plannedDate: new Date(plannedDate + "T00:00:00"),
+            plannedDate: plannedDate ? new Date(plannedDate + "T00:00:00") : null,
             executionDate: executionDate ? new Date(executionDate + "T00:00:00") : undefined,
-            guidance: guidance || undefined
+            guidance: guidance || undefined,
+            status: status
         });
 
         // Reset form
@@ -48,7 +54,6 @@ export default function AddAppointmentDialog({
                     value={plannedDate}
                     onChange={setPlannedDate}
                     min={today}
-                    required
                 />
 
                 <DatePicker
@@ -76,7 +81,7 @@ export default function AddAppointmentDialog({
                     variant="resalted"
                     className='min-w-48 w-1/2'
                     onClick={handleSubmit}
-                    disabled={!plannedDate}
+                    disabled={!plannedDate && !executionDate}
                 >
                     Añadir
                 </Button>

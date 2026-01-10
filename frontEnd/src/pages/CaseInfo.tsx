@@ -24,6 +24,7 @@ import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
 import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
+import type { AppointmentStatusTypeDAO } from '#database/typesDAO.ts';
 import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
@@ -345,7 +346,7 @@ export default function CaseInfo() {
                             appointmentNumber: 0, // Backend auto-increments
                             plannedDate: data.plannedDate,
                             executionDate: data.executionDate,
-                            status: "P", // Programada
+                            status: (data.status || "P") as AppointmentStatusTypeDAO,
                             guidance: data.guidance,
                             userId: user.identityCard,
                             userName: user.fullName,
