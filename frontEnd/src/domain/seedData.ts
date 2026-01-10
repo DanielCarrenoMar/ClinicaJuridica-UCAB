@@ -113,6 +113,10 @@ export const workConditionData = [
         name: 'Cuenta Propia',
         isActive: true,
     },
+    {
+        name: 'Buscando Trabajo',
+        isActive: true,
+    }
 ];
 
 export const activityConditionData = [

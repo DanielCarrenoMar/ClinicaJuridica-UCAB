@@ -36,6 +36,13 @@ type ApplicantDAO = {
   bedroomCount?: number | null;
 
   servicesIdAvailable?: number[];
+  houseType?: number | null;
+  floorMaterial?: number | null;
+  wallMaterial?: number | null;
+  roofMaterial?: number | null;
+  potableWaterService?: number | null;
+  sewageService?: number | null;
+  cleaningService?: number | null;
 };
 
 type ApplicantInfoDAO = ApplicantDAO & {
@@ -79,16 +86,40 @@ function mapApplicantRow(row: ApplicantJoinedRow, servicesIdAvailable: number[])
   };
 }
 
-async function fetchServicesIdAvailable(db: any, applicantId: number | string): Promise<number[]> {
+async function fetchHousingDetails(db: any, applicantId: number | string): Promise<Partial<ApplicantInfoDAO>> {
   try {
-    const rows = await db.$queryRaw<{ serviceId: number }[]>`
-      SELECT "detailNumber" as "serviceId"
-      FROM "HousingDetail"
-      WHERE "applicantId" = ${applicantId}
+    const rows = await db.$queryRaw<{ detailNumber: number; charName: string }[]>`
+      SELECT hd."detailNumber", hc."name" as "charName"
+      FROM "HousingDetail" hd
+      JOIN "HousingCharacteristic" hc ON hd."idCharacteristic" = hc."idCharacteristic"
+      WHERE hd."applicantId" = ${applicantId}
     `;
-    return rows.map((r: { serviceId: number }) => r.serviceId);
+
+    const result: Partial<ApplicantInfoDAO> = {
+      servicesIdAvailable: []
+    };
+
+    // Reverse map from DB name to field name
+    const DB_TO_FIELD: Record<string, keyof ApplicantDAO> = Object.entries(HOUSING_CHARACTERISTIC_NAMES).reduce((acc, [key, value]) => {
+      acc[value] = key as keyof ApplicantDAO;
+      return acc;
+    }, {} as Record<string, keyof ApplicantDAO>);
+
+    for (const row of rows) {
+      if (row.charName === 'Artefactos Domesticos, bienes o servicios del hogar') {
+        result.servicesIdAvailable?.push(row.detailNumber);
+      } else {
+        const fieldName = DB_TO_FIELD[row.charName];
+        if (fieldName) {
+          // Frontend expects 0-based index, DB has 1-based (detailNumber)
+          (result as any)[fieldName] = row.detailNumber - 1;
+        }
+      }
+    }
+
+    return result;
   } catch (error: any) {
-    if (isMissingRelationError(error, 'HousingDetail')) return [];
+    if (isMissingRelationError(error, 'HousingDetail')) return {};
     throw error;
   }
 }
@@ -124,8 +155,12 @@ async function fetchApplicantInfo(db: any, applicantId: number | string): Promis
 
   if (!rows[0]) return null;
 
-  const servicesIdAvailable = await fetchServicesIdAvailable(db, applicantId);
-  return mapApplicantRow(rows[0], servicesIdAvailable);
+  const housingDetails = await fetchHousingDetails(db, applicantId);
+  // Merge details into the main row
+  const rowWithDetails = { ...rows[0], ...housingDetails };
+
+  // existing mapApplicantRow expects servicesIdAvailable as arg, but let's pass it from housingDetails
+  return mapApplicantRow(rowWithDetails, housingDetails.servicesIdAvailable || []);
 }
 
 async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
@@ -165,11 +200,21 @@ async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
       ORDER BY a."createdAt" DESC
     `;
 
-    return rows.map((row: any) => {
-      const servicesIdAvailable = Array.isArray(row.servicesIdAvailable) ? row.servicesIdAvailable : [];
+    // We need to fetch housing details for EACH applicant efficiently. 
+    // Doing N+1 query for simplicity now, but ideally updated query to JSON_AGG/ARRAY_AGG everything.
+    // For now, let's keep it simple as this list probably isn't huge yet.
+
+    const results = await Promise.all(rows.map(async (row: any) => {
+      // We'll ignore the COALESCE logic in SQL for servicesIdAvailable and re-fetch to be consistent 
+      // OR we can trust SQL for services but we miss other housing details.
+      // Better to re-fetch all housing details properly.
       const { servicesIdAvailable: _svc, ...rest } = row;
-      return mapApplicantRow(rest as ApplicantJoinedRow, servicesIdAvailable);
-    });
+      const housingDetails = await fetchHousingDetails(db, row.identityCard);
+      const merged = { ...rest, ...housingDetails };
+      return mapApplicantRow(merged as ApplicantJoinedRow, housingDetails.servicesIdAvailable || []);
+    }));
+
+    return results;
   } catch (error: any) {
     if (!isMissingRelationError(error, 'HousingDetail')) throw error;
 
@@ -200,7 +245,86 @@ async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
       ORDER BY a."createdAt" DESC
     `;
 
+    // Fallback if missing relation
     return rows.map((row: ApplicantJoinedRow) => mapApplicantRow(row, []));
+  }
+}
+
+
+const HOUSING_CHARACTERISTIC_NAMES: Record<string, string> = {
+  houseType: 'Tipo de Vivienda',
+  floorMaterial: 'Material del piso',
+  wallMaterial: 'Material de las paredes',
+  roofMaterial: 'Material del techo',
+  potableWaterService: 'Servicio de agua potable',
+  sewageService: 'Eliminacion de excretas (aguas negras)',
+  cleaningService: 'Servicio de aseo',
+};
+
+async function saveHousingDetails(tx: any, applicantId: string, data: ApplicantDAO) {
+  // 1. Handle services (multi-select)
+  if (data.servicesIdAvailable !== undefined) {
+    // Delete existing services (using a fixed ID/Name for services if possible, or assumed logic)
+    // IMPORTANT: The prompt implies services are also in HousingDetail.
+    // Assuming we can identify services by a characteristic, but the seed says 'Artefactos Domesticos...'?
+    // Wait, the seed has 'Artefactos Domesticos' as one characteristic.
+    // BUT verify seedData.ts line 141 servicesData has IDs 1-7.
+    // However, in seed.ts lines 50-52 'Artefactos...' is created.
+    // The previous code inserted directly into HousingDetail with detailNumber.
+    // Let's keep the existing logic for servicesIdAvailable but wrapped here?
+    // No, let's keep services logic as is in the main function or integrate it.
+
+    // Let's focus on the single-selects first.
+  }
+
+  const housingFields: (keyof ApplicantDAO)[] = [
+    'houseType',
+    'floorMaterial',
+    'wallMaterial',
+    'roofMaterial',
+    'potableWaterService',
+    'sewageService',
+    'cleaningService'
+  ];
+
+  for (const field of housingFields) {
+    const value = coerceNumber(data[field]);
+    if (value !== null) {
+      const charName = HOUSING_CHARACTERISTIC_NAMES[field as string];
+      if (!charName) continue;
+
+      // Find characteristic ID
+      const characteristic = await tx.housingCharacteristic.findUnique({ where: { name: charName } });
+      if (!characteristic) continue;
+
+      // Delete existing detail for this characteristic
+      await tx.$executeRaw`
+        DELETE FROM "HousingDetail" 
+        WHERE "applicantId" = ${applicantId} AND "idCharacteristic" = ${characteristic.idCharacteristic}
+      `;
+
+      // Insert new detail.
+      // NOTE: Frontend sends index (0-based) or value?
+      // Seed says detailNumber = detailCounter++ (1-based).
+      // Assuming frontend sends 0-based index from a list, we might need value + 1.
+      // Checking CreateCaseApplicantStep.tsx...
+      // It iterates map((t, i) => <DropdownOption value={i}>)
+      // So frontend sends 0, 1, 2...
+      // Database seed starts at 1.
+      // So we need value + 1.
+
+      const detailNumber = value + 1;
+
+      try {
+        await tx.$executeRaw`
+          INSERT INTO "HousingDetail" ("applicantId", "idCharacteristic", "detailNumber")
+          VALUES (${applicantId}, ${characteristic.idCharacteristic}, ${detailNumber})
+        `;
+      } catch (e) {
+        // Ignore unique constraint or similar if user sends invalid index
+        console.error(`Failed to save housing detail ${field} for applicant ${applicantId}:`, e);
+      }
+    }
   }
 }
 
@@ -252,7 +376,7 @@ class ApplicantService {
           )
           VALUES (
             ${data.identityCard}, ${toDbValue(data.email)}, ${toDbValue(data.cellPhone)}, ${toDbValue(data.homePhone)}, 
-            ${toDbValue(data.maritalStatus)}, ${data.isConcubine ?? false}, ${data.isHeadOfHousehold ?? false},
+            ${toDbValue(data.maritalStatus)}, ${toDbValue(data.isConcubine)}, ${toDbValue(data.isHeadOfHousehold)},
             ${toDbValue(data.headEducationLevelId)}, ${toDbValue(data.headStudyTime)}, 
             ${applicantEducationLevelId}, 
             ${toDbValue(data.applicantStudyTime)}, ${toDbValue(data.workConditionId)}, ${toDbValue(data.activityConditionId)}
@@ -263,22 +387,38 @@ class ApplicantService {
           ("applicantId", "memberCount", "workingMemberCount", "children7to12Count", "studentChildrenCount", "monthlyIncome")
           VALUES (
             ${data.identityCard}, 
-            ${coerceNumber(data.memberCount) ?? 0}, ${coerceNumber(data.workingMemberCount) ?? 0}, 
-            ${coerceNumber(data.children7to12Count) ?? 0}, ${coerceNumber(data.studentChildrenCount) ?? 0}, 
-            ${coerceNumber(data.monthlyIncome) ?? 0}
+            ${toDbValue(coerceNumber(data.memberCount))}, ${toDbValue(coerceNumber(data.workingMemberCount))}, 
+            ${toDbValue(coerceNumber(data.children7to12Count))}, ${toDbValue(coerceNumber(data.studentChildrenCount))}, 
+            ${toDbValue(coerceNumber(data.monthlyIncome))}
           )
         `;
         await tx.$executeRaw`
           INSERT INTO "Housing" ("applicantId", "bathroomCount", "bedroomCount")
-          VALUES (${data.identityCard}, ${coerceNumber(data.bathroomCount) ?? 0}, ${coerceNumber(data.bedroomCount) ?? 0})
+          VALUES (${data.identityCard}, ${toDbValue(coerceNumber(data.bathroomCount))}, ${toDbValue(coerceNumber(data.bedroomCount))})
         `;
         if (data.servicesIdAvailable && data.servicesIdAvailable.length > 0) {
           try {
-            for (const serviceId of data.servicesIdAvailable) {
-              await tx.$executeRaw`
-                INSERT INTO "HousingDetail" ("applicantId", "detailNumber")
-                VALUES (${data.identityCard}, ${serviceId})
-              `;
+            // For services, we need to know the characteristic ID for 'Artefactos Domesticos...'?
+            // Or is servicesIdAvailable relating to a different table?
+            // Looking at previous code: INSERT INTO "HousingDetail" ("applicantId", "detailNumber") ...
+            // It was missing "idCharacteristic"! This would fail a NOT NULL constraint if idCharacteristic is not default.
+            // Schema says: idCharacteristic Int.
+            // Previous code: INSERT INTO "HousingDetail" ("applicantId", "detailNumber") VALUES ...
+            // This works ONLY if idCharacteristic is not required or has default?
+            // Checking schema... idCharacteristic Int (REQUIRED).
+            // The previous code WAS BROKEN because it didn't supply idCharacteristic.
+            // I must fix this too.
+            // Services correspond to 'Artefactos Domesticos...' in seed?
+            // Seed data: 'Artefactos Domesticos, bienes o servicios del hogar' (line 50)
+
+            const serviceChar = await tx.housingCharacteristic.findUnique({ where: { name: 'Artefactos Domesticos, bienes o servicios del hogar' } });
+            if (serviceChar) {
+              for (const serviceId of data.servicesIdAvailable) {
+                await tx.$executeRaw`
+                     INSERT INTO "HousingDetail" ("applicantId", "idCharacteristic", "detailNumber")
+                     VALUES (${data.identityCard}, ${serviceChar.idCharacteristic}, ${serviceId})
+                   `;
+              }
             }
           } catch (error: any) {
             if (!isMissingRelationError(error, 'HousingDetail')) {
@@ -286,6 +426,8 @@ class ApplicantService {
             }
           }
         }
+
+        await saveHousingDetails(tx, data.identityCard, data);
         const created = await fetchApplicantInfo(tx, data.identityCard);
         if (!created) throw new Error('Applicant not found after create');
 
@@ -358,12 +500,20 @@ class ApplicantService {
         `;
         if (Array.isArray(data.servicesIdAvailable)) {
           try {
-            await tx.$executeRaw`DELETE FROM "HousingDetail" WHERE "applicantId" = ${id}`;
-            for (const serviceId of data.servicesIdAvailable) {
+            const serviceChar = await tx.housingCharacteristic.findUnique({ where: { name: 'Artefactos Domesticos, bienes o servicios del hogar' } });
+            if (serviceChar) {
+              // Delete only services
               await tx.$executeRaw`
-                INSERT INTO "HousingDetail" ("applicantId", "detailNumber")
-                VALUES (${id}, ${serviceId})
-              `;
+                    DELETE FROM "HousingDetail" 
+                    WHERE "applicantId" = ${id} AND "idCharacteristic" = ${serviceChar.idCharacteristic}
+                `;
+
+              for (const serviceId of data.servicesIdAvailable) {
+                await tx.$executeRaw`
+                    INSERT INTO "HousingDetail" ("applicantId", "idCharacteristic", "detailNumber")
+                    VALUES (${id}, ${serviceChar.idCharacteristic}, ${serviceId})
+                `;
+              }
             }
           } catch (error: any) {
             if (!isMissingRelationError(error, 'HousingDetail')) {
@@ -371,6 +521,8 @@ class ApplicantService {
             }
           }
         }
+
+        await saveHousingDetails(tx, id as string, data as ApplicantDAO);
 
         const updated = await fetchApplicantInfo(tx, id);
         if (!updated) throw new Error('Applicant not found');

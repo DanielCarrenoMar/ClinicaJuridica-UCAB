@@ -7,6 +7,8 @@ import TitleTextInput from "#components/TitleTextInput.tsx";
 import Dialog from "#components/dialogs/Dialog.tsx";
 import { locationData } from "#domain/seedData.ts";
 import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
+import type { GenderTypeModel } from "#domain/typesModel.ts";
+import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
 
 interface NewBeneficiaryDialogProps {
   open: boolean;
@@ -23,14 +25,13 @@ export default function CreateBeneficiaryDialog({
 
   const [identityCard, setIdentityCard] = useState("");
   const [fullName, setFullName] = useState("");
-  const [gender, setGender] = useState<BeneficiaryDAO["gender"]>();
-
+  const [gender, setGender] = useState<GenderTypeModel>();
   const [birthDate, setBirthDate] = useState<string>();
   const [idNationality, setNationality] = useState<BeneficiaryDAO["idNationality"]>();
 
-  const [idState, setIdState] = useState<number>();
-  const [municipalityNumber, setMunicipalityNumber] = useState<number>();
-  const [parishNumber, setParishNumber] = useState<number>();
+  const [stateIndex, setStateIndex] = useState<number | null>(null);
+  const [munIndex, setMunIndex] = useState<number | null>(null);
+  const [parishName, setParishName] = useState<string>();
 
   const resetForm = () => {
     setIdentityCard("");
@@ -38,12 +39,9 @@ export default function CreateBeneficiaryDialog({
     setGender(undefined);
     setBirthDate(undefined);
     setNationality(undefined);
-
-    setIdState(undefined);
-    setMunicipalityNumber(undefined);
-    setParishNumber(undefined);
-
-    // TitleTextInput usa defaultValue internamente; esto fuerza remount para que el UI se resetee.
+    setStateIndex(null);
+    setMunIndex(null);
+    setParishName(undefined);
     setFormKey((k) => k + 1);
   };
 
@@ -57,10 +55,20 @@ export default function CreateBeneficiaryDialog({
     if (!fullName.trim()) return;
     if (!birthDate || !gender || !idNationality) return;
 
+    const idState = stateIndex !== null ? stateIndex + 1 : undefined;
+    const municipalityNumber = munIndex !== null ? munIndex + 1 : undefined;
+    let parishNumber: number | undefined = undefined;
+
+    if (stateIndex !== null && munIndex !== null && parishName) {
+      const parishList = locationData[stateIndex].municipalities[munIndex].parishes;
+      const pIdx = parishList.indexOf(parishName);
+      parishNumber = pIdx !== -1 ? pIdx + 1 : undefined;
+    }
+
     onCreate({
       identityCard: identityCard.trim(),
       hasId: identityCard.trim().length > 0,
-      gender: gender,
+      gender: typeModelToGenderTypeDao(gender),
       type: "B",
       fullName: fullName.trim(),
       birthDate: birthDate,
@@ -81,86 +89,99 @@ export default function CreateBeneficiaryDialog({
   return (
     <Dialog closeOnOutsideClick={false} open={open} title="Nuevo Beneficiario" onClose={handleClose}>
       <div key={formKey} className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <TitleTextInput
-            label="Cédula"
-            value={identityCard}
-            onChange={setIdentityCard}
-            placeholder="V-12345678"
-          />
-          <TitleTextInput
-            label="Nombre"
-            value={fullName}
-            onChange={setFullName}
-            placeholder="Nombre y apellido"
-          />
-        </div>
+        <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
+          <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
+            <div>
+              <TitleTextInput
+                label="Cédula"
+                value={identityCard}
+                onChange={setIdentityCard}
+              />
+            </div>
+            <div>
+              <TitleTextInput
+                label="Nombre y apellido"
+                value={fullName}
+                onChange={setFullName}
+              />
+            </div>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <DatePicker label="Nacimiento" value={birthDate} onChange={(date) => setBirthDate(date)} />
+          <div className="col-span-1">
+            <TitleDropdown
+              label="Sexo"
+              selectedValue={gender || undefined}
+              onSelectionChange={(value) => setGender(value as GenderTypeModel)}
+            >
+              <DropdownOption value="Masculino">Masculino</DropdownOption>
+              <DropdownOption value="Femenino">Femenino</DropdownOption>
+            </TitleDropdown>
+          </div>
+          <div className="col-span-1">
+            <DatePicker
+              label="Fecha Nacimiento"
+              value={birthDate}
+              onChange={(text) => setBirthDate(text)}
+            />
+          </div>
+          <div className="col-span-1">
+            <TitleDropdown
+              label="Nacionalidad"
+              selectedValue={idNationality ?? undefined}
+              onSelectionChange={(value) => setNationality(value as BeneficiaryDAO["idNationality"])}
+            >
+              <DropdownOption value="V">Venezolana</DropdownOption>
+              <DropdownOption value="E">Extranjera</DropdownOption>
+              <DropdownOption value="J">Juridica</DropdownOption>
+            </TitleDropdown>
+          </div>
 
-          <TitleDropdown
-            label="Género"
-            selectedValue={gender ?? undefined}
-            onSelectionChange={(value) => setGender(value as BeneficiaryDAO["gender"])}
-          >
-            <DropdownOption value="M">Masculino</DropdownOption>
-            <DropdownOption value="F">Femenino</DropdownOption>
-          </TitleDropdown>
-
-          <TitleDropdown
-            label="Nacionalidad"
-            selectedValue={idNationality ?? undefined}
-            onSelectionChange={(value) => setNationality(value as BeneficiaryDAO["idNationality"])}
-          >
-            <DropdownOption value="V">Venezolana</DropdownOption>
-            <DropdownOption value="E">Extranjera</DropdownOption>
-            <DropdownOption value="J">Juridica</DropdownOption>
-          </TitleDropdown>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <TitleDropdown
-            label="Estado*"
-            selectedValue={idState}
-            onSelectionChange={(value) => {
-              const idx = value as number;
-              setIdState(idx + 1);
-              setMunicipalityNumber(undefined);
-              setParishNumber(undefined);
-            }}
-          >
-            {locationData.map((state, index) => (
-              <DropdownOption key={index} value={index}>{state.name}</DropdownOption>
-            ))}
-          </TitleDropdown>
-          <TitleDropdown
-            label="Municipio*"
-            selectedValue={municipalityNumber}
-            onSelectionChange={(value) => {
-              const idx = value as number;
-              setMunicipalityNumber(idx + 1);
-              setParishNumber(undefined);
-            }}
-            disabled={idState === undefined}
-          >
-            {idState !== undefined && locationData[idState - 1].municipalities.map((mun, index) => (
-              <DropdownOption key={index} value={index}>{mun.name}</DropdownOption>
-            ))}
-          </TitleDropdown>
-          <TitleDropdown
-            label="Parroquia*"
-            selectedValue={parishNumber}
-            onSelectionChange={(value) => {
-              const idx = value as number;
-              setParishNumber(idx + 1);
-            }}
-            disabled={municipalityNumber === undefined}
-          >
-            {idState !== undefined && municipalityNumber !== undefined && locationData[idState - 1].municipalities[municipalityNumber - 1].parishes.map((parish, index) => (
-              <DropdownOption key={index} value={index + 1}>{parish}</DropdownOption>
-            ))}
-          </TitleDropdown>
+          <div className="col-span-1">
+            <TitleDropdown
+              label="Estado*"
+              selectedValue={stateIndex !== null ? stateIndex : undefined}
+              onSelectionChange={(value) => {
+                const idx = value as number;
+                setStateIndex(idx);
+                setMunIndex(null);
+                setParishName(undefined);
+              }}
+            >
+              {locationData.map((state, index) => (
+                <DropdownOption key={index} value={index}>{state.name}</DropdownOption>
+              ))}
+            </TitleDropdown>
+          </div>
+          <div className="col-span-1">
+            <TitleDropdown
+              label="Municipio*"
+              selectedValue={munIndex !== null ? munIndex : undefined}
+              onSelectionChange={(value) => {
+                const idx = value as number;
+                setMunIndex(idx);
+                setParishName(undefined);
+              }}
+              disabled={stateIndex === null}
+            >
+              {stateIndex !== null && locationData[stateIndex].municipalities.map((mun, index) => (
+                <DropdownOption key={index} value={index}>{mun.name}</DropdownOption>
+              ))}
+            </TitleDropdown>
+          </div>
+          <div className="col-span-1">
+            <TitleDropdown
+              label="Parroquia*"
+              selectedValue={parishName || undefined}
+              onSelectionChange={(value) => {
+                setParishName(value as string);
+              }}
+              disabled={munIndex === null}
+            >
+              {stateIndex !== null && munIndex !== null && locationData[stateIndex].municipalities[munIndex].parishes.map((parish, index) => (
+                <DropdownOption key={index} value={parish}>{parish}</DropdownOption>
+              ))}
+            </TitleDropdown>
+          </div>
         </div>
       </div>
 
