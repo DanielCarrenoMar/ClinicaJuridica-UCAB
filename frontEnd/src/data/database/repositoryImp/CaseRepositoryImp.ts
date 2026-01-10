@@ -69,6 +69,9 @@ export function getCaseRepository(): CaseRepository {
                 body: JSON.stringify(data)
             });
             const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || 'Error creating case');
+            }
             const caseDAO: CaseInfoDAO = result.data;
             return daoToCaseModel(caseDAO);
         },

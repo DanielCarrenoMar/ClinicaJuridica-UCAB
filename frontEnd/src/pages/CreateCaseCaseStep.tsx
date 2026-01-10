@@ -9,10 +9,6 @@ import { ChevronRight, Close } from "flowbite-react-icons/outline";
 import { useEffect, useState } from "react";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import type { ProcessTypeDAO } from "#database/typesDAO.ts";
-import { useCreateCase, useSetBeneficiariesToCase } from "#domain/useCaseHooks/useCase.ts";
-import type { CaseDAO } from "#database/daos/caseDAO.ts";
-import { useCreateApplicant, useUpdateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
-import { useAuth } from "../context/AuthContext.tsx";
 
 import InBox from "#components/InBox.tsx";
 import PersonSearchDialog from "#components/dialogs/PersonSearchDialog.tsx";
@@ -26,7 +22,7 @@ import PersonCard from "#components/PersonCard.tsx";
 import BeneficiaryRelationshipDialog from "#components/dialogs/BeneficiaryRelationshipDialog.tsx";
 import type { PersonModel } from "#domain/models/person.ts";
 import type { CaseBeneficiaryTypeModel } from "#domain/typesModel.ts";
-import { caseBeneficiaryModelToDao, type CaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
+import type { CaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
 import BeneficiaryCard from "#components/BeneficiaryCard.tsx";
 
 function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): number {
@@ -44,14 +40,9 @@ function getLegalAreaId(subjectIdx: number, catIdx: number, areaIdx: number): nu
 
 function CreateCaseCaseStep() {
     const navigate = useNavigate();
-    const { applicantModel, caseDAO, updateCaseDAO, isApplicantExisting, caseBeneficiaries, setCaseBeneficiaries } = useCaseOutletContext();
-    const { createCase, loading: createCaseLoading } = useCreateCase();
-    const { createApplicant, loading: createApplicantLoading } = useCreateApplicant();
-    const { updateApplicant, loading: updateApplicantLoading } = useUpdateApplicant();
-    const { setBeneficiariesToCase, loading: setBeneficiariesLoading } = useSetBeneficiariesToCase();
+    const { applicantModel, caseDAO, updateCaseDAO, caseBeneficiaries, setCaseBeneficiaries, submitCreateCase, isSubmittingCreateCase } = useCaseOutletContext();
     const { beneficiaries, refresh: refreshBeneficiaries } = useGetAllBeneficiaries();
     const { createBeneficiary } = useCreateBeneficiary();
-    const { user } = useAuth()
 
     const [subjectIndex, setSubjectIndex] = useState<number | null>(null);
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
@@ -82,41 +73,6 @@ function CreateCaseCaseStep() {
         setIsBeneficiaryRelationshipDialogOpen(false);
     }
 
-    async function handleCreateCase() {
-        try {
-            if (isApplicantExisting) {
-                await updateApplicant(applicantModel.identityCard, applicantModel);
-            } else {
-                const created = await createApplicant(applicantModel as any);
-                if (!created) {
-                    throw new Error("Applicant creation failed.");
-                }
-            }
-
-            const caseToCreate: CaseDAO = {
-                ...caseDAO,
-                applicantId: applicantModel.identityCard,
-                userId: user?.identityCard || "",
-            };
-
-            console.log("Creating case with data:", caseToCreate);
-            const createdCase = await createCase(caseToCreate);
-            if (createdCase) {
-                if (caseBeneficiaries.length > 0) {
-                    await setBeneficiariesToCase(
-                        createdCase.idCase,
-                        caseBeneficiaries.map((b) => caseBeneficiaryModelToDao({ ...b, idCase: createdCase.idCase }))
-                    );
-                }
-                navigate(`/caso/${createdCase.idCase}`);
-            } else {
-                throw new Error("Case creation failed. Case is null.");
-            }
-        } catch (error) {
-            console.error("Error en el flujo de creación de caso:", error);
-        }
-    }
-
     useEffect(() => {
         if (!applicantModel.identityCard) {
             navigate("/crearCaso/solicitante");
@@ -132,7 +88,7 @@ function CreateCaseCaseStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { navigate("/crearCaso/solicitante"); }} variant="outlined" icon={<UserEdit />} className="h-10 w-28">Volver</Button>
-                    <Button onClick={handleCreateCase} variant="resalted" icon={<ChevronRight />} disabled={createCaseLoading || createApplicantLoading || updateApplicantLoading || setBeneficiariesLoading} className="w-32">Aceptar</Button>
+                    <Button onClick={submitCreateCase} variant="resalted" icon={<ChevronRight />} disabled={isSubmittingCreateCase} className="w-32">Aceptar</Button>
                 </div>
             </header>
             <div className="px-4 py-2 flex flex-col gap-4">
