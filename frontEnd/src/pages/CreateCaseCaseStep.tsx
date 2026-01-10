@@ -224,7 +224,7 @@ function CreateCaseCaseStep() {
 
                 <CreateBeneficiaryDialog
                     open={isCreateBeneficiaryDialogOpen}
-                    onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
+                    onClose={() =>{ setIsCreateBeneficiaryDialogOpen(false); setIsBeneficiarySearchDialogOpen(true);}}
                     onCreate={async (data: BeneficiaryDAO) => {
                         const created = await createBeneficiary(data);
                         await refreshBeneficiaries();
@@ -238,6 +238,7 @@ function CreateCaseCaseStep() {
                     open={isBeneficiaryRelationshipDialogOpen}
                     onClose={() => {
                         setIsBeneficiaryRelationshipDialogOpen(false);
+                        setIsBeneficiarySearchDialogOpen(true);
                         setPendingCaseBeneficiary(null);
                     }}
                     onCreate={(data) => {

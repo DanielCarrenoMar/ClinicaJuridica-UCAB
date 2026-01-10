@@ -82,7 +82,9 @@ export default function CreateBeneficiaryDialog({
   };
 
   function handleClose() {
-    if (window.confirm("¿Cerrar el diálogo? Se perderán los datos no guardados."))
+    const isEmpty = !identityCard.trim() && !fullName.trim() && !gender && !birthDate && !idNationality && stateIndex === null;
+
+    if (isEmpty || window.confirm("¿Cerrar el diálogo? Se perderán los datos no guardados."))
       onClose();
   }
 

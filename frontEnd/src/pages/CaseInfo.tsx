@@ -646,7 +646,7 @@ export default function CaseInfo() {
 
                 <CreateBeneficiaryDialog
                     open={isCreateBeneficiaryDialogOpen}
-                    onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
+                    onClose={() =>{ setIsCreateBeneficiaryDialogOpen(false); setIsBeneficiarySearchDialogOpen(true); }}
                     onCreate={handleCreateCaseBeneficiary}
                 />
 
@@ -654,6 +654,7 @@ export default function CaseInfo() {
                     open={isBeneficiaryRelationshipDialogOpen}
                     onClose={() => {
                         setIsBeneficiaryRelationshipDialogOpen(false);
+                        setIsBeneficiarySearchDialogOpen(true);
                         setPendingCaseBeneficiary(null);
                     }}
                     onCreate={(data) => {

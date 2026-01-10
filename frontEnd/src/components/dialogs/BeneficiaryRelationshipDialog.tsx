@@ -56,7 +56,9 @@ export default function BeneficiaryRelationshipDialog({
   };
 
   function handleClose() {
-    if (window.confirm("¿Cerrar el diálogo? Se perderán los datos no guardados.")) {
+    const isEmpty = !type && !relationship.trim();
+
+    if (isEmpty || window.confirm("¿Cerrar el diálogo? Se perderán los datos no guardados.")) {
       onClose();
     }
   }
