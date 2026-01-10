@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { useGetBeneficiariesByCaseId, useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetBeneficiariesToCase, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
@@ -17,7 +17,7 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
-import { typeModelToCaseBeneficiaryTypeDao, type CaseStatusTypeModel } from '#domain/typesModel.ts';
+import { typeDaoToCaseBeneficiaryTypeModel, typeModelToCaseBeneficiaryTypeDao, type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
@@ -44,11 +44,12 @@ import { useCreateBeneficiary, useGetAllBeneficiaries } from '#domain/useCaseHoo
 import CreateBeneficiaryDialog from '#components/dialogs/CreateBeneficiaryDialog.tsx';
 import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
 import Fuse from 'fuse.js';
-import type { CaseBeneficiaryDAO } from '#database/daos/caseBeneficiaryDAO.ts';
-import type { CaseBeneficiaryModel } from '#domain/models/caseBeneficiary.ts';
+import { caseBeneficiaryModelToDao, type CaseBeneficiaryModel } from '#domain/models/caseBeneficiary.ts';
 import BeneficiaryCard from '#components/BeneficiaryCard.tsx';
 import type { BeneficiaryModel } from '#domain/models/beneficiary.ts';
 import { useNotifications } from '#/context/NotificationsContext';
+import BeneficiaryRelationshipDialog from '#components/dialogs/BeneficiaryRelationshipDialog.tsx';
+import type { CaseBeneficiaryTypeDAO } from '#database/typesDAO.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -64,7 +65,7 @@ export default function CaseInfo() {
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
     const { user, permissionLevel } = useAuth()
-    const {error: notificationError} = useNotifications()
+    const { error: notificationError } = useNotifications()
     const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
@@ -117,6 +118,8 @@ export default function CaseInfo() {
     const [isTeacherSearchDialogOpen, setIsTeacherSearchDialogOpen] = useState(false);
     const [isBeneficiarySearchDialogOpen, setIsBeneficiarySearchDialogOpen] = useState(false);
     const [isCreateBeneficiaryDialogOpen, setIsCreateBeneficiaryDialogOpen] = useState(false);
+    const [isBeneficiaryRelationshipDialogOpen, setIsBeneficiaryRelationshipDialogOpen] = useState(false);
+    const [pendingCaseBeneficiary, setPendingCaseBeneficiary] = useState<PersonModel | null>(null);
     const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
@@ -144,7 +147,7 @@ export default function CaseInfo() {
     async function saveChanges() {
         if (!localCaseData || !caseData) return;
         await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
-        await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(b => ({identityCard: b.identityCard, caseType: typeModelToCaseBeneficiaryTypeDao(b.caseType), relationship: b.relationship, description: b.description})));
+        await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(caseBeneficiaryModelToDao));
         await updateCase(caseData.idCase, localCaseData)
         loadCase(Number(id));
         loadCaseStudents(Number(id));
@@ -468,7 +471,9 @@ export default function CaseInfo() {
     );
 
     function handleSelectCaseBeneficiary(person: PersonModel) {
-
+        setPendingCaseBeneficiary(person);
+        setIsBeneficiarySearchDialogOpen(false);
+        setIsBeneficiaryRelationshipDialogOpen(true);
     }
     async function handleCreateCaseBeneficiary(beneficiaryDao: BeneficiaryDAO) {
         console.log("Creating beneficiary:", beneficiaryDao);
@@ -478,7 +483,23 @@ export default function CaseInfo() {
             throw new Error("Failed to create beneficiary");
         }
         await refreshBeneficiaries();
-        handleSelectCaseBeneficiary({identityCard: created.identityCard, fullName: created.fullName});
+        handleSelectCaseBeneficiary(created);
+    }
+    function handleAddCaseBeneficiary(type: CaseBeneficiaryTypeModel, relationship: string, description: string) {
+        if (!pendingCaseBeneficiary) return;
+
+        const newCaseBeneficiary: CaseBeneficiaryModel = {
+            ...pendingCaseBeneficiary,
+            idCase: Number(id),
+            caseType: type,
+            relationship: relationship.trim(),
+            description: description.trim(),
+        };
+
+        setLocalBeneficiaries((prev) => [...prev, newCaseBeneficiary]);
+
+        setPendingCaseBeneficiary(null);
+        setIsBeneficiaryRelationshipDialogOpen(false);
     }
 
     const InvolucradosTabContent = (
@@ -627,6 +648,17 @@ export default function CaseInfo() {
                     open={isCreateBeneficiaryDialogOpen}
                     onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
                     onCreate={handleCreateCaseBeneficiary}
+                />
+
+                <BeneficiaryRelationshipDialog
+                    open={isBeneficiaryRelationshipDialogOpen}
+                    onClose={() => {
+                        setIsBeneficiaryRelationshipDialogOpen(false);
+                        setPendingCaseBeneficiary(null);
+                    }}
+                    onCreate={(data) => {
+                        handleAddCaseBeneficiary(data.type, data.relationship, data.description);
+                    }}
                 />
             </section>
         </div>

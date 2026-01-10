@@ -384,14 +384,15 @@ export function useSetBeneficiariesToCase() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    async function setBeneficiariesToCase(idCase: number, beneficiaryIds: Pick<CaseBeneficiaryDAO, "identityCard" | "caseType" | "relationship" | "description">[]) {
+    async function setBeneficiariesToCase(idCase: number, caseBene: CaseBeneficiaryDAO[]) {
         setLoading(true);
+        console.log("Setting beneficiaries to case:", { idCase, caseBene });
         try {
             const currentBeneficiaries = await findBeneficiariesByCaseId(idCase);
             const currentBeneficiaryIds = currentBeneficiaries.map(b => b.identityCard);
 
-            const toAdd = beneficiaryIds.filter(id => !currentBeneficiaryIds.includes(id.identityCard));
-            const toRemove = currentBeneficiaryIds.filter(id => !beneficiaryIds.map(b => b.identityCard).includes(id));
+            const toAdd = caseBene.filter(id => !currentBeneficiaryIds.includes(id.identityCard));
+            const toRemove = currentBeneficiaryIds.filter(id => !caseBene.map(b => b.identityCard).includes(id));
 
             await Promise.all([
                 ...toAdd.map(b => addBeneficiaryToCase(idCase, b.identityCard, b.caseType, b.relationship, b.description)),

@@ -4,10 +4,11 @@ import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import TitleDropdown from "#components/TitleDropdown.tsx";
 import TitleTextInput from "#components/TitleTextInput.tsx";
 import Dialog from "#components/dialogs/Dialog.tsx";
-import type { CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
+import type { CaseBeneficiaryTypeModel } from "#domain/typesModel.ts";
 
 export interface BeneficiaryRelationshipData {
-  type: CaseBeneficiaryTypeDAO;
+  type: CaseBeneficiaryTypeModel;
+  relationship: string;
   description: string;
 }
 
@@ -24,11 +25,13 @@ export default function BeneficiaryRelationshipDialog({
 }: BeneficiaryRelationshipDialogProps) {
   const [formKey, setFormKey] = useState(0);
 
-  const [type, setType] = useState<CaseBeneficiaryTypeDAO>();
+  const [type, setType] = useState<CaseBeneficiaryTypeModel>();
+  const [relationship, setRelationship] = useState("");
   const [description, setDescription] = useState("");
 
   const resetForm = () => {
     setType(undefined);
+    setRelationship("");
     setDescription("");
 
     // TitleTextInput usa defaultValue internamente; esto fuerza remount para que el UI se resetee.
@@ -43,9 +46,11 @@ export default function BeneficiaryRelationshipDialog({
 
   const handleSubmit = () => {
     if (!type) return;
+    if (!relationship.trim()) return;
 
     onCreate({
       type,
+      relationship: relationship.trim(),
       description: description.trim(),
     });
 
@@ -69,11 +74,18 @@ export default function BeneficiaryRelationshipDialog({
         <TitleDropdown
           label="Tipo"
           selectedValue={type ?? undefined}
-          onSelectionChange={(value) => setType(value as CaseBeneficiaryTypeDAO)}
+          onSelectionChange={(value) => setType(value as CaseBeneficiaryTypeModel)}
         >
-          <DropdownOption value="D">Directo</DropdownOption>
-          <DropdownOption value="I">Indirecto</DropdownOption>
+          <DropdownOption value="Directo">Directo</DropdownOption>
+          <DropdownOption value="Indirecto">Indirecto</DropdownOption>
         </TitleDropdown>
+
+        <TitleTextInput
+          label="Relación"
+          value={relationship}
+          onChange={setRelationship}
+          placeholder="Ej: Hijo, cónyuge, representante..."
+        />
 
         <TitleTextInput
           label="Descripción"
@@ -87,7 +99,7 @@ export default function BeneficiaryRelationshipDialog({
         <Button
           variant="resalted"
           onClick={handleSubmit}
-          disabled={!type || description.trim().length === 0}
+          disabled={!type || relationship.trim().length === 0 || description.trim().length === 0}
         >
           Guardar
         </Button>

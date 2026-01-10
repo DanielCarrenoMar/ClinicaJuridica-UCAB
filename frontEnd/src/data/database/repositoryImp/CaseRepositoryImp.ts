@@ -162,6 +162,7 @@ export function getCaseRepository(): CaseRepository {
         },
 
         addBeneficiaryToCase: async (idCase, idBeneficiary, caseType, relationship, description) => {
+            console.log("Adding beneficiary to case:", { idCase, idBeneficiary, caseType, relationship, description });
             const response = await fetch(`${CASE_URL}/${idCase}/beneficiaries`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

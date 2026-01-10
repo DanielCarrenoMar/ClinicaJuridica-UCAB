@@ -4,7 +4,7 @@ export interface CaseBeneficiaryDAO {
   identityCard: string;
   idCase: number;
   fullName: string;
-  idNationality: IdNationalityTypeDAO;
+  idNationality?: IdNationalityTypeDAO;
   relationship: string;
   caseType: CaseBeneficiaryTypeDAO;
   description: string;
