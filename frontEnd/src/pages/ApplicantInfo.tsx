@@ -13,7 +13,7 @@ import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
 import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import DatePicker from "#components/DatePicker.tsx";
-import { CaretDown, Close, Home, Users } from "flowbite-react-icons/outline";
+import { CaretDown, Close, FilePdf, Home, Users } from "flowbite-react-icons/outline";
 import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { locationData, characteristicsData } from "#domain/seedData.ts";
 import { educationLevelData, workConditionData, activityConditionData } from "#domain/seedData.ts";
@@ -573,8 +573,8 @@ export default function ApplicantInfo() {
                                 Guardar
                             </Button>
                         ) : (
-                            <Button onClick={() => navigate(-1)} variant="outlined" className="h-10 w-32">
-                                Volver
+                            <Button onClick={() => {}} icon={<FilePdf />} variant="outlined" className="h-10 w-32">
+                                Exportar
                             </Button>
                         )
                     }
