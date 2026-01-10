@@ -73,22 +73,23 @@ export default function DropdownCheck({
           onClick={() => !disabled && setIsOpen(!isOpen)}
           className={`bg-surface border border-onSurface border-solid flex gap-2 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50'}`}
         >
-          <p className="font-['Poppins'] text-[13px] text-onSurface text-nowrap">
+          <p className="text-body-medium text-nowrap">
             {label}
           </p>
 
-          {showSelectedCountBadge && (
-            <span
-              className={`text-surface text-body-small leading-none rounded-full h-5 min-w-5 px-1 flex items-center justify-center transition-colors duration-200 ${
-                currentSelectedValues.length > 0 ? 'bg-success' : 'bg-onSurface/30 opacity-70'
-              }`}
-              aria-label={`${currentSelectedValues.length} opciones activas`}
-            >
-              {currentSelectedValues.length}
-            </span>
-          )}
-
-          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          <div className='flex'>
+            {showSelectedCountBadge && (
+              <span
+                className={`text-surface text-body-small leading-none rounded-full h-5 min-w-5 px-1 flex items-center justify-center transition-colors duration-200 ${
+                  currentSelectedValues.length > 0 ? 'bg-success' : 'bg-onSurface/30 opacity-70'
+                }`}
+                aria-label={`${currentSelectedValues.length} opciones activas`}
+              >
+                {currentSelectedValues.length}
+              </span>
+            )}
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            </div>
         </button>
 
         {isOpen && (
