@@ -72,7 +72,7 @@ export function useCreateBeneficiary() {
             return created;
         } catch (err) {
             setError(err as Error);
-            return null;
+            throw err;
         } finally {
             setLoading(false);
         }

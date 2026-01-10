@@ -274,7 +274,7 @@ model Student {
 }
 
 model Beneficiary {
-  identityCard  String          @id @db.VarChar(20)
+  identityCard  String          @id @db.VarChar(32)
   gender        Gender
   birthDate     DateTime        @db.Date
   fullName      String          @db.VarChar(63)
