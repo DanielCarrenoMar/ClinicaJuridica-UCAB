@@ -113,7 +113,7 @@ function CreateCaseCaseStep() {
                             <PersonCard person={applicantModel} icon={<User />} />
                         </span>
                     </section>
-                    <section className="col-span-2 row-span-2 flex flex-col">
+                    <section className="col-span-2 row-span-4 flex flex-col">
                         <header className="flex justify-between items-center w-full mb-2">
                             <h3 className="text-label-small mb-2">
                                 Beneficiarios
@@ -205,17 +205,6 @@ function CreateCaseCaseStep() {
                                 </Dropdown>
                             </div>
                         </span>
-                    </section>
-                    <section className="col-span-2 row-span-2 flex flex-col">
-                        <header className="flex justify-between items-center w-full mb-2">
-                            <h3 className="text-label-small mb-2">
-                                Recaudos consignados
-                            </h3>
-                            <Button variant="outlined" className="h-10">Añadir</Button>
-                        </header>
-                        <div className="bg-surface rounded-xl border border-onSurface flex-1">
-
-                        </div>
                     </section>
                 </article>
 
