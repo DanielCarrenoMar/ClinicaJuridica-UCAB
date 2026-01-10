@@ -174,6 +174,10 @@ async function main() {
             name: 'Cuenta Propia',
             isActive: true,
         },
+        {
+            name: 'Buscando Trabajo',
+            isActive: true,
+        }
     ];
 
     for (const conditionItem of workConditionData) {

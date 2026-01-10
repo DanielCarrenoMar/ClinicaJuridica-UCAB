@@ -42,8 +42,8 @@ export default function ApplicantInfo() {
                 // Clonar el objeto profundamente, especialmente las fechas
                 const clonedApplicant = {
                     ...applicant,
-                    birthDate: applicant.birthDate ? (applicant.birthDate instanceof Date ? new Date(applicant.birthDate) : new Date(applicant.birthDate)) : undefined,
-                    createdAt: applicant.createdAt ? (applicant.createdAt instanceof Date ? new Date(applicant.createdAt) : new Date(applicant.createdAt)) : applicant.createdAt,
+                    birthDate: new Date(applicant.birthDate),
+                    createdAt: new Date(applicant.createdAt),
                     servicesIdAvailable: applicant.servicesIdAvailable ? [...applicant.servicesIdAvailable] : undefined
                 };
                 setApplicantData(clonedApplicant);
@@ -117,8 +117,8 @@ export default function ApplicantInfo() {
                     label="Fecha Nacimiento"
                     value={(() => {
                         if (!localApplicantData?.birthDate) return undefined;
-                        const date = localApplicantData.birthDate instanceof Date 
-                            ? localApplicantData.birthDate 
+                        const date = localApplicantData.birthDate instanceof Date
+                            ? localApplicantData.birthDate
                             : new Date(localApplicantData.birthDate);
                         return date.toISOString().split('T')[0];
                     })()}

@@ -16,7 +16,6 @@ import type { SupportDocumentModel } from "./models/supportDocument";
 import type { UserModel } from "./models/user";
 import type { TeacherModel } from "./models/teacher";
 import type { CaseBeneficiaryModel } from "./models/caseBeneficiary";
-import type { CaseBeneficiaryTypeModel } from "./typesModel";
 import type { CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;

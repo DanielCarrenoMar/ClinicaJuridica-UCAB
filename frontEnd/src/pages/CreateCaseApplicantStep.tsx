@@ -16,7 +16,7 @@ import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import ConfirmDialog from "#components/dialogs/ConfirmDialog.tsx";
 import { useBlocker, useNavigate } from "react-router";
 import DatePicker from "#components/DatePicker.tsx";
-import { activityConditionData, characteristicsData, educationLevelData, locationData, servicesData, workConditionData } from "#domain/seedData.ts";
+import { activityConditionData, characteristicsData, educationLevelData, locationData, workConditionData } from "#domain/seedData.ts";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
@@ -42,6 +42,7 @@ function CreateCaseApplicantStep() {
 
     const [foundApplicant, setFoundApplicant] = useState<ApplicantModel | null>(null);
     const [isApplyingAutoFill, setIsApplyingAutoFill] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [lastIdentityCard, setLastIdentityCard] = useState<string>(
         (isApplicantExisting && applicantModel.fullName && applicantModel.fullName.trim().length > 0)
             ? applicantModel.identityCard.trim()
@@ -53,6 +54,7 @@ function CreateCaseApplicantStep() {
     const isFieldDisabled = (fieldName: keyof ApplicantModel) => {
         if (!isApplicantExisting || !dbOriginalData) return false;
         const dbValue = (dbOriginalData as any)[fieldName];
+        if (Array.isArray(dbValue) && dbValue.length === 0) return false;
         return dbValue !== undefined && dbValue !== null && dbValue !== "";
     };
 
@@ -132,6 +134,7 @@ function CreateCaseApplicantStep() {
         setHaveMinDataToNextStep(!!(
             isVerifyingIdentityCard &&
             !showAutoFillToast &&
+            Object.keys(validationErrors).length === 0 &&
             applicantModel.fullName &&
             applicantModel.fullName.trim().length > 0 &&
             applicantModel.identityCard &&
@@ -151,7 +154,27 @@ function CreateCaseApplicantStep() {
             "idNationality": applicantModel.idNationality !== undefined,
             "gender": applicantModel.gender !== undefined,
         });*/
-    }, [applicantModel, showAutoFillToast, isVerifyingIdentityCard, isApplyingAutoFill]);
+    }, [applicantModel, showAutoFillToast, isVerifyingIdentityCard, isApplyingAutoFill, validationErrors]);
+
+    // Validation Effect
+    useEffect(() => {
+        const errors: Record<string, string> = {};
+        const { memberCount, workingMemberCount, children7to12Count, studentChildrenCount } = applicantModel;
+
+        if (memberCount !== undefined && memberCount !== null) {
+            if (workingMemberCount !== undefined && workingMemberCount !== null && workingMemberCount > memberCount) {
+                errors.workingMemberCount = "No pueden trabajar más personas de las que viven en casa";
+            }
+            if (children7to12Count !== undefined && children7to12Count !== null && children7to12Count > memberCount) {
+                errors.children7to12Count = "No puede haber más niños de los que viven en casa";
+            }
+            if (studentChildrenCount !== undefined && studentChildrenCount !== null && studentChildrenCount > memberCount) {
+                errors.studentChildrenCount = "No puede haber más niños de los que viven en casa";
+            }
+        }
+
+        setValidationErrors(errors);
+    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount]);
 
     useEffect(() => {
         return () => {
@@ -347,10 +370,6 @@ function CreateCaseApplicantStep() {
                         updateApplicantModel({
                             stateName: locationData[idx].name,
                             idState: idx + 1,
-                            municipalityName: undefined,
-                            municipalityNumber: undefined,
-                            parishName: undefined,
-                            parishNumber: undefined
                         });
                     }}
                     disabled={isFieldDisabled('stateName')}
@@ -370,8 +389,6 @@ function CreateCaseApplicantStep() {
                         updateApplicantModel({
                             municipalityName: locationData[stateIndex!].municipalities[idx].name,
                             municipalityNumber: idx + 1,
-                            parishName: undefined,
-                            parishNumber: undefined
                         });
                     }}
                     disabled={stateIndex === null || isFieldDisabled('municipalityName')}
@@ -444,7 +461,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Condición Trabajo*"
                     selectedValue={applicantModel.workConditionId || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number, activityConditionId: undefined }); }}
                     disabled={isFieldDisabled('workConditionId')}
                 >
                     {workConditionData.map((condition, index) => (
@@ -456,7 +473,7 @@ function CreateCaseApplicantStep() {
                 <TitleDropdown
                     label="Condición Actividad*"
                     selectedValue={applicantModel.activityConditionId || undefined}
-                    onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number }); }}
+                    onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number, workConditionId: undefined }); }}
                     disabled={isFieldDisabled('activityConditionId')}
                 >
                     {activityConditionData.map((condition, index) => (
@@ -588,19 +605,37 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3">
                 <div className="flex flex-col gap-2">
                     <header>
-                        <h4 className="text-body-large ">Servicios básicos*</h4>
+                        <h4 className="text-body-large ">Artefactos Domesticos, bienes o servicios del hogar*</h4>
                     </header>
                     <DropdownCheck
-                        label="Servicios basicos*"
+                        label="Seleccionar"
                         selectedValues={applicantModel.servicesIdAvailable ?? []}
                         onSelectionChange={(values) => { updateApplicantModel({ servicesIdAvailable: values as number[] }); }}
                         disabled={isFieldDisabled('servicesIdAvailable')}
                     >
-                        {servicesData.map((service) => (
-                            <DropdownOptionCheck key={service.id} value={service.id}>{service.name}</DropdownOptionCheck>
+                        {housingCharacteristicOptions('Artefactos Domesticos, bienes o servicios del hogar').map((option, index) => (
+                            <DropdownOptionCheck key={index} value={index + 1}>{option}</DropdownOptionCheck>
                         ))}
                     </DropdownCheck>
                 </div>
+                {applicantModel.servicesIdAvailable && applicantModel.servicesIdAvailable.length > 0 && (
+                    <div className="mt-2">
+                        <span className="text-body-small font-medium text-onSurface/80 block mb-1">Opciones elegidas:</span>
+                        <div className="flex flex-wrap gap-2">
+                            {applicantModel.servicesIdAvailable.map((id) => {
+                                const options = housingCharacteristicOptions('Artefactos Domesticos, bienes o servicios del hogar');
+                                // ID is 1-based, options array is 0-based
+                                const name = options[id - 1];
+                                if (!name) return null;
+                                return (
+                                    <span key={id} className="bg-surface-container-high text-onSurface px-2 py-1 rounded-md text-sm border border-outline-variant">
+                                        {name}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );
@@ -615,48 +650,59 @@ function CreateCaseApplicantStep() {
                         const num = Number(text);
                         updateApplicantModel({ memberCount: Number.isNaN(num) ? undefined : num });
                     }}
-
                     disabled={isFieldDisabled('memberCount')}
                 />
             </div>
             <div className="col-span-1">
-                <TitleTextInput
-                    label="Personas que trabajan*"
-                    value={applicantModel.workingMemberCount?.toString() ?? ""}
-                    onChange={(text) => {
-                        const num = Number(text);
-                        updateApplicantModel({ workingMemberCount: Number.isNaN(num) ? undefined : num });
-                    }}
-
-                    disabled={isFieldDisabled('workingMemberCount')}
-                />
+                <div className="flex flex-col">
+                    <TitleTextInput
+                        label="Personas que trabajan*"
+                        value={applicantModel.workingMemberCount?.toString() ?? ""}
+                        onChange={(text) => {
+                            const num = Number(text);
+                            updateApplicantModel({ workingMemberCount: Number.isNaN(num) ? undefined : num });
+                        }}
+                        disabled={isFieldDisabled('workingMemberCount')}
+                    />
+                    {validationErrors.workingMemberCount && (
+                        <span className="text-xs text-error mt-1">{validationErrors.workingMemberCount}</span>
+                    )}
+                </div>
             </div>
 
             {/* Numero de niños entre 7 y 12 años | Cuantos niños estudian */}
             <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
                 <div>
-                    <TitleTextInput
-                        label="Número de niños entre 7 y 12 años*"
-                        value={applicantModel.children7to12Count?.toString() ?? ""}
-                        onChange={(text) => {
-                            const num = Number(text);
-                            updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
-                        }}
-
-                        disabled={isFieldDisabled('children7to12Count')}
-                    />
+                    <div className="flex flex-col">
+                        <TitleTextInput
+                            label="Número de niños entre 7 y 12 años*"
+                            value={applicantModel.children7to12Count?.toString() ?? ""}
+                            onChange={(text) => {
+                                const num = Number(text);
+                                updateApplicantModel({ children7to12Count: Number.isNaN(num) ? undefined : num });
+                            }}
+                            disabled={isFieldDisabled('children7to12Count')}
+                        />
+                        {validationErrors.children7to12Count && (
+                            <span className="text-xs text-error mt-1">{validationErrors.children7to12Count}</span>
+                        )}
+                    </div>
                 </div>
                 <div>
-                    <TitleTextInput
-                        label="Cuántos niños estudian*"
-                        value={applicantModel.studentChildrenCount?.toString() ?? ""}
-                        onChange={(text) => {
-                            const num = Number(text);
-                            updateApplicantModel({ studentChildrenCount: Number.isNaN(num) ? undefined : num });
-                        }}
-
-                        disabled={isFieldDisabled('studentChildrenCount')}
-                    />
+                    <div className="flex flex-col">
+                        <TitleTextInput
+                            label="Cuántos niños estudian*"
+                            value={applicantModel.studentChildrenCount?.toString() ?? ""}
+                            onChange={(text) => {
+                                const num = Number(text);
+                                updateApplicantModel({ studentChildrenCount: Number.isNaN(num) ? undefined : num });
+                            }}
+                            disabled={isFieldDisabled('studentChildrenCount')}
+                        />
+                        {validationErrors.studentChildrenCount && (
+                            <span className="text-xs text-error mt-1">{validationErrors.studentChildrenCount}</span>
+                        )}
+                    </div>
                 </div>
             </div>
 

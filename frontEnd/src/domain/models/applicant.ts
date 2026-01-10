@@ -63,6 +63,7 @@ export function modelToApplicantDao(model: ApplicantModel): ApplicantDAO {
 		...daoBase,
 		birthDate: birthDate.toISOString(),
 		gender: typeModelToGenderTypeDao(gender),
-		maritalStatus: maritalStatus ? typeModelToMaritalStatusTypeDao(maritalStatus) : undefined
+		maritalStatus: maritalStatus ? typeModelToMaritalStatusTypeDao(maritalStatus) : undefined,
+		servicesIdAvailable: servicesIdAvailable
 	};
 }

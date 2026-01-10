@@ -79,6 +79,12 @@ function CreateCaseCaseStep() {
         }
     }, []);
 
+    const isFormValid =
+        (caseDAO.idLegalArea || 0) !== 0 &&
+        !!caseDAO.idNucleus &&
+        !!caseDAO.problemSummary &&
+        caseDAO.problemSummary.trim().length > 0;
+
     return (
         <>
             <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16">
@@ -88,7 +94,7 @@ function CreateCaseCaseStep() {
                 </div>
                 <div className="flex items-end gap-2.5">
                     <Button onClick={() => { navigate("/crearCaso/solicitante"); }} variant="outlined" icon={<UserEdit />} className="h-10 w-28">Volver</Button>
-                    <Button onClick={submitCreateCase} variant="resalted" icon={<ChevronRight />} disabled={isSubmittingCreateCase} className="w-32">Aceptar</Button>
+                    <Button onClick={submitCreateCase} variant="resalted" icon={<ChevronRight />} disabled={isSubmittingCreateCase || !isFormValid} className="w-32">Aceptar</Button>
                 </div>
             </header>
             <div className="px-4 py-2 flex flex-col gap-4">
