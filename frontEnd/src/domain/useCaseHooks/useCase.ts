@@ -4,14 +4,13 @@ import { getCaseRepository } from '#database/repositoryImp/CaseRepositoryImp.ts'
 import type { CaseDAO } from '#database/daos/caseDAO.ts';
 import type { StatusCaseAmountModel } from '#domain/models/statusCaseAmount.ts';
 import type { StudentModel } from '../models/student';
-import type { BeneficiaryModel } from '../models/beneficiary';
 import type { CaseStatusDAO } from '#database/daos/caseStatusDAO.ts';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts'
 import { typeModelToCaseStatusTypeDao } from '#domain/typesModel.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import type { CaseBeneficiaryDAO } from '#database/daos/caseBeneficiaryDAO.ts';
-import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
+import type { CaseBeneficiaryModel } from '#domain/models/caseBeneficiary.ts';
 export function useGetCases() {
     const { findAllCases } = getCaseRepository();
     const [cases, setCases] = useState<CaseModel[]>([]);
@@ -224,7 +223,7 @@ export function useGetStudentsByCaseId(id: number) {
 
 export function useGetBeneficiariesByCaseId(id: number) {
     const { findBeneficiariesByCaseId } = getCaseRepository();
-    const [beneficiaries, setBeneficiaries] = useState<BeneficiaryModel[]>([]);
+    const [beneficiaries, setBeneficiaries] = useState<CaseBeneficiaryModel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 

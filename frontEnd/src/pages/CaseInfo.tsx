@@ -17,7 +17,7 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
-import type { CaseStatusTypeModel } from '#domain/typesModel.ts';
+import { typeModelToCaseBeneficiaryTypeDao, type CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
@@ -44,6 +44,11 @@ import { useCreateBeneficiary, useGetAllBeneficiaries } from '#domain/useCaseHoo
 import CreateBeneficiaryDialog from '#components/dialogs/CreateBeneficiaryDialog.tsx';
 import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
 import Fuse from 'fuse.js';
+import type { CaseBeneficiaryDAO } from '#database/daos/caseBeneficiaryDAO.ts';
+import type { CaseBeneficiaryModel } from '#domain/models/caseBeneficiary.ts';
+import BeneficiaryCard from '#components/BeneficiaryCard.tsx';
+import type { BeneficiaryModel } from '#domain/models/beneficiary.ts';
+import { useNotifications } from '#/context/NotificationsContext';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -59,6 +64,7 @@ export default function CaseInfo() {
     if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
 
     const { user, permissionLevel } = useAuth()
+    const {error: notificationError} = useNotifications()
     const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
     const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user!!.identityCard);
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
@@ -93,7 +99,7 @@ export default function CaseInfo() {
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [localCaseStudents, setLocalStudents] = useState<PersonModel[]>([]); // Local state for students
-    const [localCaseBeneficiaries, setLocalBeneficiaries] = useState<PersonModel[]>([]); // Local state for beneficiaries
+    const [localCaseBeneficiaries, setLocalBeneficiaries] = useState<CaseBeneficiaryModel[]>([]);
     const [isDataModified, setIsDataModified] = useState(false);
 
     // Citas Tab State
@@ -138,7 +144,7 @@ export default function CaseInfo() {
     async function saveChanges() {
         if (!localCaseData || !caseData) return;
         await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
-        await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(b => b.identityCard));
+        await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(b => ({identityCard: b.identityCard, caseType: typeModelToCaseBeneficiaryTypeDao(b.caseType), relationship: b.relationship, description: b.description})));
         await updateCase(caseData.idCase, localCaseData)
         loadCase(Number(id));
         loadCaseStudents(Number(id));
@@ -461,6 +467,20 @@ export default function CaseInfo() {
         </div>
     );
 
+    function handleSelectCaseBeneficiary(person: PersonModel) {
+
+    }
+    async function handleCreateCaseBeneficiary(beneficiaryDao: BeneficiaryDAO) {
+        console.log("Creating beneficiary:", beneficiaryDao);
+        const created = await createBeneficiary(beneficiaryDao);
+        if (!created) {
+            notificationError("Error al crear el beneficiario.");
+            throw new Error("Failed to create beneficiary");
+        }
+        await refreshBeneficiaries();
+        handleSelectCaseBeneficiary({identityCard: created.identityCard, fullName: created.fullName});
+    }
+
     const InvolucradosTabContent = (
         <div className="flex flex-col md:flex-row gap-8 h-full">
             <section className="flex-1 flex flex-col gap-8">
@@ -570,7 +590,7 @@ export default function CaseInfo() {
                         {localCaseBeneficiaries.map((beneficiary) => (
                             <li key={beneficiary.identityCard}>
                                 <span className="flex items-center justify-between">
-                                    <PersonCard icon={<UserCircle />} person={beneficiary} />
+                                    <BeneficiaryCard icon={<UserCircle />} beneficiary={beneficiary} />
                                     <Button
                                         onClick={() => setLocalBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
                                         icon={<Close />}
@@ -589,9 +609,7 @@ export default function CaseInfo() {
                     placeholder="Buscar por nombre o cédula..."
                     onClose={() => setIsBeneficiarySearchDialogOpen(false)}
                     users={beneficiaries.filter(b => !localCaseBeneficiaries.some(lb => lb.identityCard === b.identityCard) && b.identityCard !== caseData.applicantId)}
-                    onSelect={(beneficiary) => {
-                        setLocalBeneficiaries((prev) => [...prev, beneficiary]);
-                    }}
+                    onSelect={handleSelectCaseBeneficiary}
                     headerItems={
                         <Button
                             variant='outlined'
@@ -608,14 +626,7 @@ export default function CaseInfo() {
                 <CreateBeneficiaryDialog
                     open={isCreateBeneficiaryDialogOpen}
                     onClose={() => setIsCreateBeneficiaryDialogOpen(false)}
-                    onCreate={async (data: BeneficiaryDAO) => {
-                        console.log("Creating beneficiary:", data);
-                        const created = await createBeneficiary(data);
-                        await refreshBeneficiaries();
-                        if (created) {
-                            setLocalBeneficiaries((prev) => [...prev, created]);
-                        }
-                    }}
+                    onCreate={handleCreateCaseBeneficiary}
                 />
             </section>
         </div>
