@@ -27,12 +27,10 @@ export default function BeneficiaryRelationshipDialog({
 
   const [type, setType] = useState<CaseBeneficiaryTypeModel>();
   const [relationship, setRelationship] = useState("");
-  const [description, setDescription] = useState("");
 
   const resetForm = () => {
     setType(undefined);
     setRelationship("");
-    setDescription("");
 
     // TitleTextInput usa defaultValue internamente; esto fuerza remount para que el UI se resetee.
     setFormKey((k) => k + 1);
