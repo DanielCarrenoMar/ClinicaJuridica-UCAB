@@ -49,7 +49,32 @@ class BeneficiaryService {
   async create(data: any) {
     try {
       const fullName = data.fullName ?? data.name;
-      const idNationality = data.idNationality ?? data.idNationality ?? data.idType;
+      const idNationality = data.idNationality ?? data.idType;
+
+      const providedIdentityCard = (data.identityCard ?? "").toString().trim();
+      let identityCardToUse = providedIdentityCard;
+      let hasIdToUse = data.hasId;
+
+      if (identityCardToUse.length === 0) {
+        const maxResult = await prisma.$queryRaw`
+          SELECT MAX(
+            CASE
+              WHEN b."identityCard" ~ '^[0-9]+$' THEN b."identityCard"::bigint
+              ELSE NULL
+            END
+          ) AS "maxIdentityCard"
+          FROM "Beneficiary" b
+          WHERE b."hasId" = false
+        `;
+
+        const maxIdentityCard = Array.isArray(maxResult) ? maxResult[0]?.maxIdentityCard : null;
+        const nextIdentityCard = (maxIdentityCard ? BigInt(maxIdentityCard) : 0n) + 1n;
+        identityCardToUse = nextIdentityCard.toString();
+        hasIdToUse = false;
+      }
+
+      console.log("Creating beneficiary with identityCard:", identityCardToUse);
+
       const result = await prisma.$queryRaw`
         INSERT INTO "Beneficiary" (
           "identityCard", "fullName", "gender", "birthDate", 
@@ -57,8 +82,8 @@ class BeneficiaryService {
           "municipalityNumber", "parishNumber"
         )
         VALUES (
-          ${data.identityCard}, ${fullName}, ${data.gender}, CAST(${data.birthDate} AS DATE), 
-          ${idNationality}, ${data.hasId}, ${data.type}, ${data.idState}, 
+          ${identityCardToUse}, ${fullName}, ${data.gender}, CAST(${data.birthDate} AS DATE), 
+          ${idNationality}, ${hasIdToUse}, ${data.type}, ${data.idState}, 
           ${data.municipalityNumber}, ${data.parishNumber}
         )
         RETURNING *

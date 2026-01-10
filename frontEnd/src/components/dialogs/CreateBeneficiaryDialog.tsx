@@ -58,8 +58,8 @@ export default function CreateBeneficiaryDialog({
     if (!birthDate || !gender || !idNationality) return;
 
     onCreate({
-      identityCard: identityCard !== undefined && identityCard.trim().length > 0 ? identityCard.trim() : crypto.randomUUID(),
-      hasId: identityCard !== undefined && identityCard.trim().length > 0,
+      identityCard: identityCard.trim(),
+      hasId: identityCard.trim().length > 0,
       gender: gender,
       type: "B",
       fullName: fullName.trim(),
