@@ -168,7 +168,7 @@ export default function CreateBeneficiaryDialog({
         <Button
           variant="resalted"
           onClick={handleSubmit}
-          disabled={fullName.trim().length === 0 || !birthDate || !idNationality || idState === undefined || municipalityNumber === undefined || parishNumber === undefined || !gender}
+          disabled={fullName.trim().length === 0 || !birthDate || !idNationality || !gender}
         >
           Crear
         </Button>
