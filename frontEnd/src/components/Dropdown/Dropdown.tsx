@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useRef, useEffect, type ReactNode, Children, isValidElement } from 'react';
-import { createPortal } from 'react-dom';
 import { ChevronDown } from 'flowbite-react-icons/outline';
 
 // Context definition
@@ -92,27 +91,15 @@ export default function Dropdown({
     };
   }, [dropdownRef, contentRef]);
 
-  const getDropdownPosition = () => {
-    if (!dropdownRef.current) return { top: 0, left: 0 };
+  /* Removed getDropdownPosition logic as inline absolute handles it */
 
-    const rect = dropdownRef.current.getBoundingClientRect();
-    return {
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.left + window.scrollX
-    };
-  };
-
-  const dropdownContent = isOpen ? createPortal(
-    <div className="fixed inset-0 z-50 pointer-events-none">
-      <div
-        ref={contentRef}
-        className="absolute mt-2 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto p-2 flex flex-col gap-1.5 pointer-events-auto shadow-lg"
-        style={getDropdownPosition()}
-      >
-        {children}
-      </div>
-    </div>,
-    document.body
+  const dropdownContent = isOpen ? (
+    <div
+      ref={contentRef}
+      className="absolute left-0 mt-2 z-50 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto min-w-full w-max p-2 flex flex-col gap-1.5 shadow-lg"
+    >
+      {children}
+    </div>
   ) : null;
 
   return (

@@ -456,8 +456,12 @@ class ApplicantService {
         const bathroomCount = coerceNumber(data.bathroomCount);
         const bedroomCount = coerceNumber(data.bedroomCount);
 
-        await tx.$executeRaw`
+        const newId = data.identityCard ? String(data.identityCard) : String(id);
+        const oldId = String(id);
+
+        const beneficiaryUpdateCount = await tx.$executeRaw`
           UPDATE "Beneficiary" SET 
+            "identityCard" = ${newId},
             "fullName" = COALESCE(${data.fullName}, "fullName"), 
             "gender" = COALESCE(${data.gender}, "gender"),
             "birthDate" = COALESCE(CAST(${data.birthDate} AS DATE), "birthDate"),
@@ -465,8 +469,13 @@ class ApplicantService {
             "idState" = COALESCE(${data.idState}, "idState"),
             "municipalityNumber" = COALESCE(${data.municipalityNumber}, "municipalityNumber"),
             "parishNumber" = COALESCE(${data.parishNumber}, "parishNumber")
-          WHERE "identityCard" = ${id}
+          WHERE "identityCard" = ${oldId}
         `;
+
+        if (beneficiaryUpdateCount === 0) {
+          throw new Error(`Beneficiary with ID ${oldId} not found.`);
+        }
+
         await tx.$executeRaw`
           UPDATE "Applicant" SET 
             "email" = COALESCE(${data.email}, "email"), 
@@ -481,37 +490,59 @@ class ApplicantService {
             "applicantStudyTime" = COALESCE(${data.applicantStudyTime}, "applicantStudyTime"),
             "workConditionId" = COALESCE(${data.workConditionId}, "workConditionId"),
             "activityConditionId" = COALESCE(${data.activityConditionId}, "activityConditionId")
-          WHERE "identityCard" = ${id}
+          WHERE "identityCard" = ${newId}
         `;
-        await tx.$executeRaw`
+
+        // Upsert FamilyHome
+        const familyHomeUpdateCount = await tx.$executeRaw`
           UPDATE "FamilyHome" SET
             "memberCount" = COALESCE(${memberCount}, "memberCount"),
             "workingMemberCount" = COALESCE(${workingMemberCount}, "workingMemberCount"),
             "children7to12Count" = COALESCE(${children7to12Count}, "children7to12Count"),
             "studentChildrenCount" = COALESCE(${studentChildrenCount}, "studentChildrenCount"),
             "monthlyIncome" = COALESCE(${monthlyIncome}, "monthlyIncome")
-          WHERE "applicantId" = ${id}
+          WHERE "applicantId" = ${newId}
         `;
-        await tx.$executeRaw`
+
+        if (familyHomeUpdateCount === 0) {
+          await tx.$executeRaw`
+             INSERT INTO "FamilyHome" ("applicantId", "memberCount", "workingMemberCount", "children7to12Count", "studentChildrenCount", "monthlyIncome")
+             VALUES (${newId}, ${memberCount}, ${workingMemberCount}, ${children7to12Count}, ${studentChildrenCount}, ${monthlyIncome})
+           `;
+        }
+
+        // Upsert Housing
+        const housingUpdateCount = await tx.$executeRaw`
           UPDATE "Housing" SET
             "bathroomCount" = COALESCE(${bathroomCount}, "bathroomCount"),
             "bedroomCount" = COALESCE(${bedroomCount}, "bedroomCount")
-          WHERE "applicantId" = ${id}
+          WHERE "applicantId" = ${newId}
         `;
+
+        if (housingUpdateCount === 0) {
+          await tx.$executeRaw`
+             INSERT INTO "Housing" ("applicantId", "bathroomCount", "bedroomCount")
+             VALUES (${newId}, ${bathroomCount}, ${bedroomCount})
+           `;
+        }
+
         if (Array.isArray(data.servicesIdAvailable)) {
           try {
             const serviceChar = await tx.housingCharacteristic.findUnique({ where: { name: 'Artefactos Domesticos, bienes o servicios del hogar' } });
             if (serviceChar) {
+              // First ensure HousingDetail parent/structure exists if needed? 
+              // HousingDetail depends on Housing. We just upserted Housing, so it should exist.
+
               // Delete only services
               await tx.$executeRaw`
                     DELETE FROM "HousingDetail" 
-                    WHERE "applicantId" = ${id} AND "idCharacteristic" = ${serviceChar.idCharacteristic}
+                    WHERE "applicantId" = ${newId} AND "idCharacteristic" = ${serviceChar.idCharacteristic}
                 `;
 
               for (const serviceId of data.servicesIdAvailable) {
                 await tx.$executeRaw`
                     INSERT INTO "HousingDetail" ("applicantId", "idCharacteristic", "detailNumber")
-                    VALUES (${id}, ${serviceChar.idCharacteristic}, ${serviceId})
+                    VALUES (${newId}, ${serviceChar.idCharacteristic}, ${serviceId})
                 `;
               }
             }
@@ -522,9 +553,9 @@ class ApplicantService {
           }
         }
 
-        await saveHousingDetails(tx, id as string, data as ApplicantDAO);
+        await saveHousingDetails(tx, newId, data as ApplicantDAO);
 
-        const updated = await fetchApplicantInfo(tx, id);
+        const updated = await fetchApplicantInfo(tx, newId);
         if (!updated) throw new Error('Applicant not found');
         return { success: true, data: updated };
       });

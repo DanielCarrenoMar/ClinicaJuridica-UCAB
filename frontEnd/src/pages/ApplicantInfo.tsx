@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useBlocker } from "react-router";
 import { useGetApplicantById, useUpdateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel } from "#domain/typesModel.ts";
@@ -32,7 +32,41 @@ export default function ApplicantInfo() {
 
     const [stateIndex, setStateIndex] = useState<number | null>(null);
     const [munIndex, setMunIndex] = useState<number | null>(null);
+
+    // Unsaved changes protection
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDataModified) {
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [isDataModified]);
+
+    const blocker = useBlocker(
+        ({ nextLocation }) => isDataModified && !nextLocation.pathname.includes(location.pathname)
+    );
+
+    useEffect(() => {
+        if (blocker.state === "blocked") {
+            const proceed = window.confirm("Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?");
+            if (proceed) {
+                blocker.proceed();
+            } else {
+                blocker.reset();
+            }
+        }
+    }, [blocker]);
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+    const [isCheckingId, setIsCheckingId] = useState(false);
+
+    // Reuse the hook instance (or create a new one if needed for independent loading state)
+    // We can use the same hook but we need to be careful not to overwrite 'applicantData' state
+    // Actually useGetApplicantById exposes getApplicantById function which returns a promise.
+    // We can use that directly without relying on its internal state if we just await the promise.
+    const { getApplicantById: checkIdAvailability } = useGetApplicantById();
 
     useEffect(() => {
         const loadApplicant = async () => {
@@ -77,8 +111,14 @@ export default function ApplicantInfo() {
     // Validation Effect
     useEffect(() => {
         const errors: Record<string, string> = {};
-        const { memberCount, workingMemberCount, children7to12Count, studentChildrenCount } = localApplicantData || {};
+        const {
+            memberCount, workingMemberCount, children7to12Count, studentChildrenCount,
+            fullName, identityCard, birthDate, idNationality, gender
+        } = localApplicantData || {};
 
+        if (!localApplicantData) return;
+
+        // Family validations
         if (memberCount !== undefined && memberCount !== null) {
             if (workingMemberCount !== undefined && workingMemberCount !== null && workingMemberCount > memberCount) {
                 errors.workingMemberCount = "No pueden trabajar más personas de las que viven en casa";
@@ -91,8 +131,71 @@ export default function ApplicantInfo() {
             }
         }
 
-        setValidationErrors(errors);
-    }, [localApplicantData?.memberCount, localApplicantData?.workingMemberCount, localApplicantData?.children7to12Count, localApplicantData?.studentChildrenCount]);
+        // Mandatory fields validations
+        if (!fullName || fullName.trim().length === 0) errors.fullName = "El nombre es obligatorio";
+        if (!identityCard || identityCard.trim().length === 0) errors.identityCard = "La cédula es obligatoria";
+        if (!birthDate) errors.birthDate = "La fecha de nacimiento es obligatoria";
+        if (!idNationality) errors.idNationality = "La nacionalidad es obligatoria";
+        if (!gender) errors.gender = "El género es obligatorio";
+
+
+        setValidationErrors(prev => {
+            // Preserve async Duplicate ID error if sync checks pass for ID
+            const preservedIdError = prev.identityCard === "Esta cédula ya está registrada" && !errors.identityCard
+                ? prev.identityCard
+                : undefined;
+
+            return {
+                ...errors,
+                ...(preservedIdError ? { identityCard: preservedIdError } : {})
+            };
+        });
+    }, [
+        localApplicantData?.memberCount, localApplicantData?.workingMemberCount,
+        localApplicantData?.children7to12Count, localApplicantData?.studentChildrenCount,
+        localApplicantData?.fullName, localApplicantData?.identityCard,
+        localApplicantData?.birthDate, localApplicantData?.idNationality, localApplicantData?.gender,
+        localApplicantData?.idState, localApplicantData?.municipalityNumber, localApplicantData?.parishNumber
+    ]);
+
+    // Check duplicate ID
+    useEffect(() => {
+        const checkId = async () => {
+            if (!localApplicantData?.identityCard || !applicantData?.identityCard) return;
+
+            const newId = localApplicantData.identityCard.trim();
+            const originalId = applicantData.identityCard;
+
+            if (newId.length > 0 && newId !== originalId) {
+                setIsCheckingId(true);
+                // Clear previous ID error to avoid flickering if valid
+                setValidationErrors(prev => {
+                    const next = { ...prev };
+                    delete next.identityCard;
+                    return next;
+                });
+
+                const exists = await checkIdAvailability(newId);
+                setIsCheckingId(false);
+
+                if (exists) {
+                    setValidationErrors(prev => ({ ...prev, identityCard: "Esta cédula ya está registrada" }));
+                }
+            } else if (newId === originalId) {
+                // If reverted to original, replace error if any (unless it's empty, handled by mandatory check above)
+                setValidationErrors(prev => {
+                    const next = { ...prev };
+                    if (next.identityCard === "Esta cédula ya está registrada") {
+                        delete next.identityCard;
+                    }
+                    return next;
+                });
+            }
+        };
+
+        const timeoutId = setTimeout(checkId, 500); // Debounce
+        return () => clearTimeout(timeoutId);
+    }, [localApplicantData?.identityCard, applicantData?.identityCard]);
 
     function discardChanges() {
         setLocalApplicantData(applicantData || undefined);
@@ -102,11 +205,16 @@ export default function ApplicantInfo() {
         const applicantId = id;
         if (!applicantId) return;
         if (!localApplicantData || !applicantData) return;
-        await updateApplicant(applicantId, localApplicantData);
-        const updatedApplicant = await getApplicantById(applicantId);
+
+        const updatedApplicant = await updateApplicant(applicantId, localApplicantData);
         if (updatedApplicant) {
             setApplicantData(updatedApplicant);
             setLocalApplicantData(updatedApplicant);
+
+            // If ID changed, navigate to new URL
+            if (updatedApplicant.identityCard !== applicantId) {
+                navigate(`/solicitante/${updatedApplicant.identityCard}`, { replace: true });
+            }
         }
     }
 
@@ -126,9 +234,9 @@ export default function ApplicantInfo() {
                     <TitleTextInput
                         label="Cédula"
                         value={localApplicantData.identityCard}
-                        onChange={() => { }}
-                        disabled
+                        onChange={(text) => handleChange({ identityCard: text })}
                     />
+                    {validationErrors.identityCard && <span className="text-xs text-error mt-1">{validationErrors.identityCard}</span>}
                 </div>
                 <div>
                     <TitleTextInput
@@ -136,6 +244,7 @@ export default function ApplicantInfo() {
                         value={localApplicantData.fullName || ""}
                         onChange={(text) => { handleChange({ fullName: text }); }}
                     />
+                    {validationErrors.fullName && <span className="text-xs text-error mt-1">{validationErrors.fullName}</span>}
                 </div>
             </div>
 
@@ -148,6 +257,7 @@ export default function ApplicantInfo() {
                     <DropdownOption value="Masculino">Masculino</DropdownOption>
                     <DropdownOption value="Femenino">Femenino</DropdownOption>
                 </TitleDropdown>
+                {validationErrors.gender && <span className="text-xs text-error mt-1">{validationErrors.gender}</span>}
             </div>
             <div className="col-span-1">
                 <DatePicker
@@ -155,6 +265,7 @@ export default function ApplicantInfo() {
                     value={localApplicantData.birthDate ? localApplicantData.birthDate.toISOString().split('T')[0] : undefined}
                     onChange={(text) => { handleChange({ birthDate: new Date(text) }); }}
                 />
+                {validationErrors.birthDate && <span className="text-xs text-error mt-1">{validationErrors.birthDate}</span>}
             </div>
             <div className="col-span-1">
                 <TitleDropdown
@@ -166,6 +277,7 @@ export default function ApplicantInfo() {
                     <DropdownOption value="E">Extranjera</DropdownOption>
                     <DropdownOption value="J">Juridica</DropdownOption>
                 </TitleDropdown>
+                {validationErrors.idNationality && <span className="text-xs text-error mt-1">{validationErrors.idNationality}</span>}
             </div>
 
             <div className="col-span-1">
@@ -208,6 +320,7 @@ export default function ApplicantInfo() {
                         <DropdownOption key={index} value={index}>{state.name}</DropdownOption>
                     ))}
                 </TitleDropdown>
+                {validationErrors.idState && <span className="text-xs text-error mt-1">{validationErrors.idState}</span>}
             </div>
             <div className="col-span-1">
                 <TitleDropdown
@@ -227,6 +340,7 @@ export default function ApplicantInfo() {
                         <DropdownOption key={index} value={index}>{mun.name}</DropdownOption>
                     ))}
                 </TitleDropdown>
+                {validationErrors.municipalityNumber && <span className="text-xs text-error mt-1">{validationErrors.municipalityNumber}</span>}
             </div>
             <div className="col-span-1">
                 <TitleDropdown
@@ -246,6 +360,7 @@ export default function ApplicantInfo() {
                         <DropdownOption key={index} value={parish}>{parish}</DropdownOption>
                     ))}
                 </TitleDropdown>
+                {validationErrors.parishNumber && <span className="text-xs text-error mt-1">{validationErrors.parishNumber}</span>}
             </div>
 
             {/* Estadubinato */}
@@ -569,11 +684,16 @@ export default function ApplicantInfo() {
                     }
                     {
                         isDataModified ? (
-                            <Button onClick={saveChanges} disabled={updating} variant="resalted" className="h-10 w-32">
+                            <Button
+                                onClick={saveChanges}
+                                disabled={updating || isCheckingId || Object.keys(validationErrors).length > 0}
+                                variant="resalted"
+                                className="h-10 w-32"
+                            >
                                 Guardar
                             </Button>
                         ) : (
-                            <Button onClick={() => {}} icon={<FilePdf />} variant="outlined" className="h-10 w-32">
+                            <Button onClick={() => { }} icon={<FilePdf />} variant="outlined" className="h-10 w-32">
                                 Exportar
                             </Button>
                         )
@@ -594,6 +714,7 @@ export default function ApplicantInfo() {
                     {activeSection === "identificacion" && identificationInputs}
                     {activeSection === "vivienda" && houseInputs}
                     {activeSection === "familia" && familyInputs}
+                    <div className="h-64 w-full col-span-3"></div>
                 </div>
             </section>
         </Box>
