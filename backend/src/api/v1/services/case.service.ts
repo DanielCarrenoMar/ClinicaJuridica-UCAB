@@ -278,7 +278,7 @@ class CaseService {
         SELECT 
           cb."idCase",
           cb."relationship", 
-          cb."type", 
+          cb."type" AS "caseType", 
           cb."description",
           b."identityCard",
           b."fullName",
