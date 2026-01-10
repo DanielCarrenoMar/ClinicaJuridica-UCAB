@@ -422,34 +422,34 @@ async function main() {
     });
 
     await prisma.caseBeneficiary.upsert({
-        where: { idCase_beneficiaryId: { idCase: caseOne.idCase, beneficiaryId: applicantOne.identityCard } },
+        where: { idCase_beneficiaryId: { idCase: caseOne.idCase, beneficiaryId: applicantTwo.identityCard } },
         update: {
             relationship: 'Solicitante',
             type: 'DIRECT' as any,
-            description: 'Titular del caso'
+            description: ''
         },
         create: {
             idCase: caseOne.idCase,
-            beneficiaryId: applicantOne.identityCard,
+            beneficiaryId: applicantTwo.identityCard,
             relationship: 'Solicitante',
             type: 'DIRECT' as any,
-            description: 'Titular del caso'
+            description: ''
         }
     });
 
     await prisma.caseBeneficiary.upsert({
-        where: { idCase_beneficiaryId: { idCase: caseTwo.idCase, beneficiaryId: applicantTwo.identityCard } },
+        where: { idCase_beneficiaryId: { idCase: caseTwo.idCase, beneficiaryId: applicantOne.identityCard } },
         update: {
             relationship: 'Solicitante',
             type: 'DIRECT' as any,
-            description: 'Titular del caso'
+            description: ''
         },
         create: {
             idCase: caseTwo.idCase,
-            beneficiaryId: applicantTwo.identityCard,
+            beneficiaryId: applicantOne.identityCard,
             relationship: 'Solicitante',
             type: 'DIRECT' as any,
-            description: 'Titular del caso'
+            description: ''
         }
     });
 
