@@ -117,13 +117,13 @@ async function main() {
 
     console.log('Seeding semestre y usuarios académicos');
     const semester = await prisma.semester.upsert({
-        where: { term: '2025-01' },
+        where: { term: '2025-15' },
         update: {
             startDate: new Date('2025-01-08'),
             endDate: new Date('2025-06-30')
         },
         create: {
-            term: '2025-01',
+            term: '2025-15',
             startDate: new Date('2025-01-08'),
             endDate: new Date('2025-06-30')
         }
@@ -199,6 +199,37 @@ async function main() {
             term: semester.term,
             nrc: 'UCAB-101',
             type: 'REGULAR' as any
+        }
+    });
+
+    const coordinadorUser = await prisma.user.upsert({
+        where: { identityCard: '15000001' },
+        update: {
+            fullName: 'Ana Pérez',
+            gender: Gender.F,
+            email: 'ana.perez@ucab.edu',
+            password: 'seeded-coordinator',
+            isActive: true,
+            type: 'COORDINATOR' as any
+        },
+        create: {
+            identityCard: '15000001',
+            fullName: 'Ana Pérez',
+            gender: Gender.F,
+            email: 'ana.perez@ucab.edu',
+            password: 'seeded-coordinator',
+            isActive: true,
+            type: 'COORDINATOR' as any
+        }
+    });
+
+    const coordinador = await prisma.coordinator.upsert({
+        where: {
+            identityCard: coordinadorUser.identityCard,
+        },
+        update: { },
+        create: {
+            identityCard: coordinadorUser.identityCard,
         }
     });
 
