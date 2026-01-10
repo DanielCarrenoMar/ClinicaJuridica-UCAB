@@ -59,7 +59,7 @@ class BeneficiaryService {
         const maxResult = await prisma.$queryRaw`
           SELECT MAX(
             CASE
-              WHEN b."identityCard" ~ '^[0-9]+$' THEN b."identityCard"::bigint
+              WHEN b."identityCard" ~ '^NoCed[0-9]+$' THEN SUBSTRING(b."identityCard", 6)::bigint
               ELSE NULL
             END
           ) AS "maxIdentityCard"
@@ -69,7 +69,7 @@ class BeneficiaryService {
 
         const maxIdentityCard = Array.isArray(maxResult) ? maxResult[0]?.maxIdentityCard : null;
         const nextIdentityCard = (maxIdentityCard ? BigInt(maxIdentityCard) : 0n) + 1n;
-        identityCardToUse = nextIdentityCard.toString();
+        identityCardToUse = `NoCed${nextIdentityCard.toString()}`;
         hasIdToUse = false;
       }
 
