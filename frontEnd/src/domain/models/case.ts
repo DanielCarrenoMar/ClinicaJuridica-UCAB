@@ -38,14 +38,8 @@ export function daoToCaseModel(dao: CaseInfoDAO): CaseModel {
 
 export function modelToCaseDao(model: CaseModel, userId: string): CaseDAO {
     return {
-        problemSummary: model.problemSummary,
+        ...model,
         processType: typeModelToProcessTypeDao(model.processType),
-        applicantId: model.applicantId,
-        idNucleus: model.idNucleus,
-        idLegalArea: model.idLegalArea,
-        teacherId: model.teacherId,
-        teacherTerm: model.teacherTerm,
-        idCourt: model.idCourt,
-        userId,
+        userId
     };
 }
