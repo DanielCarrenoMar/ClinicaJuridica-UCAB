@@ -1,4 +1,4 @@
-import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO, AppointmentStatusTypeDAO } from "#database/typesDAO.ts";
+import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO, AppointmentStatusTypeDAO, CaseBeneficiaryTypeDAO, BeneficiaryTypeDAO } from "#database/typesDAO.ts";
 
 export type IdNacionalityTypeModel = "V" | "E" | "J";
 export type IDTypeModel = 'V' | 'E' | 'J';
@@ -11,6 +11,9 @@ export type ProcessTypeModel =
     "Redaccion";
 export type CaseStatusTypeModel = "Abierto" | "En Espera" | "Pausado" | "Cerrado";
 export type AppointmentStatusTypeModel = "Completada" | "Programada" | "Cancelada";
+export type CaseBeneficiaryTypeModel = "Directo" | "Indirecto";
+export type BeneficiaryTypeModel = "Beneficiario" | "Solicitante";
+
 export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel {
     switch (gender) {
         case 'M':
@@ -121,5 +124,39 @@ export function typeModelToAppointmentStatusTypeDao(appointmentStatusModel: Appo
             return "P";
         case "Cancelada":
             return "C";
+    }
+}
+
+export function typeModelToCaseBeneficiaryTypeDao(type: CaseBeneficiaryTypeModel): CaseBeneficiaryTypeDAO {
+    switch (type) {
+        case "Directo":
+            return "D";
+        case "Indirecto":
+            return "I";
+    }
+}
+export function typeDaoToCaseBeneficiaryTypeModel(type: CaseBeneficiaryTypeDAO): CaseBeneficiaryTypeModel {
+    switch (type) {
+        case "D":
+            return "Directo";
+        case "I":
+            return "Indirecto";
+    }
+}
+
+export function typeModelToBeneficiaryTypeDao(type: BeneficiaryTypeModel): BeneficiaryTypeDAO {
+    switch (type) {
+        case "Beneficiario":
+            return "B";
+        case "Solicitante":
+            return "S";
+    }
+}
+export function typeDaoToBeneficiaryTypeModel(type: BeneficiaryTypeDAO): BeneficiaryTypeModel {
+    switch (type) {
+        case "B":
+            return "Beneficiario";
+        case "S":
+            return "Solicitante";
     }
 }

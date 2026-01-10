@@ -2,9 +2,7 @@ import { daoToCaseModel } from "#domain/models/case.ts";
 import type { CaseRepository } from "../../../domain/repositories";
 import { CASE_URL } from "./apiUrl";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
-import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
 import type { StatusCaseAmountDAO } from "#database/daos/statusCaseAmountDAO.ts";
-import { daoToBeneficiaryModel } from "#domain/models/beneficiary.ts";
 import { daoToStatusCaseAmountModel } from "#domain/models/statusCaseAmount.ts";
 import { daoToCaseStatusModel } from "#domain/models/caseStatus.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
@@ -16,6 +14,8 @@ import { daoToSupportDocumentModel } from "#domain/models/supportDocument.ts";
 import type { SupportDocumentDAO } from "#database/daos/supportDocumentDAO.ts";
 import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 import { daoToCaseActionModel } from "#domain/models/caseAction.ts";
+import type { CaseBeneficiaryInfoDAO } from "#database/daos/caseBeneficiaryInfoDAO.ts";
+import { daoToCaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
 
 export function getCaseRepository(): CaseRepository {
     async function getCaseTerm(idCase: number): Promise<string> {
@@ -47,8 +47,8 @@ export function getCaseRepository(): CaseRepository {
             const response = await fetch(`${CASE_URL}/${idCase}/beneficiaries`);
             if (!response.ok) return [];
             const result = await response.json();
-            const daoList: BeneficiaryInfoDAO[] = result.data;
-            return daoList.map(daoToBeneficiaryModel);
+            const daoList: CaseBeneficiaryInfoDAO[] = result.data;
+            return daoList.map(daoToCaseBeneficiaryModel);
         },
         findCaseStatusByCaseId: async (idCase) => {
             const response = await fetch(`${CASE_URL}/${idCase}/status`);
@@ -161,15 +161,15 @@ export function getCaseRepository(): CaseRepository {
             }
         },
 
-        addBeneficiaryToCase: async (idCase, idBeneficiary) => {
+        addBeneficiaryToCase: async (idCase, idBeneficiary, caseType, relationship, description) => {
             const response = await fetch(`${CASE_URL}/${idCase}/beneficiaries`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     beneficiaryId: idBeneficiary,
-                    relationship: 'Beneficiario',
-                    type: 'D',
-                    description: ''
+                    relationship: relationship,
+                    type: caseType,
+                    description: description
                 })
             });
             if (!response.ok) {

@@ -15,6 +15,9 @@ import type { AppointmentModel } from "./models/appointment";
 import type { SupportDocumentModel } from "./models/supportDocument";
 import type { UserModel } from "./models/user";
 import type { TeacherModel } from "./models/teacher";
+import type { CaseBeneficiaryModel } from "./models/caseBeneficiary";
+import type { CaseBeneficiaryTypeModel } from "./typesModel";
+import type { CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -33,7 +36,7 @@ export interface ApplicantRepository {
 export interface CaseRepository {
     findAllCases(): Promise<CaseModel[]>;
     findCaseById(id: number): Promise<CaseModel | null>;
-    findBeneficiariesByCaseId(idCase: number): Promise<BeneficiaryModel[]>;
+    findBeneficiariesByCaseId(idCase: number): Promise<CaseBeneficiaryModel[]>;
     findCaseStatusByCaseId(idCase: number): Promise<CaseStatusModel[]>;
     findStudentsByCaseId(idCase: number): Promise<StudentModel[]>;
     getStatusCaseAmount(): Promise<StatusCaseAmountModel[]>;
@@ -47,7 +50,7 @@ export interface CaseRepository {
     findSupportDocumentByCaseId(idCase: number): Promise<SupportDocumentModel[]>;
     addStudentToCase(idCase: number, identityCard: string): Promise<void>;
     removeStudentFromCase(idCase: number, identityCard: string): Promise<void>;
-    addBeneficiaryToCase(idCase: number, idBeneficiary: string): Promise<void>;
+    addBeneficiaryToCase(idCase: number, idBeneficiary: string, caseType: CaseBeneficiaryTypeDAO, relationship: string, description: string): Promise<void>;
     removeBeneficiaryFromCase(idCase: number, idBeneficiary: string): Promise<void>;
 }
 
