@@ -57,6 +57,7 @@ export interface CaseActionRepository {
     findAllCaseActions(): Promise<CaseActionModel[]>;
     findCaseActionById(id: string): Promise<CaseActionModel | null>;
     createCaseAction(data: CaseActionDAO): Promise<CaseActionModel>;
+    findActionsByUserId(userId: string): Promise<CaseActionModel[]>;
 }
 
 

@@ -60,3 +60,36 @@ export function useCreateCaseAction() {
         error
     };
 }
+
+export function useGetActionsByUserId(userId: string) {
+    const { findActionsByUserId } = getCaseActionRepository();
+    const [actions, setActions] = useState<CaseActionModel[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const loadActions = useCallback(async () => {
+        if (!userId) return;
+
+        setLoading(true);
+        try {
+            const data = await findActionsByUserId(userId);
+            setActions(data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        loadActions();
+    }, [loadActions]);
+
+    return {
+        actions,
+        loading,
+        error,
+        refresh: loadActions
+    };
+}

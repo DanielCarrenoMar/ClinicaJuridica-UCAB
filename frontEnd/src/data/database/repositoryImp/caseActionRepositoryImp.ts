@@ -55,6 +55,21 @@ export function getCaseActionRepository(): CaseActionRepository {
 			} catch (error) {
 				throw error;
 			}
+		},
+
+		findActionsByUserId: async (userId: string) => {
+			try {
+				const response = await fetch(`${CASE_ACTION_URL}/user/${userId}`);
+				if (!response.ok) return [];
+
+				const result = await response.json();
+				const actionsList: CaseActionInfoDAO[] = result.data ?? [];
+
+				return actionsList.map(action => daoToCaseActionModel(action));
+			} catch (error) {
+				console.error("Error fetching user actions:", error);
+				return [];
+			}
 		}
 	} as CaseActionRepository;
 }

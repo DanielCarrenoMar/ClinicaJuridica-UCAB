@@ -18,6 +18,25 @@ class CaseActionService {
     }
   }
 
+  async getCaseActionsByUserId(userId: string) {
+    try {
+      const actions = await prisma.$queryRaw`
+        SELECT 
+          a.*,
+          u."fullName" as "userName",
+          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "caseCompoundKey"
+        FROM "CaseAction" a
+        JOIN "Case" c ON a."idCase" = c."idCase"
+        JOIN "User" u ON a."userId" = u."identityCard"
+        WHERE a."userId" = ${userId}
+        ORDER BY a."registryDate" DESC
+      `;
+      return { success: true, data: actions };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async createCaseAction(data: {
     idCase: number;
     description: string;
