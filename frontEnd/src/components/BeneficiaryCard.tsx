@@ -17,7 +17,7 @@ export default function BeneficiaryCard({ beneficiary, icon, to }: BeneficiaryCa
 
   const MainText = (
     <span className="text-body-small">
-      <strong className="text-body-medium">{title}</strong> {idPrefix}
+      <strong className="text-body-medium">{title}</strong> &nbsp; {idPrefix}
       {beneficiary.identityCard}
     </span>
   );
@@ -28,7 +28,7 @@ export default function BeneficiaryCard({ beneficiary, icon, to }: BeneficiaryCa
       <span className="flex flex-col">
         {to ? (
           <Link to={to} className="text-body-small hover:underline">
-            <strong className="text-body-medium">{title}</strong> {idPrefix}
+            <strong className="text-body-medium">{title}</strong> &nbsp; {idPrefix}
             {beneficiary.identityCard}
           </Link>
         ) : (
