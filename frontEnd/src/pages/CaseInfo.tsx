@@ -235,7 +235,7 @@ export default function CaseInfo() {
 
     const GeneralTabContent = (
         <div className="flex flex-col gap-6">
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pr-20">
                 <article className="flex flex-col">
                     <h4 className="text-label-small mb-1">Ámbito Legal</h4>
                     <div className="flex flex-col gap-2 pl-2 border-l-2 border-onSurface/10">

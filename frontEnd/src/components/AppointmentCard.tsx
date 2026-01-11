@@ -1,5 +1,4 @@
 import type { AppointmentModel } from '#domain/models/appointment.ts';
-import { UserCircle } from 'flowbite-react-icons/solid';
 import { Link } from 'react-router';
 
 interface AppointmentCardProps {
@@ -15,7 +14,8 @@ export default function AppointmentCard({ appointment, applicantName, onClick }:
     const dateString = appointment.plannedDate.toLocaleDateString("es-ES", {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone: 'UTC'
     });
 
     return (
