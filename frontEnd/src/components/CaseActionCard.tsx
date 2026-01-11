@@ -24,7 +24,7 @@ export default function CaseActionCard({
       className={`flex flex-col gap-1 items-start w-full px-4 py-2.5 rounded-3xl hover:bg-surface bg-surface/70 ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
       <header className='flex items-end justify-between w-full'>
-        <span className='flex flex-wrap text-body-small'>
+        <span className='flex flex-wrap text-body-small gap-2'>
           {
             caseAction.caseCompoundKey &&
             <p>
@@ -40,7 +40,7 @@ export default function CaseActionCard({
             </p>
           }
           <p>
-            responsable &nbsp;
+            Responsable &nbsp;
             <Link
               to={`/usuario/${caseAction.userId}`}
               className="text-body-large truncate hover:underline"
@@ -54,7 +54,7 @@ export default function CaseActionCard({
           {dateString}
         </span>
       </header>
-      <p className="text-body-small pl-2 text-onSurface/70 line-clamp-3 text-ellipsis max-w-full">
+      <p className="text-body-small text-onSurface/70 line-clamp-3 text-ellipsis max-w-full">
         {caseAction.description}
       </p>
     </span>
