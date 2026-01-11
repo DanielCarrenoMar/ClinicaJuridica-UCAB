@@ -2,7 +2,7 @@ import { typeDaoToGenderTypeModel, type GenderTypeModel } from "#domain/typesMod
 import type { UserTypeDAO } from "#database/typesDAO.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 
-export type UserTypeModel = "coordinator" | "teacher" | "student";
+export type UserTypeModel = "Coordinador" | "Profesor" | "Estudiante";
 export interface UserModel {
     identityCard: string;
     fullName: string;
@@ -16,11 +16,11 @@ export interface UserModel {
 export function userTypeDaoToModel(dao: UserTypeDAO): UserTypeModel {
     switch (dao) {
         case "E":
-            return "student";
+            return "Estudiante";
         case "C":
-            return "coordinator";
+            return "Coordinador";
         case "P":
-            return "teacher";
+            return "Profesor";
     }
 }
 

@@ -20,7 +20,7 @@ import Login from '#pages/Login.tsx';
 import ErrorPage from '#pages/ErrorPage.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
-import InfoUser from '#pages/InfoUser.tsx';
+import InfoUser from '#pages/infoUser/InfoUser.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
