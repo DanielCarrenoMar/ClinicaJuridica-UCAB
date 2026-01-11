@@ -17,7 +17,7 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
-import { typeModelToAppointmentStatusTypeDao, type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
+import { type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
@@ -763,7 +763,7 @@ export default function CaseInfo() {
                     <div>
                         <h1 className="text-label-small">{caseData.compoundKey}</h1>
                         <span className='flex gap-2'>
-                            <p className="text-body-small"> <strong className='text-body-medium'>Fecha:</strong> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
+                            <p className="text-body-small"> <strong className='text-body-medium'>Fecha Creación:</strong> {caseData.createdAt.toLocaleDateString("es-ES")}</p>
                             <p className="text-body-small"> <strong className='text-body-medium'>Term:</strong> {caseData.term}</p>
                         </span>
                     </div>

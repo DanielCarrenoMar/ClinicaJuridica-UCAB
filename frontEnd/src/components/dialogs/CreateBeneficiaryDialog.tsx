@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getBeneficiaryRepository } from "#database/repositoryImp/BeneficiaryRepositoryImp.ts";
 import Button from "#components/Button.tsx";
 import DatePicker from "#components/DatePicker.tsx";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
@@ -32,6 +33,10 @@ export default function CreateBeneficiaryDialog({
   const [stateIndex, setStateIndex] = useState<number | null>(null);
   const [munIndex, setMunIndex] = useState<number | null>(null);
   const [parishName, setParishName] = useState<string>();
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+
+  const { findBeneficiaryById } = getBeneficiaryRepository();
 
   const resetForm = () => {
     setIdentityCard("");
@@ -42,8 +47,33 @@ export default function CreateBeneficiaryDialog({
     setStateIndex(null);
     setMunIndex(null);
     setParishName(undefined);
+    setValidationError(null);
     setFormKey((k) => k + 1);
   };
+
+  useEffect(() => {
+    const checkId = async () => {
+      const id = identityCard.trim();
+      if (!id) {
+        setValidationError(null);
+        return;
+      }
+
+      setIsChecking(true);
+      // Clear error while checking to avoid flickering
+      setValidationError(null);
+
+      const exists = await findBeneficiaryById(id);
+      setIsChecking(false);
+
+      if (exists) {
+        setValidationError("Este beneficiario ya se encuentra registrado");
+      }
+    };
+
+    const timeoutId = setTimeout(checkId, 500);
+    return () => clearTimeout(timeoutId);
+  }, [identityCard]);
 
   useEffect(() => {
     if (!open) resetForm();
@@ -99,6 +129,7 @@ export default function CreateBeneficiaryDialog({
                 value={identityCard}
                 onChange={setIdentityCard}
               />
+              {validationError && <span className="text-xs text-error mt-1">{validationError}</span>}
             </div>
             <div>
               <TitleTextInput
@@ -191,7 +222,7 @@ export default function CreateBeneficiaryDialog({
         <Button
           variant="resalted"
           onClick={handleSubmit}
-          disabled={fullName.trim().length === 0 || !birthDate || !idNationality || !gender}
+          disabled={fullName.trim().length === 0 || !birthDate || !idNationality || !gender || !!validationError || isChecking}
         >
           Crear
         </Button>
