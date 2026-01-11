@@ -147,12 +147,18 @@ export default function CaseInfo() {
     }
     async function saveChanges() {
         if (!localCaseData || !caseData) return;
-        await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
-        await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(caseBeneficiaryModelToDao));
-        await updateCase(caseData.idCase, localCaseData)
-        loadCase(Number(id));
-        loadCaseStudents(Number(id));
-        loadCaseBeneficiaries(Number(id));
+        try {
+            await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
+            await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(caseBeneficiaryModelToDao));
+            await updateCase(caseData.idCase, localCaseData)
+            loadCase(Number(id));
+            loadCaseStudents(Number(id));
+            loadCaseBeneficiaries(Number(id));
+            setIsDataModified(false);
+        } catch (e: any) {
+            notificationError(e.message || "Error al guardar los cambios");
+            console.error(e);
+        }
     }
 
     const handleChange = (updateField: Partial<CaseModel>) => {
@@ -329,8 +335,9 @@ export default function CaseInfo() {
                         loadAppointments(Number(id));
                         setIsAppointmentDialogOpen(false);
                         setSelectedAppointment(null);
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error("Error deleting appointment:", error);
+                        notificationError(error.message || "Error al eliminar la cita");
                     }
                 }}
             />
@@ -354,8 +361,9 @@ export default function CaseInfo() {
                         };
                         await createNewAppointment(newAppt);
                         loadAppointments(Number(id));
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error("Error creating appointment:", error);
+                        notificationError(error.message || "Error al crear la cita");
                     }
                 }}
             />
@@ -369,8 +377,9 @@ export default function CaseInfo() {
                         await updateAppt(idCase, { ...data, appointmentNumber });
                         loadAppointments(Number(id));
                         setIsEditAppointmentDialogOpen(false);
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error("Error updating appointment:", error);
+                        notificationError(error.message || "Error al actualizar la cita");
                     }
                 }}
             />
@@ -426,8 +435,9 @@ export default function CaseInfo() {
                         loadSupportDocuments(Number(id));
                         setIsSupportDialogOpen(false);
                         setSelectedSupportDocument(null);
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error("Error deleting support document:", error);
+                        notificationError(error.message || "Error al eliminar el recaudo");
                     }
                 }}
             />
@@ -448,8 +458,9 @@ export default function CaseInfo() {
                         };
                         await createNewSupportDocument(newDoc);
                         loadSupportDocuments(Number(id));
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error("Error creating support document:", error);
+                        notificationError(error.message || "Error al crear el recaudo");
                     }
                 }}
             />
@@ -463,8 +474,10 @@ export default function CaseInfo() {
                         await updateSupDocument(idCase, { ...data, supportNumber });
                         loadSupportDocuments(Number(id));
                         setIsEditSupportDialogOpen(false);
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error("Error updating support document:", error);
+                        notificationError(error.message || "Error al actualizar el recaudo")
+                        setIsEditSupportDialogOpen(false);
                     }
                 }}
             />
@@ -478,13 +491,17 @@ export default function CaseInfo() {
     }
     async function handleCreateCaseBeneficiary(beneficiaryDao: BeneficiaryDAO) {
         console.log("Creating beneficiary:", beneficiaryDao);
-        const created = await createBeneficiary(beneficiaryDao);
-        if (!created) {
-            notificationError("Error al crear el beneficiario.");
-            throw new Error("Failed to create beneficiary");
+        try {
+            const created = await createBeneficiary(beneficiaryDao);
+            if (!created) {
+                throw new Error("Failed to create beneficiary");
+            }
+            await refreshBeneficiaries();
+            handleSelectCaseBeneficiary(created);
+        } catch (error: any) {
+            notificationError(error.message || "Error al crear el beneficiario");
+            console.error("Error creating beneficiary:", error);
         }
-        await refreshBeneficiaries();
-        handleSelectCaseBeneficiary(created);
     }
     function handleAddCaseBeneficiary(type: CaseBeneficiaryTypeModel, relationship: string, description: string) {
         if (!pendingCaseBeneficiary) return;
@@ -647,7 +664,7 @@ export default function CaseInfo() {
 
                 <CreateBeneficiaryDialog
                     open={isCreateBeneficiaryDialogOpen}
-                    onClose={() =>{ setIsCreateBeneficiaryDialogOpen(false); setIsBeneficiarySearchDialogOpen(true); }}
+                    onClose={() => { setIsCreateBeneficiaryDialogOpen(false); setIsBeneficiarySearchDialogOpen(true); }}
                     onCreate={handleCreateCaseBeneficiary}
                 />
 
@@ -724,7 +741,8 @@ export default function CaseInfo() {
                         };
                         await createAction(newAction);
                         loadCaseActions(Number(id));
-                    } catch (error) {
+                    } catch (error: any) {
+                        notificationError(error.message || "Error al crear la acción del caso");
                         console.error("Error creating case action:", error);
                     }
                 }}
