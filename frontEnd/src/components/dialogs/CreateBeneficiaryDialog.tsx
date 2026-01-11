@@ -10,6 +10,7 @@ import { locationData } from "#domain/seedData.ts";
 import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
 import type { GenderTypeModel } from "#domain/typesModel.ts";
 import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
+import { useGetBeneficiaryById } from "#domain/useCaseHooks/useBeneficiary.ts";
 
 interface NewBeneficiaryDialogProps {
   open: boolean;
@@ -34,9 +35,8 @@ export default function CreateBeneficiaryDialog({
   const [munIndex, setMunIndex] = useState<number | null>(null);
   const [parishName, setParishName] = useState<string>();
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [isChecking, setIsChecking] = useState(false);
 
-  const { findBeneficiaryById } = getBeneficiaryRepository();
+  const { getBeneficiaryById, loading:isChecking } = useGetBeneficiaryById()
 
   const resetForm = () => {
     setIdentityCard("");
@@ -59,20 +59,16 @@ export default function CreateBeneficiaryDialog({
         return;
       }
 
-      setIsChecking(true);
-      // Clear error while checking to avoid flickering
       setValidationError(null);
 
-      const exists = await findBeneficiaryById(id);
-      setIsChecking(false);
+      const exists = await getBeneficiaryById(id);
 
       if (exists) {
         setValidationError("Este beneficiario ya se encuentra registrado");
       }
     };
 
-    const timeoutId = setTimeout(checkId, 500);
-    return () => clearTimeout(timeoutId);
+    checkId();
   }, [identityCard]);
 
   useEffect(() => {
