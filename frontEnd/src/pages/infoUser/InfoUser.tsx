@@ -1,18 +1,15 @@
-import { useState, useMemo } from 'react'
-import { useParams, useNavigate } from 'react-router'
+import { useState } from 'react'
+import { useParams } from 'react-router'
 import { UserCircle, User, Clock } from "flowbite-react-icons/outline"
 import { File } from "flowbite-react-icons/solid"
 import Tabs from '#components/Tabs.tsx'
 import { useGetUserById } from '#domain/useCaseHooks/useUser.ts'
-import { useGetAllCaseActions } from '#domain/useCaseHooks/useCaseActions.ts'
-import type { CaseActionModel } from '#domain/models/caseAction.ts'
 import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
 import type { UserModel } from '#domain/models/user.ts'
 
 function InfoUser() {
-  const navigate = useNavigate()
   const { userId } = useParams<{ userId: string }>()
   if (!userId) {
     return <div className="p-8 text-center text-error">ID de usuario no proporcionado</div>
