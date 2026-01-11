@@ -30,7 +30,7 @@ export default function AddAppointmentDialog({
         }
 
         onAdd({
-            plannedDate: plannedDate ? new Date(plannedDate + "T00:00:00") : null,
+            plannedDate: plannedDate ? new Date(plannedDate + "T00:00:00") : new Date(executionDate + "T00:00:00"),
             executionDate: executionDate ? new Date(executionDate + "T00:00:00") : undefined,
             guidance: guidance || undefined,
             status: status
