@@ -17,15 +17,15 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
-import { typeDaoToCaseBeneficiaryTypeModel, typeModelToCaseBeneficiaryTypeDao, type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
+import { type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
-import { createAppointment, updateAppointment, deleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
+import { useCreateAppointment, useUpdateAppointment, useDeleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
 import type { AppointmentStatusTypeDAO } from '#database/typesDAO.ts';
-import { createSupportDocument, updateSupportDocument, deleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
+import { useCreateSupportDocument, useUpdateSupportDocument, useDeleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
 import EditSupportDocumentDialog from '#components/dialogs/EditSupportDocumentDialog.tsx';
@@ -37,7 +37,7 @@ import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
 import AddCaseActionDialog from '#components/dialogs/AddCaseActionDialog.tsx';
 import CaseActionDetailsDialog from '#components/dialogs/CaseActionDetailsDialog.tsx';
 import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
-import { createCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
+import { useCreateCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import CaseActionCard from '#components/CaseActionCard.tsx';
 import type { PersonModel } from '#domain/models/person.ts';
@@ -47,10 +47,8 @@ import type { BeneficiaryDAO } from '#database/daos/beneficiaryDAO.ts';
 import Fuse from 'fuse.js';
 import { caseBeneficiaryModelToDao, type CaseBeneficiaryModel } from '#domain/models/caseBeneficiary.ts';
 import BeneficiaryCard from '#components/BeneficiaryCard.tsx';
-import type { BeneficiaryModel } from '#domain/models/beneficiary.ts';
 import { useNotifications } from '#/context/NotificationsContext';
 import BeneficiaryRelationshipDialog from '#components/dialogs/BeneficiaryRelationshipDialog.tsx';
-import type { CaseBeneficiaryTypeDAO } from '#database/typesDAO.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -62,25 +60,24 @@ type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Histori
 
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
-
-    if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
+    const safeId = Number(id) || 0;
 
     const { user, permissionLevel } = useAuth()
     const { error: notificationError } = useNotifications()
-    const { caseData, loading, error, loadCase } = useGetCaseById(Number(id));
-    const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user!!.identityCard);
+    const { caseData, loading, error, loadCase } = useGetCaseById(safeId);
+    const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user?.identityCard || "");
     const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
-    const { students: caseStudents, loadStudents: loadCaseStudents } = useGetStudentsByCaseId(Number(id));
-    const { beneficiaries: caseBeneficiaries, loadBeneficiaries: loadCaseBeneficiaries } = useGetBeneficiariesByCaseId(Number(id));
-    const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(Number(id));
+    const { students: caseStudents, loadStudents: loadCaseStudents } = useGetStudentsByCaseId(safeId);
+    const { beneficiaries: caseBeneficiaries, loadBeneficiaries: loadCaseBeneficiaries } = useGetBeneficiariesByCaseId(safeId);
+    const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(safeId);
     const { setStudentsToCase } = useSetStudentsToCase()
     const { setBeneficiariesToCase } = useSetBeneficiariesToCase()
-    const { createCaseAction: createAction } = createCaseAction();
+    const { createCaseAction: createAction } = useCreateCaseAction();
 
-    const { appointments, loadAppointments } = useGetAppointmentByCaseId(Number(id));
-    const { createAppointment: createNewAppointment } = createAppointment();
-    const { updateAppointment: updateAppt } = updateAppointment();
-    const { deleteAppointment: deleteAppt } = deleteAppointment();
+    const { appointments, loadAppointments } = useGetAppointmentByCaseId(safeId);
+    const { createAppointment: createNewAppointment } = useCreateAppointment();
+    const { updateAppointment: updateAppt } = useUpdateAppointment();
+    const { deleteAppointment: deleteAppt } = useDeleteAppointment();
 
     const { students } = useGetAllStudents();
     const { teachers } = useGetAllTeachers();
@@ -88,10 +85,10 @@ export default function CaseInfo() {
     const { createBeneficiary } = useCreateBeneficiary();
 
     // Support Document Hooks
-    const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(Number(id));
-    const { createSupportDocument: createNewSupportDocument } = createSupportDocument();
-    const { updateSupportDocument: updateSupDocument } = updateSupportDocument();
-    const { deleteSupportDocument: deleteSupDocument } = deleteSupportDocument();
+    const { supportDocument: supportDocuments, loadSupportDocuments } = useGetSupportDocumentByCaseId(safeId);
+    const { createSupportDocument: createNewSupportDocument } = useCreateSupportDocument();
+    const { updateSupportDocument: updateSupDocument } = useUpdateSupportDocument();
+    const { deleteSupportDocument: deleteSupDocument } = useDeleteSupportDocument();
 
     // Recaudos Tab State
     const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
@@ -151,9 +148,9 @@ export default function CaseInfo() {
             await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
             await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(caseBeneficiaryModelToDao));
             await updateCase(caseData.idCase, localCaseData)
-            loadCase(Number(id));
-            loadCaseStudents(Number(id));
-            loadCaseBeneficiaries(Number(id));
+            loadCase(safeId);
+            loadCaseStudents(safeId);
+            loadCaseBeneficiaries(safeId);
             setIsDataModified(false);
         } catch (e: any) {
             notificationError(e.message || "Error al guardar los cambios");
@@ -229,6 +226,7 @@ export default function CaseInfo() {
         return caseActionsFuse.search(trimmed).map(r => r.item);
     }, [caseActions, caseActionsFuse, caseActionSearchQuery]);
 
+    if (!id) return <div className="text-error">ID del caso no proporcionado en la URL.</div>;
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
     if (error) return <div className="text-error">Error al cargar el caso: {error.message}</div>;
     if (!caseData) return <div className="">No se encontró el caso</div>;
@@ -332,7 +330,7 @@ export default function CaseInfo() {
                     if (!selectedAppointment) return;
                     try {
                         await deleteAppt(selectedAppointment.idCase, selectedAppointment.appointmentNumber);
-                        loadAppointments(Number(id));
+                        loadAppointments(safeId);
                         setIsAppointmentDialogOpen(false);
                         setSelectedAppointment(null);
                     } catch (error: any) {
@@ -360,7 +358,7 @@ export default function CaseInfo() {
                             registryDate: new Date()
                         };
                         await createNewAppointment(newAppt);
-                        loadAppointments(Number(id));
+                        loadAppointments(safeId);
                     } catch (error: any) {
                         console.error("Error creating appointment:", error);
                         notificationError(error.message || "Error al crear la cita");
@@ -375,7 +373,7 @@ export default function CaseInfo() {
                 onSave={async (idCase, appointmentNumber, data) => {
                     try {
                         await updateAppt(idCase, { ...data, appointmentNumber });
-                        loadAppointments(Number(id));
+                        loadAppointments(safeId);
                         setIsEditAppointmentDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating appointment:", error);
@@ -432,7 +430,7 @@ export default function CaseInfo() {
                     if (!selectedSupportDocument) return;
                     try {
                         await deleteSupDocument(selectedSupportDocument.idCase, selectedSupportDocument.supportNumber);
-                        loadSupportDocuments(Number(id));
+                        loadSupportDocuments(safeId);
                         setIsSupportDialogOpen(false);
                         setSelectedSupportDocument(null);
                     } catch (error: any) {
@@ -457,7 +455,7 @@ export default function CaseInfo() {
                             fileUrl: data.fileUrl || ""
                         };
                         await createNewSupportDocument(newDoc);
-                        loadSupportDocuments(Number(id));
+                        loadSupportDocuments(safeId);
                     } catch (error: any) {
                         console.error("Error creating support document:", error);
                         notificationError(error.message || "Error al crear el recaudo");
@@ -472,7 +470,7 @@ export default function CaseInfo() {
                 onSave={async (idCase, supportNumber, data) => {
                     try {
                         await updateSupDocument(idCase, { ...data, supportNumber });
-                        loadSupportDocuments(Number(id));
+                        loadSupportDocuments(safeId);
                         setIsEditSupportDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating support document:", error);
@@ -508,7 +506,7 @@ export default function CaseInfo() {
 
         const newCaseBeneficiary: CaseBeneficiaryModel = {
             ...pendingCaseBeneficiary,
-            idCase: Number(id),
+            idCase: safeId,
             caseType: type,
             relationship: relationship.trim(),
             description: description.trim(),
@@ -740,7 +738,7 @@ export default function CaseInfo() {
                             registryDate: new Date()
                         };
                         await createAction(newAction);
-                        loadCaseActions(Number(id));
+                        loadCaseActions(safeId);
                     } catch (error: any) {
                         notificationError(error.message || "Error al crear la acción del caso");
                         console.error("Error creating case action:", error);

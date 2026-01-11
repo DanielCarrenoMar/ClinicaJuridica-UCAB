@@ -2,7 +2,7 @@ import { getAppointmentRepository } from "#database/repositoryImp/AppointmentRep
 import { useState, useEffect, useCallback } from "react";
 import type { AppointmentModel } from "#domain/models/appointment.ts";
 import type { AppointmentDAO } from "#database/daos/appointmentDAO.ts";
-export function findAllAppointments() {
+export function useFindAllAppointments() {
     const { findAllAppointments } = getAppointmentRepository();
     const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ export function findAllAppointments() {
     };
 }
 
-export function findAppointmentById(id: number) {
+export function useFindAppointmentById(id: number) {
     const { findAppointmentById } = getAppointmentRepository();
     const [appointment, setAppointment] = useState<AppointmentModel | null>(null);
     const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ export function findAppointmentById(id: number) {
     };
 }
 
-export function createAppointment() {
+export function useCreateAppointment() {
     const { createAppointment } = getAppointmentRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -90,7 +90,7 @@ export function createAppointment() {
     };
 }
 
-export function updateAppointment() {
+export function useUpdateAppointment() {
     const { updateAppointment } = getAppointmentRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -116,7 +116,7 @@ export function updateAppointment() {
     };
 }
 
-export function deleteAppointment() {
+export function useDeleteAppointment() {
     const { deleteAppointment } = getAppointmentRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);

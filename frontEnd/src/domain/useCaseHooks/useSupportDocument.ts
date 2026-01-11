@@ -2,7 +2,7 @@ import { getSupportDocumentRepository } from "#database/repositoryImp/SupportDoc
 import { useState, useEffect, useCallback } from "react";
 import type { SupportDocumentModel } from "#domain/models/supportDocument.ts";
 import type { SupportDocumentDAO } from "#database/daos/supportDocumentDAO.ts";
-export function findAllSupportDocuments() {
+export function useFindAllSupportDocuments() {
     const { findAllSupportDocuments } = getSupportDocumentRepository();
     const [supportDocuments, setSupportDocuments] = useState<SupportDocumentModel[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ export function findAllSupportDocuments() {
     };
 }
 
-export function findSupportDocumentById(id: number) {
+export function useFindSupportDocumentById(id: number) {
     const { findSupportDocumentById } = getSupportDocumentRepository();
     const [supportDocument, setSupportDocument] = useState<SupportDocumentModel | null>(null);
     const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ export function findSupportDocumentById(id: number) {
     };
 }
 
-export function createSupportDocument() {
+export function useCreateSupportDocument() {
     const { createSupportDocument } = getSupportDocumentRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -90,7 +90,7 @@ export function createSupportDocument() {
     };
 }
 
-export function updateSupportDocument() {
+export function useUpdateSupportDocument() {
     const { updateSupportDocument } = getSupportDocumentRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -116,7 +116,7 @@ export function updateSupportDocument() {
     };
 }
 
-export function deleteSupportDocument() {
+export function useDeleteSupportDocument() {
     const { deleteSupportDocument } = getSupportDocumentRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);

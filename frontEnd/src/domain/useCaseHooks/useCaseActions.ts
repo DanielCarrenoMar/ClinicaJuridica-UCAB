@@ -35,7 +35,7 @@ export function useGetAllCaseActions() {
     };
 }
 
-export function createCaseAction() {
+export function useCreateCaseAction() {
     const { createCaseAction } = getCaseActionRepository();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
