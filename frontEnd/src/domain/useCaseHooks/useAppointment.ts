@@ -95,7 +95,7 @@ export function useUpdateAppointment() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const updateAppointmentData = useCallback(async (id: number, appointmentData: Partial<AppointmentModel>) => {
+    const updateAppointmentData = useCallback(async (id: number, appointmentData: Partial<AppointmentDAO>) => {
         setLoading(true);
         try {
             const updatedAppointment = await updateAppointment(id, appointmentData);

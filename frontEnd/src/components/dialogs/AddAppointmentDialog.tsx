@@ -3,11 +3,13 @@ import Button from '#components/Button.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import TextInput from '#components/TextInput.tsx';
 import Dialog from '#components/dialogs/Dialog.tsx';
+import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
+import type { AppointmentStatusTypeDAO } from '#database/typesDAO.ts';
 
 interface AddAppointmentDialogProps {
     open: boolean;
     onClose: () => void;
-    onAdd: (appointment: { plannedDate?: Date | null; executionDate?: Date; guidance?: string; status: string }) => void;
+    onAdd: (daoAppointment:  Omit<AppointmentDAO, "appointmentNumber" | "idCase" | "userId" | "registryDate">) => void;
 }
 
 export default function AddAppointmentDialog({
@@ -24,16 +26,16 @@ export default function AddAppointmentDialog({
     const handleSubmit = () => {
         if (!plannedDate && !executionDate) return;
 
-        let status = "P";
+        let status: AppointmentStatusTypeDAO = "P";
         if (executionDate && !plannedDate) {
             status = "R";
         }
 
         onAdd({
-            plannedDate: plannedDate ? new Date(plannedDate + "T00:00:00") : new Date(executionDate + "T00:00:00"),
-            executionDate: executionDate ? new Date(executionDate + "T00:00:00") : undefined,
+            plannedDate: plannedDate ? plannedDate : executionDate,
+            executionDate: executionDate ? executionDate : undefined,
             guidance: guidance || undefined,
-            status: status
+            status: status,
         });
 
         // Reset form

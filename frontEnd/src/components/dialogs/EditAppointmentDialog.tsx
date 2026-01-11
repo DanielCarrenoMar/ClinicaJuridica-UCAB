@@ -8,11 +8,12 @@ import DropdownOption from '#components/Dropdown/DropdownOption.tsx';
 import TextInput from '#components/TextInput.tsx';
 import TitleDropdown from '#components/TitleDropdown.tsx';
 import Dialog from '#components/dialogs/Dialog.tsx';
+import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
 
 interface EditAppointmentDialogProps {
     open: boolean;
     onClose: () => void;
-    onSave: (idCase: number, appointmentNumber: number, data: Partial<AppointmentModel>) => void;
+    onSave: (daoAppointment: AppointmentDAO) => void;
     appointment: AppointmentModel | null;
 }
 
@@ -28,7 +29,7 @@ export default function EditAppointmentDialog({
     // Initialize with a valid default or empty string if that's how you handle "loading" state, 
     // but better to use the specific type or undefined. 
     // Since Dropdown expects string, we keep it as string but cast when saving.
-    const [status, setStatus] = useState<AppointmentStatusTypeModel | "">("");
+    const [status, setStatus] = useState<AppointmentStatusTypeModel>();
 
     useEffect(() => {
         if (appointment) {
@@ -46,14 +47,18 @@ export default function EditAppointmentDialog({
     const handleSubmit = () => {
         if (!plannedDate) return;
 
-        const updateData: Partial<AppointmentModel> = {
-            plannedDate: new Date(plannedDate + "T00:00:00"),
-            executionDate: executionDate ? new Date(executionDate + "T00:00:00") : undefined,
+        const updateData: AppointmentDAO = {
+            idCase: appointment.idCase,
+            appointmentNumber: appointment.appointmentNumber,
+            userId: appointment.userId,
+            registryDate: appointment.registryDate.toISOString(),
+            plannedDate: plannedDate,
+            executionDate: executionDate,
             guidance: guidance || undefined,
             status: typeModelToAppointmentStatusTypeDao(status as AppointmentStatusTypeModel) as any
         };
 
-        onSave(appointment.idCase, appointment.appointmentNumber, updateData);
+        onSave(updateData);
         onClose();
     };
 

@@ -53,7 +53,7 @@ function CreateCaseApplicantStep() {
 
     const isFieldDisabled = (fieldName: keyof ApplicantModel) => {
         if (!isApplicantExisting || !dbOriginalData) return false;
-        const dbValue = (dbOriginalData as any)[fieldName];
+        const dbValue = dbOriginalData[fieldName];
         if (Array.isArray(dbValue) && dbValue.length === 0) return false;
         return dbValue !== undefined && dbValue !== null && dbValue !== "";
     };
@@ -88,7 +88,7 @@ function CreateCaseApplicantStep() {
 
             return relevantFields.some(field => {
                 const current = applicantModel[field];
-                const original = (dbOriginalData as any)[field];
+                const original = dbOriginalData[field];
                 const isEmptyValue = (val: any) => val === undefined || val === null || val === "";
 
                 return isEmptyValue(original) && !isEmptyValue(current);

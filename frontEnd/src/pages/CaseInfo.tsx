@@ -17,7 +17,7 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
-import { type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
+import { typeModelToAppointmentStatusTypeDao, type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
@@ -355,7 +355,7 @@ export default function CaseInfo() {
                             guidance: data.guidance,
                             userId: user.identityCard,
                             userName: user.fullName,
-                            registryDate: new Date()
+                            registryDate: ""
                         };
                         await createNewAppointment(newAppt);
                         loadAppointments(safeId);
@@ -370,10 +370,10 @@ export default function CaseInfo() {
                 open={isEditAppointmentDialogOpen}
                 onClose={() => setIsEditAppointmentDialogOpen(false)}
                 appointment={selectedAppointment}
-                onSave={async (idCase, appointmentNumber, data) => {
+                onSave={async (daoAppointment) => {
                     try {
-                        await updateAppt(idCase, { ...data, appointmentNumber });
-                        loadAppointments(safeId);
+                        await updateAppt(daoAppointment.idCase, daoAppointment);
+                        loadAppointments(daoAppointment.idCase);
                         setIsEditAppointmentDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating appointment:", error);

@@ -64,7 +64,7 @@ export interface AppointmentRepository {
     findAllAppointments(): Promise<AppointmentModel[]>;
     findAppointmentById(id: number): Promise<AppointmentModel | null>;
     createAppointment(data: AppointmentDAO): Promise<AppointmentModel>;
-    updateAppointment(id: number, data: Partial<AppointmentModel>): Promise<AppointmentModel>;
+    updateAppointment(id: number, data: Partial<AppointmentDAO>): Promise<AppointmentModel>;
     deleteAppointment(idCase: number, appointmentNumber: number): Promise<void>;
 }
 
