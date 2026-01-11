@@ -66,6 +66,6 @@ svg{
   }
   .text-body-small {
     font-size: var(--text-body-small);
-    font-weight: lighter;
+    font-weight: normal;
   }
 }
