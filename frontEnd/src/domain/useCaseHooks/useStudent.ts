@@ -34,7 +34,7 @@ export function useGetAllStudents() {
     };
 }
 
-export function useGetStudentById(id: string) {
+export function useGetStudentById(id?: string) {
     const { findStudentById } = getStudentRepository();
     const [student, setStudent] = useState<StudentModel | null>(null);
     const [loading, setLoading] = useState(true);

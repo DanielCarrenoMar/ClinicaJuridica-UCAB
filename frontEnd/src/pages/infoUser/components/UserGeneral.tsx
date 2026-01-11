@@ -1,27 +1,31 @@
-import type { ChangeEvent } from 'react'
-
-export interface UserInfo {
-  name: string
-  identityCard: string
-  userType: 'profesor' | 'estudiante' | 'coordinador'
-  semester: string
-  email: string
-  phone?: string
-}
+import type { UserModel, UserTypeModel } from '#domain/models/user.ts';
+import { useGetStudentById } from '#domain/useCaseHooks/useStudent.ts';
+import { useGetTeacherById } from '#domain/useCaseHooks/useTeacher.ts';
+import { useEffect, type ChangeEvent } from 'react'
 
 interface UserGeneralProps {
-    userInfo: UserInfo;
+    userModel: UserModel;
+    onInputChange: (field: keyof UserModel, value: string) => void;
     isEditing: boolean;
-    onInputChange: (field: keyof UserInfo, value: string) => void;
 }
 
-export default function UserGeneral({ userInfo, isEditing, onInputChange }: UserGeneralProps) {
+export default function UserGeneral({ userModel, onInputChange, isEditing }: UserGeneralProps) {
+    const { student, loadStudent } = useGetStudentById()
+    const { teacher, loadTeacher } = useGetTeacherById()
 
-  const getUserTypeColor = (type?: UserInfo['userType']) => {
-    return type === 'profesor' ? 'text-blue-600' : 'text-green-600'
-  }
+    useEffect(() => {
+        if (userModel.type === 'Estudiante') {
+            loadStudent(userModel.identityCard)
+        } else if (userModel.type === 'Profesor') {
+            loadTeacher(userModel.identityCard)
+        }
+    }, [userModel, loadStudent, loadTeacher])
 
-  const handleChange = (field: keyof UserInfo) => (e: ChangeEvent<HTMLInputElement>) => {
+    const getUserTypeColor = () => {
+        return userModel.type === 'Profesor' ? 'text-blue-600' : 'text-green-600'
+    }
+
+  const handleChange = (field: keyof UserModel) => (e: ChangeEvent<HTMLInputElement>) => {
       onInputChange(field, e.target.value);
   }
 
@@ -36,8 +40,8 @@ export default function UserGeneral({ userInfo, isEditing, onInputChange }: User
                 <label className="block text-sm font-medium text-onSurface mb-2">Nombre Completo</label>
                 <input
                     type="text"
-                    value={userInfo.name}
-                    onChange={handleChange('name')}
+                    value={userModel.fullName}
+                    onChange={handleChange('fullName')}
                     disabled={!isEditing}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
@@ -47,7 +51,7 @@ export default function UserGeneral({ userInfo, isEditing, onInputChange }: User
                 <label className="block text-sm font-medium text-onSurface mb-2">Cédula</label>
                 <input
                     type="text"
-                    value={userInfo.identityCard}
+                    value={userModel.identityCard}
                     onChange={handleChange('identityCard')}
                     disabled={!isEditing}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -58,25 +62,12 @@ export default function UserGeneral({ userInfo, isEditing, onInputChange }: User
                 <label className="block text-sm font-medium text-onSurface mb-2">Correo Electrónico</label>
                 <input
                     type="email"
-                    value={userInfo.email}
+                    value={userModel.email}
                     onChange={handleChange('email')}
                     disabled={!isEditing}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
                 </div>
-
-                {userInfo.phone && (
-                <div>
-                    <label className="block text-sm font-medium text-onSurface mb-2">Teléfono</label>
-                    <input
-                    type="tel"
-                    value={userInfo.phone}
-                    onChange={handleChange('phone')}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    />
-                </div>
-                )}
             </div>
             </div>
 
@@ -87,18 +78,13 @@ export default function UserGeneral({ userInfo, isEditing, onInputChange }: User
                 <div>
                 <label className="block text-sm font-medium text-onSurface mb-2">Tipo de Usuario</label>
                 <div className="flex items-center gap-4">
-                    <span className={`text-sm ${getUserTypeColor(userInfo.userType)} capitalize font-medium`}>{userInfo.userType}</span>
+                    <span className={`text-sm ${getUserTypeColor()} capitalize font-medium`}>{userModel.type}</span>
                 </div>
                 </div>
 
                 <div>
                 <label className="block text-sm font-medium text-onSurface mb-2">Semestre Asignado</label>
-                <input
-                    type="text"
-                    value={userInfo.semester || 'N/A'}
-                    disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-                />
+                faltante (solo mostrar)
                 </div>
             </div>
             </div>

@@ -34,7 +34,7 @@ export function useGetAllTeachers() {
     };
 }
 
-export function useGetTeacherById(id: string) {
+export function useGetTeacherById(id?: string) {
     const { findTeacherById } = getTeacherRepository();
     const [teacher, setTeacher] = useState<TeacherModel | null>(null);
     const [loading, setLoading] = useState(true);
