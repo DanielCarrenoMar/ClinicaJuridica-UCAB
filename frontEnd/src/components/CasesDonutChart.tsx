@@ -34,7 +34,7 @@ export default function CasesDonutChart( {statusAmounts}:CasesDonutChartProps ) 
 
   return (
     <div className="flex flex-col w-full gap-8">
-        <div className='flex-1'>
+        <div className='flex justify-center'>
             <Doughnut 
               data={data} 
               options={{
@@ -56,7 +56,7 @@ export default function CasesDonutChart( {statusAmounts}:CasesDonutChartProps ) 
                 className="w-2.5 h-2.5 rounded-full" 
                 style={{ backgroundColor: data.datasets[0].backgroundColor[index] }}
                 />
-                <span className="flex gap-2 align-baseline text-onSurface/70">
+                <span className="flex gap-2 align-top text-onSurface/70">
                     <h4 className='text-body-medium'>
                         {label}
                     </h4>
