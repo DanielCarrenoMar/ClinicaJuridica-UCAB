@@ -34,6 +34,9 @@ export default function AddCaseActionDialog({
     };
 
     const handleClose = () => {
+        const isEmpty = !description.trim() && !notes.trim();
+        if (!isEmpty && !window.confirm("¿Cerrar el diálogo? Se perderán los datos no guardados.")) return;
+
         setDescription("");
         setNotes("");
         onClose();
