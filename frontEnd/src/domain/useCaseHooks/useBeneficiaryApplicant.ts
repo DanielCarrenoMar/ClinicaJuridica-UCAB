@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useGetApplicantById } from "./useApplicant";
 import { useGetBeneficiaryById } from "./useBeneficiary";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
+import type { BeneficiaryModel } from "#domain/models/beneficiary.ts";
 
 /**
  * Busca un solicitante, si no lo encuentra, busca un beneficiario y rellena la información de ahi.
@@ -12,13 +13,18 @@ export function useGetApplicantOrBeneficiaryById() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const getApplicantOrBeneficiaryById = async (id: string): Promise<ApplicantModel | null> => {
+    interface ApplicantModelType extends Pick<BeneficiaryModel, "type"> {
+
+    }
+    
+
+    const getApplicantOrBeneficiaryById = async (id: string): Promise<ApplicantModelType | null> => {
         setLoading(true);
         setError(null);
         try {
             let applicant = await getApplicantById(id);
             if (applicant) {
-                return applicant;
+                return {...applicant, type: "Solicitante"};
             }
             
             const beneficiary = await getBeneficiaryById(id);
@@ -28,7 +34,7 @@ export function useGetApplicantOrBeneficiaryById() {
             if (beneficiary){
                 const { type, hasId, ...rest } = beneficiary
                 applicant = {createdAt: new Date(), ...rest}
-                return applicant
+                return {...applicant, type: "Beneficiario"}
             }
 
             return null;

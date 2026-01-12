@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useBlocker } from "react-router";
-import { useGetApplicantById, useUpdateApplicant, useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
+import { useUpdateApplicant, useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
 import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel } from "#domain/typesModel.ts";
@@ -18,13 +18,15 @@ import { CaretDown, Close, FilePdf, Home, Users } from "flowbite-react-icons/out
 import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { locationData, characteristicsData } from "#domain/seedData.ts";
 import { educationLevelData, workConditionData, activityConditionData } from "#domain/seedData.ts";
+import type {BeneficiaryTypeModel} from "#domain/typesModel.ts"
+import { useGetBeneficiaryById } from "#domain/useCaseHooks/useBeneficiary.ts";
 
 export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
+    const { getBeneficiaryById, loading: loadingBeneficiary } = useGetBeneficiaryById()
     const { getApplicantOrBeneficiaryById, loading, error } = useGetApplicantOrBeneficiaryById();
-    const { getApplicantById: checkApplicantExists } = useGetApplicantById();
     const { updateApplicant, loading: updating } = useUpdateApplicant();
     const { createApplicant, loading: creating } = useCreateApplicant();
 
@@ -32,12 +34,12 @@ export default function ApplicantInfo() {
     const [localApplicantData, setLocalApplicantData] = useState<ApplicantModel>();
     const [isDataModified, setIsDataModified] = useState(false);
     const [activeSection, setActiveSection] = useState("identificacion");
-    const [isApplicantExisting, setIsApplicantExisting] = useState(false);
+    const [type, setType] = useState<BeneficiaryTypeModel | null>(null);
+    const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
 
     const [stateIndex, setStateIndex] = useState<number | null>(null);
     const [munIndex, setMunIndex] = useState<number | null>(null);
 
-    // Unsaved changes protection
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (isDataModified) {
@@ -50,7 +52,7 @@ export default function ApplicantInfo() {
     }, [isDataModified]);
 
     const blocker = useBlocker(
-        ({ nextLocation }) => isDataModified && !nextLocation.pathname.includes(location.pathname)
+        ({ nextLocation }) => isDataModified && !nextLocation.pathname.includes("/solicitante/")
     );
 
     useEffect(() => {
@@ -63,14 +65,8 @@ export default function ApplicantInfo() {
             }
         }
     }, [blocker]);
-    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-    const [isCheckingId, setIsCheckingId] = useState(false);
 
-    // Reuse the hook instance (or create a new one if needed for independent loading state)
-    // We can use the same hook but we need to be careful not to overwrite 'applicantData' state
-    // Actually useGetApplicantById exposes getApplicantById function which returns a promise.
-    // We can use that directly without relying on its internal state if we just await the promise.
-    const { getApplicantById: checkIdAvailability } = useGetApplicantById();
+    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         const loadApplicant = async () => {
@@ -78,39 +74,21 @@ export default function ApplicantInfo() {
             if (!applicantId) return;
             
             // Primero verificar si el solicitante existe realmente
-            const existingApplicant = await checkApplicantExists(applicantId);
-            setIsApplicantExisting(!!existingApplicant);
-            
-            // Cargar solicitante o beneficiario
-            const applicant = await getApplicantOrBeneficiaryById(applicantId);
-            if (applicant) {
-                // Clonar el objeto profundamente, especialmente las fechas
-                const clonedApplicant = {
-                    ...applicant,
-                    birthDate: new Date(applicant.birthDate),
-                    createdAt: applicant.createdAt ? new Date(applicant.createdAt) : new Date(),
-                    servicesIdAvailable: applicant.servicesIdAvailable ? [...applicant.servicesIdAvailable] : undefined
-                };
-                setApplicantData(clonedApplicant);
-                setLocalApplicantData({ ...clonedApplicant });
-
-                // Establecer índices de ubicación si existen
-                if (applicant.stateName) {
-                    const sIdx = locationData.findIndex(s => s.name === applicant.stateName);
-                    if (sIdx !== -1) {
-                        setStateIndex(sIdx);
-                        if (applicant.municipalityName) {
-                            const mIdx = locationData[sIdx].municipalities.findIndex(m => m.name === applicant.municipalityName);
-                            if (mIdx !== -1) {
-                                setMunIndex(mIdx);
-                            }
-                        }
-                    }
-                }
+            const response = await getApplicantOrBeneficiaryById(applicantId);
+            if (!response) {
+                setApplicantData(null);
+                return;
             }
+            const { type , ...aplicant } = response
+
+            setType(type);
+            
+            setApplicantData(aplicant as ApplicantModel);
+            setLocalApplicantData(aplicant as ApplicantModel);
+            setIsApplicantExisting(true);
         };
         loadApplicant();
-    }, [id, checkApplicantExists, getApplicantOrBeneficiaryById]);
+    }, [id]);
 
     useEffect(() => {
         if (!localApplicantData || !applicantData) return;
@@ -177,7 +155,6 @@ export default function ApplicantInfo() {
             const originalId = applicantData.identityCard;
 
             if (newId.length > 0 && newId !== originalId) {
-                setIsCheckingId(true);
                 // Clear previous ID error to avoid flickering if valid
                 setValidationErrors(prev => {
                     const next = { ...prev };
@@ -185,8 +162,7 @@ export default function ApplicantInfo() {
                     return next;
                 });
 
-                const exists = await checkIdAvailability(newId);
-                setIsCheckingId(false);
+                const exists = await getBeneficiaryById(newId);
 
                 if (exists) {
                     setValidationErrors(prev => ({ ...prev, identityCard: "Esta cédula ya está registrada" }));
@@ -203,8 +179,7 @@ export default function ApplicantInfo() {
             }
         };
 
-        const timeoutId = setTimeout(checkId, 500); // Debounce
-        return () => clearTimeout(timeoutId);
+        checkId();
     }, [localApplicantData?.identityCard, applicantData?.identityCard]);
 
     function discardChanges() {
@@ -218,7 +193,7 @@ export default function ApplicantInfo() {
 
         let savedApplicant: ApplicantModel | null = null;
 
-        if (isApplicantExisting) {
+        if (type === "Solicitante") {
             // Si el solicitante existe, actualizar
             savedApplicant = await updateApplicant(applicantId, localApplicantData);
         } else {
@@ -708,7 +683,7 @@ export default function ApplicantInfo() {
                         isDataModified ? (
                             <Button
                                 onClick={saveChanges}
-                                disabled={updating || creating || isCheckingId || Object.keys(validationErrors).length > 0}
+                                disabled={updating || creating || Object.keys(validationErrors).length > 0 || loadingBeneficiary}
                                 variant="resalted"
                                 className="h-10 w-32"
                             >
