@@ -35,6 +35,7 @@ export default function ApplicantInfo() {
     const [isDataModified, setIsDataModified] = useState(false);
     const [activeSection, setActiveSection] = useState("identificacion");
     const [type, setType] = useState<BeneficiaryTypeModel | null>(null);
+    const [hasId, setHasId] = useState<boolean | null>(null);
     const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
 
     const [stateIndex, setStateIndex] = useState<number | null>(null);
@@ -74,17 +75,17 @@ export default function ApplicantInfo() {
             if (!applicantId) return;
             
             // Primero verificar si el solicitante existe realmente
-            const response = await getApplicantOrBeneficiaryById(applicantId);
-            if (!response) {
+            const applicant = await getApplicantOrBeneficiaryById(applicantId);
+            if (!applicant) {
                 setApplicantData(null);
                 return;
             }
-            const { type , ...aplicant } = response
 
-            setType(type);
+            setType(applicant.type);
+            setHasId(applicant.hasId ?? null);
             
-            setApplicantData(aplicant as ApplicantModel);
-            setLocalApplicantData(aplicant as ApplicantModel);
+            setApplicantData(applicant);
+            setLocalApplicantData(applicant);
             setIsApplicantExisting(true);
         };
         loadApplicant();
@@ -194,10 +195,8 @@ export default function ApplicantInfo() {
         let savedApplicant: ApplicantModel | null = null;
 
         if (type === "Solicitante") {
-            // Si el solicitante existe, actualizar
             savedApplicant = await updateApplicant(applicantId, localApplicantData);
-        } else {
-            // Si no existe, crear nuevo solicitante
+        } else if (hasId === true) { // Si no tiene cedula no se puede crear un aplicant
             savedApplicant = await createApplicant(localApplicantData);
             if (savedApplicant) {
                 setIsApplicantExisting(true);

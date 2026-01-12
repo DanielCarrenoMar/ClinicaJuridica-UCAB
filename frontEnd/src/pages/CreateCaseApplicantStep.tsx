@@ -195,8 +195,8 @@ function CreateCaseApplicantStep() {
         }
 
         const timeoutId = setTimeout(async () => {
-            const applicant = await getApplicantOrBeneficiaryById(sanitizedIdentityCard);
             setIsVerifyingIdentityCard(true);
+            const applicant = await getApplicantOrBeneficiaryById(sanitizedIdentityCard);
 
             if (applicant) {
                 setFoundApplicant(applicant);

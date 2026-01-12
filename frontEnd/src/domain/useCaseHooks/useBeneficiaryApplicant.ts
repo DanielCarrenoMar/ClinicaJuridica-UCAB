@@ -13,7 +13,7 @@ export function useGetApplicantOrBeneficiaryById() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    interface ApplicantModelType extends Pick<BeneficiaryModel, "type"> {
+    interface ApplicantModelType extends ApplicantModel, Pick<BeneficiaryModel, "type" | "hasId"> {
 
     }
     
@@ -24,7 +24,7 @@ export function useGetApplicantOrBeneficiaryById() {
         try {
             let applicant = await getApplicantById(id);
             if (applicant) {
-                return {...applicant, type: "Solicitante"};
+                return {...applicant, type: "Solicitante", hasId: true};
             }
             
             const beneficiary = await getBeneficiaryById(id);
@@ -34,7 +34,7 @@ export function useGetApplicantOrBeneficiaryById() {
             if (beneficiary){
                 const { type, hasId, ...rest } = beneficiary
                 applicant = {createdAt: new Date(), ...rest}
-                return {...applicant, type: "Beneficiario"}
+                return {...applicant, type: "Beneficiario", hasId: beneficiary.hasId};
             }
 
             return null;
