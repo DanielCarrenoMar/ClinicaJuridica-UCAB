@@ -222,6 +222,7 @@ export default function ApplicantInfo() {
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
     if (error) return <div className="text-error">Error al cargar el solicitante: {error.message}</div>;
     if (!applicantData || !localApplicantData) return <div className="">No se encontró el solicitante</div>;
+    if (hasId === false) return <div className="">No se puede modificar la información de un beneficiario sin cédula</div>;
 
     const identificationInputs = (
         <>
