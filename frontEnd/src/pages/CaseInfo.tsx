@@ -17,6 +17,7 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
+import { jsPDF } from 'jspdf';
 import { type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
 import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
@@ -232,6 +233,212 @@ export default function CaseInfo() {
     if (!caseData) return <div className="">No se encontró el caso</div>;
 
     const getStatusColor = (status: CaseStatusTypeModel) => STATUS_COLORS[status] || "bg-surface ";
+
+    const generatePDF = () => {
+        if (!caseData) return;
+
+        const doc = new jsPDF();
+        let yPos = 20;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 20;
+        const maxWidth = doc.internal.pageSize.width - (margin * 2);
+
+        // Helper function to add new page if needed
+        const checkPageBreak = (requiredSpace: number) => {
+            if (yPos + requiredSpace > pageHeight - margin) {
+                doc.addPage();
+                yPos = margin;
+            }
+        };
+
+        // Helper function to add text with word wrap
+        const addText = (text: string, fontSize: number, isBold: boolean = false, x: number = margin) => {
+            doc.setFontSize(fontSize);
+            doc.setFont(undefined, isBold ? 'bold' : 'normal');
+            const lines = doc.splitTextToSize(text, maxWidth - (x - margin));
+            checkPageBreak(lines.length * (fontSize * 0.4) + 5);
+            doc.text(lines, x, yPos);
+            yPos += lines.length * (fontSize * 0.4) + 5;
+        };
+
+        // Header
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text('Resumen de Caso', margin, yPos);
+        yPos += 10;
+
+        // Información General del Caso
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Información General', margin, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        addText(`Clave del Caso: ${caseData.compoundKey}`, 10);
+        addText(`Estado: ${caseData.caseStatus}`, 10);
+        addText(`Tipo de Trámite: ${caseData.processType}`, 10);
+        addText(`Fecha de Creación: ${caseData.createdAt.toLocaleDateString('es-ES')}`, 10);
+        if (caseData.courtName) {
+            addText(`Tribunal: ${caseData.courtName}`, 10);
+        }
+        yPos += 5;
+
+        // Ámbito Legal
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Ámbito Legal', margin, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        addText(`Materia: ${caseData.subjectName}`, 10);
+        addText(`Categoría: ${caseData.subjectCategoryName}`, 10);
+        addText(`Área Legal: ${caseData.legalAreaName}`, 10);
+        yPos += 5;
+
+        // Síntesis del Problema
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Síntesis del Problema', margin, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        addText(caseData.problemSummary || 'Sin síntesis', 10);
+        yPos += 5;
+
+        // Solicitante
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text('Solicitante', margin, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        addText(`Nombre: ${caseData.applicantName}`, 10);
+        addText(`Cédula: ${caseData.applicantId}`, 10);
+        yPos += 5;
+
+        // Profesor Asignado
+        if (caseData.teacherName) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Profesor Asignado', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            addText(`Nombre: ${caseData.teacherName}`, 10);
+            if (caseData.teacherTerm) {
+                addText(`Término: ${caseData.teacherTerm}`, 10);
+            }
+            yPos += 5;
+        }
+
+        // Estudiantes Asignados
+        if (localCaseStudents.length > 0) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Estudiantes Asignados', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            localCaseStudents.forEach((student, index) => {
+                addText(`${index + 1}. ${student.fullName} - ${student.identityCard}`, 10);
+            });
+            yPos += 5;
+        }
+
+        // Beneficiarios
+        if (localCaseBeneficiaries.length > 0) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Beneficiarios', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            localCaseBeneficiaries.forEach((beneficiary, index) => {
+                checkPageBreak(15);
+                addText(`${index + 1}. ${beneficiary.fullName} - ${beneficiary.identityCard}`, 10);
+                addText(`   Tipo: ${beneficiary.caseType} | Relación: ${beneficiary.relationship || 'N/A'}`, 9, false, margin + 5);
+                if (beneficiary.description) {
+                    addText(`   Descripción: ${beneficiary.description}`, 9, false, margin + 5);
+                }
+            });
+            yPos += 5;
+        }
+
+        // Citas
+        if (appointments.length > 0) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Citas', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            appointments.forEach((appointment, index) => {
+                checkPageBreak(20);
+                const dateStr = appointment.plannedDate.toLocaleDateString('es-ES');
+                addText(`${index + 1}. Fecha: ${dateStr} - Estado: ${appointment.status}`, 10);
+                if (appointment.guidance) {
+                    addText(`   Orientación: ${appointment.guidance}`, 9, false, margin + 5);
+                }
+                if (appointment.executionDate) {
+                    const execDateStr = appointment.executionDate.toLocaleDateString('es-ES');
+                    addText(`   Fecha de Ejecución: ${execDateStr}`, 9, false, margin + 5);
+                }
+            });
+            yPos += 5;
+        }
+
+        // Recaudos
+        if (supportDocuments.length > 0) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Recaudos', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            supportDocuments.forEach((supportDoc, index) => {
+                checkPageBreak(20);
+                const dateStr = supportDoc.submissionDate.toLocaleDateString('es-ES');
+                addText(`${index + 1}. ${supportDoc.title}`, 10);
+                addText(`   Fecha: ${dateStr}`, 9, false, margin + 5);
+                if (supportDoc.description) {
+                    addText(`   Descripción: ${supportDoc.description}`, 9, false, margin + 5);
+                }
+            });
+            yPos += 5;
+        }
+
+        // Historial de Acciones
+        if (caseActions.length > 0) {
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Historial de Acciones', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            caseActions.forEach((action, index) => {
+                checkPageBreak(25);
+                const dateStr = action.registryDate.toLocaleDateString('es-ES');
+                addText(`${index + 1}. ${action.description}`, 10);
+                addText(`   Fecha: ${dateStr} | Por: ${action.userName}`, 9, false, margin + 5);
+                if (action.notes) {
+                    addText(`   Notas: ${action.notes}`, 9, false, margin + 5);
+                }
+            });
+        }
+
+        // Guardar PDF
+        doc.save(`Caso_${caseData.compoundKey}_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
 
     const GeneralTabContent = (
         <div className="flex flex-col gap-6">
@@ -789,7 +996,7 @@ export default function CaseInfo() {
                         isDataModified ? (
                             <Button variant='resalted' className='w-32' onClick={saveChanges} disabled={updating}>Guardar</Button>
                         ) : (
-                            <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf />}>
+                            <Button variant="outlined" className='w-32' onClick={generatePDF} icon={<FilePdf />}>
                                 Exportar
                             </Button>
                         )

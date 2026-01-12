@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useBlocker } from "react-router";
-import { useGetApplicantById, useUpdateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
+import { useGetApplicantById, useUpdateApplicant, useCreateApplicant } from "#domain/useCaseHooks/useApplicant.ts";
+import { useGetApplicantOrBeneficiaryById } from "#domain/useCaseHooks/useBeneficiaryApplicant.ts";
 import type { ApplicantModel } from "#domain/models/applicant.ts";
 import type { GenderTypeModel, IdNacionalityTypeModel, MaritalStatusTypeModel } from "#domain/typesModel.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
@@ -22,13 +23,16 @@ export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const { getApplicantById, loading, error } = useGetApplicantById();
+    const { getApplicantOrBeneficiaryById, loading, error } = useGetApplicantOrBeneficiaryById();
+    const { getApplicantById: checkApplicantExists } = useGetApplicantById();
     const { updateApplicant, loading: updating } = useUpdateApplicant();
+    const { createApplicant, loading: creating } = useCreateApplicant();
 
     const [applicantData, setApplicantData] = useState<ApplicantModel | null>(null);
     const [localApplicantData, setLocalApplicantData] = useState<ApplicantModel>();
     const [isDataModified, setIsDataModified] = useState(false);
     const [activeSection, setActiveSection] = useState("identificacion");
+    const [isApplicantExisting, setIsApplicantExisting] = useState(false);
 
     const [stateIndex, setStateIndex] = useState<number | null>(null);
     const [munIndex, setMunIndex] = useState<number | null>(null);
@@ -72,13 +76,19 @@ export default function ApplicantInfo() {
         const loadApplicant = async () => {
             const applicantId = id;
             if (!applicantId) return;
-            const applicant = await getApplicantById(applicantId);
+            
+            // Primero verificar si el solicitante existe realmente
+            const existingApplicant = await checkApplicantExists(applicantId);
+            setIsApplicantExisting(!!existingApplicant);
+            
+            // Cargar solicitante o beneficiario
+            const applicant = await getApplicantOrBeneficiaryById(applicantId);
             if (applicant) {
                 // Clonar el objeto profundamente, especialmente las fechas
                 const clonedApplicant = {
                     ...applicant,
                     birthDate: new Date(applicant.birthDate),
-                    createdAt: new Date(applicant.createdAt),
+                    createdAt: applicant.createdAt ? new Date(applicant.createdAt) : new Date(),
                     servicesIdAvailable: applicant.servicesIdAvailable ? [...applicant.servicesIdAvailable] : undefined
                 };
                 setApplicantData(clonedApplicant);
@@ -100,7 +110,7 @@ export default function ApplicantInfo() {
             }
         };
         loadApplicant();
-    }, [id]);
+    }, [id, checkApplicantExists, getApplicantOrBeneficiaryById]);
 
     useEffect(() => {
         if (!localApplicantData || !applicantData) return;
@@ -206,14 +216,26 @@ export default function ApplicantInfo() {
         if (!applicantId) return;
         if (!localApplicantData || !applicantData) return;
 
-        const updatedApplicant = await updateApplicant(applicantId, localApplicantData);
-        if (updatedApplicant) {
-            setApplicantData(updatedApplicant);
-            setLocalApplicantData(updatedApplicant);
+        let savedApplicant: ApplicantModel | null = null;
+
+        if (isApplicantExisting) {
+            // Si el solicitante existe, actualizar
+            savedApplicant = await updateApplicant(applicantId, localApplicantData);
+        } else {
+            // Si no existe, crear nuevo solicitante
+            savedApplicant = await createApplicant(localApplicantData);
+            if (savedApplicant) {
+                setIsApplicantExisting(true);
+            }
+        }
+
+        if (savedApplicant) {
+            setApplicantData(savedApplicant);
+            setLocalApplicantData(savedApplicant);
 
             // If ID changed, navigate to new URL
-            if (updatedApplicant.identityCard !== applicantId) {
-                navigate(`/solicitante/${updatedApplicant.identityCard}`, { replace: true });
+            if (savedApplicant.identityCard !== applicantId) {
+                navigate(`/solicitante/${savedApplicant.identityCard}`, { replace: true });
             }
         }
     }
@@ -686,11 +708,11 @@ export default function ApplicantInfo() {
                         isDataModified ? (
                             <Button
                                 onClick={saveChanges}
-                                disabled={updating || isCheckingId || Object.keys(validationErrors).length > 0}
+                                disabled={updating || creating || isCheckingId || Object.keys(validationErrors).length > 0}
                                 variant="resalted"
                                 className="h-10 w-32"
                             >
-                                Guardar
+                                {isApplicantExisting ? "Guardar" : "Crear"}
                             </Button>
                         ) : (
                             <Button onClick={() => { }} icon={<FilePdf />} variant="outlined" className="h-10 w-32">
