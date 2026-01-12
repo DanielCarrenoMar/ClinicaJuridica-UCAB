@@ -21,7 +21,7 @@ export default function CaseActionCard({
   return (
     <span
       onClick={onClick}
-      className={`flex flex-col gap-1 items-start w-full px-4 py-2.5 rounded-3xl hover:bg-surface bg-surface/70 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex flex-col border border-onSurface/20 hover:border-onSurface/40 gap-1 items-start w-full px-4 py-2.5 rounded-3xl hover:bg-surface bg-surface/70 ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
       <header className='flex items-end justify-between w-full'>
         <span className='flex flex-wrap text-body-small gap-2'>
