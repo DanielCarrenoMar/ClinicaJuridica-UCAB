@@ -11,6 +11,7 @@ import { useGetAllCaseActions } from "#domain/useCaseHooks/useCaseActions.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import { useGetStatusCaseAmounts } from "#domain/useCaseHooks/useCase.ts";
 import { useState } from "react";
+import LinkButton from "#components/LinkButton.tsx";
 
 function DashBoard() {
     const navigate = useNavigate()
@@ -26,7 +27,7 @@ function DashBoard() {
                 <Box className="col-span-4 h-full flex flex-col gap-2">
                     <span className="flex items-center justify-between pb-2">
                         <h2 className="text-label-small text-onSurface">Ultimas acciones</h2>
-                        <Button icon={<Search />} />
+                        <LinkButton icon={<Search />} to={"/acciones"} />
                     </span>
 
                     <div className="flex flex-col gap-2 flex-11">
