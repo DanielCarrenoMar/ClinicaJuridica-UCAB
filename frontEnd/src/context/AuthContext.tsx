@@ -14,7 +14,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function roleToPermissionLevel(role: UserTypeModel): number {
+export function roleToPermissionLevel(role: UserTypeModel): number {
     switch (role) {
         case "Coordinador":
             return 1;

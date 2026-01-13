@@ -1,3 +1,4 @@
+import { roleToPermissionLevel, useAuth } from '#/context/AuthContext';
 import DropdownOption from '#components/Dropdown/DropdownOption.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import TitleDropdown from '#components/TitleDropdown.tsx';
@@ -24,6 +25,10 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
     }
 
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+    const { permissionLevel } = useAuth();
+
+
+    const isInputsDisabled = permissionLevel > roleToPermissionLevel(localUser.type); 
 
     const getUserTypeColor = () => {
         return localUser.type === 'Profesor' ? 'text-blue-600' : 'text-green-600'
@@ -38,6 +43,7 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                         label="Cédula"
                         value={localUser.identityCard}
                         onChange={(text) => handleUserChange({ identityCard: text })}
+                        disabled={isInputsDisabled}
                     />
                     {validationErrors.identityCard && <span className="text-xs text-error mt-1">{validationErrors.identityCard}</span>}
                 </div>
@@ -46,6 +52,7 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                         label="Nombre y apellido"
                         value={localUser.fullName || ""}
                         onChange={(text) => { handleUserChange({ fullName: text }); }}
+                        disabled={isInputsDisabled}
                     />
                     {validationErrors.fullName && <span className="text-xs text-error mt-1">{validationErrors.fullName}</span>}
                 </div>
@@ -53,8 +60,8 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
             <div className="col-span-1">
                 <TitleDropdown
                     label="Sexo"
-                    selectedValue={localUser.gender || undefined}
-                    onSelectionChange={(value) => { handleUserChange({ gender: value as GenderTypeModel }); }}
+                    disabled={isInputsDisabled}
+                    onSelectionChange={(value) => {handleUserChange({gender: value as GenderTypeModel})}}
                 >
                     <DropdownOption value="Masculino">Masculino</DropdownOption>
                     <DropdownOption value="Femenino">Femenino</DropdownOption>
