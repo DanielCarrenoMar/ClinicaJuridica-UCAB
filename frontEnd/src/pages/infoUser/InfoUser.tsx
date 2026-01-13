@@ -8,6 +8,9 @@ import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
 import type { UserModel } from '#domain/models/user.ts'
+import Box from '#components/Box.tsx'
+import DropdownOption from '#components/Dropdown/DropdownOption.tsx'
+import Dropdown from '#components/Dropdown/Dropdown.tsx'
 
 function InfoUser() {
   const { userId } = useParams<{ userId: string }>()
@@ -16,7 +19,7 @@ function InfoUser() {
   }
 
   const { user, loading: userLoading } = useGetUserById(userId)
-  
+
   const [activeTab, setActiveTab] = useState("General")
   const [isEditing, setIsEditing] = useState(false)
   const [editedInfo, setEditedInfo] = useState<UserModel | null>(null)
@@ -32,82 +35,80 @@ function InfoUser() {
   let content = null;
   switch (activeTab) {
     case 'General':
-        content = (
-            <UserGeneral 
-                userModel={user}
-                isEditing={isEditing}
-                onInputChange={handleInputChange}
-            />
-        );
-        break;
+      content = (
+        <UserGeneral
+          userModel={user}
+          isEditing={isEditing}
+          onInputChange={handleInputChange}
+        />
+      );
+      break;
     case 'Casos Asociados':
-        content = (
-            <UserCases userId={userId} userType={user.type ?? "Estudiante"} />
-        );
-        break;
+      content = (
+        <UserCases userId={userId} userType={user.type ?? "Estudiante"} />
+      );
+      break;
     case 'Acciones Realizadas':
-        content = (
-            <UserActions 
-                userId={userId}
-            />
-        );
-        break;
+      content = (
+        <UserActions
+          userId={userId}
+        />
+      );
+      break;
   }
 
   return (
-    <div className="w-full h-full relative from-gray-200 via-gray-100 to-gray-200 overflow-hidden">
-        <div className="container mx-auto px-6 py-8 h-full flex flex-col">
-          <div className="w-full p-4 bg-white/70 rounded-2xl mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <UserCircle className="w-7 h-7 text-onSurface" />
-                <div className="flex flex-col">
-                  <div className="text-[22px] font-normal text-onSurface">{user.fullName}</div>
-                  <div className="flex items-center gap-5">
-                    <div className="text-[13px] font-medium text-onSurface">Cedula</div>
-                    <div className="text-[13px] font-normal text-onSurface">{user.identityCard}</div>
-                    <div className="text-[13px] font-medium text-onSurface">Rol</div>
-                    <div className="text-[13px] font-normal text-onSurface capitalize">{user.type}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-[13px] font-medium text-onSurface">Estado:</div>
-                <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-[13px] font-medium">
-                  Activo
-                </div>
-              </div>
-            </div>
+    <Box className="p-0!">
+      <header className='bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16'>
+        <span className='flex gap-3 items-center'>
+          <UserCircle className="size-6" />
+          <div className="flex flex-col">
+            <h1 className="text-label-small">{user.fullName}</h1>
+            <span className='flex gap-2'>
+                <p className="text-body-small"> <strong className='text-body-medium'>Cedula:</strong> {user.identityCard}</p>
+                <p className="text-body-small"> <strong className='text-body-medium'>Rol:</strong> {user.type}</p>
+            </span>
           </div>
-
-          <Tabs 
-            selectedId={activeTab}
-            className="mb-6"
-          >
-            <Tabs.Item 
-              id="General" 
-              label="General" 
-              icon={<User className="w-5 h-5" />}
-              onClick={() => setActiveTab('General')}
-            />
-            <Tabs.Item 
-              id="Casos Asociados" 
-              label="Casos Asociados" 
-              icon={<File className="w-5 h-5" />}
-              onClick={() => setActiveTab('Casos Asociados')}
-            />
-            <Tabs.Item 
-              id="Acciones Realizadas" 
-              label="Acciones Realizadas" 
-              icon={<Clock className="w-5 h-5" />}
-              onClick={() => setActiveTab('Acciones Realizadas')}
-            />
-          </Tabs>
-
-          {content}
-
-        </div>
-    </div>
+        </span>
+        <Dropdown
+          label={user?.isActive ? "Activo" : "Inactivo"}
+          triggerClassName={""}
+          selectedValue={user?.isActive ? "Activo" : "Inactivo"}
+          onSelectionChange={() => { }}
+        >
+          <DropdownOption value="Activo">Activo</DropdownOption>
+          <DropdownOption value="Inactivo">Inactivo</DropdownOption>
+        </Dropdown>
+      </header>
+      <section className="flex py-2">
+        <Tabs
+          selectedId={activeTab}
+          className="mb-6"
+        >
+          <Tabs.Item
+            id="General"
+            label="General"
+            icon={<User className="w-5 h-5" />}
+            onClick={() => setActiveTab('General')}
+          />
+          <Tabs.Item
+            id="Casos Asociados"
+            label="Casos Asociados"
+            icon={<File className="w-5 h-5" />}
+            onClick={() => setActiveTab('Casos Asociados')}
+          />
+          <Tabs.Item
+            id="Acciones Realizadas"
+            label="Acciones Realizadas"
+            icon={<Clock className="w-5 h-5" />}
+            onClick={() => setActiveTab('Acciones Realizadas')}
+          />
+        </Tabs>
+      </section>
+      <section className="px-4 pb-6 flex flex-col">
+        {content}
+      </section>
+    </Box>
   )
 }
 

@@ -757,7 +757,7 @@ export default function CaseInfo() {
 
     return (
         <Box className='p-0! h-full overflow-y-auto'>
-            <header className="bg-surface/70 flex items-center justify-between px-4 rounded-xl h-16">
+            <header className="bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16">
                 <span className="flex gap-3 items-center">
                     <Clipboard className='size-6!' />
                     <div>
