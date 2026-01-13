@@ -130,7 +130,6 @@ function LateralMenuLayer() {
                                 icon={<Bell />}
                                 onClick={() => setIsAssignedCasesOpen((prev) => !prev)}
                             />
-                            |{permissionLevel}|
 
                             {isAssignedCasesOpen && (
                                 <InBox className="absolute right-0 mt-2 w-96 z-50 gap-2">
