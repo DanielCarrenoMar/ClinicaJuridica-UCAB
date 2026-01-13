@@ -687,7 +687,7 @@ export default function ApplicantInfo() {
                                 variant="resalted"
                                 className="h-10 w-32"
                             >
-                                {isApplicantExisting ? "Guardar" : "Crear"}
+                                Guardar
                             </Button>
                         ) : (
                             <Button onClick={() => { }} icon={<FilePdf />} variant="outlined" className="h-10 w-32">

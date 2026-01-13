@@ -20,7 +20,7 @@ import Login from '#pages/Login.tsx';
 import ErrorPage from '#pages/ErrorPage.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
-import InfoUser from '#pages/infoUser/InfoUser.tsx';
+import UserInfo from '#pages/infoUser/UserInfo.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -41,7 +41,7 @@ const router = createBrowserRouter(
 
           <Route element={<ProtectedRoute requiredLevel={2} />}>
             <Route path="/usuarios" element={<Users />} />
-            <Route path="/usuario/:userId" element={<InfoUser />} />
+            <Route path="/usuario/:userId" element={<UserInfo />} />
           </Route>
 
           <Route element={<ProtectedRoute requiredLevel={1} />}>
