@@ -38,9 +38,9 @@ function LateralMenuLayer() {
     const { cases: studentCases, loading: studentCasesLoading, error: studentCasesError, loadCases: loadStudentCases } = useGetCasesByStudentId();
     const { cases: teacherCases, loading: teacherCasesLoading, error: teacherCasesError, loadCases: loadTeacherCases } = useGetCasesByTeacherId();
 
-    const assignedCases = user?.type === 'student' ? studentCases : teacherCases;
-    const assignedCasesLoading = user?.type === 'student' ? studentCasesLoading : teacherCasesLoading;
-    const assignedCasesError = user?.type === 'student' ? studentCasesError : teacherCasesError;
+    const assignedCases = user?.type === 'Estudiante' ? studentCases : teacherCases;
+    const assignedCasesLoading = user?.type === 'Estudiante' ? studentCasesLoading : teacherCasesLoading;
+    const assignedCasesError = user?.type === 'Estudiante' ? studentCasesError : teacherCasesError;
 
     const latestAssignedCases = useMemo(() => {
         return [...assignedCases]
@@ -74,7 +74,7 @@ function LateralMenuLayer() {
 
     useEffect(() => {
         if (!user) return;
-        if (user?.type === 'student') {
+        if (user?.type === 'Estudiante') {
             loadStudentCases(user?.identityCard);
         }else {
             loadTeacherCases(user?.identityCard);
@@ -130,6 +130,7 @@ function LateralMenuLayer() {
                                 icon={<Bell />}
                                 onClick={() => setIsAssignedCasesOpen((prev) => !prev)}
                             />
+                            |{permissionLevel}|
 
                             {isAssignedCasesOpen && (
                                 <InBox className="absolute right-0 mt-2 w-96 z-50 gap-2">
