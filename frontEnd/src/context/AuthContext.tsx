@@ -16,11 +16,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function roleToPermissionLevel(role: UserTypeModel): number {
     switch (role) {
-        case "coordinator":
+        case "Coordinador":
             return 1;
-        case "teacher":
+        case "Profesor":
             return 2;
-        case "student":
+        case "Estudiante":
             return 3;
     }
 }
