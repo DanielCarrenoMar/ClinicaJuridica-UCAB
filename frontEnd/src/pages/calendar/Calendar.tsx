@@ -3,8 +3,8 @@ import { useFindAllAppointments } from '#domain/useCaseHooks/useAppointment.ts';
 import { ChevronRight, ChevronLeft } from 'flowbite-react-icons/outline';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
-import AppointmentDetailsDialog from '#components/dialogs/AppointmentDetailsDialog.tsx';
-import DayAppointmentsDialog from '#components/dialogs/DayAppointmentsDialog.tsx';
+import DayAppointmentsDialog from '#pages/calendar/components/DayAppointmentsDialog.tsx';
+import { useNavigate } from 'react-router';
 
 const DAYS = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SAB', 'DOM'];
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -12,8 +12,7 @@ const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 
 function Calendar() {
     const { appointments, loading } = useFindAllAppointments();
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+    const navigate = useNavigate();
 
     // Day View State
     const [dayViewDate, setDayViewDate] = useState<Date | null>(null);
@@ -135,10 +134,10 @@ function Calendar() {
                             key={`${dayObj.key}-${index}`}
                             className={`relative bg-white p-2 flex flex-col gap-1 transition-colors h-full w-full overflow-hidden
                                 ${!dayObj.currentMonth ? 'bg-gray-50/50 text-gray-400' : 'text-gray-800'}
-                                ${dayAppointments.length > 1 ? 'hover:bg-gray-50 cursor-pointer' : ''}
+                                ${dayAppointments.length > 0 ? 'hover:bg-gray-50 cursor-pointer' : ''}
                             `}
                             onClick={() => {
-                                if (dayAppointments.length > 1) {
+                                if (dayAppointments.length > 0) {
                                     handleOpenDayView(dayObj.dateObj);
                                 }
                             }}
@@ -164,11 +163,7 @@ function Calendar() {
                                     return (
                                         <div
                                             key={i}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSelectedAppointment(apt);
-                                                setIsDetailsOpen(true);
-                                            }}
+                                            // Make click bubble up to day cell
                                             className={`text-xs px-2 py-1 rounded-md border truncate cursor-pointer transition-colors shrink-0 ${colorClass}`}
                                             title={`${apt.guidance} - ${apt.status}`}
                                         >
@@ -189,12 +184,6 @@ function Calendar() {
                 })}
             </div>
 
-            <AppointmentDetailsDialog
-                open={isDetailsOpen}
-                onClose={() => setIsDetailsOpen(false)}
-                appointment={selectedAppointment}
-            />
-
             {dayViewDate && (
                 <DayAppointmentsDialog
                     open={isDayViewOpen}
@@ -205,8 +194,7 @@ function Calendar() {
                     }
                     onAppointmentClick={(apt) => {
                         setIsDayViewOpen(false); // Close day view first
-                        setSelectedAppointment(apt);
-                        setIsDetailsOpen(true);
+                        navigate(`/caso/${apt.idCase}`);
                     }}
                 />
             )}
@@ -215,3 +203,4 @@ function Calendar() {
 }
 
 export default Calendar;
+

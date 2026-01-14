@@ -5,7 +5,7 @@ import DashBoard from '#pages/DashBoard.tsx';
 import CreateCase from '#pages/CreateCase.tsx';
 import CreateCaseApplicantStep from '#pages/CreateCaseApplicantStep.tsx';
 import CreateCaseCaseStep from '#pages/CreateCaseCaseStep.tsx';
-import Calendar from '#pages/Calendar.tsx';
+import Calendar from '#pages/calendar/Calendar.tsx';
 import ActionsHistory from '#pages/ActionsHistory.tsx';
 import Reports from '#pages/Reports.tsx';
 import Users from '#pages/Users.tsx';

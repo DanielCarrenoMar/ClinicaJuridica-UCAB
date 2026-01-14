@@ -1,5 +1,6 @@
 import Dialog from "#components/dialogs/Dialog.tsx";
 import type { AppointmentModel } from "#domain/models/appointment.ts";
+import { Clock } from "flowbite-react-icons/solid";
 
 interface DayAppointmentsDialogProps {
     open: boolean;
@@ -46,19 +47,31 @@ export default function DayAppointmentsDialog({
                         } else if (apt.status === "Cancelada") {
                             colorClass = "bg-error text-white";
                         }
+                        
+                        // Format time (assuming plannedDate holds the full datetime)
+                        const timeString = apt.plannedDate.toLocaleTimeString("es-ES", {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
 
                         return (
                             <div
                                 key={i}
                                 onClick={() => onAppointmentClick(apt)}
-                                className={`p-3 rounded-xl border flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity ${colorClass}`}
+                                className={`p-3 rounded-xl border flex flex-col gap-1 cursor-pointer hover:opacity-80 transition-opacity ${colorClass}`}
                             >
-                                <span className="font-medium text-body-medium truncate flex-1 pr-2">
-                                    {apt.guidance || "Cita sin descripción"}
-                                </span>
-                                <span className="text-label-small opacity-90 whitespace-nowrap">
-                                    {apt.status}
-                                </span>
+                                <div className="flex justify-between items-start">
+                                    <span className="font-medium text-body-medium truncate pr-2">
+                                        {apt.guidance || "Cita sin descripción"}
+                                    </span>
+                                    <span className="text-label-small opacity-90 whitespace-nowrap px-2 py-0.5 rounded-full bg-black/10 backdrop-blur-sm">
+                                        {apt.status}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-label-medium opacity-90">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{timeString}</span>
+                                </div>
                             </div>
                         );
                     })
@@ -67,3 +80,4 @@ export default function DayAppointmentsDialog({
         </Dialog>
     );
 }
+
