@@ -5,6 +5,7 @@ import TextInput from '#components/TextInput.tsx';
 import Dialog from '#components/dialogs/Dialog.tsx';
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
 import type { AppointmentStatusTypeDAO } from '#database/typesDAO.ts';
+import DateTimePicker from '#components/DateTimePicker.tsx';
 
 interface AddAppointmentDialogProps {
     open: boolean;
@@ -51,14 +52,14 @@ export default function AddAppointmentDialog({
     return (
         <Dialog open={open} title="Nueva Cita" onClose={onClose}>
             <div className="flex flex-col gap-4">
-                <DatePicker
+                <DateTimePicker
                     label="Planificada para"
                     value={plannedDate}
                     onChange={setPlannedDate}
                     min={today}
                 />
 
-                <DatePicker
+                <DateTimePicker
                     label="Ejecutada el"
                     value={executionDate}
                     onChange={setExecutionDate}
