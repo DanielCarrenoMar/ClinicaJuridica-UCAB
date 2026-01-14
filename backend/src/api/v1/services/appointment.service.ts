@@ -96,16 +96,83 @@ class AppointmentService {
 
   async updateAppointment(idCase: number, appointmentNumber: number, data: any) {
     try {
-      await prisma.$executeRaw`
-        UPDATE "Appointment"
-        SET 
-          "plannedDate" = COALESCE(CAST(${data.plannedDate} AS DATE), "plannedDate"),
-          "executionDate" = COALESCE(CAST(${data.executionDate} AS DATE), "executionDate"),
-          "status" = COALESCE(${data.status}, "status"),
-          "guidance" = COALESCE(${data.guidance}, "guidance"),
-          "userId" = COALESCE(${data.userId}, "userId")
-        WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
-      `;
+      // Validar y preparar las fechas: solo hacer CAST si no son cadenas vacías o null
+      // Si es cadena vacía, no actualizar el campo (mantener el valor actual)
+      const hasPlannedDate = data.plannedDate && typeof data.plannedDate === 'string' && data.plannedDate.trim() !== '';
+      const hasExecutionDate = data.executionDate !== undefined;
+      const executionDateIsEmpty = data.executionDate === null || data.executionDate === '' || (typeof data.executionDate === 'string' && data.executionDate.trim() === '');
+
+      if (hasPlannedDate) {
+        // Si hay plannedDate válido, actualizar con CAST
+        if (hasExecutionDate) {
+          if (executionDateIsEmpty) {
+            await prisma.$executeRaw`
+              UPDATE "Appointment"
+              SET 
+                "plannedDate" = CAST(${data.plannedDate} AS DATE),
+                "executionDate" = NULL,
+                "status" = COALESCE(${data.status}, "status"),
+                "guidance" = COALESCE(${data.guidance}, "guidance"),
+                "userId" = COALESCE(${data.userId}, "userId")
+              WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
+            `;
+          } else {
+            await prisma.$executeRaw`
+              UPDATE "Appointment"
+              SET 
+                "plannedDate" = CAST(${data.plannedDate} AS DATE),
+                "executionDate" = CAST(${data.executionDate} AS DATE),
+                "status" = COALESCE(${data.status}, "status"),
+                "guidance" = COALESCE(${data.guidance}, "guidance"),
+                "userId" = COALESCE(${data.userId}, "userId")
+              WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
+            `;
+          }
+        } else {
+          await prisma.$executeRaw`
+            UPDATE "Appointment"
+            SET 
+              "plannedDate" = CAST(${data.plannedDate} AS DATE),
+              "status" = COALESCE(${data.status}, "status"),
+              "guidance" = COALESCE(${data.guidance}, "guidance"),
+              "userId" = COALESCE(${data.userId}, "userId")
+            WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
+          `;
+        }
+      } else if (hasExecutionDate) {
+        // Si no hay plannedDate pero sí executionDate
+        if (executionDateIsEmpty) {
+          await prisma.$executeRaw`
+            UPDATE "Appointment"
+            SET 
+              "executionDate" = NULL,
+              "status" = COALESCE(${data.status}, "status"),
+              "guidance" = COALESCE(${data.guidance}, "guidance"),
+              "userId" = COALESCE(${data.userId}, "userId")
+            WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
+          `;
+        } else {
+          await prisma.$executeRaw`
+            UPDATE "Appointment"
+            SET 
+              "executionDate" = CAST(${data.executionDate} AS DATE),
+              "status" = COALESCE(${data.status}, "status"),
+              "guidance" = COALESCE(${data.guidance}, "guidance"),
+              "userId" = COALESCE(${data.userId}, "userId")
+            WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
+          `;
+        }
+      } else {
+        // Solo actualizar otros campos
+        await prisma.$executeRaw`
+          UPDATE "Appointment"
+          SET 
+            "status" = COALESCE(${data.status}, "status"),
+            "guidance" = COALESCE(${data.guidance}, "guidance"),
+            "userId" = COALESCE(${data.userId}, "userId")
+          WHERE "idCase" = ${idCase} AND "appointmentNumber" = ${appointmentNumber}
+        `;
+      }
 
       const updated = await prisma.$queryRaw`
         SELECT 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { useGetBeneficiariesByCaseId, useGetCaseActionsByCaseId, useGetCaseById, useGetStudentsByCaseId, useUpdateCaseWithCaseModel, useGetAppointmentByCaseId, useGetSupportDocumentByCaseId, useSetBeneficiariesToCase, useSetStudentsToCase } from '#domain/useCaseHooks/useCase.ts';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
@@ -58,15 +58,22 @@ const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
 
 type CaseInfoTabs = "General" | "Involucrados" | "Citas" | "Recaudos" | "Historial";
 
+const VALID_TABS: CaseInfoTabs[] = ["General", "Involucrados", "Citas", "Recaudos", "Historial"];
+
 export default function CaseInfo() {
     const { id } = useParams<{ id: string }>();
+    const [searchParams] = useSearchParams();
     const safeId = Number(id) || 0;
 
     const { user, permissionLevel } = useAuth()
     const { error: notificationError } = useNotifications()
     const { caseData, loading, error, loadCase } = useGetCaseById(safeId);
     const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user?.identityCard || "");
-    const [activeTab, setActiveTab] = useState<CaseInfoTabs>("General");
+    
+    // Leer el parámetro 'tab' de la URL, validar que sea una tab válida
+    const tabFromUrl = searchParams.get('tab') as CaseInfoTabs | null;
+    const initialTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : "General";
+    const [activeTab, setActiveTab] = useState<CaseInfoTabs>(initialTab);
     const { students: caseStudents, loadStudents: loadCaseStudents } = useGetStudentsByCaseId(safeId);
     const { beneficiaries: caseBeneficiaries, loadBeneficiaries: loadCaseBeneficiaries } = useGetBeneficiariesByCaseId(safeId);
     const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(safeId);
@@ -121,6 +128,14 @@ export default function CaseInfo() {
     const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
+
+    // Actualizar la tab cuando cambie el parámetro de la URL
+    useEffect(() => {
+        const tabFromUrl = searchParams.get('tab') as CaseInfoTabs | null;
+        if (tabFromUrl && VALID_TABS.includes(tabFromUrl)) {
+            setActiveTab(tabFromUrl);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (!caseData) return

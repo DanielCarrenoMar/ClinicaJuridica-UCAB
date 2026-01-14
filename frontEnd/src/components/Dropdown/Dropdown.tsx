@@ -96,7 +96,7 @@ export default function Dropdown({
   const dropdownContent = isOpen ? (
     <div
       ref={contentRef}
-      className="absolute left-0 mt-2 z-50 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto min-w-full w-max p-2 flex flex-col gap-1.5 shadow-lg"
+      className="absolute left-0 mt-2 z-50 origin-top-right rounded-xl bg-surface border border-onSurface border-solid focus:outline-none max-h-60 overflow-y-auto min-w-full max-w-full p-2 flex flex-col gap-1.5 shadow-lg"
     >
       {children}
     </div>
@@ -104,25 +104,25 @@ export default function Dropdown({
 
   return (
     <DropdownContext.Provider value={{ selectedValue: selectedValue, selectOption }}>
-      <div className="relative inline-block text-left" ref={dropdownRef}>
+      <div className="relative inline-block text-left w-full" ref={dropdownRef}>
         <button
           type="button"
           disabled={disabled}
           onClick={() => setIsOpen(!isOpen)}
-          className={`text-body-medium text-onSurface text-nowrap bg-surface border border-onSurface border-solid flex gap-1.5 h-10 items-center justify-center overflow-clip px-3 py-2.5 rounded-xl transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50'
+          className={`text-body-medium text-onSurface bg-surface border border-onSurface border-solid flex gap-1.5 h-10 items-center justify-center overflow-hidden px-3 py-2.5 rounded-xl transition-colors max-w-full ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50'
             } ${triggerClassName}`}
         >
           {showTitle ? (
-            <p>
+            <p className="truncate">
               {label}
             </p>
           ) : (
-            <p>
+            <p className="truncate">
               {selectedLabel}
             </p>
           )}
 
-          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {dropdownContent}

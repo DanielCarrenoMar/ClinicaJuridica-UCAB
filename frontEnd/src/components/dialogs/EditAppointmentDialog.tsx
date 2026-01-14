@@ -34,8 +34,18 @@ export default function EditAppointmentDialog({
 
     useEffect(() => {
         if (appointment) {
-            setPlannedDate(appointment.plannedDate ? new Date(appointment.plannedDate).toISOString().split('T')[0] : "");
-            setExecutionDate(appointment.executionDate ? new Date(appointment.executionDate).toISOString().split('T')[0] : "");
+            // Convertir Date a formato datetime-local (YYYY-MM-DDTHH:mm)
+            const formatDateTimeLocal = (date: Date): string => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            };
+
+            setPlannedDate(appointment.plannedDate ? formatDateTimeLocal(new Date(appointment.plannedDate)) : "");
+            setExecutionDate(appointment.executionDate ? formatDateTimeLocal(new Date(appointment.executionDate)) : "");
             setGuidance(appointment.guidance || "");
 
             // AppointmentModel.status is AppointmentStatusTypeModel
@@ -48,13 +58,20 @@ export default function EditAppointmentDialog({
     const handleSubmit = () => {
         if (!plannedDate) return;
 
+        // Convertir datetime-local a formato ISO para el backend
+        const convertToISO = (datetimeLocal: string): string => {
+            if (!datetimeLocal) return "";
+            // datetime-local viene como "YYYY-MM-DDTHH:mm", necesitamos agregar segundos y timezone
+            return new Date(datetimeLocal).toISOString();
+        };
+
         const updateData: AppointmentDAO = {
             idCase: appointment.idCase,
             appointmentNumber: appointment.appointmentNumber,
             userId: appointment.userId,
             registryDate: appointment.registryDate.toISOString(),
-            plannedDate: plannedDate,
-            executionDate: executionDate,
+            plannedDate: convertToISO(plannedDate),
+            executionDate: executionDate ? convertToISO(executionDate) : undefined,
             guidance: guidance || undefined,
             status: typeModelToAppointmentStatusTypeDao(status as AppointmentStatusTypeModel) as any
         };

@@ -26,7 +26,7 @@ export default function DropdownOption({ value, children, icon, circleIcon = fal
         </div>
       )}
       
-      <p className="text-body-medium text-onSurface text-nowrap grow">
+      <p className="text-body-medium text-onSurface truncate grow">
         {children}
       </p>
 
