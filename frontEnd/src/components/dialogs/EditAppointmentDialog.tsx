@@ -9,6 +9,7 @@ import TextInput from '#components/TextInput.tsx';
 import TitleDropdown from '#components/TitleDropdown.tsx';
 import Dialog from '#components/dialogs/Dialog.tsx';
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
+import DateTimePicker from '#components/DateTimePicker.tsx';
 
 interface EditAppointmentDialogProps {
     open: boolean;
@@ -82,7 +83,7 @@ export default function EditAppointmentDialog({
                     <DropdownOption value="Cancelada">Cancelada</DropdownOption>
                 </TitleDropdown>
 
-                <DatePicker
+                <DateTimePicker
                     label="Fecha Planificada"
                     value={plannedDate}
                     onChange={setPlannedDate}
@@ -90,7 +91,7 @@ export default function EditAppointmentDialog({
                     min={today}
                 />
 
-                <DatePicker
+                <DateTimePicker
                     label="Fecha de Ejecución"
                     value={executionDate}
                     onChange={setExecutionDate}
