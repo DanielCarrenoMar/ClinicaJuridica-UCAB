@@ -2,10 +2,8 @@
 
 import { useState, useMemo, Fragment } from 'react';
 import Box from '#components/Box.tsx';
-import Button from '#components/Button.tsx';
 import OptionCard from '#components/OptionCard.tsx';
 import {
-    FileExport,
     FilePdf,
     ChartPie,
 } from 'flowbite-react-icons/outline';
@@ -134,10 +132,8 @@ function Reports() {
                 </span>
             </header>
 
-            {/* Content Body */}
             <div className="flex flex-1 overflow-hidden">
-                {/* Left Side: Options Grid */}
-                <div className="flex-3 p-4 grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto">
+                <div className="flex-3 p-4 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto">
                     {reportOptions.map((option) => (
                         <OptionCard
                             className='h-32'
