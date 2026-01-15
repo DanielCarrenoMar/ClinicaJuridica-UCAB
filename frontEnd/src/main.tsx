@@ -7,7 +7,6 @@ import CreateCaseApplicantStep from '#pages/CreateCaseApplicantStep.tsx';
 import CreateCaseCaseStep from '#pages/CreateCaseCaseStep.tsx';
 import Calendar from '#pages/calendar/Calendar.tsx';
 import ActionsHistory from '#pages/ActionsHistory.tsx';
-import Reports from '#pages/Reports.tsx';
 import Users from '#pages/Users.tsx';
 import Semesters from '#pages/Semesters.tsx';
 import Nuclei from '#pages/Nuclei.tsx';
@@ -21,6 +20,7 @@ import ErrorPage from '#pages/ErrorPage.tsx';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from '#components/ProtectedRoute.tsx';
 import UserInfo from '#pages/infoUser/UserInfo.tsx';
+import Reports from '#pages/reports/Reports.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
