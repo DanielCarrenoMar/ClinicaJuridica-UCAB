@@ -15,16 +15,21 @@ function LinkButton ({
   children,
   ...props 
 }: LinkButtonProps) {
+  
+  const isDownload = !!props.download;
+  const Component = isDownload ? 'a' : Link;
+  const linkProps = isDownload ? { href: props.to as string, ...props } : props;
+
   return (
-    <Link
+    <Component
       className={`${!children && 'w-fit'} ${baseButtonStyles} ${variantButtonStyles[variant]} ${className}`}
-      {...props}
+      {...linkProps}
     >
       <span className="group-hover:animate-pulsing group-hover:animate-duration-400">
         {icon}
       </span>
       {children}
-    </Link>
+    </Component>
   );
 };
 
