@@ -128,9 +128,6 @@ function Reports() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
-                    <Button variant="outlined" icon={<FileExport />}>
-                        Exportar Word
-                    </Button>
                     <LinkButton to={instance.url ?? '#'} download={"prueba.pdf"} variant="outlined" icon={<FilePdf />}>
                         Exportar PDF
                     </LinkButton>
