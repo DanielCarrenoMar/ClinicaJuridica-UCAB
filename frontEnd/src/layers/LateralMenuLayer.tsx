@@ -90,9 +90,9 @@ function LateralMenuLayer() {
                 <LateralMenuItem id='calendario' label='Calendario' icon={<CalendarMonth />} link='/calendario' />
                 <LateralMenuItem id='acciones' label='Historial de Accciones' icon={<Book />} link='/acciones' />
                 <LateralMenuItem id='reportes' label='Generar Reportes' icon={<InfoCircle />} link='/reportes' />
-                <LateralMenuTitle label='Administración' />
                 {
                     permissionLevel <= 2 && <>
+                        <LateralMenuTitle label='Administración' />
                         <LateralMenuItem id='usuarios' label='Usuarios' icon={<UsersGroup />} link='/usuarios' />
                     </>
                 }
