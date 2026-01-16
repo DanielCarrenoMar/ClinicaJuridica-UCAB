@@ -1,11 +1,12 @@
 // @ts-nocheck
 import prisma from '#src/config/database.js';
+import { PasswordUtil } from '../utils/password.util.js';
 
 class LoginService {
   async authenticateUser(email: string, password: string) {
     try {
-      // Consulta SQL para validar credenciales
-      const user = await prisma.$queryRaw`
+      // Fetch user by email
+      const users = await prisma.$queryRaw`
         SELECT 
           u."identityCard",
           u."fullName",
@@ -16,23 +17,36 @@ class LoginService {
           u.type
         FROM "User" u
         WHERE u.email = ${email} 
-          AND u.password = ${password}
           AND u."isActive" = true
       `;
 
-      // Verificar si se encontró un usuario
-      if (!user || user.length === 0) {
+      // Check if user exists
+      if (!users || users.length === 0) {
         return {
           success: false,
           message: 'Credenciales inválidas o usuario inactivo'
         };
       }
 
-      // Retornar el usuario encontrado (primer resultado)
+      const user = users[0];
+
+      // Compare password with hashed version
+      const isMatch = await PasswordUtil.compare(password, user.password);
+
+      if (!isMatch) {
+        return {
+          success: false,
+          message: 'Credenciales inválidas'
+        };
+      }
+
+      // Remove password from response
+      delete user.password;
+
       return {
         success: true,
         message: 'Login exitoso',
-        data: user[0]
+        data: user
       };
 
     } catch (error: any) {

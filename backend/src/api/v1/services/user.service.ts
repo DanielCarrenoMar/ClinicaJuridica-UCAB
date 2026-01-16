@@ -1,5 +1,6 @@
 ﻿// @ts-nocheck
 import prisma from '#src/config/database.js';
+import { PasswordUtil } from '../utils/password.util.js';
 
 class UserService {
   private normalizeType(type: string): string {
@@ -57,14 +58,14 @@ class UserService {
       const user = result[0];
       const data = {
         ...user,
-        student: user.studentTerm ? { 
-          term: user.studentTerm, 
-          nrc: user.studentNrc, 
-          type: user.studentType 
+        student: user.studentTerm ? {
+          term: user.studentTerm,
+          nrc: user.studentNrc,
+          type: user.studentType
         } : null,
-        teacher: user.teacherTerm ? { 
-          term: user.teacherTerm, 
-          type: user.teacherType 
+        teacher: user.teacherTerm ? {
+          term: user.teacherTerm,
+          type: user.teacherType
         } : null
       };
 
@@ -90,9 +91,18 @@ class UserService {
       const gender = this.normalizeGender(data.gender);
       const fullName = data.fullName ?? data.fullname ?? data.name;
 
+      // Validate password
+      const validation = PasswordUtil.validate(data.password);
+      if (!validation.success) {
+        return { success: false, message: validation.message };
+      }
+
+      // Hash password
+      const hashedPass = await PasswordUtil.hash(data.password);
+
       await prisma.$executeRaw`
         INSERT INTO "User" ("identityCard", "fullName", "email", "password", "isActive", "type", "gender")
-        VALUES (${data.identityCard}, ${fullName}, ${data.email}, ${data.password}, ${data.isActive ?? true}, ${type}, ${gender})
+        VALUES (${data.identityCard}, ${fullName}, ${data.email}, ${hashedPass}, ${data.isActive ?? true}, ${type}, ${gender})
       `;
 
       return { success: true, message: 'Creado exitosamente' };
@@ -104,11 +114,21 @@ class UserService {
   async updateUser(id: string, data: any) {
     try {
       const fullName = data.fullName ?? data.fullname ?? data.name;
+
+      let passwordToUpdate = data.password;
+      if (passwordToUpdate) {
+        const validation = PasswordUtil.validate(passwordToUpdate);
+        if (!validation.success) {
+          return { success: false, message: validation.message };
+        }
+        passwordToUpdate = await PasswordUtil.hash(passwordToUpdate);
+      }
+
       await prisma.$executeRaw`
         UPDATE "User" SET
           "fullName" = COALESCE(${fullName}, "fullName"),
           "email" = COALESCE(${data.email}, "email"),
-          "password" = COALESCE(${data.password}, "password"),
+          "password" = COALESCE(${passwordToUpdate}, "password"),
           "isActive" = COALESCE(${data.isActive}, "isActive"),
           "gender" = COALESCE(${data.gender ? this.normalizeGender(data.gender) : null}, "gender"),
           "type" = COALESCE(${data.type ? this.normalizeType(data.type) : null}, "type")
@@ -124,7 +144,7 @@ class UserService {
     try {
       const userRows = await prisma.$queryRaw`SELECT "type" FROM "User" WHERE "identityCard" = ${id}`;
       if (userRows.length === 0) return { success: false, message: 'Usuario no encontrado' };
-      
+
       const type = userRows[0].type;
       let cases = [];
 

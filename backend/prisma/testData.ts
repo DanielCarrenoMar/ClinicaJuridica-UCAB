@@ -2,6 +2,9 @@ import { Gender, idNationality, PrismaClient } from '#src/generated/client.js';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import bcrypt from 'bcrypt';
+
+const SALT_ROUNDS = 10;
 
 const connectionString = `${process.env.DATABASE_URL}`;
 if (!connectionString) {
@@ -129,13 +132,14 @@ async function main() {
         }
     });
 
+    const teacherPass = await bcrypt.hash('seeded-teacher', SALT_ROUNDS);
     const teacherUser = await prisma.user.upsert({
         where: { identityCard: '16000001' },
         update: {
             fullName: 'Mariana Díaz',
             gender: Gender.F,
             email: 'mariana.diaz@ucab.edu',
-            password: 'seeded-teacher',
+            password: teacherPass,
             isActive: true,
             type: 'TEACHER' as any
         },
@@ -144,7 +148,7 @@ async function main() {
             fullName: 'Mariana Díaz',
             gender: Gender.F,
             email: 'mariana.diaz@ucab.edu',
-            password: 'seeded-teacher',
+            password: teacherPass,
             isActive: true,
             type: 'TEACHER' as any
         }
@@ -165,13 +169,14 @@ async function main() {
         }
     });
 
+    const studentPass = await bcrypt.hash('seeded-student', SALT_ROUNDS);
     const studentUser = await prisma.user.upsert({
         where: { identityCard: '27000001' },
         update: {
             fullName: 'Luis Gómez',
             gender: Gender.M,
             email: 'luis.gomez@ucab.edu',
-            password: 'seeded-student',
+            password: studentPass,
             isActive: true,
             type: 'STUDENT' as any
         },
@@ -180,7 +185,7 @@ async function main() {
             fullName: 'Luis Gómez',
             gender: Gender.M,
             email: 'luis.gomez@ucab.edu',
-            password: 'seeded-student',
+            password: studentPass,
             isActive: true,
             type: 'STUDENT' as any
         }
@@ -202,13 +207,14 @@ async function main() {
         }
     });
 
+    const coordPass = await bcrypt.hash('seeded-coordinator', SALT_ROUNDS);
     const coordinadorUser = await prisma.user.upsert({
         where: { identityCard: '15000001' },
         update: {
             fullName: 'Ana Pérez',
             gender: Gender.F,
             email: 'ana.perez@ucab.edu',
-            password: 'seeded-coordinator',
+            password: coordPass,
             isActive: true,
             type: 'COORDINATOR' as any
         },
@@ -217,7 +223,7 @@ async function main() {
             fullName: 'Ana Pérez',
             gender: Gender.F,
             email: 'ana.perez@ucab.edu',
-            password: 'seeded-coordinator',
+            password: coordPass,
             isActive: true,
             type: 'COORDINATOR' as any
         }
@@ -227,7 +233,7 @@ async function main() {
         where: {
             identityCard: coordinadorUser.identityCard,
         },
-        update: { },
+        update: {},
         create: {
             identityCard: coordinadorUser.identityCard,
         }
