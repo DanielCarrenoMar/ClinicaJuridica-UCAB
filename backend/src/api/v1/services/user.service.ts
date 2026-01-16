@@ -20,15 +20,23 @@ class UserService {
 
   async getAllUsers() {
     try {
-      const users = await prisma.$queryRaw`
+      const semester = await prisma.semester.findFirst({
+        orderBy: { startDate: 'desc' },
+      });
+      const currentTerm = semester?.term;
+
+      const users: any[] = await prisma.$queryRaw`
         SELECT 
           u.*,
           u."fullName" AS "fullname",
           s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
           t.term AS "teacherTerm", t.type AS "teacherType"
         FROM "User" u
-        LEFT JOIN "Student" s ON u."identityCard" = s."identityCard"
-        LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard"
+        LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
+        LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
+        WHERE u."type" = 'C' 
+           OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
+           OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
         ORDER BY u."identityCard" ASC
       `;
       return { success: true, data: users, count: users.length };
