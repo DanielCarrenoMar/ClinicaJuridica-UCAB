@@ -38,7 +38,11 @@ function DashBoard() {
                         }
                         {
                             errorCaseActions &&
-                            <p className="text-error text-center">Error al cargar las acciones de casos.</p>
+                            <p className="text-body-medium text-error text-center">Error al cargar las acciones de casos.</p>
+                        }
+                        {
+                            caseActions.length === 0 && !loadingCaseActions && !errorCaseActions &&
+                            <p className="text-body-medium text-onSurface/70 text-center">No hay acciones de casos disponibles.</p>
                         }
                         {!errorCaseActions && caseActions.map((action, index) => (
                             <CaseActionCard
