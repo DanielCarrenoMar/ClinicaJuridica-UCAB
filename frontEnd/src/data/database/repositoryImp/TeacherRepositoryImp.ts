@@ -30,7 +30,7 @@ export function getTeacherRepository(): TeacherRepository {
             return daoList.map(daoToCaseModel);
         },
 
-        updateTeacher: async (id: string, data: Partial<TeacherModel>) => {
+        updateTeacher: async (id, data) => {
             const response = await fetch(`${TEACHER_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
