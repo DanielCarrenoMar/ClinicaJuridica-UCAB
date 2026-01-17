@@ -6,7 +6,6 @@ import CaseActionDetailsDialog from "#components/dialogs/CaseActionDetailsDialog
 import type { CaseActionModel } from "#domain/models/caseAction.ts";
 import CasesDonutChart from "#components/CasesDonutChart.tsx";
 import { Search } from "flowbite-react-icons/outline";
-import { useNavigate } from "react-router";
 import { useGetAllCaseActions } from "#domain/useCaseHooks/useCaseActions.ts";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
 import { useGetStatusCaseAmounts } from "#domain/useCaseHooks/useCase.ts";
@@ -14,7 +13,6 @@ import { useState } from "react";
 import LinkButton from "#components/LinkButton.tsx";
 
 function DashBoard() {
-    const navigate = useNavigate()
     const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
     const { statusAmounts } = useGetStatusCaseAmounts();
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
@@ -23,14 +21,14 @@ function DashBoard() {
     return (
 
         <div className="flex flex-col gap-3 h-full">
-            <section className="grid grid-cols-6 gap-3 flex-1">
-                <Box className="col-span-4 h-full flex flex-col gap-2">
-                    <span className="flex items-center justify-between pb-2">
+            <section className="grid grid-cols-6 gap-3 flex-1 min-h-0">
+                <Box className="col-span-4 h-full flex flex-col gap-2 min-h-0">
+                    <span className="flex items-center justify-between">
                         <h2 className="text-label-small text-onSurface">Ultimas acciones</h2>
-                        <LinkButton icon={<Search />} to={"/acciones"} />
+                        <LinkButton variant="outlined" icon={<Search />} to={"/acciones"} />
                     </span>
 
-                    <div className="flex flex-col gap-2 flex-11">
+                    <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
                         {loadingCaseActions &&
                             <div className="flex justify-center">
                                 <LoadingSpinner />
@@ -56,8 +54,8 @@ function DashBoard() {
                         ))}
                     </div>
                 </Box>
-                <Box className="col-span-2 flex flex-col">
-                    <h2 className="text-label-small text-onSurface mb-4">Estado de Casos</h2>
+                <Box className="col-span-2 flex flex-col gap-5">
+                    <h2 className="text-label-small text-onSurface mt-2">Estado de Casos</h2>
                     <div className="flex-1 flex mx-4 w-5/6">
                         <CasesDonutChart statusAmounts={statusAmounts} />
                     </div>

@@ -82,7 +82,7 @@ function LateralMenuLayer() {
     }, [location.pathname, user]);
 
     return (
-        <div className="flex gap-6 h-full">
+        <div className="flex gap-6 h-full ">
             <LateralMenu activeItemId={locationId} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)}>
                 <LateralMenuItem id='/' label='Inicio' icon={<Home />} link='/' />
                 <LateralMenuItem id='crearCaso' label='Crear Caso' icon={<Plus />} link='/crearCaso' />
@@ -196,7 +196,7 @@ function LateralMenuLayer() {
                         </Button>
                     </span>
                 </header>
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 min-h-0">
                     <NotificationsProvider>
                         <Outlet context={{ setDefaultSearchText }} />
                     </NotificationsProvider>
