@@ -132,3 +132,29 @@ export function useUpdateStudentById() {
         error,
     };
 }
+
+export function useImportStudents() {
+    const { importStudents: importStudentsRepo } = getStudentRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const importStudents = useCallback(async (file: File) => {
+        setLoading(true);
+        try {
+            const result = await importStudentsRepo(file);
+            setError(null);
+            return result;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [importStudentsRepo]);
+
+    return {
+        importStudents,
+        loading,
+        error,
+    };
+}

@@ -1,17 +1,18 @@
 import prisma from '#src/config/database.js';
 import userService from './user.service.js';
+import { PasswordUtil } from '../utils/password.util.js';
 
 class StudentService {
   async getAllStudents(term?: string) {
     try {
       let resolvedTerm = term;
-      
+
       if (!resolvedTerm) {
         const termRows = await prisma.$queryRaw`
           SELECT MAX("term") as term
           FROM "Semester"
         ` as Array<{ term: string | null }>;
-        
+
         resolvedTerm = termRows?.[0]?.term ?? undefined;
       }
 
@@ -161,7 +162,7 @@ class StudentService {
 
   async updateStudent(id: string, data: any) {
     try {
-      const userUpdate = await userService.updateUser(id, {...data, type: 'E' });
+      const userUpdate = await userService.updateUser(id, { ...data, type: 'E' });
       if (!userUpdate.success) {
         return userUpdate;
       }
@@ -178,7 +179,7 @@ class StudentService {
         }
       }
 
-      if (term) { 
+      if (term) {
         await prisma.$executeRaw`
           UPDATE "Student" SET
             "nrc" = COALESCE(${data.nrc}, "nrc"),
@@ -191,6 +192,108 @@ class StudentService {
     } catch (error: any) {
       return { success: false, error: error.message };
     }
+  }
+
+  async importStudents(studentsData: any[]) {
+    const results = {
+      total: studentsData.length,
+      success: 0,
+      failed: 0,
+      errors: [] as string[]
+    };
+
+    if (studentsData.length === 0) {
+      return { success: false, message: 'No hay datos para importar.' };
+    }
+
+    try {
+      // 1. Get the latest semester from the database
+      const latestSemesterRows = await prisma.$queryRaw`
+        SELECT "term" FROM "Semester" ORDER BY "startDate" DESC LIMIT 1
+      ` as any[];
+
+      if (!latestSemesterRows || latestSemesterRows.length === 0) {
+        return {
+          success: false,
+          message: 'No hay semestres registrados en el sistema. Por favor, registre el semestre actual antes de importar estudiantes.'
+        };
+      }
+
+      const latestTerm = latestSemesterRows[0].term;
+
+      // 2. Validate the term in the data against the latest semester
+      // We assume all students in the import belong to the same term
+      const dataTermRaw = studentsData[0].term || '';
+      const dataTermNormalized = dataTermRaw.replace(/\s+/g, ''); // Normalize "2025 - 2026" to "2025-2026"
+
+      if (dataTermNormalized !== latestTerm.replace(/\s+/g, '')) {
+        return {
+          success: false,
+          message: `El semestre del archivo (${dataTermRaw}) no coincide con el semestre actual del sistema (${latestTerm}). Por favor, registre el nuevo semestre o verifique el archivo.`
+        };
+      }
+
+      // 3. Process students
+      for (const data of studentsData) {
+        try {
+          await prisma.$transaction(async (tx) => {
+            // Upsert User
+            const defaultPass = await PasswordUtil.hash(data.identityCard);
+            const gender = data.gender === 'F' ? 'F' : 'M';
+
+            await tx.$executeRaw`
+              INSERT INTO "User" ("identityCard", "fullName", "email", "password", "type", "gender", "isActive")
+              VALUES (
+                ${data.identityCard},
+                ${data.fullName},
+                ${data.email},
+                ${defaultPass},
+                'E'::"UserType",
+                ${gender}::"Gender",
+                true
+              )
+              ON CONFLICT ("identityCard") DO UPDATE SET
+                "fullName" = EXCLUDED."fullName",
+                "email" = EXCLUDED."email",
+                "gender" = EXCLUDED."gender"
+            `;
+
+            // Upsert Student record for this term
+            const studentType = (data.type?.startsWith('R') ? 'R' :
+              data.type?.startsWith('V') ? 'V' :
+                data.type?.startsWith('E') ? 'E' :
+                  data.type?.startsWith('S') ? 'S' : 'R');
+
+            await tx.$executeRaw`
+              INSERT INTO "Student" ("identityCard", "term", "nrc", "type")
+              VALUES (
+                ${data.identityCard},
+                ${latestTerm}, -- Use the confirmed latest term from DB
+                ${data.nrc},
+                ${studentType}::"StudentType"
+              )
+              ON CONFLICT ("identityCard", "term") DO UPDATE SET
+                "nrc" = EXCLUDED."nrc",
+                "type" = EXCLUDED."type"
+            `;
+          });
+          results.success++;
+        } catch (error: any) {
+          results.failed++;
+          results.errors.push(`ID ${data.identityCard}: ${error.message}`);
+        }
+      }
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+
+    return {
+      success: results.failed === 0,
+      data: results,
+      message: results.failed === 0
+        ? 'Todos los estudiantes fueron importados correctamente.'
+        : `Se importaron ${results.success} estudiantes, pero ${results.failed} fallaron.`
+    };
   }
 }
 

@@ -1,19 +1,21 @@
-
-
 import { useState, useMemo } from 'react'
 import Fuse from 'fuse.js'
 import { Plus } from "flowbite-react-icons/outline"
 import { Upload } from "flowbite-react-icons/solid"
 import SearchBar from '#components/SearchBar.tsx'
 import { useGetAllUsers } from '#domain/useCaseHooks/useUser.ts'
+import { useImportStudents } from '#domain/useCaseHooks/useStudent.ts'
 import Box from '#components/Box.tsx'
 import Button from '#components/Button.tsx'
 import LoadingSpinner from '#components/LoadingSpinner.tsx'
 import UserListRow from '#components/UserListRow.tsx'
+import ImportStudentsDialog from '#components/dialogs/ImportStudentsDialog.tsx'
 
 function Users() {
-  const { users, loading, error } = useGetAllUsers()
+  const { users, loading, error, refresh } = useGetAllUsers()
+  const { importStudents } = useImportStudents()
   const [searchValue, setSearchValue] = useState('')
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   const filteredUsers = useMemo(() => {
     if (searchValue === '') return users
@@ -31,11 +33,19 @@ function Users() {
   }, [users, searchValue])
 
   const handleLoadUsers = () => {
-    console.log('Loading users...')
+    setIsImportDialogOpen(true)
   }
 
   const handleAddUser = () => {
     console.log('Adding new user...')
+  }
+
+  const handleImport = async (file: File) => {
+    const result = await importStudents(file)
+    if (result.success || result.data.success > 0) {
+      refresh()
+    }
+    return result
   }
 
   return (
@@ -55,7 +65,7 @@ function Users() {
             Añadir
           </Button>
           <Button
-            icon={< Upload />}  
+            icon={< Upload />}
             onClick={handleLoadUsers}
             variant='outlined'
           >
@@ -72,6 +82,12 @@ function Users() {
           ))}
         </Box>
       </section>
+
+      <ImportStudentsDialog
+        open={isImportDialogOpen}
+        onClose={() => setIsImportDialogOpen(false)}
+        onImport={handleImport}
+      />
     </div>
   )
 }

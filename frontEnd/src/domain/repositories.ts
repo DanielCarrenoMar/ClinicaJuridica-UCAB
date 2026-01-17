@@ -92,6 +92,7 @@ export interface StudentRepository {
     findStudentById(id: string): Promise<StudentModel | null>;
     updateStudent(id: string, data: Partial<StudentDAO>): Promise<StudentModel>;
     getCasesByStudentId(id: string): Promise<CaseModel[]>;
+    importStudents(file: File): Promise<any>;
 }
 
 export interface TeacherRepository {

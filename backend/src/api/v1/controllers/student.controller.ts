@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import studentService from '../services/student.service.js';
+import fileParserUtil from '../utils/fileParser.util.js';
 
 export async function getAllStudents(req: Request, res: Response): Promise<void> {
   try {
@@ -44,6 +45,28 @@ export async function updateStudent(req: Request, res: Response): Promise<void> 
 
     const result = await studentService.updateStudent(id, data);
     res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
+
+export async function importStudents(req: Request, res: Response): Promise<void> {
+  try {
+    if (!req.file) {
+      res.status(400).json({ success: false, message: 'No se ha subido ningún archivo.' });
+      return;
+    }
+
+    const studentsData = fileParserUtil.parseStudentFile(req.file.buffer);
+
+    if (studentsData.length === 0) {
+      res.status(400).json({ success: false, message: 'El archivo está vacío o no tiene el formato correcto.' });
+      return;
+    }
+
+    const result = await studentService.importStudents(studentsData);
+    res.status(result.success ? 200 : 207).json(result); // 207 Multi-Status if there are partial errors
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: msg });

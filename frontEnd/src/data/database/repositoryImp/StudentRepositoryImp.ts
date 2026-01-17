@@ -42,6 +42,23 @@ export function getStudentRepository(): StudentRepository {
             const result = await response.json();
             const updatedStudentDAO: StudentDAO = result.data;
             return daoToStudentModel(updatedStudentDAO);
+        },
+
+        importStudents: async (file: File) => {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch(`${STUDENT_URL}/import`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al importar estudiantes');
+            }
+
+            return await response.json();
         }
 
     } as StudentRepository;
