@@ -16,9 +16,9 @@ import SupportDocumentCard from '#components/SupportDocumentCard.tsx';
 import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDetailsDialog.tsx';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
-import { Clipboard, User, CalendarMonth, Book, File, FilePdf, UserCircle } from 'flowbite-react-icons/solid';
+import { Clipboard, User, CalendarMonth, Book, File, UserCircle } from 'flowbite-react-icons/solid';
 import { type CaseBeneficiaryTypeModel, type CaseStatusTypeModel } from '#domain/typesModel.ts';
-import { Close, UserAdd, UserEdit } from 'flowbite-react-icons/outline';
+import { Close, UserAdd, UserEdit, FilePdf } from 'flowbite-react-icons/outline';
 import { type CaseModel } from '#domain/models/case.ts';
 import InBox from '#components/InBox.tsx';
 import { useAuth } from '../context/AuthContext';
@@ -712,28 +712,30 @@ export default function CaseInfo() {
                 </Button>
             </section>
 
-            <section className="flex flex-col gap-4 pb-20">
-                {caseActionsLoading && <LoadingSpinner />}
-                {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
-                {
-                    visibleCaseActions.length === 0 ? (
-                        <span className="flex flex-col items-center justify-center gap-4 mt-20">
-                            <p className="text-body-small">No hay acciones registradas para este caso.</p>
-                        </span>
-                    ) : (
-                        visibleCaseActions
-                            .map((caseAction) => (
-                                <CaseActionCard
-                                    key={caseAction.actionNumber}
-                                    caseAction={caseAction}
-                                    onClick={() => {
-                                        setSelectedCaseAction(caseAction);
-                                        setIsCaseActionDetailsDialogOpen(true);
-                                    }}
-                                />
-                            ))
-                    )
-                }
+            <section className="flex-1 flex flex-col pb-20">
+                <Box className="col-span-4 h-full flex flex-col gap-2">
+                    {caseActionsLoading && <LoadingSpinner />}
+                    {caseActionsError && <div className="text-error">Error al cargar las acciones: {caseActionsError.message}</div>}
+                    {
+                        visibleCaseActions.length === 0 ? (
+                            <span className="flex flex-col items-center justify-center gap-4 mt-20">
+                                <p className="text-body-small">No hay acciones registradas para este caso.</p>
+                            </span>
+                        ) : (
+                            visibleCaseActions
+                                .map((caseAction) => (
+                                    <CaseActionCard
+                                        key={caseAction.actionNumber}
+                                        caseAction={caseAction}
+                                        onClick={() => {
+                                            setSelectedCaseAction(caseAction);
+                                            setIsCaseActionDetailsDialogOpen(true);
+                                        }}
+                                    />
+                                ))
+                        )
+                    }
+                </Box>
             </section>
 
             <AddCaseActionDialog
@@ -771,7 +773,7 @@ export default function CaseInfo() {
     );
 
     return (
-        <Box className='p-0! h-full overflow-y-auto'>
+        <Box className='p-0! min-h-full flex flex-col'>
             <header className="bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16">
                 <span className="flex gap-3 items-center">
                     <Clipboard className='size-6!' />
@@ -783,7 +785,7 @@ export default function CaseInfo() {
                         </span>
                     </div>
                 </span>
-                <span className="flex items-center gap-4 h-full">
+                <span className="flex items-center gap-4">
                     {
                         isDataModified && <Button onClick={discardChanges} icon={<Close />} variant='outlined'>
                             Cancelar Cambios
@@ -823,13 +825,11 @@ export default function CaseInfo() {
             </section>
 
             <section className="px-4 pb-6 flex flex-col">
-                <div className="flex-1 overflow-y-auto pr-2">
-                    {activeTab === 'General' && GeneralTabContent}
-                    {activeTab === 'Citas' && CitasTabContent}
-                    {activeTab === 'Recaudos' && RecaudosTabContent}
-                    {activeTab === 'Involucrados' && InvolucradosTabContent}
-                    {activeTab === 'Historial' && HistorialTabContent}
-                </div>
+                {activeTab === 'General' && GeneralTabContent}
+                {activeTab === 'Citas' && CitasTabContent}
+                {activeTab === 'Recaudos' && RecaudosTabContent}
+                {activeTab === 'Involucrados' && InvolucradosTabContent}
+                {activeTab === 'Historial' && HistorialTabContent}
             </section >
         </Box>
     );
