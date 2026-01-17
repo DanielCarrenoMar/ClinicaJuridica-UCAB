@@ -1,6 +1,6 @@
 
 
-import { useState, useMemo, Fragment } from 'react';
+import { useState, useMemo, Fragment, useRef } from 'react';
 import Box from '#components/Box.tsx';
 import OptionCard from '#components/OptionCard.tsx';
 import {
@@ -13,8 +13,9 @@ import {
 } from 'flowbite-react-icons/solid';
 import DropdownCheck from '#components/DropdownCheck/DropdownCheck.tsx';
 import DropdownOptionCheck from '#components/DropdownCheck/DropdownOptionCheck.tsx';
-import { PDFViewer, usePDF } from '@react-pdf/renderer';
+import { PDFViewer, pdf } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
+import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
 import ReportDocument from './components/ReportDocument';
 import ReportCaseType from './components/ReportCaseType';
 import ReportGenderDistribution from './components/ReportGenderDistribution';
@@ -35,7 +36,7 @@ const reportOptions = [
         title: 'Casos por materia y ambito',
         description: 'Cantidad de casos agrupados por materia y separados en ambito',
         icon: <ChartPie />,
-        component: <ReportCaseSubject />
+        component: <ReportCaseSubjectScope />
     },
     {
         id: 3,
@@ -96,28 +97,83 @@ const dateRanges = [
 function Reports() {
     const [selectedReportIds, setSelectedReportIds] = useState<number[]>([1]);
     const [selectedRanges, setSelectedRanges] = useState<(string | number)[]>(['2025-15']);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const pdfRef = useRef<string | null>(null);
+
+    // Crear componentes frescos cada vez
+    const createFreshComponent = (reportId: number) => {
+        switch(reportId) {
+            case 1:
+                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} />;
+            case 2:
+                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} />;
+            case 3:
+                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} />;
+            case 6:
+                return <ReportCaseType key={`fresh-6-${Date.now()}`} />;
+            case 8:
+                return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} />;
+            default:
+                return null;
+        }
+    };
 
     const reportDoc = useMemo(() => {
         const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
+        const timestamp = Date.now();
+        
         return (
-            <ReportDocument>
+            <ReportDocument key={`doc-${timestamp}`}>
                 {selectedReports.map(report => (
-                    <Fragment key={report.id}>
-                        {report.component}
+                    <Fragment key={`frag-${report.id}-${timestamp}`}>
+                        {createFreshComponent(report.id)}
                     </Fragment>
                 ))}
             </ReportDocument>
         );
     }, [selectedReportIds]);
 
-    const [instance] = usePDF({ document: reportDoc });
-
     const handleReportSelect = (id: number) => {
-        setSelectedReportIds(prev =>
-            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-        );
+        const newSelection = selectedReportIds.includes(id) 
+            ? selectedReportIds.filter(item => item !== id) 
+            : [...selectedReportIds, id];
+        setSelectedReportIds(newSelection);
+        // Limpiar PDF cacheado cuando cambia la selección
+        pdfRef.current = null;
     };
 
+    const generateFileName = () => {
+        const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
+        const reportTitles = selectedReports.map(r => r.title.replace(/\s+/g, '_').toLowerCase());
+        const timestamp = new Date().toISOString().slice(0, 10);
+        return `reporte_${reportTitles.join('_')}_${timestamp}.pdf`;
+    };
+
+    const handleDownloadPDF = async () => {
+        if (isGenerating) return;
+        
+        setIsGenerating(true);
+        try {
+            // Generar PDF fresh cada vez
+            const blob = await pdf(reportDoc).toBlob();
+            const url = URL.createObjectURL(blob);
+            
+            // Forzar descarga
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = generateFileName();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Limpiar URL object
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error generando PDF:', error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     return (
         <Box className="p-0! h-full overflow-y-auto flex flex-col">
@@ -129,8 +185,8 @@ function Reports() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
-                    <LinkButton to={instance.url ?? '#'} download={"prueba.pdf"} variant="outlined" icon={<FilePdf />}>
-                        Exportar PDF
+                    <LinkButton to="#" onClick={handleDownloadPDF} download={generateFileName()} variant="outlined" icon={<FilePdf />}>
+                        {isGenerating ? 'Generando...' : 'Exportar PDF'}
                     </LinkButton>
                 </span>
             </header>
@@ -174,19 +230,13 @@ function Reports() {
                     </section>
 
                     <section className="flex flex-col gap-3 overflow-hidden h-full relative">
-                        {instance.error && (
-                            <div className="flex-1 flex items-center justify-center text-error p-4 text-center">
-                                <p>Ocurrió un error al generar el reporte. Por favor intente nuevamente.</p>
-                            </div>
-                        )}
-
-                        {instance.loading && (
+                        {isGenerating && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/50 backdrop-blur-sm">
                                 <LoadingSpinner />
                             </div>
                         )}
 
-                        {!instance.error && (
+                        {!isGenerating && (
                             <PDFViewer className="w-full h-full" showToolbar={false}>
                                 {reportDoc}
                             </PDFViewer>

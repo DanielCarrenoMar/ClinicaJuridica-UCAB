@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, View, Text } from "@react-pdf/renderer";
 
 export const styleDocument = StyleSheet.create({
   page: {
@@ -43,11 +43,19 @@ interface DocumentProps {
 }
 
 export default function ReportDocument({children}: DocumentProps) {
+    // Convert children to array and render each section on its own page
+    const childrenArray = Array.isArray(children) ? children : [children];
+    
     return (
         <Document>
-              <Page style={styleDocument.page}>
-                    {children}
-              </Page>
+            {childrenArray.map((child, index) => (
+                <Page key={index} style={styleDocument.page}>
+                    {child}
+                    <View style={styleDocument.pageNumber}>
+                        <Text render={({pageNumber, totalPages}) => `${pageNumber}/${totalPages}`} />
+                    </View>
+                </Page>
+            ))}
         </Document>
     )
 }

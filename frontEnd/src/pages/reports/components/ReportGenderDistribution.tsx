@@ -179,10 +179,7 @@ function ReportGenderDistribution() {
         </Text>
       </View>
 
-      <View style={styleDocument.pageNumber}>
-        <Text render={({pageNumber, totalPages}) => `${pageNumber}/${totalPages}`} />
-      </View>
-    </>
+          </>
   );
 }
 
