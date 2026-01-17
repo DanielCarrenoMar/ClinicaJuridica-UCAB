@@ -31,7 +31,7 @@ function ActionsHistory() {
     }, [caseActions, searchQuery]);
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full min-h-0">
             <section className="mb-4">
                 <SearchBar
                     isOpen={true}
@@ -39,34 +39,32 @@ function ActionsHistory() {
                     onChange={setSearchQuery}
                 />
             </section>
-            <section className="flex-1">
-                <Box className="col-span-4 h-full flex flex-col gap-2">
-                    <div className="flex flex-col gap-2 flex-1">
-                        {loadingCaseActions &&
-                            <div className="flex justify-center">
-                                <LoadingSpinner />
-                            </div>
-                        }
-                        {
-                            errorCaseActions &&
-                            <p className="text-error text-center">Error al cargar las acciones de casos.</p>
-                        }
-                        {
-                            caseActions.length === 0 && !loadingCaseActions && !errorCaseActions &&
-                            <p className="text-body-medium text-onSurface/70 text-center">No hay acciones de casos disponibles.</p>
-                        }
-                        {!errorCaseActions && filteredActions.map((action, index) => (
-                            <CaseActionCard
-                                key={index}
-                                caseAction={action}
-                                onClick={() => {
-                                    setSelectedCaseAction(action);
-                                    setIsCaseActionDetailsDialogOpen(true);
-                                }}
-                            />
-                        ))}
-                    </div>
-                </Box>
+            <section className="flex-1 min-h-0">
+                <div className="col-span-4 h-full flex flex-col gap-2 min-h-0 overflow-y-auto">
+                    {loadingCaseActions &&
+                        <div className="flex justify-center">
+                            <LoadingSpinner />
+                        </div>
+                    }
+                    {
+                        errorCaseActions &&
+                        <p className="text-error text-center">Error al cargar las acciones de casos.</p>
+                    }
+                    {
+                        caseActions.length === 0 && !loadingCaseActions && !errorCaseActions &&
+                        <p className="text-body-medium text-onSurface/70 text-center">No hay acciones de casos disponibles.</p>
+                    }
+                    {!errorCaseActions && filteredActions.map((action, index) => (
+                        <CaseActionCard
+                            key={index}
+                            caseAction={action}
+                            onClick={() => {
+                                setSelectedCaseAction(action);
+                                setIsCaseActionDetailsDialogOpen(true);
+                            }}
+                        />
+                    ))}
+                </div>
             </section>
 
             <CaseActionDetailsDialog
