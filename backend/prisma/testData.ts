@@ -159,14 +159,14 @@ async function main() {
             email: 'mariana.diaz@ucab.edu',
             password: teacherPass,
             isActive: true,
-            type: 'TEACHER'
+            type: 'TEACHER' as any
         }
     });
 
     const teacher = await prisma.teacher.upsert({
         where: { identityCard_term: { identityCard: teacherUser.identityCard, term: semester.term } },
         update: {},
-        create: { identityCard: teacherUser.identityCard, term: semester.term, type: 'REGULAR' }
+        create: { identityCard: teacherUser.identityCard, term: semester.term, type: 'REGULAR' as any }
     });
 
     const coordPass = await bcrypt.hash('seeded-coordinator', SALT_ROUNDS);
@@ -180,7 +180,7 @@ async function main() {
             email: 'ana.perez@ucab.edu',
             password: coordPass,
             isActive: true,
-            type: 'COORDINATOR'
+            type: 'COORDINATOR' as any
         }
     });
     
@@ -206,7 +206,7 @@ async function main() {
                 email: `estudiante.${i}@ucab.edu`,
                 password: studentPass,
                 isActive: true,
-                type: 'STUDENT'
+                type: 'STUDENT' as any
             }
         });
 
@@ -217,7 +217,7 @@ async function main() {
                 identityCard: user.identityCard,
                 term: semester.term,
                 nrc: 'UCAB-101',
-                type: 'REGULAR'
+                type: 'REGULAR' as any
             }
         });
         students.push(student);
@@ -256,9 +256,9 @@ async function main() {
                 fullName: info.name,
                 gender: info.gender,
                 birthDate: new Date('1990-01-01'),
-                idNationality: 'VENEZUELAN',
+                idNationality: 'VENEZUELAN' as any,
                 hasId: true,
-                type: 'APPLICANT',
+                type: 'APPLICANT' as any,
                 idState: state.idState,
                 municipalityNumber: municipality.municipalityNumber,
                 parishNumber: parish.parishNumber
@@ -272,7 +272,7 @@ async function main() {
                 identityCard: ben.identityCard,
                 email: info.email,
                 cellPhone: '+58-412-0000000',
-                maritalStatus: 'SINGLE',
+                maritalStatus: 'SINGLE' as any,
                 isConcubine: false,
                 isHeadOfHousehold: true,
                 headEducationLevelId: universityLevel?.idLevel,
@@ -324,7 +324,7 @@ async function main() {
             data: {
                 idCase: newCase.idCase,
                 statusNumber: 1,
-                status: 'OPEN',
+                status: 'OPEN' as any,
                 reason: 'Apertura de caso de prueba',
                 userId: teacherUser.identityCard,
                 registryDate: new Date()
@@ -345,7 +345,7 @@ async function main() {
                     idCase: newCase.idCase,
                     beneficiaryId: beneficiary.identityCard,
                     relationship: 'Familiar',
-                    type: 'DIRECT',
+                    type: 'DIRECT' as any,
                     description: 'Beneficiario directo del caso'
                 }
             });
