@@ -41,7 +41,7 @@ function ActionsHistory() {
             </section>
             <section className="flex-1">
                 <Box className="col-span-4 h-full flex flex-col gap-2">
-                    <div className="flex flex-col gap-2 flex-11">
+                    <div className="flex flex-col gap-2 flex-1">
                         {loadingCaseActions &&
                             <div className="flex justify-center">
                                 <LoadingSpinner />
