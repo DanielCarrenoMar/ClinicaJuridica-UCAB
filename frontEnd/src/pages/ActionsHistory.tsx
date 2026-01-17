@@ -31,7 +31,7 @@ function ActionsHistory() {
     }, [caseActions, searchQuery]);
 
     return (
-        <div className="flex flex-col h-full min-h-0">
+        <div className="flex flex-col h-full min-h-0 max-w-5xl">
             <section className="mb-4">
                 <SearchBar
                     isOpen={true}
