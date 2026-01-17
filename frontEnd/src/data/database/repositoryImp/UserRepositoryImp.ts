@@ -7,8 +7,12 @@ const AUTH_URL = "http://localhost:3000/api/v1/auth";
 
 export function getUserRepository(): UserRepository {
     return {
-        findAllUsers: async () => {
-            const responseUsers = await fetch(USER_URL);
+        findAllUsers: async (params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString() ? `${USER_URL}?${query.toString()}` : USER_URL;
+            const responseUsers = await fetch(url);
             if (!responseUsers.ok) return [];
             const usersData = await responseUsers.json();
             const usersDAO: UserDAO[] = usersData.data;

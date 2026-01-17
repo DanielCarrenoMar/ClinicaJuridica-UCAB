@@ -10,10 +10,10 @@ export function useGetAllStudents() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadStudents = useCallback(async () => {
+    const loadStudents = useCallback(async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllStudents();
+            const data = await findAllStudents(params);
             setStudents(data);
             setError(null);
         } catch (err) {
@@ -21,7 +21,7 @@ export function useGetAllStudents() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [findAllStudents]);
 
     useEffect(() => {
         loadStudents();

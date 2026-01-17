@@ -4,8 +4,12 @@ import { daoToSupportDocumentModel } from "#domain/models/supportDocument.ts";
 import type { SupportDocumentRepository } from "#domain/repositories.ts";
 export function getSupportDocumentRepository(): SupportDocumentRepository {
     return {
-        findAllSupportDocuments: async () => {
-            const responseSupportDocument = await fetch(SUPPORT_DOCUMENT_URL);
+        findAllSupportDocuments: async (params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString() ? `${SUPPORT_DOCUMENT_URL}?${query.toString()}` : SUPPORT_DOCUMENT_URL;
+            const responseSupportDocument = await fetch(url);
             const supportDocumentData = await responseSupportDocument.json();
             const supportDocumentDAOs: SupportDocumentInfoDAO[] = supportDocumentData.data;
             return supportDocumentDAOs.map(daoToSupportDocumentModel);

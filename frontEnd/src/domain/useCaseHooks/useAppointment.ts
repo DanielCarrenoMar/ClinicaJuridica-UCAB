@@ -8,10 +8,10 @@ export function useFindAllAppointments() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadAppointments = useCallback(async () => {
+    const loadAppointments = useCallback(async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllAppointments();
+            const data = await findAllAppointments(params);
             setAppointments(data);
             setError(null);
         } catch (err) {

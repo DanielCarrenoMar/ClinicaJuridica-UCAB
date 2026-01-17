@@ -8,10 +8,10 @@ export function useFindAllSupportDocuments() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadSupportDocuments = useCallback(async () => {
+    const loadSupportDocuments = useCallback(async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllSupportDocuments();
+            const data = await findAllSupportDocuments(params);
             setSupportDocuments(data);
             setError(null);
         } catch (err) {

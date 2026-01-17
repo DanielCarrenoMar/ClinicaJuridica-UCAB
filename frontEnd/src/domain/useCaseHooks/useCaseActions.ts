@@ -10,10 +10,10 @@ export function useGetAllCaseActions() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadCaseActions = useCallback(async () => {
+    const loadCaseActions = useCallback(async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllCaseActions();
+            const data = await findAllCaseActions(params);
             setCaseActions(data);
             setError(null);
         } catch (err) {

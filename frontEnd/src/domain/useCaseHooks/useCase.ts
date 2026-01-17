@@ -17,10 +17,10 @@ export function useGetCases() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadCases = useCallback(async () => {
+    const loadCases = useCallback(async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllCases();
+            const data = await findAllCases(params);
             setCases(data);
             setError(null);
         } catch (err) {

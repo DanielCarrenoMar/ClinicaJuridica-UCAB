@@ -38,10 +38,10 @@ export function useGetAllBeneficiaries() {
         loadBeneficiaries();
     }, []);
 
-    const loadBeneficiaries = async () => {
+    const loadBeneficiaries = async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllBeneficiaries();
+            const data = await findAllBeneficiaries(params);
             setBeneficiaries(data);
             setError(null);
         } catch (err) {

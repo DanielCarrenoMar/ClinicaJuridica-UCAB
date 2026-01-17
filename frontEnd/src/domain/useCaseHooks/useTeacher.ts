@@ -10,10 +10,10 @@ export function useGetAllTeachers() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadTeachers = useCallback(async () => {
+    const loadTeachers = useCallback(async (params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAllTeachers();
+            const data = await findAllTeachers(params);
             setTeachers(data);
             setError(null);
         } catch (err) {

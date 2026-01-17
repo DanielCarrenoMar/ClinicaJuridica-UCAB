@@ -4,8 +4,12 @@ import type { AppointmentInfoDAO } from "#database/daos/appointmentInfoDAO.ts";
 import { daoToAppointmentModel } from "#domain/models/appointment.ts";
 export function getAppointmentRepository(): AppointmentRepository {
     return {
-        findAllAppointments: async () => {
-            const responseAppointment = await fetch(APPOINTMENT_URL);
+        findAllAppointments: async (params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString() ? `${APPOINTMENT_URL}?${query.toString()}` : APPOINTMENT_URL;
+            const responseAppointment = await fetch(url);
             const appointmentData = await responseAppointment.json();
             const appointmentDAOs: AppointmentInfoDAO[] = appointmentData.data;
             return appointmentDAOs.map(daoToAppointmentModel);

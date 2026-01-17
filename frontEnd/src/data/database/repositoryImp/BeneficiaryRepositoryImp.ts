@@ -5,8 +5,12 @@ import { BENEFICIARY_URL } from "./apiUrl";
 
 export function getBeneficiaryRepository(): BeneficiaryRepository {
     return {
-        findAllBeneficiaries: async () => {
-            const response = await fetch(BENEFICIARY_URL);
+        findAllBeneficiaries: async (params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString() ? `${BENEFICIARY_URL}?${query.toString()}` : BENEFICIARY_URL;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daos: BeneficiaryInfoDAO[] = result.data ?? [];

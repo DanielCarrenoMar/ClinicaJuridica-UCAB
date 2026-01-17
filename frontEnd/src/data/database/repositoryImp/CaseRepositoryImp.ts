@@ -19,8 +19,12 @@ import { daoToCaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
 
 export function getCaseRepository(): CaseRepository {
     return {
-        findAllCases: async () => {
-            const responseCase = await fetch(CASE_URL);
+        findAllCases: async (params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString() ? `${CASE_URL}?${query.toString()}` : CASE_URL;
+            const responseCase = await fetch(url);
             const casesData = await responseCase.json();
             const caseDAOs: CaseInfoDAO[] = casesData.data;
 

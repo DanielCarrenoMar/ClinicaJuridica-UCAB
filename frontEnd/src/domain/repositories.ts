@@ -21,7 +21,7 @@ import type { UserDAO } from "#database/daos/userDAO.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
 export interface BeneficiaryRepository {
-    findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
+    findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
     createBeneficiary(data: BeneficiaryDAO): Promise<BeneficiaryModel>;
     updateBeneficiary(id: string, data: Partial<BeneficiaryModel>): Promise<BeneficiaryModel>;
@@ -36,7 +36,7 @@ export interface ApplicantRepository {
 }
 
 export interface CaseRepository {
-    findAllCases(): Promise<CaseModel[]>;
+    findAllCases(params?: { page?: number; limit?: number }): Promise<CaseModel[]>;
     findCaseById(id: number): Promise<CaseModel | null>;
     findBeneficiariesByCaseId(idCase: number): Promise<CaseBeneficiaryModel[]>;
     findCaseStatusByCaseId(idCase: number): Promise<CaseStatusModel[]>;
@@ -57,7 +57,7 @@ export interface CaseRepository {
 }
 
 export interface CaseActionRepository {
-    findAllCaseActions(): Promise<CaseActionModel[]>;
+    findAllCaseActions(params?: { page?: number; limit?: number }): Promise<CaseActionModel[]>;
     findCaseActionById(id: string): Promise<CaseActionModel | null>;
     createCaseAction(data: CaseActionDAO): Promise<CaseActionModel>;
     findActionsByUserId(userId: string): Promise<CaseActionModel[]>;
@@ -65,7 +65,7 @@ export interface CaseActionRepository {
 
 
 export interface AppointmentRepository {
-    findAllAppointments(): Promise<AppointmentModel[]>;
+    findAllAppointments(params?: { page?: number; limit?: number }): Promise<AppointmentModel[]>;
     findAppointmentById(id: number): Promise<AppointmentModel | null>;
     createAppointment(data: AppointmentDAO): Promise<AppointmentModel>;
     updateAppointment(id: number, data: Partial<AppointmentDAO>): Promise<AppointmentModel>;
@@ -73,7 +73,7 @@ export interface AppointmentRepository {
 }
 
 export interface SupportDocumentRepository {
-    findAllSupportDocuments(): Promise<SupportDocumentModel[]>;
+    findAllSupportDocuments(params?: { page?: number; limit?: number }): Promise<SupportDocumentModel[]>;
     findSupportDocumentById(id: number): Promise<SupportDocumentModel | null>;
     createSupportDocument(data: SupportDocumentDAO): Promise<SupportDocumentModel>;
     updateSupportDocument(id: number, data: Partial<SupportDocumentDAO>): Promise<SupportDocumentModel>;
@@ -81,14 +81,14 @@ export interface SupportDocumentRepository {
 }
 
 export interface UserRepository {
-    findAllUsers(): Promise<UserModel[]>;
+    findAllUsers(params?: { page?: number; limit?: number }): Promise<UserModel[]>;
     findUserById(id: string): Promise<UserModel | null>;
     updateUser(id: string, data: Partial<UserDAO>): Promise<UserModel>;
     authenticate(email: string, password: string): Promise<UserModel>;
 }
 
 export interface StudentRepository {
-    findAllStudents(): Promise<StudentModel[]>;
+    findAllStudents(params?: { page?: number; limit?: number }): Promise<StudentModel[]>;
     findStudentById(id: string): Promise<StudentModel | null>;
     updateStudent(id: string, data: Partial<StudentDAO>): Promise<StudentModel>;
     getCasesByStudentId(id: string): Promise<CaseModel[]>;
@@ -96,7 +96,7 @@ export interface StudentRepository {
 }
 
 export interface TeacherRepository {
-    findAllTeachers(): Promise<TeacherModel[]>;
+    findAllTeachers(params?: { page?: number; limit?: number }): Promise<TeacherModel[]>;
     findTeacherById(id: string): Promise<TeacherModel | null>;
     updateTeacher(id: string, data: Partial<TeacherDAO>): Promise<TeacherModel>;
     getCasesByTeacherId(id: string): Promise<CaseModel[]>;

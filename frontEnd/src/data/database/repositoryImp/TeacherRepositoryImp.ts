@@ -7,8 +7,12 @@ import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import { daoToCaseModel } from "#domain/models/case.ts";
 export function getTeacherRepository(): TeacherRepository {
     return {
-        findAllTeachers: async () => {
-            const response = await fetch(TEACHER_URL);
+        findAllTeachers: async (params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString() ? `${TEACHER_URL}?${query.toString()}` : TEACHER_URL;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const teachersData = await response.json();
             const teacherDAOs: TeacherDAO[] = teachersData.data;

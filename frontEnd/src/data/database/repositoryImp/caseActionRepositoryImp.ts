@@ -5,9 +5,13 @@ import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 
 export function getCaseActionRepository(): CaseActionRepository {
 	return {
-		findAllCaseActions: async (): Promise<CaseActionModel[] | null> => {
+		findAllCaseActions: async (params): Promise<CaseActionModel[] | null> => {
 			try {
-				const actionsRes = await fetch(`${CASE_ACTION_URL}`);
+				const query = new URLSearchParams();
+				if (params?.page !== undefined) query.set('page', String(params.page));
+				if (params?.limit !== undefined) query.set('limit', String(params.limit));
+				const url = query.toString() ? `${CASE_ACTION_URL}?${query.toString()}` : CASE_ACTION_URL;
+				const actionsRes = await fetch(url);
 
 				if (!actionsRes.ok) {
 					throw new Error("El servidor respondió con un error al obtener las acciones de casos.");

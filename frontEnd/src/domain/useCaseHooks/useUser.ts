@@ -9,10 +9,10 @@ export function useGetAllUsers() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
 
-	const loadUsers = useCallback(async () => {
+	const loadUsers = useCallback(async (params?: { page?: number; limit?: number }) => {
 		setLoading(true);
 		try {
-			const data = await findAllUsers();
+			const data = await findAllUsers(params);
 			setUsers(data);
 			setError(null);
 		} catch (err) {
