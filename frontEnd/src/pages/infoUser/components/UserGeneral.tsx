@@ -30,10 +30,6 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
 
     const isInputsDisabled = permissionLevel > roleToPermissionLevel(localUser.type); 
 
-    const getUserTypeColor = () => {
-        return localUser.type === 'Profesor' ? 'text-blue-600' : 'text-green-600'
-    }
-
     return (
         <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
 
@@ -61,6 +57,7 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                 <TitleDropdown
                     label="Sexo"
                     disabled={isInputsDisabled}
+                    selectedValue={localUser.gender}
                     onSelectionChange={(value) => {handleUserChange({gender: value as GenderTypeModel})}}
                 >
                     <DropdownOption value="Masculino">Masculino</DropdownOption>

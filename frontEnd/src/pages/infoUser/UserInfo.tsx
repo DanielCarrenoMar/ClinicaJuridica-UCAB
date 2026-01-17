@@ -7,15 +7,15 @@ import { useGetUserById, useUpdateUserById } from '#domain/useCaseHooks/useUser.
 import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
-import type { UserModel } from '#domain/models/user.ts'
+import { modelToUserDao, type UserModel } from '#domain/models/user.ts'
 import Box from '#components/Box.tsx'
 import DropdownOption from '#components/Dropdown/DropdownOption.tsx'
 import Dropdown from '#components/Dropdown/Dropdown.tsx'
 import Button from '#components/Button.tsx'
-import type { TeacherModel } from '#domain/models/teacher.ts'
+import { modelToTeacherDao, type TeacherModel } from '#domain/models/teacher.ts'
 import { useGetTeacherById, useUpdateTeacherById } from '#domain/useCaseHooks/useTeacher.ts'
 import { useGetStudentById, useUpdateStudentById } from '#domain/useCaseHooks/useStudent.ts'
-import type { StudentModel } from '#domain/models/student.ts'
+import { modelToStudentDao, type StudentModel } from '#domain/models/student.ts'
 import { useNotifications } from '#/context/NotificationsContext.tsx'
 
 function UserInfo() {
@@ -113,15 +113,15 @@ function UserInfo() {
     if (!localUser) return;
     if (!user) return;
     if (user.type === 'Estudiante' && localStudent) {
-      updateStudentById(localStudent.identityCard, localStudent).catch(notyError)
+      updateStudentById(localStudent.identityCard, modelToStudentDao(localStudent)).catch(notyError)
       setIsDataModified(false);
       return
     } else if (user.type === 'Profesor' && localTeacher) {
-      updateTeacherById(localTeacher.identityCard, localTeacher).catch(notyError)
+      updateTeacherById(localTeacher.identityCard, modelToTeacherDao(localTeacher)).catch(notyError)
       setIsDataModified(false);
       return
     }
-    updateUserById(localUser.identityCard, localUser).catch(notyError)
+    updateUserById(localUser.identityCard, modelToUserDao(localUser)).catch(notyError)
     setIsDataModified(false);
   }
 
@@ -157,7 +157,7 @@ function UserInfo() {
   }
 
   return (
-    <Box className='p-0!'>
+    <Box className='p-0! h-full'>
       <header className='bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16'>
         <span className='flex gap-3 items-center'>
           <UserCircle className='size-6' />

@@ -43,7 +43,6 @@ export function getUserRepository(): UserRepository {
             return daoToUserModel(userDAO);
         },
         updateUser: async (id, data) => {
-            console.log('Updating user with data:', data);
             const response = await fetch(`${USER_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
