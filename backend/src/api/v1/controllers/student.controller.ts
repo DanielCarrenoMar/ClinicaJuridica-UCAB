@@ -68,7 +68,7 @@ export async function importStudents(req: Request, res: Response): Promise<void>
     }
 
     const result = await studentService.importStudents(studentsData);
-    res.status(result.success ? 200 : 207).json(result); // 207 Multi-Status if there are partial errors
+    res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: msg });
