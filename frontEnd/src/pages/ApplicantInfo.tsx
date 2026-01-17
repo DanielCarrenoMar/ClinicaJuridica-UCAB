@@ -36,7 +36,6 @@ export default function ApplicantInfo() {
     const [activeSection, setActiveSection] = useState("identificacion");
     const [type, setType] = useState<BeneficiaryTypeModel | null>(null);
     const [hasId, setHasId] = useState<boolean | null>(null);
-    const [isApplicantExisting, setIsApplicantExisting] = useState<boolean>(false);
 
     const [stateIndex, setStateIndex] = useState<number | null>(null);
     const [munIndex, setMunIndex] = useState<number | null>(null);
@@ -86,7 +85,6 @@ export default function ApplicantInfo() {
 
             setApplicantData(applicant);
             setLocalApplicantData(applicant);
-            setIsApplicantExisting(true);
         };
         loadApplicant();
     }, [id]);
@@ -198,9 +196,6 @@ export default function ApplicantInfo() {
             savedApplicant = await updateApplicant(applicantId, localApplicantData);
         } else if (hasId === true) { // Si no tiene cedula no se puede crear un aplicant
             savedApplicant = await createApplicant(localApplicantData);
-            if (savedApplicant) {
-                setIsApplicantExisting(true);
-            }
         }
 
         if (savedApplicant) {

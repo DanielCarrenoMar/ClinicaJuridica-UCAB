@@ -1,4 +1,3 @@
-import Box from "#components/Box.tsx";
 import CaseActionCard from "#components/CaseActionCard.tsx";
 import CaseActionDetailsDialog from "#components/dialogs/CaseActionDetailsDialog.tsx";
 import type { CaseActionModel } from "#domain/models/caseAction.ts";
