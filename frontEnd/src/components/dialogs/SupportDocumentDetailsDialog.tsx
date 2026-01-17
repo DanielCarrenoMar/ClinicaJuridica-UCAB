@@ -1,28 +1,37 @@
 import { useState } from "react";
 import type { SupportDocumentModel } from "#domain/models/supportDocument.ts";
-import Button from "#components/Button.tsx";
-import { CalendarMonth, FilePdf, Download, AlignLeft, Pen, TrashBin } from "flowbite-react-icons/outline";
+import { Pen, TrashBin } from "flowbite-react-icons/outline";
 import Dialog from "#components/dialogs/Dialog.tsx";
+import Button from "#components/Button.tsx";
 import ConfirmDialog from "#components/dialogs/ConfirmDialog.tsx";
+import { CalendarMonth, FileSearch } from "flowbite-react-icons/solid";
 
 interface SupportDocumentDetailsDialogProps {
     open: boolean;
     onClose: () => void;
-    document: SupportDocumentModel | null;
     onEdit?: () => void;
     onDelete?: () => void;
+    document: SupportDocumentModel | null;
 }
 
 export default function SupportDocumentDetailsDialog({
     open,
     onClose,
-    document,
     onEdit,
-    onDelete
+    onDelete,
+    document
 }: SupportDocumentDetailsDialogProps) {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     if (!open || !document) return null;
+
+    const submissionDate = document.submissionDate.toLocaleDateString("es-ES", {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC'
+    });
 
     return (
         <Dialog
@@ -30,68 +39,63 @@ export default function SupportDocumentDetailsDialog({
             title="Detalles del Recaudo"
             onClose={onClose}
             headerItems={
-                onEdit ? (
-                    <button
-                        onClick={onEdit}
-                        className="text-onSurface/50 hover:text-primary cursor-pointer transition-colors p-1"
-                    >
-                        <Pen className="w-6 h-6" />
-                    </button>
-                ) : undefined
+                <>
+                    {onDelete && (
+                        <Button
+                            variant="outlined"
+                            onClick={() => setShowDeleteConfirmation(true)}
+                            icon={<TrashBin />}
+                        >
+                        </Button>
+                    )}
+                </>
             }
         >
             <div className="flex flex-col gap-4">
-                {/* Header Info */}
-                <div className="flex items-center gap-3 p-4 bg-surfaceVariant/30 rounded-lg border border-surfaceVariant">
-                    <div className="p-2 bg-surface rounded-md">
-                        <FilePdf className="w-6 h-6 text-onSurface" />
-                    </div>
-                    <div className="flex-1">
-                        <h3 className="text-title-medium font-bold text-onSurface">{document.title}</h3>
-                        <div className="flex gap-2 items-center mt-1">
-                            <span className="text-body-small text-onSurface/70">
-                                Recaudo #{document.supportNumber}
-                            </span>
-                            <div className="w-1 h-1 rounded-full bg-onSurface/30"></div>
-                            <div className="flex items-center gap-1 text-onSurface/70">
-                                <CalendarMonth className="w-3 h-3" />
-                                <span className="text-body-small">
-                                    {document.submissionDate.toLocaleDateString("es-ES")}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Details */}
                 <div className="flex flex-col gap-2">
-                    <label className="flex items-center gap-2 text-label-medium text-onSurface/70">
-                        <AlignLeft className="w-4 h-4" /> Descripción
-                    </label>
-                    <p className="text-body-medium text-onSurface bg-background p-3 rounded-lg border border-onSurface/5 min-h-20">
-                        {document.description || "Sin descripción disponible."}
+                    <header className="flex items-center gap-2">
+                        <FileSearch />
+                        <h4 className="text-label-small">
+                            Título
+                        </h4>
+                    </header>
+                    <p className="text-body-medium ps-7 font-bold">
+                        {document.title}
                     </p>
                 </div>
-            </div>
 
-            <div className="flex justify-between gap-3 pt-4 border-t border-onSurface/10">
-                {onDelete && (
-                    <Button
-                        variant="outlined"
-                        onClick={() => setShowDeleteConfirmation(true)}
-                        icon={<TrashBin className="w-4 h-4" />}
-                    >
-                        Eliminar
-                    </Button>
-                )}
-                <div className={`flex gap-3 ${!onDelete ? 'ml-auto' : ''}`}>
-                    <Button
-                        variant="outlined"
-                        onClick={() => window.open(document.fileUrl, '_blank')}
-                        icon={<Download className="w-4 h-4" />}
-                    >
-                        Descargar
-                    </Button>
+                <div className="flex flex-col gap-2">
+                    <header className="flex items-center gap-2">
+                        <CalendarMonth />
+                        <h4 className="text-label-small">
+                            Fecha de Entrega
+                        </h4>
+                    </header>
+                    <p className="text-body-medium ps-7 text-capitalize">
+                        {submissionDate}
+                    </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <header className="flex items-center gap-2">
+                        <h4 className="text-label-small ps-7">
+                            Descripción
+                        </h4>
+                    </header>
+                    <p className="text-body-medium ps-7 text-onSurface/70">
+                        {document.description || 'Sin descripción.'}
+                    </p>
+                </div>
+
+                <div className="flex justify-end mt-4">
+                    {onEdit && (
+                        <Button
+                            variant="resalted"
+                            icon={<Pen />}
+                            onClick={onEdit}
+                            className="min-w-48 w-1/2"
+                            aria-label="Editar Recaudo">Editar Recaudo</Button>
+                    )}
                 </div>
             </div>
 

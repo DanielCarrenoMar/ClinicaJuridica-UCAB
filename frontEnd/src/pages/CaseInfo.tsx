@@ -69,7 +69,7 @@ export default function CaseInfo() {
     const { notyError } = useNotifications()
     const { caseData, loading, error, loadCase } = useGetCaseById(safeId);
     const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user?.identityCard || "");
-    
+
     // Leer el parámetro 'tab' de la URL, validar que sea una tab válida
     const tabFromUrl = searchParams.get('tab') as CaseInfoTabs | null;
     const initialTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : "General";
@@ -804,7 +804,7 @@ export default function CaseInfo() {
                         isDataModified ? (
                             <Button variant='resalted' className='w-32' onClick={saveChanges} disabled={updating}>Guardar</Button>
                         ) : (
-                            <Button variant="outlined" className='w-32' onClick={()=>{}} icon={<FilePdf />}>
+                            <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf />}>
                                 Exportar
                             </Button>
                         )
