@@ -759,7 +759,7 @@ function CreateCaseApplicantStep() {
                 </div>
             </header>
             <section className="flex py-2">
-                <Tabs selectedId={activeSection} onChange={setActiveSection}>
+                <Tabs selectedId={activeSection} onChange={setActiveSection} className='pb-2'>
                     <Tabs.Item id="identificacion" label="Identificación" icon={<CaretDown />} />
                     <Tabs.Item id="vivienda" label="Vivienda y Servicios" icon={<Home />} />
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />

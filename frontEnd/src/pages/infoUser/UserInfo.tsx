@@ -211,6 +211,7 @@ function UserInfo() {
       <section className='flex py-2'>
         <Tabs
           selectedId={activeTab}
+          className='pb-2'
         >
           <Tabs.Item
             id='General'
