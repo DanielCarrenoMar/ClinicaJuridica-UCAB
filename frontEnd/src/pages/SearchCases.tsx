@@ -219,7 +219,7 @@ function SearchCases() {
                     ))
                 }
             </ul>
-            <section className="mt-4 flex items-center justify-between">
+            <section className="mt-4 flex items-center justify-between max-w-5xl">
                 <Button
                     variant="outlined"
                     icon={<ArrowLeft />}

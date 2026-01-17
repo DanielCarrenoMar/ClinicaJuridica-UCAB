@@ -45,16 +45,16 @@ function ActionsHistory() {
     const canGoNext = !loadingCaseActions && !errorCaseActions && caseActions.length === pageSize;
 
     return (
-        <div className="flex flex-col h-full min-h-0 max-w-5xl">
-            <section className="mb-4">
+        <div className="flex flex-col h-full min-h-0">
+            <section className="mb-4 max-w-5xl">
                 <SearchBar
                     isOpen={true}
                     placeholder="Buscar acción por usuario, ID de caso o descripción..."
                     onChange={setSearchQuery}
                 />
             </section>
-            <section className="flex-1 min-h-0">
-                <div className="col-span-4 h-full flex flex-col gap-2 min-h-0 overflow-y-auto">
+            <section className="flex-1 min-h-0 overflow-y-auto">
+                <div className="col-span-4 h-full flex flex-col gap-2 min-h-0 max-w-5xl">
                     {loadingCaseActions &&
                         <div className="flex justify-center">
                             <LoadingSpinner />
@@ -81,7 +81,7 @@ function ActionsHistory() {
                 </div>
             </section>
 
-            <section className="mt-4 flex items-center justify-between">
+            <section className="mt-4 flex items-center justify-between max-w-5xl">
                 <Button
                     variant="outlined"
                     icon={<ArrowLeft />}
