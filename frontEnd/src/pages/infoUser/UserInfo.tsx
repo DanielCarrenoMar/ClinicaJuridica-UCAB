@@ -20,7 +20,7 @@ import { useNotifications } from '#/context/NotificationsContext.tsx'
 
 function UserInfo() {
   const { userId } = useParams<{ userId: string }>()
-  
+
   const { user, loading: userLoading } = useGetUserById(userId ?? '')
   const { student, loading: studentLoading, loadStudent } = useGetStudentById()
   const { teacher, loading: teacherLoading, loadTeacher } = useGetTeacherById()
@@ -156,6 +156,8 @@ function UserInfo() {
       break;
   }
 
+  const getActiveColor = (active: boolean) => active ? "bg-success! text-white border-0" : "bg-onSurface! text-white border-0";
+
   return (
     <Box className='p-0! h-full'>
       <header className='bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16'>
@@ -169,39 +171,42 @@ function UserInfo() {
             </span>
           </div>
         </span>
-        <Dropdown
-          label={user?.isActive ? 'Activo' : 'Inactivo'}
-          triggerClassName={''}
-          selectedValue={user?.isActive ? 'Activo' : 'Inactivo'}
-          onSelectionChange={() => { }}
-        >
-          <DropdownOption value='Activo'>Activo</DropdownOption>
-          <DropdownOption value='Inactivo'>Inactivo</DropdownOption>
-        </Dropdown>
-        <div className='flex items-end gap-2.5'>
+
+        <span className='flex flex-1 justify-end items-center gap-4 h-full'>
           {
             isDataModified && (
-              <Button onClick={discardChanges} icon={<Close />} variant='outlined' className='h-10'>
+              <Button onClick={discardChanges} icon={<Close />} variant='outlined'>
                 Cancelar Cambios
               </Button>
             )
           }
+          <div>
+            <Dropdown
+              label={localUser?.isActive ? 'Activo' : 'Inactivo'}
+              triggerClassName={getActiveColor(localUser?.isActive ?? false)}
+              selectedValue={localUser?.isActive ? 'Activo' : 'Inactivo'}
+              onSelectionChange={(result) => { handleUserChange({ isActive: result === 'Activo' }) }}
+            >
+              <DropdownOption value='Activo'>Activo</DropdownOption>
+              <DropdownOption value='Inactivo'>Inactivo</DropdownOption>
+            </Dropdown>
+          </div>
           {
             isDataModified ? (
               <Button
                 onClick={saveChanges}
                 variant='resalted'
-                className='h-10 w-32'
+                className='w-32'
               >
                 Guardar
               </Button>
             ) : (
-              <Button onClick={() => { }} icon={<FilePdf />} variant='outlined' className='h-10 w-32'>
+              <Button onClick={() => { }} icon={<FilePdf />} variant='outlined' className='w-32'>
                 Exportar
               </Button>
             )
           }
-        </div>
+        </span>
       </header>
       <section className='flex py-2'>
         <Tabs
