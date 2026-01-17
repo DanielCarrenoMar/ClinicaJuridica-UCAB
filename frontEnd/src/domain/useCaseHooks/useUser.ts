@@ -102,3 +102,27 @@ export function useLoginUser() {
 		clearError
 	};
 }
+
+export function useUpdateUserById() {
+	const { updateUser: updateUserData  } = getUserRepository();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<Error | null>(null);
+
+	const updateUserById = useCallback(async (id: string, data: Partial<UserModel>) => {
+		setLoading(true);
+		try {
+			await updateUserData(id, data);
+			setError(null);
+		} catch (err) {
+			setError(err as Error);
+		} finally {
+			setLoading(false);
+		}	
+	}, [updateUserData]);
+
+	return {
+		updateUserById,
+		loading,
+		error,
+	};
+}

@@ -66,7 +66,7 @@ export default function CaseInfo() {
     const safeId = Number(id) || 0;
 
     const { user, permissionLevel } = useAuth()
-    const { error: notificationError } = useNotifications()
+    const { notyError } = useNotifications()
     const { caseData, loading, error, loadCase } = useGetCaseById(safeId);
     const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user?.identityCard || "");
     
@@ -168,7 +168,7 @@ export default function CaseInfo() {
             loadCaseBeneficiaries(safeId);
             setIsDataModified(false);
         } catch (e: any) {
-            notificationError(e.message || "Error al guardar los cambios");
+            notyError(e.message || "Error al guardar los cambios");
             console.error(e);
         }
     }
@@ -350,7 +350,7 @@ export default function CaseInfo() {
                         setSelectedAppointment(null);
                     } catch (error: any) {
                         console.error("Error deleting appointment:", error);
-                        notificationError(error.message || "Error al eliminar la cita");
+                        notyError(error.message || "Error al eliminar la cita");
                     }
                 }}
             />
@@ -376,7 +376,7 @@ export default function CaseInfo() {
                         loadAppointments(safeId);
                     } catch (error: any) {
                         console.error("Error creating appointment:", error);
-                        notificationError(error.message || "Error al crear la cita");
+                        notyError(error.message || "Error al crear la cita");
                     }
                 }}
             />
@@ -392,7 +392,7 @@ export default function CaseInfo() {
                         setIsEditAppointmentDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating appointment:", error);
-                        notificationError(error.message || "Error al actualizar la cita");
+                        notyError(error.message || "Error al actualizar la cita");
                     }
                 }}
             />
@@ -450,7 +450,7 @@ export default function CaseInfo() {
                         setSelectedSupportDocument(null);
                     } catch (error: any) {
                         console.error("Error deleting support document:", error);
-                        notificationError(error.message || "Error al eliminar el recaudo");
+                        notyError(error.message || "Error al eliminar el recaudo");
                     }
                 }}
             />
@@ -473,7 +473,7 @@ export default function CaseInfo() {
                         loadSupportDocuments(safeId);
                     } catch (error: any) {
                         console.error("Error creating support document:", error);
-                        notificationError(error.message || "Error al crear el recaudo");
+                        notyError(error.message || "Error al crear el recaudo");
                     }
                 }}
             />
@@ -489,7 +489,7 @@ export default function CaseInfo() {
                         setIsEditSupportDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating support document:", error);
-                        notificationError(error.message || "Error al actualizar el recaudo")
+                        notyError(error.message || "Error al actualizar el recaudo")
                         setIsEditSupportDialogOpen(false);
                     }
                 }}
@@ -512,7 +512,7 @@ export default function CaseInfo() {
             await refreshBeneficiaries();
             handleSelectCaseBeneficiary(created);
         } catch (error: any) {
-            notificationError(error.message || "Error al crear el beneficiario");
+            notyError(error.message || "Error al crear el beneficiario");
             console.error("Error creating beneficiary:", error);
         }
     }
@@ -755,7 +755,7 @@ export default function CaseInfo() {
                         await createAction(newAction);
                         loadCaseActions(safeId);
                     } catch (error: any) {
-                        notificationError(error.message || "Error al crear la acción del caso");
+                        notyError(error.message || "Error al crear la acción del caso");
                         console.error("Error creating case action:", error);
                     }
                 }}

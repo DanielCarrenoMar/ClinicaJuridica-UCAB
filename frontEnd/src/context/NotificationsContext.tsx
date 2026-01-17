@@ -2,8 +2,8 @@ import React, { createContext, useCallback, useContext, useMemo, useRef, useStat
 import NotificationContainer, { type NotificationItem, type NotificationVariant } from "#components/notifications/NotificationContainer.tsx";
 
 type NotificationsApi = {
-  message: (text: string) => void;
-  error: (text: string) => void;
+  notyMessage: (text: string) => void;
+  notyError: (text: string) => void;
 };
 
 const NotificationsContext = createContext<NotificationsApi | null>(null);
@@ -49,8 +49,8 @@ export function NotificationsProvider({ children, durationMs = 4000 }: ProviderP
 
   const api = useMemo<NotificationsApi>(
     () => ({
-      message: (text: string) => push("message", text),
-      error: (text: string) => push("error", text),
+      notyMessage: (text: string) => push("message", text),
+      notyError: (text: string) => push("error", text),
     }),
     [push]
   );

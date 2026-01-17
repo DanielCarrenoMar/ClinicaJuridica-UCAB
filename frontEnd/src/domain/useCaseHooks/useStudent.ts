@@ -107,3 +107,27 @@ export function useGetCasesByStudentId(id?: string) {
         loadCases,
     };
 }
+
+export function useUpdateStudentById() {
+    const { updateStudent } = getStudentRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const updateStudentById = useCallback(async (id: string, data: Partial<StudentModel>) => {
+        setLoading(true);
+        try {
+            await updateStudent(id, data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return {
+        updateStudentById,
+        loading,
+        error,
+    };
+}

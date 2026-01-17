@@ -1,7 +1,7 @@
 import type { UserRepository } from "#domain/repositories.ts";
 import { USER_URL } from "./apiUrl";
 import type { UserDAO } from "#database/daos/userDAO.ts";
-import { daoToUserModel } from "#domain/models/user.ts";
+import { daoToUserModel, type UserModel } from "#domain/models/user.ts";
 
 const AUTH_URL = "http://localhost:3000/api/v1/auth";
 
@@ -41,6 +41,20 @@ export function getUserRepository(): UserRepository {
 
             const userDAO: UserDAO = result.data;
             return daoToUserModel(userDAO);
+        },
+        updateUser: async (id: string, data: Partial<UserModel>) => {
+            const response = await fetch(`${USER_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al actualizar el usuario');
+            }
+            const result = await response.json();
+            const updatedUserDAO: UserDAO = result.data;
+            return daoToUserModel(updatedUserDAO);
         }
     } as UserRepository;
 }
