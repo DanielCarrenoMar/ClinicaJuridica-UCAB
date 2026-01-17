@@ -211,7 +211,6 @@ function UserInfo() {
       <section className='flex py-2'>
         <Tabs
           selectedId={activeTab}
-          className='mb-6'
         >
           <Tabs.Item
             id='General'
@@ -233,7 +232,7 @@ function UserInfo() {
           />
         </Tabs>
       </section>
-      <section className='px-4 pb-6 flex flex-col flex-1'>
+      <section className='px-4 pb-6 flex flex-col flex-1 min-h-0'>
         {content}
       </section>
     </Box>

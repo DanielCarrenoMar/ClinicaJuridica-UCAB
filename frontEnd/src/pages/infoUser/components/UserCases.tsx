@@ -31,7 +31,7 @@ export default function UserCases({ userId, userType }: UserCasesProps) {
   return (
     <div className="flex flex-col h-full">
       <section className="flex-1">
-        <Box className="col-span-4 h-full flex flex-col gap-2">
+        <div className="col-span-4 h-full flex flex-col gap-2">
             {loading &&
               <div className="flex justify-center">
                 <LoadingSpinner />
@@ -51,7 +51,7 @@ export default function UserCases({ userId, userType }: UserCasesProps) {
                 caseData={caseItem}
               />
             ))}
-        </Box>
+        </div>
       </section>
     </div>
   )

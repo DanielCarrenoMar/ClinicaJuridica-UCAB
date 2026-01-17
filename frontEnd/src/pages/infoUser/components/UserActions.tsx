@@ -37,7 +37,7 @@ export default function UserActions({ userId }: UserActionsProps) {
 
   return (
     <div className="flex flex-col h-full">
-      <section className="mb-4">
+      <section className="mb-4 max-w-5xl">
         <SearchBar
           isOpen={true}
           placeholder="Buscar acción por usuario, ID de caso o descripción..."
@@ -45,8 +45,8 @@ export default function UserActions({ userId }: UserActionsProps) {
         />
       </section>
       <section className="flex-1">
-        <Box className="col-span-4 h-full flex flex-col gap-2">
-          <div className="flex flex-col gap-2 flex-1">
+        <div className="col-span-4 h-full flex flex-col gap-2">
+          <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
             {loading &&
               <div className="flex justify-center">
                 <LoadingSpinner />
@@ -75,7 +75,7 @@ export default function UserActions({ userId }: UserActionsProps) {
             onClose={() => setShowCaseActionDetails(false)}
             caseAction={selectedCaseAction}
           />
-        </Box>
+        </div>
       </section>
     </div>
   )
