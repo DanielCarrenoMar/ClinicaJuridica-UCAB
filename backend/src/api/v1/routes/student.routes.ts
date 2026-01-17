@@ -6,5 +6,6 @@ const router = Router();
 router.get('/', studentController.getAllStudents);
 router.get('/:id/cases', studentController.getCasesByStudentId);
 router.get('/:id', studentController.getStudentById);
+router.put('/:id', studentController.updateStudent);
 
 export default router;

@@ -36,3 +36,16 @@ export async function getCasesByStudentId(req: Request, res: Response): Promise<
     res.status(500).json({ success: false, error: msg });
   }
 }
+
+export async function updateStudent(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+
+    const result = await studentService.updateStudent(id, data);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}

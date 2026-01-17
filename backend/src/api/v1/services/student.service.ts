@@ -1,4 +1,5 @@
 import prisma from '#src/config/database.js';
+import userService from './user.service.js';
 
 class StudentService {
   async getAllStudents(term?: string) {
@@ -153,6 +154,40 @@ class StudentService {
       `;
 
       return { success: true, data: cases };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async updateStudent(id: string, data: any) {
+    try {
+      const userUpdate = await userService.updateUser(id, data);
+      if (!userUpdate.success) {
+        return userUpdate;
+      }
+
+      let term = data.term || data.studentTerm;
+      if (!term) {
+        const rows: any[] = await prisma.$queryRaw`
+          SELECT term FROM "Student" 
+          WHERE "identityCard" = ${id} 
+          ORDER BY "term" DESC LIMIT 1
+        `;
+        if (rows.length > 0) {
+          term = rows[0].term;
+        }
+      }
+
+      if (term) { 
+        await prisma.$executeRaw`
+          UPDATE "Student" SET
+            "nrc" = COALESCE(${data.nrc}, "nrc"),
+            "type" = COALESCE(${data.type}::"StudentType", "type")
+          WHERE "identityCard" = ${id} AND "term" = ${term}
+        `;
+      }
+
+      return { success: true, message: 'Estudiante actualizado correctamente' };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
