@@ -13,8 +13,8 @@ import { useNotifications } from '#/context/NotificationsContext'
 
 function Users() {
   const { users, loading, error, refresh } = useGetAllUsers()
-  const { importStudents } = useImportStudents()
-  const { notyError } = useNotifications()
+  const { importStudents, loading: importLoading } = useImportStudents()
+  const { notyError, notyMessage } = useNotifications()
   const [searchValue, setSearchValue] = useState('')
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
@@ -42,8 +42,10 @@ function Users() {
   }
 
   const handleImport = async (file: File) => {
-    importStudents(file).then(() => {
+    importStudents(file).then((result) => {
       refresh()
+      setIsImportDialogOpen(false)
+      notyMessage(result.data.success + ' Estudiantes importados exitosamente.' + (result.data.failed && result.data.failed.length > 0 ? ` ${result.data.failed.length} fallidos.` : ''))
     }).catch((err) => {
       notyError('Error al importar estudiantes: ' + err.message)
     })
@@ -88,6 +90,7 @@ function Users() {
         open={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
         onImport={handleImport}
+        isLoading={importLoading}
       />
     </div>
   )

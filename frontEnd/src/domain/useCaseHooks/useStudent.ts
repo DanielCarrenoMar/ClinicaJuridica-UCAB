@@ -142,7 +142,6 @@ export function useImportStudents() {
         setLoading(true);
         try {
             const result = await importStudentsRepo(file);
-            
             setError(null);
             return result;
         } catch (err) {
