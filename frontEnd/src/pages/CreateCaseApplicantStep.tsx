@@ -748,7 +748,7 @@ function CreateCaseApplicantStep() {
 
     return (
         <>
-            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16">
+            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16 shrink-0">
                 <div className="flex items-center gap-2.5">
                     <UserEditS className="size-8!" />
                     <h1 className="text-label-medium">Solicitante</h1>
@@ -765,14 +765,11 @@ function CreateCaseApplicantStep() {
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
                 </Tabs>
             </section>
-            <section className="px-4 pb-6">
-                <header className="flex justify-between items-center w-full mb-6">
-                </header>
-                <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
-                    {activeSection === "identificacion" && identificationInputs}
-                    {activeSection === "vivienda" && houseInputs}
-                    {activeSection === "familia" && familyInputs}
-                </div>
+            <section className="px-4 pb-6 overflow-y-auto grid grid-cols-3 items-start gap-x-6 gap-y-6">
+                {activeSection === "identificacion" && identificationInputs}
+                {activeSection === "vivienda" && houseInputs}
+                {activeSection === "familia" && familyInputs}
+                <footer className="h-60"></footer>
             </section>
             <ConfirmDialog
                 open={showCancelConfirm}

@@ -114,7 +114,7 @@ function CreateCase() {
     }
 
     return (
-        <Box className="p-0!">
+        <Box className="p-0! h-full min-h-0 flex flex-col">
             <Outlet context={{
                 caseDAO, setCaseDAO, updateCaseDAO,
                 caseBeneficiaries, setCaseBeneficiaries,
@@ -124,7 +124,6 @@ function CreateCase() {
                 submitCreateCase,
                 isSubmittingCreateCase,
             }} />
-            <footer className="h-60"></footer>
         </Box>
     );
 }
