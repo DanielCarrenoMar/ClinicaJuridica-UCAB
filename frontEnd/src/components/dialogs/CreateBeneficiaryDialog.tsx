@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getBeneficiaryRepository } from "#database/repositoryImp/BeneficiaryRepositoryImp.ts";
 import Button from "#components/Button.tsx";
 import DatePicker from "#components/DatePicker.tsx";
 import DropdownOption from "#components/Dropdown/DropdownOption.tsx";

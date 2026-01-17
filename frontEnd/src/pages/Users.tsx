@@ -5,7 +5,6 @@ import { Upload } from "flowbite-react-icons/solid"
 import SearchBar from '#components/SearchBar.tsx'
 import { useGetAllUsers } from '#domain/useCaseHooks/useUser.ts'
 import { useImportStudents } from '#domain/useCaseHooks/useStudent.ts'
-import Box from '#components/Box.tsx'
 import Button from '#components/Button.tsx'
 import LoadingSpinner from '#components/LoadingSpinner.tsx'
 import UserListRow from '#components/UserListRow.tsx'

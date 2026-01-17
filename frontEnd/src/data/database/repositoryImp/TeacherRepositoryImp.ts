@@ -1,7 +1,7 @@
 import type { TeacherRepository } from "#domain/repositories.ts";
 import { TEACHER_URL } from "./apiUrl";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
-import { daoToTeacherModel, type TeacherModel } from "#domain/models/teacher.ts";
+import { daoToTeacherModel } from "#domain/models/teacher.ts";
 
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import { daoToCaseModel } from "#domain/models/case.ts";

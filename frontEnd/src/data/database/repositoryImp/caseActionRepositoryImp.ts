@@ -6,26 +6,21 @@ import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 export function getCaseActionRepository(): CaseActionRepository {
 	return {
 		findAllCaseActions: async (params): Promise<CaseActionModel[] | null> => {
-			try {
-				const query = new URLSearchParams();
-				if (params?.page !== undefined) query.set('page', String(params.page));
-				if (params?.limit !== undefined) query.set('limit', String(params.limit));
-				const url = query.toString() ? `${CASE_ACTION_URL}?${query.toString()}` : CASE_ACTION_URL;
-				const actionsRes = await fetch(url);
+			const query = new URLSearchParams();
+			if (params?.page !== undefined) query.set('page', String(params.page));
+			if (params?.limit !== undefined) query.set('limit', String(params.limit));
+			const url = query.toString() ? `${CASE_ACTION_URL}?${query.toString()}` : CASE_ACTION_URL;
+			const actionsRes = await fetch(url);
 
-				if (!actionsRes.ok) {
-					throw new Error("El servidor respondió con un error al obtener las acciones de casos.");
-				}
-
-				const actionsData = await actionsRes.json();
-
-				const actionsList: CaseActionInfoDAO[] = actionsData.data;
-
-				return actionsList.map(action => daoToCaseActionModel(action));
-
-			} catch (error) {
-				throw error;
+			if (!actionsRes.ok) {
+				throw new Error("El servidor respondió con un error al obtener las acciones de casos.");
 			}
+
+			const actionsData = await actionsRes.json();
+
+			const actionsList: CaseActionInfoDAO[] = actionsData.data;
+
+			return actionsList.map(action => daoToCaseActionModel(action));
 		},
 
 

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Button from '#components/Button.tsx';
-import DatePicker from '#components/DatePicker.tsx';
 import TextInput from '#components/TextInput.tsx';
 import Dialog from '#components/dialogs/Dialog.tsx';
 import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';

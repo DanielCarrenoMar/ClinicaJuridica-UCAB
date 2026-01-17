@@ -2,7 +2,6 @@ import CaseActionCard from '#components/CaseActionCard.tsx'
 import CaseActionDetailsDialog from '#components/dialogs/CaseActionDetailsDialog.tsx';
 import type { CaseActionModel } from '#domain/models/caseAction.ts'
 import { useMemo, useState } from 'react';
-import Box from '#components/Box.tsx';
 import Fuse from 'fuse.js';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import { useGetActionsByUserId } from '#domain/useCaseHooks/useCaseActions.ts';

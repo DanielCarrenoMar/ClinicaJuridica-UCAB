@@ -3,7 +3,6 @@ import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { AppointmentStatusTypeModel } from '#domain/typesModel.ts';
 import { typeModelToAppointmentStatusTypeDao } from '#domain/typesModel.ts';
 import Button from '#components/Button.tsx';
-import DatePicker from '#components/DatePicker.tsx';
 import DropdownOption from '#components/Dropdown/DropdownOption.tsx';
 import TextInput from '#components/TextInput.tsx';
 import TitleDropdown from '#components/TitleDropdown.tsx';

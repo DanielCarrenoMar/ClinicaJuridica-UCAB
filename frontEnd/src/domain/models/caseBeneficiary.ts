@@ -1,6 +1,6 @@
 import type { CaseBeneficiaryDAO } from "#database/daos/caseBeneficiaryDAO.ts";
 import type { CaseBeneficiaryInfoDAO } from "#database/daos/caseBeneficiaryInfoDAO.ts";
-import { typeDaoToCaseBeneficiaryTypeModel, typeModelToCaseBeneficiaryTypeDao, type CaseBeneficiaryTypeModel, type IdNacionalityTypeModel } from "#domain/typesModel.ts";
+import { typeDaoToCaseBeneficiaryTypeModel, typeModelToCaseBeneficiaryTypeDao, type CaseBeneficiaryTypeModel} from "#domain/typesModel.ts";
 import type { PersonModel } from "./person";
 
 export interface CaseBeneficiaryModel extends PersonModel {

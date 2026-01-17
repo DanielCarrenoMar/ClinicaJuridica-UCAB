@@ -1,7 +1,5 @@
-import Box from '#components/Box.tsx';
 import CaseCard from '#components/CaseCard.tsx'
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
-import SearchBar from '#components/SearchBar.tsx';
 import type { UserTypeModel } from '#domain/models/user.ts';
 import { useGetCasesByStudentId } from '#domain/useCaseHooks/useStudent.ts';
 import { useGetCasesByTeacherId } from '#domain/useCaseHooks/useTeacher.ts';
