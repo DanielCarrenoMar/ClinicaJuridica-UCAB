@@ -16,6 +16,9 @@ import DropdownOptionCheck from '#components/DropdownCheck/DropdownOptionCheck.t
 import { PDFViewer, usePDF } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
 import ReportDocument from './components/ReportDocument';
+import ReportCaseType from './components/ReportCaseType';
+import ReportGenderDistribution from './components/ReportGenderDistribution';
+import ReportStudentInvolvement from './components/ReportStudentInvolvement';
 import LinkButton from '#components/LinkButton.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 
@@ -39,7 +42,7 @@ const reportOptions = [
         title: 'Solicitantes y beneficiarios por sexo',
         description: 'Cantidad de solicitantes y beneficiarios separados por sexo',
         icon: <ChartPie />,
-        component: null
+        component: <ReportGenderDistribution />
     },
     {
         id: 4,
@@ -60,7 +63,7 @@ const reportOptions = [
         title: 'Casos por tipo',
         description: 'Cantidad de casos separados por tipo',
         icon: <ChartPie />,
-        component: null
+        component: <ReportCaseType />
     },
     {
         id: 7,
@@ -74,7 +77,7 @@ const reportOptions = [
         title: 'Estudiantes involucrados por tipo',
         description: 'Cantidad de estudiantes involucrados separados por tipo',
         icon: <ChartPie />,
-        component: null
+        component: <ReportStudentInvolvement />
     },
     {
         id: 9,
