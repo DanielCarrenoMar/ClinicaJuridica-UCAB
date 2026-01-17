@@ -9,14 +9,14 @@ type Props = {
 export default function UserListRow({ user }: Props) {
     return (
         <Link
-            className={`w-full p-4 bg-white/70 border border-onSurface/20 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-surface hover:border-onSurface/40 transition-colors ${!user.isActive ? 'opacity-90' : ''}`}
+            className={`w-full py-2.5 px-4 max-w-5xl bg-white/70 border border-onSurface/20 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-surface hover:border-onSurface/40 transition-colors ${!user.isActive ? 'opacity-90' : ''}`}
             to={`/usuario/${user.identityCard}`}
         >
             <div className="flex items-center gap-3">
-                <UserCircle className="w-7 h-7 " />
+                <UserCircle />
                 <div className="flex items-center gap-2">
-                    <div className="text-[13px] font-medium ">{user.fullName}</div>
-                    <div className="text-[13px] font-normal text-black">{user.identityCard}</div>
+                    <div className="text-body-medium">{user.fullName}</div>
+                    <div className="text-body-small">{user.identityCard}</div>
                 </div>
             </div>
             <div className="flex items-center gap-4">
@@ -27,7 +27,7 @@ export default function UserListRow({ user }: Props) {
                         : 'bg-onSurface text-surface'
                         }`}
                 >
-                    <div className="text-[13px] font-normal">
+                    <div className="text-body-medium font-normal">
                         {user.isActive ? 'Activo' : 'Inactivo'}
                     </div>
                 </div>

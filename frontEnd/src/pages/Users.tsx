@@ -49,7 +49,7 @@ function Users() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0 max-w-5xl">
       <section className="mb-4 flex items-center justify-between gap-6">
         <SearchBar
           isOpen={true}
@@ -73,14 +73,14 @@ function Users() {
           </Button>
         </div>
       </section>
-      <section className="flex-1">
-        <Box className="col-span-4 h-full flex flex-col gap-2">
+      <section className="flex-1 min-h-0">
+        <div className="col-span-4 h-full flex flex-col gap-2 overflow-y-auto">
           {loading && <div className='flex justify-center'><LoadingSpinner /></div>}
           {error && <div className='text-error'>Error al cargar los usuarios.</div>}
           {!error && filteredUsers.map((user) => (
             <UserListRow key={user.identityCard} user={user} />
           ))}
-        </Box>
+        </div>
       </section>
 
       <ImportStudentsDialog
