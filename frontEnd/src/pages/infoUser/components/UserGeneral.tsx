@@ -6,7 +6,7 @@ import TitleTextInput from '#components/TitleTextInput.tsx';
 import type { StudentModel } from '#domain/models/student.ts';
 import type { TeacherModel } from '#domain/models/teacher.ts';
 import type { UserModel } from '#domain/models/user.ts';
-import type { GenderTypeModel } from '#domain/typesModel.ts';
+import type { GenderTypeModel, StudentTypeModel, TeacherTypeModel } from '#domain/typesModel.ts';
 import { useState } from 'react';
 
 interface UserGeneralProps {
@@ -65,6 +65,36 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                 </TitleDropdown>
                 {validationErrors.gender && <span className="text-xs text-error mt-1">{validationErrors.gender}</span>}
             </div>
+
+            {localStudent && (
+                <div className="col-span-1">
+                    <TitleDropdown
+                        label="Tipo de Estudiante"
+                        disabled={isInputsDisabled}
+                        selectedValue={localStudent.type}
+                        onSelectionChange={(value) => handleStudentChange({ type: value as StudentTypeModel })}
+                    >
+                        <DropdownOption value="regular">Regular</DropdownOption>
+                        <DropdownOption value="volunteer">Voluntario</DropdownOption>
+                        <DropdownOption value="graduate">Egresado</DropdownOption>
+                        <DropdownOption value="service">Servicio Comunitario</DropdownOption>
+                    </TitleDropdown>
+                </div>
+            )}
+
+            {localTeacher && (
+                <div className="col-span-1">
+                    <TitleDropdown
+                        label="Tipo de Profesor"
+                        disabled={isInputsDisabled}
+                        selectedValue={localTeacher.type}
+                        onSelectionChange={(value) => handleTeacherChange({ type: value as TeacherTypeModel })}
+                    >
+                        <DropdownOption value="REGULAR">Regular</DropdownOption>
+                        <DropdownOption value="VOLUNTEER">Voluntario</DropdownOption>
+                    </TitleDropdown>
+                </div>
+            )}
         </div>
     )
 }
