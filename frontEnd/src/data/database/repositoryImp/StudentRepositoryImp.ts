@@ -1,7 +1,7 @@
 import type { StudentRepository } from "#domain/repositories.ts";
 import { STUDENT_URL } from "./apiUrl";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
-import { daoToStudentModel } from "#domain/models/student.ts";
+import { daoToStudentModel, type StudentModel } from "#domain/models/student.ts";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import { daoToCaseModel } from "#domain/models/case.ts";
 export function getStudentRepository(): StudentRepository {
@@ -28,6 +28,21 @@ export function getStudentRepository(): StudentRepository {
             const daoList: CaseInfoDAO[] = result.data;
             return daoList.map(daoToCaseModel);
         },
+
+        updateStudent: async (id: string, data: Partial<StudentModel>) => {
+            const response = await fetch(`${STUDENT_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al actualizar el estudiante');
+            }
+            const result = await response.json();
+            const updatedStudentDAO: StudentDAO = result.data;
+            return daoToStudentModel(updatedStudentDAO);
+        }
 
     } as StudentRepository;
 }

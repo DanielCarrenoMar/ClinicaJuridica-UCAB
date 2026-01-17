@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 import { UserCircle, User, Clock, Close, FilePdf } from 'flowbite-react-icons/outline'
 import { File } from 'flowbite-react-icons/solid'
 import Tabs from '#components/Tabs.tsx'
-import { useGetUserById } from '#domain/useCaseHooks/useUser.ts'
+import { useGetUserById, useUpdateUserById } from '#domain/useCaseHooks/useUser.ts'
 import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
@@ -13,9 +13,10 @@ import DropdownOption from '#components/Dropdown/DropdownOption.tsx'
 import Dropdown from '#components/Dropdown/Dropdown.tsx'
 import Button from '#components/Button.tsx'
 import type { TeacherModel } from '#domain/models/teacher.ts'
-import { useGetTeacherById } from '#domain/useCaseHooks/useTeacher.ts'
-import { useGetStudentById } from '#domain/useCaseHooks/useStudent.ts'
+import { useGetTeacherById, useUpdateTeacherById } from '#domain/useCaseHooks/useTeacher.ts'
+import { useGetStudentById, useUpdateStudentById } from '#domain/useCaseHooks/useStudent.ts'
 import type { StudentModel } from '#domain/models/student.ts'
+import { useNotifications } from '#/context/NotificationsContext.tsx'
 
 function UserInfo() {
   const { userId } = useParams<{ userId: string }>()
@@ -23,6 +24,12 @@ function UserInfo() {
   const { user, loading: userLoading } = useGetUserById(userId ?? '')
   const { student, loading: studentLoading, loadStudent } = useGetStudentById()
   const { teacher, loading: teacherLoading, loadTeacher } = useGetTeacherById()
+  const { updateUserById } = useUpdateUserById()
+  const { updateStudentById } = useUpdateStudentById()
+  const { updateTeacherById } = useUpdateTeacherById()
+
+  const { notyError } = useNotifications()
+
   const [localUser, setLocalUser] = useState<UserModel>();
   const [localStudent, setLocalStudent] = useState<StudentModel>();
   const [localTeacher, setLocalTeacher] = useState<TeacherModel>();
@@ -67,7 +74,7 @@ function UserInfo() {
     return <div className='p-8 text-center text-error'>ID de usuario no proporcionado</div>
   }
 
-  if (userLoading) return <div className='p-8 text-center text-gray-500'>Cargando información del usuario...</div>
+  if (userLoading) return <div className='p-8 text-center text-gray-500'>Cargando informaciï¿½n del usuario...</div>
   if (!user) return <div className='p-8 text-center text-red-500'>Usuario no encontrado</div>
 
   if (user.type === 'Estudiante' && !student && studentLoading) return <div className='p-8 text-center text-gray-500'>Cargando datos de estudiante...</div>
@@ -103,7 +110,19 @@ function UserInfo() {
   }
 
   function saveChanges() {
-
+    if (!localUser) return;
+    if (!user) return;
+    if (user.type === 'Estudiante' && localStudent) {
+      updateStudentById(localStudent.identityCard, localStudent).catch(notyError)
+      setIsDataModified(false);
+      return
+    } else if (user.type === 'Profesor' && localTeacher) {
+      updateTeacherById(localTeacher.identityCard, localTeacher).catch(notyError)
+      setIsDataModified(false);
+      return
+    }
+    updateUserById(localUser.identityCard, localUser).catch(notyError)
+    setIsDataModified(false);
   }
 
   let content = null;

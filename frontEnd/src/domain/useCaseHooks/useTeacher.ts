@@ -107,3 +107,27 @@ export function useGetCasesByTeacherId(id?: string) {
         loadCases,
     };
 }
+
+export function useUpdateTeacherById() {
+    const { updateTeacher } = getTeacherRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const updateTeacherById = useCallback(async (id: string, data: Partial<TeacherModel>) => {
+        setLoading(true);
+        try {
+            await updateTeacher(id, data);
+            setError(null);
+        } catch (err) {
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return {
+        updateTeacherById,
+        loading,
+        error,
+    };
+}

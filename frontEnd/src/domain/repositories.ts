@@ -80,17 +80,20 @@ export interface SupportDocumentRepository {
 export interface UserRepository {
     findAllUsers(): Promise<UserModel[]>;
     findUserById(id: string): Promise<UserModel | null>;
+    updateUser(id: string, data: Partial<UserModel>): Promise<UserModel>;
     authenticate(email: string, password: string): Promise<UserModel>;
 }
 
 export interface StudentRepository {
     findAllStudents(): Promise<StudentModel[]>;
     findStudentById(id: string): Promise<StudentModel | null>;
+    updateStudent(id: string, data: Partial<StudentModel>): Promise<StudentModel>;
     getCasesByStudentId(id: string): Promise<CaseModel[]>;
 }
 
 export interface TeacherRepository {
     findAllTeachers(): Promise<TeacherModel[]>;
     findTeacherById(id: string): Promise<TeacherModel | null>;
+    updateTeacher(id: string, data: Partial<TeacherModel>): Promise<TeacherModel>;
     getCasesByTeacherId(id: string): Promise<CaseModel[]>;
 }

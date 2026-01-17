@@ -1,4 +1,5 @@
 import prisma from '#src/config/database.js';
+import userService from './user.service.js';
 
 class TeacherService {
   async getAllTeachers(term?: string) {
@@ -149,6 +150,39 @@ class TeacherService {
       `;
 
       return { success: true, data: cases };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async updateTeacher(id: string, data: any) {
+    try {
+      const userUpdate = await userService.updateUser(id, data);
+      if (!userUpdate.success) {
+        return userUpdate;
+      }
+
+      let term = data.term || data.teacherTerm;
+      if (!term) {
+        const rows: any[] = await prisma.$queryRaw`
+          SELECT term FROM "Teacher" 
+          WHERE "identityCard" = ${id} 
+          ORDER BY "term" DESC LIMIT 1
+        `;
+        if (rows.length > 0) {
+          term = rows[0].term;
+        }
+      }
+
+      if (term) {
+        await prisma.$executeRaw`
+          UPDATE "Teacher" SET
+            "type" = COALESCE(${data.type}::"TeacherType", "type")
+          WHERE "identityCard" = ${id} AND "term" = ${term}
+        `;
+      }
+
+      return { success: true, message: 'Profesor actualizado correctamente' };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
