@@ -32,7 +32,6 @@ export default function UserCases({ userId, userType }: UserCasesProps) {
     <div className="flex flex-col h-full">
       <section className="flex-1">
         <Box className="col-span-4 h-full flex flex-col gap-2">
-          <div className="flex flex-col gap-2 flex-1">
             {loading &&
               <div className="flex justify-center">
                 <LoadingSpinner />
@@ -52,7 +51,6 @@ export default function UserCases({ userId, userType }: UserCasesProps) {
                 caseData={caseItem}
               />
             ))}
-          </div>
         </Box>
       </section>
     </div>
