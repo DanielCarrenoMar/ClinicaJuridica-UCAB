@@ -118,6 +118,7 @@ export default function CaseInvolucrados({
                             {localCaseData?.teacherName ? (
                                 <PersonCard
                                     icon={<UserCircle />}
+                                    to={`/usuario/${localCaseData.teacherId}`}
                                     person={{
                                         identityCard: String(localCaseData.teacherId ?? ''),
                                         fullName: localCaseData.teacherName,
@@ -143,7 +144,7 @@ export default function CaseInvolucrados({
                                             {localCaseStudents.map((student) => (
                                                 <li key={student.identityCard}>
                                                     <span className="flex items-center justify-between">
-                                                        <PersonCard icon={<UserCircle />} person={student} />
+                                                        <PersonCard to={`/usuario/${student.identityCard}`} icon={<UserCircle />} person={student} />
                                                         <Button onClick={() => setLocalStudents((prev) => prev.filter(s => s.identityCard !== student.identityCard))} icon={<Close />} className='p-2!' variant='outlined'></Button>
                                                     </span>
                                                 </li>
@@ -156,7 +157,7 @@ export default function CaseInvolucrados({
                                         <ul>
                                             {localCaseStudents.map((student) => (
                                                 <li key={student.identityCard} className="mb-2">
-                                                    <PersonCard icon={<UserCircle />} person={student} />
+                                                    <PersonCard to={`/usuario/${student.identityCard}`} icon={<UserCircle />} person={student} />
                                                 </li>
                                             ))}
                                         </ul>
@@ -200,7 +201,7 @@ export default function CaseInvolucrados({
                         {localCaseBeneficiaries.map((beneficiary) => (
                             <li key={beneficiary.identityCard}>
                                 <span className="flex items-center justify-between">
-                                    <BeneficiaryCard icon={<UserCircle />} beneficiary={beneficiary} />
+                                    <BeneficiaryCard to={`/solicitante/${beneficiary.identityCard}`} icon={<UserCircle />} beneficiary={beneficiary} />
                                     <Button
                                         onClick={() => setLocalBeneficiaries((prev) => prev.filter(b => b.identityCard !== beneficiary.identityCard))}
                                         icon={<Close />}
