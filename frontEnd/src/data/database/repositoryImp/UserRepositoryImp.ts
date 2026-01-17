@@ -1,7 +1,7 @@
 import type { UserRepository } from "#domain/repositories.ts";
 import { USER_URL } from "./apiUrl";
 import type { UserDAO } from "#database/daos/userDAO.ts";
-import { daoToUserModel, type UserModel } from "#domain/models/user.ts";
+import { daoToUserModel } from "#domain/models/user.ts";
 
 const AUTH_URL = "http://localhost:3000/api/v1/auth";
 
@@ -21,7 +21,7 @@ export function getUserRepository(): UserRepository {
             const userDAO: UserDAO = userData.data;
             return daoToUserModel(userDAO);
         },
-        authenticate: async (email: string, password: string) => {
+        authenticate: async (email, password) => {
             const response = await fetch(AUTH_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -42,7 +42,8 @@ export function getUserRepository(): UserRepository {
             const userDAO: UserDAO = result.data;
             return daoToUserModel(userDAO);
         },
-        updateUser: async (id: string, data: Partial<UserModel>) => {
+        updateUser: async (id, data) => {
+            console.log('Updating user with data:', data);
             const response = await fetch(`${USER_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },

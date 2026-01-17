@@ -1,3 +1,4 @@
+import type { UserDAO } from "#database/daos/userDAO.ts";
 import { getUserRepository } from "#database/repositoryImp/UserRepositoryImp.ts";
 import type { UserModel } from "#domain/models/user.ts";
 import { useCallback, useEffect, useState } from "react";
@@ -108,7 +109,7 @@ export function useUpdateUserById() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
-	const updateUserById = useCallback(async (id: string, data: Partial<UserModel>) => {
+	const updateUserById = useCallback(async (id: string, data: Partial<UserDAO>) => {
 		setLoading(true);
 		try {
 			await updateUserData(id, data);

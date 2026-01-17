@@ -17,6 +17,9 @@ import type { UserModel } from "./models/user";
 import type { TeacherModel } from "./models/teacher";
 import type { CaseBeneficiaryModel } from "./models/caseBeneficiary";
 import type { CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
+import type { UserDAO } from "#database/daos/userDAO.ts";
+import type { StudentDAO } from "#database/daos/studentDAO.ts";
+import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -73,27 +76,27 @@ export interface SupportDocumentRepository {
     findAllSupportDocuments(): Promise<SupportDocumentModel[]>;
     findSupportDocumentById(id: number): Promise<SupportDocumentModel | null>;
     createSupportDocument(data: SupportDocumentDAO): Promise<SupportDocumentModel>;
-    updateSupportDocument(id: number, data: Partial<SupportDocumentModel>): Promise<SupportDocumentModel>;
+    updateSupportDocument(id: number, data: Partial<SupportDocumentDAO>): Promise<SupportDocumentModel>;
     deleteSupportDocument(idCase: number, supportNumber: number): Promise<void>;
 }
 
 export interface UserRepository {
     findAllUsers(): Promise<UserModel[]>;
     findUserById(id: string): Promise<UserModel | null>;
-    updateUser(id: string, data: Partial<UserModel>): Promise<UserModel>;
+    updateUser(id: string, data: Partial<UserDAO>): Promise<UserModel>;
     authenticate(email: string, password: string): Promise<UserModel>;
 }
 
 export interface StudentRepository {
     findAllStudents(): Promise<StudentModel[]>;
     findStudentById(id: string): Promise<StudentModel | null>;
-    updateStudent(id: string, data: Partial<StudentModel>): Promise<StudentModel>;
+    updateStudent(id: string, data: Partial<StudentDAO>): Promise<StudentModel>;
     getCasesByStudentId(id: string): Promise<CaseModel[]>;
 }
 
 export interface TeacherRepository {
     findAllTeachers(): Promise<TeacherModel[]>;
     findTeacherById(id: string): Promise<TeacherModel | null>;
-    updateTeacher(id: string, data: Partial<TeacherModel>): Promise<TeacherModel>;
+    updateTeacher(id: string, data: Partial<TeacherDAO>): Promise<TeacherModel>;
     getCasesByTeacherId(id: string): Promise<CaseModel[]>;
 }

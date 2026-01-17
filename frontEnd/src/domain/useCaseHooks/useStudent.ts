@@ -2,6 +2,7 @@ import { getStudentRepository } from "#database/repositoryImp/StudentRepositoryI
 import type { StudentModel } from "#domain/models/student.ts";
 import type { CaseModel } from "#domain/models/case.ts";
 import { useCallback, useEffect, useState } from "react";
+import type { StudentDAO } from "#database/daos/studentDAO.ts";
 
 export function useGetAllStudents() {
     const { findAllStudents } = getStudentRepository();
@@ -113,7 +114,7 @@ export function useUpdateStudentById() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const updateStudentById = useCallback(async (id: string, data: Partial<StudentModel>) => {
+    const updateStudentById = useCallback(async (id: string, data: Partial<StudentDAO>) => {
         setLoading(true);
         try {
             await updateStudent(id, data);
