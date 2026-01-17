@@ -18,7 +18,7 @@ import { CaretDown, Close, FilePdf, Home, Users } from "flowbite-react-icons/out
 import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { locationData, characteristicsData } from "#domain/seedData.ts";
 import { educationLevelData, workConditionData, activityConditionData } from "#domain/seedData.ts";
-import type {BeneficiaryTypeModel} from "#domain/typesModel.ts"
+import type { BeneficiaryTypeModel } from "#domain/typesModel.ts"
 import { useGetBeneficiaryById } from "#domain/useCaseHooks/useBeneficiary.ts";
 
 export default function ApplicantInfo() {
@@ -73,7 +73,7 @@ export default function ApplicantInfo() {
         const loadApplicant = async () => {
             const applicantId = id;
             if (!applicantId) return;
-            
+
             // Primero verificar si el solicitante existe realmente
             const applicant = await getApplicantOrBeneficiaryById(applicantId);
             if (!applicant) {
@@ -83,7 +83,7 @@ export default function ApplicantInfo() {
 
             setType(applicant.type);
             setHasId(applicant.hasId ?? null);
-            
+
             setApplicantData(applicant);
             setLocalApplicantData(applicant);
             setIsApplicantExisting(true);
@@ -665,11 +665,14 @@ export default function ApplicantInfo() {
     );
 
     return (
-        <Box className="p-0! h-full overflow-y-auto">
-            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16">
+        <Box className="p-0! h-full min-h-0 flex flex-col">
+            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16 shrink-0">
                 <div className="flex items-center gap-2.5">
                     <UserEditS className="size-8!" />
-                    <h1 className="text-label-medium">Solicitante</h1>
+                    <div className='flex flex-col'>
+                        <h1 className="text-label-small">{applicantData.fullName}</h1>
+                        <p className='text-body-medium'>{type}</p>
+                    </div>
                 </div>
                 <div className="flex items-end gap-2.5">
                     {
@@ -704,15 +707,11 @@ export default function ApplicantInfo() {
                     <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
                 </Tabs>
             </section>
-            <section className="px-4 pb-6">
-                <header className="flex justify-between items-center w-full mb-6">
-                </header>
-                <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
-                    {activeSection === "identificacion" && identificationInputs}
-                    {activeSection === "vivienda" && houseInputs}
-                    {activeSection === "familia" && familyInputs}
-                    <div className="h-64 w-full col-span-3"></div>
-                </div>
+            <section className="px-4 pb-6 overflow-y-auto grid grid-cols-3 items-start gap-x-6 gap-y-6">
+                {activeSection === "identificacion" && identificationInputs}
+                {activeSection === "vivienda" && houseInputs}
+                {activeSection === "familia" && familyInputs}
+                <footer className="h-60"></footer>
             </section>
         </Box>
     );
