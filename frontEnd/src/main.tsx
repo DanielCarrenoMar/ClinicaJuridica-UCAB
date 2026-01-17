@@ -13,7 +13,7 @@ import Nuclei from '#pages/Nuclei.tsx';
 import Config from '#pages/Config.tsx';
 import SearchCases from '#pages/SearchCases.tsx';
 import LateralMenuLayer from '#layers/LateralMenuLayer.tsx';
-import CaseInfo from '#pages/CaseInfo.tsx';
+import CaseInfo from '#pages/caseInfo/CaseInfo.tsx';
 import ApplicantInfo from '#pages/ApplicantInfo.tsx';
 import Login from '#pages/Login.tsx';
 import ErrorPage from '#pages/ErrorPage.tsx';
