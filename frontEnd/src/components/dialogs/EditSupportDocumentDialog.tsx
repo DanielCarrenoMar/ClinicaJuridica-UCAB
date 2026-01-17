@@ -52,7 +52,7 @@ export default function EditSupportDocumentDialog({
         >
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                    <label className="flex items-center px-1.5 w-full text-body-large text-onSurface">
+                    <label className="flex items-center px-1.5 w-full text-label-small">
                         Título
                     </label>
                     <TextInput
@@ -63,7 +63,7 @@ export default function EditSupportDocumentDialog({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <label className="flex items-center px-1.5 w-full text-body-large text-onSurface">
+                    <label className="flex items-center px-1.5 w-full text-label-small">
                         Descripción
                     </label>
                     <TextInput
@@ -76,11 +76,12 @@ export default function EditSupportDocumentDialog({
                 </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-2">
+            <div className="flex justify-end mt-4">
                 <Button
-                    variant="filled"
+                    variant="resalted"
                     onClick={handleSubmit}
                     disabled={!title || !description}
+                    className="min-w-48 w-1/2"
                 >
                     Guardar Cambios
                 </Button>
