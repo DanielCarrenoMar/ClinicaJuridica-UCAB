@@ -44,8 +44,7 @@ export default function UserActions({ userId }: UserActionsProps) {
           onChange={setSearchQuery}
         />
       </section>
-      <section className="flex-1 min-h-0 col-span-4 flex flex-col gap-2">
-          <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
+      <section className="flex-1 min-h-0 col-span-4 flex flex-col gap-2 overflow-y-auto">
             {loading &&
               <div className="flex justify-center">
                 <LoadingSpinner />
@@ -68,7 +67,6 @@ export default function UserActions({ userId }: UserActionsProps) {
                 }}
               />
             ))}
-          </div>
           <CaseActionDetailsDialog
             open={showCaseActionDetails}
             onClose={() => setShowCaseActionDetails(false)}
