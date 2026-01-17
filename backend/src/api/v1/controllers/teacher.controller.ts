@@ -1,10 +1,12 @@
 import type { Request, Response } from 'express';
 import teacherService from '../services/teacher.service.js';
+import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllTeachers(req: Request, res: Response): Promise<void> {
   try {
     const term = typeof req.query.term === 'string' ? req.query.term : undefined;
-    const result = await teacherService.getAllTeachers(term);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await teacherService.getAllTeachers(term, pagination);
     res.status(result.success ? 200 : 404).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';

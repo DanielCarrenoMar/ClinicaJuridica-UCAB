@@ -1,9 +1,11 @@
 import type { Request, Response } from 'express';
 import supportDocumentService from '../services/supportDocument.service.js';
+import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllSupportDocuments(req: Request, res: Response): Promise<void> {
     try {
-        const result = await supportDocumentService.getAllSupportDocuments();
+        const pagination = parsePagination(req.query as Record<string, unknown>);
+        const result = await supportDocumentService.getAllSupportDocuments(pagination);
 
         if (!result.success) {
             res.status(500).json(result);

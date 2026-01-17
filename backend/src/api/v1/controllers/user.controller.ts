@@ -1,10 +1,12 @@
 // @ts-nocheck
 import type { Request, Response } from 'express';
 import userService from '../services/user.service.js';
+import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllUsers(req: Request, res: Response): Promise<void> {
   try {
-    const result = await userService.getAllUsers();
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await userService.getAllUsers(pagination);
     if (result.error) {
       res.status(500).json({ success: false, error: result.error });
       return;

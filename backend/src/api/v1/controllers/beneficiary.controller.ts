@@ -1,9 +1,11 @@
 import type { Request, Response } from 'express';
 import beneficiaryService from '../services/beneficiary.service.js';
+import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllBeneficiaries(req: Request, res: Response): Promise<void> {
   try {
-    const result = await beneficiaryService.getAll();
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await beneficiaryService.getAll(pagination);
     res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';

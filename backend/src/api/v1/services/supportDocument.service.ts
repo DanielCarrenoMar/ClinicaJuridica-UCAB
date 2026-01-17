@@ -2,12 +2,39 @@ import prisma from '#src/config/database.js';
 
 class SupportDocumentService {
 
-    async getAllSupportDocuments() {
+    async getAllSupportDocuments(pagination?: { page: number; limit: number; all: boolean }) {
         try {
-            const documents = await prisma.$queryRaw`
-                SELECT * FROM "SupportDocument" ORDER BY "submissionDate" DESC
+            const page = pagination?.page ?? 1;
+            const limit = pagination?.limit ?? 15;
+            const all = pagination?.all ?? false;
+            const offset = (page - 1) * limit;
+
+            const totalRows = await prisma.$queryRaw`
+                SELECT COUNT(*)::int as total FROM "SupportDocument"
             `;
-            return { success: true, data: documents };
+            const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+            const documents = all
+                ? await prisma.$queryRaw`
+                    SELECT * FROM "SupportDocument" ORDER BY "submissionDate" DESC
+                `
+                : await prisma.$queryRaw`
+                    SELECT * FROM "SupportDocument" ORDER BY "submissionDate" DESC
+                    LIMIT ${limit} OFFSET ${offset}
+                `;
+
+            const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+            return {
+                success: true,
+                data: documents,
+                pagination: {
+                    page,
+                    limit: all ? total : limit,
+                    total,
+                    totalPages,
+                    all
+                }
+            };
         } catch (error: any) {
             return { success: false, error: error.message };
         }

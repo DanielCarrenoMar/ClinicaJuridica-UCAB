@@ -18,28 +18,73 @@ class UserService {
     return (g === 'M' || g === 'F') ? g : 'M';
   }
 
-  async getAllUsers() {
+  async getAllUsers(pagination?: { page: number; limit: number; all: boolean }) {
     try {
       const semester = await prisma.semester.findFirst({
         orderBy: { startDate: 'desc' },
       });
       const currentTerm = semester?.term;
 
-      const users: any[] = await prisma.$queryRaw`
-        SELECT 
-          u.*,
-          u."fullName" AS "fullname",
-          s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
-          t.term AS "teacherTerm", t.type AS "teacherType"
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
         FROM "User" u
         LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
         LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
         WHERE u."type" = 'C' 
            OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
            OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
-        ORDER BY u."identityCard" ASC
       `;
-      return { success: true, data: users, count: users.length };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const users: any[] = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            u.*,
+            u."fullName" AS "fullname",
+            s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
+            t.term AS "teacherTerm", t.type AS "teacherType"
+          FROM "User" u
+          LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
+          LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
+          WHERE u."type" = 'C' 
+             OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
+             OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
+          ORDER BY u."identityCard" ASC
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            u.*,
+            u."fullName" AS "fullname",
+            s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
+            t.term AS "teacherTerm", t.type AS "teacherType"
+          FROM "User" u
+          LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
+          LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
+          WHERE u."type" = 'C' 
+             OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
+             OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
+          ORDER BY u."identityCard" ASC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: users,
+        count: total,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

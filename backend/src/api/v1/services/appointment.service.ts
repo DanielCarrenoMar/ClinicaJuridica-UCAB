@@ -2,17 +2,49 @@ import prisma from '#src/config/database.js';
 
 class AppointmentService {
 
-  async getAllAppointments() {
+  async getAllAppointments(pagination?: { page: number; limit: number; all: boolean }) {
     try {
-      const appointments = await prisma.$queryRaw`
-        SELECT 
-          a.*,
-          u."fullName" as "userName"
-        FROM "Appointment" a
-        JOIN "User" u ON a."userId" = u."identityCard"
-        ORDER BY a."plannedDate" DESC
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total FROM "Appointment"
       `;
-      return { success: true, data: appointments };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const appointments = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            a.*,
+            u."fullName" as "userName"
+          FROM "Appointment" a
+          JOIN "User" u ON a."userId" = u."identityCard"
+          ORDER BY a."plannedDate" DESC
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            a.*,
+            u."fullName" as "userName"
+          FROM "Appointment" a
+          JOIN "User" u ON a."userId" = u."identityCard"
+          ORDER BY a."plannedDate" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: appointments,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

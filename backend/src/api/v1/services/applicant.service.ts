@@ -163,42 +163,83 @@ async function fetchApplicantInfo(db: any, applicantId: number | string): Promis
   return mapApplicantRow(rowWithDetails, housingDetails.servicesIdAvailable || []);
 }
 
-async function fetchApplicantsList(db: any): Promise<ApplicantInfoDAO[]> {
+async function fetchApplicantsList(db: any, pagination?: { page: number; limit: number; all: boolean }): Promise<ApplicantInfoDAO[]> {
   try {
-    const rows = await db.$queryRaw<ApplicantJoinedRow[]>`
-      SELECT
-        a.*,
-        b."fullName", b."gender", b."birthDate", b."idNationality",
-        b."idState", b."municipalityNumber", b."parishNumber",
-        s."name" AS "stateName",
-        m."name" AS "municipalityName",
-        p."name" AS "parishName",
-        he."name" AS "headEducationLevelName",
-        wc."name" AS "workConditionName",
-        ac."name" AS "activityConditionName",
-        fh."memberCount", fh."workingMemberCount", fh."children7to12Count",
-        fh."studentChildrenCount", fh."monthlyIncome",
-        h."bathroomCount", h."bedroomCount",
-        COALESCE(
-          (
-            SELECT ARRAY_AGG(asa."detailNumber")
-            FROM "HousingDetail" asa
-            WHERE asa."applicantId" = a."identityCard"
-          ),
-          ARRAY[]::INTEGER[]
-        ) AS "servicesIdAvailable"
-      FROM "Applicant" a
-      INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-      LEFT JOIN "State" s ON b."idState" = s."idState"
-      LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
-      LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
-      LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
-      LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
-      LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
-      LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
-      LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
-      ORDER BY a."createdAt" DESC
-    `;
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 15;
+    const all = pagination?.all ?? false;
+    const offset = (page - 1) * limit;
+
+    const rows = all
+      ? await db.$queryRaw<ApplicantJoinedRow[]>`
+          SELECT
+            a.*,
+            b."fullName", b."gender", b."birthDate", b."idNationality",
+            b."idState", b."municipalityNumber", b."parishNumber",
+            s."name" AS "stateName",
+            m."name" AS "municipalityName",
+            p."name" AS "parishName",
+            he."name" AS "headEducationLevelName",
+            wc."name" AS "workConditionName",
+            ac."name" AS "activityConditionName",
+            fh."memberCount", fh."workingMemberCount", fh."children7to12Count",
+            fh."studentChildrenCount", fh."monthlyIncome",
+            h."bathroomCount", h."bedroomCount",
+            COALESCE(
+              (
+                SELECT ARRAY_AGG(asa."detailNumber")
+                FROM "HousingDetail" asa
+                WHERE asa."applicantId" = a."identityCard"
+              ),
+              ARRAY[]::INTEGER[]
+            ) AS "servicesIdAvailable"
+          FROM "Applicant" a
+          INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+          LEFT JOIN "State" s ON b."idState" = s."idState"
+          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+          LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+          LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+          LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
+          LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
+          LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+          ORDER BY a."createdAt" DESC
+        `
+      : await db.$queryRaw<ApplicantJoinedRow[]>`
+          SELECT
+            a.*,
+            b."fullName", b."gender", b."birthDate", b."idNationality",
+            b."idState", b."municipalityNumber", b."parishNumber",
+            s."name" AS "stateName",
+            m."name" AS "municipalityName",
+            p."name" AS "parishName",
+            he."name" AS "headEducationLevelName",
+            wc."name" AS "workConditionName",
+            ac."name" AS "activityConditionName",
+            fh."memberCount", fh."workingMemberCount", fh."children7to12Count",
+            fh."studentChildrenCount", fh."monthlyIncome",
+            h."bathroomCount", h."bedroomCount",
+            COALESCE(
+              (
+                SELECT ARRAY_AGG(asa."detailNumber")
+                FROM "HousingDetail" asa
+                WHERE asa."applicantId" = a."identityCard"
+              ),
+              ARRAY[]::INTEGER[]
+            ) AS "servicesIdAvailable"
+          FROM "Applicant" a
+          INNER JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+          LEFT JOIN "State" s ON b."idState" = s."idState"
+          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+          LEFT JOIN "EducationLevel" he ON a."headEducationLevelId" = he."idLevel"
+          LEFT JOIN "WorkCondition" wc ON a."workConditionId" = wc."idCondition"
+          LEFT JOIN "ActivityCondition" ac ON a."activityConditionId" = ac."idActivity"
+          LEFT JOIN "FamilyHome" fh ON a."identityCard" = fh."applicantId"
+          LEFT JOIN "Housing" h ON a."identityCard" = h."applicantId"
+          ORDER BY a."createdAt" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
 
     // We need to fetch housing details for EACH applicant efficiently. 
     // Doing N+1 query for simplicity now, but ideally updated query to JSON_AGG/ARRAY_AGG everything.
@@ -330,10 +371,30 @@ async function saveHousingDetails(tx: any, applicantId: string, data: ApplicantD
 
 class ApplicantService {
 
-  async getAllApplicants(): Promise<{ success: boolean; data?: ApplicantInfoDAO[]; error?: string }> {
+  async getAllApplicants(pagination?: { page: number; limit: number; all: boolean }): Promise<{ success: boolean; data?: ApplicantInfoDAO[]; error?: string; pagination?: any }> {
     try {
-      const applicants = await fetchApplicantsList(prisma);
-      return { success: true, data: applicants };
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total FROM "Applicant"
+      `;
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const applicants = await fetchApplicantsList(prisma, pagination);
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: applicants,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

@@ -2,45 +2,105 @@
 import prisma from '#src/config/database.js';
 
 class CaseService {
-  async getAllCases() {
+  async getAllCases(pagination?: { page: number; limit: number; all: boolean }) {
     try {
-      const cases = await prisma.$queryRaw`
-        SELECT 
-          c.*,
-          b."fullName" as "applicantName",
-          la."name" as "legalAreaName",
-          s."name" as "subjectName",
-          u_teacher."fullName" as "teacherName",
-          co."subject" as "courtName",
-          cs."status" as "caseStatus",
-          ca."registryDate" as "lastActionDate",
-          ca."description" as "lastActionDescription",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
 
-          FROM "Case" c
-          JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
-          JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
-          JOIN "Subject" s ON la."idSubject" = s."idSubject"
-          LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
-          LEFT JOIN "Court" co ON c."idCourt" = co."idCourt"
-          LEFT JOIN LATERAL (
-            SELECT cs1."status"
-            FROM "CaseStatus" cs1
-            WHERE cs1."idCase" = c."idCase"
-            ORDER BY cs1."statusNumber" DESC
-            LIMIT 1
-          ) cs ON TRUE
-          LEFT JOIN LATERAL (
-            SELECT ca1."registryDate", ca1."description"
-            FROM "CaseAction" ca1
-            WHERE ca1."idCase" = c."idCase"
-            ORDER BY ca1."registryDate" DESC
-            LIMIT 1
-          ) ca ON TRUE
-
-          ORDER BY c."createdAt" DESC;
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total FROM "Case"
       `;
-      return { success: true, data: cases };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const cases = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            c.*,
+            b."fullName" as "applicantName",
+            la."name" as "legalAreaName",
+            s."name" as "subjectName",
+            u_teacher."fullName" as "teacherName",
+            co."subject" as "courtName",
+            cs."status" as "caseStatus",
+            ca."registryDate" as "lastActionDate",
+            ca."description" as "lastActionDescription",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+
+            FROM "Case" c
+            JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
+            JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+            JOIN "Subject" s ON la."idSubject" = s."idSubject"
+            LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
+            LEFT JOIN "Court" co ON c."idCourt" = co."idCourt"
+            LEFT JOIN LATERAL (
+              SELECT cs1."status"
+              FROM "CaseStatus" cs1
+              WHERE cs1."idCase" = c."idCase"
+              ORDER BY cs1."statusNumber" DESC
+              LIMIT 1
+            ) cs ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT ca1."registryDate", ca1."description"
+              FROM "CaseAction" ca1
+              WHERE ca1."idCase" = c."idCase"
+              ORDER BY ca1."registryDate" DESC
+              LIMIT 1
+            ) ca ON TRUE
+
+            ORDER BY c."createdAt" DESC;
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            c.*,
+            b."fullName" as "applicantName",
+            la."name" as "legalAreaName",
+            s."name" as "subjectName",
+            u_teacher."fullName" as "teacherName",
+            co."subject" as "courtName",
+            cs."status" as "caseStatus",
+            ca."registryDate" as "lastActionDate",
+            ca."description" as "lastActionDescription",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+
+            FROM "Case" c
+            JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
+            JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+            JOIN "Subject" s ON la."idSubject" = s."idSubject"
+            LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
+            LEFT JOIN "Court" co ON c."idCourt" = co."idCourt"
+            LEFT JOIN LATERAL (
+              SELECT cs1."status"
+              FROM "CaseStatus" cs1
+              WHERE cs1."idCase" = c."idCase"
+              ORDER BY cs1."statusNumber" DESC
+              LIMIT 1
+            ) cs ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT ca1."registryDate", ca1."description"
+              FROM "CaseAction" ca1
+              WHERE ca1."idCase" = c."idCase"
+              ORDER BY ca1."registryDate" DESC
+              LIMIT 1
+            ) ca ON TRUE
+
+            ORDER BY c."createdAt" DESC
+            LIMIT ${limit} OFFSET ${offset};
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: cases,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -178,19 +238,54 @@ class CaseService {
     }
   }
 
-  async searchCases(term) {
+  async searchCases(term, pagination?: { page: number; limit: number; all: boolean }) {
     try {
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
       const searchTerm = `%${term}%`;
-      const result = await prisma.$queryRaw`
-        SELECT c."idCase", c."problemSummary", b."fullName" as "applicantName", b."identityCard" 
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
         FROM "Case" c
         JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
         WHERE b."fullName" ILIKE ${searchTerm} 
            OR c."applicantId" ILIKE ${searchTerm} 
            OR CAST(c."idCase" AS TEXT) ILIKE ${searchTerm}
-        LIMIT 20
       `;
-      return { success: true, data: result };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const result = all
+        ? await prisma.$queryRaw`
+          SELECT c."idCase", c."problemSummary", b."fullName" as "applicantName", b."identityCard" 
+          FROM "Case" c
+          JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
+          WHERE b."fullName" ILIKE ${searchTerm} 
+             OR c."applicantId" ILIKE ${searchTerm} 
+             OR CAST(c."idCase" AS TEXT) ILIKE ${searchTerm}
+        `
+        : await prisma.$queryRaw`
+          SELECT c."idCase", c."problemSummary", b."fullName" as "applicantName", b."identityCard" 
+          FROM "Case" c
+          JOIN "Beneficiary" b ON c."applicantId" = b."identityCard"
+          WHERE b."fullName" ILIKE ${searchTerm} 
+             OR c."applicantId" ILIKE ${searchTerm} 
+             OR CAST(c."idCase" AS TEXT) ILIKE ${searchTerm}
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: result,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }

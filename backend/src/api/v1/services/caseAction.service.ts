@@ -1,18 +1,52 @@
 import prisma from '#src/config/database.js';
 class CaseActionService {
-  async getAllCaseActions() {
+  async getAllCaseActions(pagination?: { page: number; limit: number; all: boolean }) {
     try {
-      const actions = await prisma.$queryRaw`
-        SELECT 
-          a.*,
-          u."fullName" as "userName",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "caseCompoundKey"
-        FROM "CaseAction" a
-        JOIN "Case" c ON a."idCase" = c."idCase"
-        JOIN "User" u ON a."userId" = u."identityCard"
-        ORDER BY a."registryDate" DESC
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total FROM "CaseAction"
       `;
-      return { success: true, data: actions };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const actions = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            a.*,
+            u."fullName" as "userName",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "caseCompoundKey"
+          FROM "CaseAction" a
+          JOIN "Case" c ON a."idCase" = c."idCase"
+          JOIN "User" u ON a."userId" = u."identityCard"
+          ORDER BY a."registryDate" DESC
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            a.*,
+            u."fullName" as "userName",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "caseCompoundKey"
+          FROM "CaseAction" a
+          JOIN "Case" c ON a."idCase" = c."idCase"
+          JOIN "User" u ON a."userId" = u."identityCard"
+          ORDER BY a."registryDate" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: actions,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

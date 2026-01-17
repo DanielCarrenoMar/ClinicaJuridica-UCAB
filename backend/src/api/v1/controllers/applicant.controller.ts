@@ -1,9 +1,11 @@
 import type { Request, Response } from 'express';
 import applicantService from '../services/applicant.service.js';
+import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllApplicant(req: Request, res: Response): Promise<void> {
   try {
-    const result = await applicantService.getAllApplicants();
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await applicantService.getAllApplicants(pagination);
     
     if (!result.success) {
       res.status(500).json(result);

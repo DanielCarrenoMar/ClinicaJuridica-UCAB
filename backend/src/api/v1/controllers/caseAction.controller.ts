@@ -1,9 +1,11 @@
 import type { Request, Response } from 'express';
 import caseActionService from '../services/caseAction.service.js';
+import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllCaseActions(req: Request, res: Response): Promise<void> {
   try {
-    const result = await caseActionService.getAllCaseActions();
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseActionService.getAllCaseActions(pagination);
     res.status(result.success ? 200 : 500).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';

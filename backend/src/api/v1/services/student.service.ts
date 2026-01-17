@@ -3,7 +3,7 @@ import userService from './user.service.js';
 import { PasswordUtil } from '../utils/password.util.js';
 
 class StudentService {
-  async getAllStudents(term?: string) {
+  async getAllStudents(term?: string, pagination?: { page: number; limit: number; all: boolean }) {
     try {
       let resolvedTerm = term;
 
@@ -20,24 +20,65 @@ class StudentService {
         return { success: false, message: 'No se encontró un término válido' };
       }
 
-      const students = await prisma.$queryRaw`
-        SELECT
-          u."identityCard",
-          u."fullName",
-          u."gender",
-          u."email",
-          u."isActive",
-          u."type" AS "userType",
-          s."term",
-          s."nrc",
-          s."type" AS "studentType"
-        FROM "Student" s
-        JOIN "User" u ON s."identityCard" = u."identityCard"
-        WHERE s."term" = ${resolvedTerm}
-        ORDER BY u."fullName"
-      `;
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
 
-      return { success: true, data: students };
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "Student" s
+        WHERE s."term" = ${resolvedTerm}
+      `;
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const students = all
+        ? await prisma.$queryRaw`
+          SELECT
+            u."identityCard",
+            u."fullName",
+            u."gender",
+            u."email",
+            u."isActive",
+            u."type" AS "userType",
+            s."term",
+            s."nrc",
+            s."type" AS "studentType"
+          FROM "Student" s
+          JOIN "User" u ON s."identityCard" = u."identityCard"
+          WHERE s."term" = ${resolvedTerm}
+          ORDER BY u."fullName"
+        `
+        : await prisma.$queryRaw`
+          SELECT
+            u."identityCard",
+            u."fullName",
+            u."gender",
+            u."email",
+            u."isActive",
+            u."type" AS "userType",
+            s."term",
+            s."nrc",
+            s."type" AS "studentType"
+          FROM "Student" s
+          JOIN "User" u ON s."identityCard" = u."identityCard"
+          WHERE s."term" = ${resolvedTerm}
+          ORDER BY u."fullName"
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: students,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

@@ -2,20 +2,55 @@
 import prisma from '#src/config/database.js';
 
 class BeneficiaryService {
-  async getAll() {
+  async getAll(pagination?: { page: number; limit: number; all: boolean }) {
     try {
-      const beneficiaries = await prisma.$queryRaw`
-        SELECT
-          b.*,
-          s."name" AS "stateName",
-          m."name" AS "municipalityName",
-          p."name" AS "parishName"
-        FROM "Beneficiary" b
-        LEFT JOIN "State" s ON b."idState" = s."idState"
-        LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
-        LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total FROM "Beneficiary"
       `;
-      return { success: true, data: beneficiaries };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const beneficiaries = all
+        ? await prisma.$queryRaw`
+          SELECT
+            b.*,
+            s."name" AS "stateName",
+            m."name" AS "municipalityName",
+            p."name" AS "parishName"
+          FROM "Beneficiary" b
+          LEFT JOIN "State" s ON b."idState" = s."idState"
+          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+        `
+        : await prisma.$queryRaw`
+          SELECT
+            b.*,
+            s."name" AS "stateName",
+            m."name" AS "municipalityName",
+            p."name" AS "parishName"
+          FROM "Beneficiary" b
+          LEFT JOIN "State" s ON b."idState" = s."idState"
+          LEFT JOIN "Municipality" m ON b."idState" = m."idState" AND b."municipalityNumber" = m."municipalityNumber"
+          LEFT JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: beneficiaries,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
