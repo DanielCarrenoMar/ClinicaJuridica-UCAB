@@ -110,7 +110,7 @@ function SearchCases() {
     }, [searchParams, setSearchParams]);
 
     return (
-        <>
+        <div className="flex flex-col h-full min-h-0">
             <div className="mb-3">
                 <span>
                     <ul className="flex gap-3">
@@ -183,7 +183,7 @@ function SearchCases() {
                     </ul>
                 </span>
             </div >
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-3 overflow-y-auto min-h-0">
                 {
                     loading && (
                         <li>Cargando casos...</li>
@@ -206,7 +206,7 @@ function SearchCases() {
                     ))
                 }
             </ul>
-        </>
+        </div>
     );
 }
 export default SearchCases;
