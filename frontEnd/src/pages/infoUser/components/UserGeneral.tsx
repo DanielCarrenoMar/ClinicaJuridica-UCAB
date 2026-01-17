@@ -7,7 +7,7 @@ import type { StudentModel } from '#domain/models/student.ts';
 import type { TeacherModel } from '#domain/models/teacher.ts';
 import type { UserModel } from '#domain/models/user.ts';
 import type { GenderTypeModel, StudentTypeModel, TeacherTypeModel } from '#domain/typesModel.ts';
-import { useState } from 'react';
+
 
 interface UserGeneralProps {
     localUser?: UserModel;
@@ -16,15 +16,15 @@ interface UserGeneralProps {
     handleUserChange: (updatedFields: Partial<UserModel>) => void;
     handleStudentChange: (updatedFields: Partial<StudentModel>) => void;
     handleTeacherChange: (updatedFields: Partial<TeacherModel>) => void;
+    validationErrors: Record<string, string>;
 }
 
-export default function UserGeneral({ localUser, localStudent, localTeacher, handleUserChange, handleStudentChange, handleTeacherChange }: UserGeneralProps) {
+export default function UserGeneral({ localUser, localStudent, localTeacher, handleUserChange, handleStudentChange, handleTeacherChange, validationErrors }: UserGeneralProps) {
     
     if (!localUser) {
         return <LoadingSpinner />;
     }
 
-    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const { permissionLevel } = useAuth();
 
 

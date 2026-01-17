@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 import { UserCircle, User, Clock, Close, FilePdf } from 'flowbite-react-icons/outline'
 import { File } from 'flowbite-react-icons/solid'
 import Tabs from '#components/Tabs.tsx'
-import { useGetUserById, useUpdateUserById } from '#domain/useCaseHooks/useUser.ts'
+import { useGetAllUsers, useGetUserById, useUpdateUserById } from '#domain/useCaseHooks/useUser.ts'
 import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
@@ -22,6 +22,7 @@ function UserInfo() {
   const { userId } = useParams<{ userId: string }>()
 
   const { user, loading: userLoading } = useGetUserById(userId ?? '')
+  const { users } = useGetAllUsers()
   const { student, loading: studentLoading, loadStudent } = useGetStudentById()
   const { teacher, loading: teacherLoading, loadTeacher } = useGetTeacherById()
   const { updateUserById } = useUpdateUserById()
@@ -33,6 +34,7 @@ function UserInfo() {
   const [localUser, setLocalUser] = useState<UserModel>();
   const [localStudent, setLocalStudent] = useState<StudentModel>();
   const [localTeacher, setLocalTeacher] = useState<TeacherModel>();
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState('General')
   const [isDataModified, setIsDataModified] = useState(false)
 
@@ -69,6 +71,34 @@ function UserInfo() {
     const hasChanges = isUserChanged || isStudentChanged || isTeacherChanged;
     setIsDataModified(hasChanges);
   }, [localUser, user, localStudent, student, localTeacher, teacher])
+
+  useEffect(() => {
+    if (!localUser) return;
+    if (!users?.length) {
+      setValidationErrors({});
+      return;
+    }
+
+    const normalizedId = localUser.identityCard?.trim();
+
+    if (normalizedId.length === 0) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        identityCard: 'La cédula no puede estar vacía.'
+      }));
+      return;
+    }
+
+    const isDuplicate = users.some((existingUser) => {
+      if (existingUser.identityCard === user?.identityCard) return false;
+      return existingUser.identityCard === normalizedId;
+    });
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      identityCard: isDuplicate ? 'La cédula ya está registrada para otro usuario.' : ''
+    }));
+  }, [localUser, user?.identityCard, users])
 
   if (!userId) {
     return <div className='p-8 text-center text-error'>ID de usuario no proporcionado</div>
@@ -112,6 +142,7 @@ function UserInfo() {
   function saveChanges() {
     if (!localUser) return;
     if (!user) return;
+    if (validationErrors.identityCard) return;
     if (user.type === 'Estudiante' && localStudent) {
       updateStudentById(localStudent.identityCard, modelToStudentDao(localStudent)).catch(notyError)
       setIsDataModified(false);
@@ -138,6 +169,7 @@ function UserInfo() {
             handleUserChange={handleUserChange}
             handleTeacherChange={handleTeacherChange}
             handleStudentChange={handleStudentChange}
+            validationErrors={validationErrors}
           />
         );
       }
@@ -197,6 +229,7 @@ function UserInfo() {
                 onClick={saveChanges}
                 variant='resalted'
                 className='w-32'
+                disabled={Boolean(validationErrors.identityCard)}
               >
                 Guardar
               </Button>
