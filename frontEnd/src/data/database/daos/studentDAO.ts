@@ -3,6 +3,6 @@ import type { UserDAO } from "./userDAO";
 
 export interface StudentDAO extends Omit<UserDAO, 'type'> {
     term: string;
-    nrc: string;
+    nrc?: string;
     type: StudentTypeDAO;
 }

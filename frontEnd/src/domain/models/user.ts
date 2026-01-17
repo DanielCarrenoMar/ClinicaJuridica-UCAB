@@ -1,8 +1,15 @@
-import { typeDaoToGenderTypeModel, type GenderTypeModel } from "#domain/typesModel.ts";
-import type { UserTypeDAO } from "#database/typesDAO.ts";
+import { 
+    typeDaoToGenderTypeModel, 
+    typeModelToGenderTypeDao,
+    type GenderTypeModel,
+    typeDaoToUserTypeModel,
+    typeModelToUserTypeDao,
+    type UserTypeModel
+} from "#domain/typesModel.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 
-export type UserTypeModel = "Coordinador" | "Profesor" | "Estudiante";
+export type { UserTypeModel };
+
 export interface UserModel {
     identityCard: string;
     fullName: string;
@@ -13,22 +20,20 @@ export interface UserModel {
     type: UserTypeModel;
 }
 
-export function userTypeDaoToModel(dao: UserTypeDAO): UserTypeModel {
-    switch (dao) {
-        case "E":
-            return "Estudiante";
-        case "C":
-            return "Coordinador";
-        case "P":
-            return "Profesor";
-    }
-}
-
 export function daoToUserModel(dao: UserDAO): UserModel {
     const { type, gender, ...rest } = dao;
     return {
-        type: userTypeDaoToModel(type),
+        type: typeDaoToUserTypeModel(type),
         gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
         ...rest
+    }
+}
+
+export function modelToUserDao(model: UserModel): UserDAO {
+    const { type, gender, ...rest } = model;
+    return {
+        ...rest,
+        type: typeModelToUserTypeDao(type),
+        gender: gender ? typeModelToGenderTypeDao(gender) : undefined
     }
 }
