@@ -36,7 +36,7 @@ export default function UserActions({ userId }: UserActionsProps) {
   }, [actions, searchQuery]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <section className="mb-4 max-w-5xl">
         <SearchBar
           isOpen={true}
@@ -44,8 +44,7 @@ export default function UserActions({ userId }: UserActionsProps) {
           onChange={setSearchQuery}
         />
       </section>
-      <section className="flex-1">
-        <div className="col-span-4 h-full flex flex-col gap-2">
+      <section className="flex-1 min-h-0 col-span-4 flex flex-col gap-2">
           <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
             {loading &&
               <div className="flex justify-center">
@@ -75,7 +74,6 @@ export default function UserActions({ userId }: UserActionsProps) {
             onClose={() => setShowCaseActionDetails(false)}
             caseAction={selectedCaseAction}
           />
-        </div>
       </section>
     </div>
   )

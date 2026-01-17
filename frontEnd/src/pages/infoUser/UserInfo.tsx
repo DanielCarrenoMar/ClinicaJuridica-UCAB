@@ -159,7 +159,7 @@ function UserInfo() {
   const getActiveColor = (active: boolean) => active ? "bg-success! text-white border-0" : "bg-onSurface! text-white border-0";
 
   return (
-    <Box className='p-0! min-h-full flex flex-col'>
+    <Box className='p-0! min-h-full flex flex-col h-full'>
       <header className='bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16'>
         <span className='flex gap-3 items-center'>
           <UserCircle className='size-6!' />
