@@ -1,5 +1,4 @@
 import type { CaseActionModel } from "#domain/models/caseAction.ts";
-import { User, ClipboardList, AlignLeft } from "flowbite-react-icons/outline";
 import Dialog from "#components/dialogs/Dialog.tsx";
 import { Clipboard, UserCircle, CalendarMonth } from "flowbite-react-icons/solid";
 import InBox from "#components/InBox.tsx";
@@ -79,7 +78,7 @@ export default function CaseActionDetailsDialog({
                             Descripción
                         </h4>
                     </span>
-                    <InBox className="flex-1 overflow-y-scroll min-h-30">
+                    <InBox className="flex-1 overflow-y-auto min-h-30">
                         <p className="text-body-small">
                             {caseAction.description}
                         </p>
