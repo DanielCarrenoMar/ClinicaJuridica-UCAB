@@ -162,7 +162,7 @@ function UserInfo() {
     <Box className='p-0! h-full flex flex-col'>
       <header className='bg-surface/70 flex items-center justify-between px-4 rounded-t-xl h-16'>
         <span className='flex gap-3 items-center'>
-          <UserCircle className='size-6' />
+          <UserCircle className='size-6!' />
           <div className='flex flex-col'>
             <h1 className='text-label-small'>{user.fullName}</h1>
             <span className='flex gap-2'>
