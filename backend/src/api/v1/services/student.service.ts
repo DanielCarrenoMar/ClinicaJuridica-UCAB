@@ -161,7 +161,7 @@ class StudentService {
 
   async updateStudent(id: string, data: any) {
     try {
-      const userUpdate = await userService.updateUser(id, data);
+      const userUpdate = await userService.updateUser(id, {...data, type: 'E' });
       if (!userUpdate.success) {
         return userUpdate;
       }
