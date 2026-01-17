@@ -115,8 +115,8 @@ const PieChart: React.FC<PieChartProps> = ({ data, size = 200, is3D = false, sho
             <Path
               d={path}
               fill={item.color}
-              stroke="#ffffff"
-              strokeWidth={2}
+              stroke="#000000"
+              strokeWidth={1}
             />
             
             {/* Value labels with lines */}
@@ -160,6 +160,8 @@ const PieChart: React.FC<PieChartProps> = ({ data, size = 200, is3D = false, sho
         cy={centerY}
         r={radius * 0.3}
         fill="#ffffff"
+        stroke="#000000"
+        strokeWidth={1}
       />
     </Svg>
   );
