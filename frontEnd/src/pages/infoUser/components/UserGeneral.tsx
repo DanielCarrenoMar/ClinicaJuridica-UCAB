@@ -52,6 +52,15 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                     />
                     {validationErrors.fullName && <span className="text-xs text-error mt-1">{validationErrors.fullName}</span>}
                 </div>
+                <div>
+                    <TitleTextInput
+                        label="Correo"
+                        value={localUser.email || ""}
+                        onChange={(text) => { handleUserChange({ email: text }); }}
+                        disabled={isInputsDisabled}
+                    />
+                    {validationErrors.email && <span className="text-xs text-error mt-1">{validationErrors.email}</span>}
+                </div>
             </div>
             <div className="col-span-1">
                 <TitleDropdown
