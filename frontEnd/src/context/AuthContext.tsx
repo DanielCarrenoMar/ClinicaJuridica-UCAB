@@ -27,8 +27,9 @@ export function roleToPermissionLevel(role: UserTypeModel): number {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserModel | null>(null);
+    const [authLoading, setAuthLoading] = useState(true);
 
-    const { login: loginUser, loading, error, clearError } = useLoginUser();
+    const { login: loginUser, loading:loginLoading, error, clearError } = useLoginUser();
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -43,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void (async () => {
             const loggedInUser = await loginUser(email, password);
             setUser(loggedInUser);
+            setAuthLoading(false);
         })();
     }, [loginUser]);
 
@@ -62,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Default to a high number (low permission) if no user
     const permissionLevel = user ? roleToPermissionLevel(user.type) : 99;
+    const loading = loginLoading || authLoading;
 
     return (
         <AuthContext.Provider value={{ user, permissionLevel, login, logout, loading, error, clearError }}>

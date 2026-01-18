@@ -7,11 +7,11 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ requiredLevel, redirectPath = '/' }: ProtectedRouteProps) {
-    const { permissionLevel } = useAuth();
+    const { permissionLevel, loading } = useAuth();
 
     // Assuming lower number = higher permission
     // If user's level is greater than required level, they don't have permission
-    if (permissionLevel > requiredLevel) {
+    if (permissionLevel > requiredLevel && !loading) {
         return <Navigate to={redirectPath} replace />;
     }
 
