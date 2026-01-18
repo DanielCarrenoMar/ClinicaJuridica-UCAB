@@ -9,10 +9,12 @@ import Button from '#components/Button.tsx'
 import LoadingSpinner from '#components/LoadingSpinner.tsx'
 import UserListRow from '#components/UserListRow.tsx'
 import ImportStudentsDialog from '#components/dialogs/ImportStudentsDialog.tsx'
+import { useNotifications } from '#/context/NotificationsContext'
 
 function Users() {
   const { users, loading, error, refresh } = useGetAllUsers()
-  const { importStudents } = useImportStudents()
+  const { importStudents, loading: importLoading } = useImportStudents()
+  const { notyError, notyMessage } = useNotifications()
   const [searchValue, setSearchValue] = useState('')
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
@@ -40,11 +42,13 @@ function Users() {
   }
 
   const handleImport = async (file: File) => {
-    const result = await importStudents(file)
-    if (result.success || result.data.success > 0) {
+    importStudents(file).then((result) => {
       refresh()
-    }
-    return result
+      setIsImportDialogOpen(false)
+      notyMessage(result.data.success + ' Estudiantes importados exitosamente.' + (result.data.failed && result.data.failed.length > 0 ? ` ${result.data.failed.length} fallidos.` : ''))
+    }).catch((err) => {
+      notyError('Error al importar estudiantes: ' + err.message)
+    })
   }
 
   return (
@@ -86,6 +90,7 @@ function Users() {
         open={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
         onImport={handleImport}
+        isLoading={importLoading}
       />
     </div>
   )

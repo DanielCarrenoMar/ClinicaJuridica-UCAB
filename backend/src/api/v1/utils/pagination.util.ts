@@ -4,14 +4,14 @@ export type PaginationParams = {
   all: boolean;
 };
 
-function parseBoolean(value: unknown): boolean {
+function parseBoolean(value: unknown): boolean | undefined {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'number') return value === 1;
   if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
     return ['true', '1', 'yes', 'si', 'sí', 'all', 'todas'].includes(normalized);
   }
-  return false;
+  return undefined;
 }
 
 function parseNumber(value: unknown, fallback: number): number {
@@ -28,7 +28,8 @@ export function parsePagination(query: Record<string, unknown>): PaginationParam
   const limitRaw = query.limit ?? query.cantidad ?? query.perPage;
   const allRaw = query.all ?? query.todas ?? query.allPages;
 
-  const all = parseBoolean(allRaw);
+  const hasPageAndLimit = pageRaw !== undefined && limitRaw !== undefined;
+  const all = parseBoolean(allRaw) ?? !hasPageAndLimit;
   const page = all ? 1 : Math.max(1, parseNumber(pageRaw, 1));
   const limit = all ? 0 : Math.max(1, parseNumber(limitRaw, 15));
 

@@ -3,11 +3,11 @@ import Button from "#components/Button.tsx";
 import DropdownCheck from "#components/DropdownCheck/DropdownCheck.tsx";
 import DropdownOptionCheck from "#components/DropdownCheck/DropdownOptionCheck.tsx";
 import Fuse from "fuse.js";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useGetCases } from "#domain/useCaseHooks/useCase.ts";
 import { useLateralMenuContext } from "#layers/LateralMenuLayer.tsx";
-import { Close } from "flowbite-react-icons/outline";
+import { Close, ArrowLeft, ArrowRight } from "flowbite-react-icons/outline";
 
 function SearchCases() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -35,7 +35,17 @@ function SearchCases() {
         courtFilters.length > 0 ||
         termFilters.length > 0;
 
-    const { cases: realCases, loading, error } = useGetCases();
+    const { cases: realCases, loading, error, refresh } = useGetCases();
+    const [page, setPage] = useState(1);
+    const pageSize = 15;
+
+    useEffect(() => {
+        refresh({ page, limit: pageSize });
+    }, [page, pageSize, refresh]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [searchParams]);
 
     const cases = useMemo(() => [...realCases], [realCases]);
 
@@ -88,6 +98,9 @@ function SearchCases() {
             return { caseData: result.item, matches };
         });
     }, [filteredCases, fuse, searchText]);
+
+        const canGoPrev = page > 1;
+        const canGoNext = !loading && !error && realCases.length === pageSize;
 
 
     const handleFilterChange = useCallback((key: string, values: (string | number)[]) => {
@@ -206,6 +219,25 @@ function SearchCases() {
                     ))
                 }
             </ul>
+            <section className="mt-4 flex items-center justify-between max-w-5xl">
+                <Button
+                    variant="outlined"
+                    icon={<ArrowLeft />}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                    disabled={!canGoPrev || loading}
+                >
+                    Anterior
+                </Button>
+                <span className="text-body-small text-onSurface/70">Página {page}</span>
+                <Button
+                    variant="outlined"
+                    icon={<ArrowRight />}
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={!canGoNext || loading}
+                >
+                    Siguiente
+                </Button>
+            </section>
         </div>
     );
 }

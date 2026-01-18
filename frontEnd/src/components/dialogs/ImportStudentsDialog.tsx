@@ -8,12 +8,14 @@ interface ImportStudentsDialogProps {
     open: boolean;
     onClose: () => void;
     onImport: (file: File) => Promise<any>;
+    isLoading?: boolean;
 }
 
 export default function ImportStudentsDialog({
     open,
     onClose,
-    onImport
+    onImport,
+    isLoading = false
 }: ImportStudentsDialogProps) {
     const [file, setFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -32,7 +34,7 @@ export default function ImportStudentsDialog({
     };
 
     const handleUpload = async () => {
-        if (!file) return;
+        if (!file || isLoading) return;
 
         setIsUploading(true);
         setGeneralError(null);
@@ -156,15 +158,14 @@ export default function ImportStudentsDialog({
                     </Button>
                 ) : (
                     <>
-
                         <Button
                             variant="resalted"
                             onClick={handleUpload}
-                            disabled={!file || isUploading}
+                            disabled={!file || isUploading || isLoading}
                             className="min-w-48"
-                            icon={isUploading ? <LoadingSpinner /> : <Upload />}
+                            icon={(isUploading || isLoading) ? <LoadingSpinner /> : <Upload />}
                         >
-                            {isUploading ? 'Procesando...' : 'Iniciar Carga'}
+                            {(isUploading || isLoading) ? 'Procesando...' : 'Iniciar Carga'}
                         </Button>
                     </>
                 )}
