@@ -26,30 +26,41 @@ export function roleToPermissionLevel(role: UserTypeModel): number {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<UserModel | null>(() => {
-        const storedUser = localStorage.getItem('user');
-        return storedUser ? JSON.parse(storedUser) : null;
-    });
+    const [user, setUser] = useState<UserModel | null>(null);
 
     const { login: loginUser, loading, error, clearError } = useLoginUser();
 
     useEffect(() => {
-        if (user) {
-            localStorage.setItem('user', JSON.stringify(user));
-        } else {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) return;
+
+        const { email, password } = JSON.parse(storedUser) as { email?: string; password?: string };
+        if (!email || !password) {
             localStorage.removeItem('user');
+            return;
         }
-    }, [user]);
+
+        void (async () => {
+            const loggedInUser = await loginUser(email, password);
+            if (loggedInUser) {
+                setUser(loggedInUser);
+            } else {
+                localStorage.removeItem('user');
+            }
+        })();
+    }, [loginUser]);
 
     const login = async (mail: string, password: string) => {
         const loggedInUser = await loginUser(mail, password);
         if (loggedInUser) {
+            localStorage.setItem('user', JSON.stringify({ email: mail, password }));
             setUser(loggedInUser);
         }
     };
 
     const logout = () => {
         setUser(null);
+        localStorage.removeItem('user');
         clearError();
     };
 
