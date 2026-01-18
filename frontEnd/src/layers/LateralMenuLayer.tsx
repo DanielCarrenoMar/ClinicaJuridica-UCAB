@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { LateralMenu } from "#components/lateralMenu/LateralMenu.tsx"
 import LateralMenuItem from "#components/lateralMenu/LateralMenuItem.tsx"
-import { ArrowLeftToBracket, Bell, Book, CalendarMonth, Clipboard, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, UsersGroup } from "flowbite-react-icons/outline";
-import { User } from "flowbite-react-icons/solid";
+import { User, ArrowLeftToBracket, Bell, Book, CalendarMonth, Clipboard, Clock, Cog, Home, InfoCircle, MapPinAlt, Plus, UsersGroup } from "flowbite-react-icons/outline";
 import LateralMenuTitle from "#components/lateralMenu/LateralMenuTitle.tsx";
 import Button from "#components/Button.tsx";
 import SearchBar from "#components/SearchBar.tsx";
-import { Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
+import { Link, Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { NotificationsProvider } from "../context/NotificationsContext";
 import LoadingSpinner from "#components/LoadingSpinner.tsx";
@@ -182,9 +181,9 @@ function LateralMenuLayer() {
                         </div>
                     </span>
                     <span className="flex items-center gap-3 ml-2">
-                        <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-surface/40">
-                            <User className="w-6 h-6" />
-                        </div>
+                        <Link to={user ? `/usuario/${user.identityCard}` : "#"} className="group h-10 w-10 rounded-xl flex items-center justify-center bg-surface/40">
+                            <User className="group-hover:animate-pulsing group-hover:animate-duration-400" />
+                        </Link>
                         <div className=" hidden sm:block">
                             <h4 className="text-body-large text-onSurface">{user?.fullName || 'Usuario'}</h4>
                             <p className="text-body-small text-onSurface/70">
