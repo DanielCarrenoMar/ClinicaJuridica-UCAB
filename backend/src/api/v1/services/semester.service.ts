@@ -7,13 +7,25 @@ class SemesterService {
       const semesters = await prisma.$queryRaw`
         SELECT 
           s.*,
-          COALESCE(case_counts."caseCount", 0)::int as "caseCount"
+          COALESCE(case_counts."caseCount", 0)::int as "caseCount",
+          COALESCE(teacher_counts."teacherCount", 0)::int as "teacherCount",
+          COALESCE(student_counts."studentCount", 0)::int as "studentCount"
         FROM "Semester" s
         LEFT JOIN (
           SELECT "term", COUNT(*)::int as "caseCount"
           FROM "Case"
           GROUP BY "term"
         ) case_counts ON s."term" = case_counts."term"
+        LEFT JOIN (
+          SELECT "term", COUNT(*)::int as "teacherCount"
+          FROM "Teacher"
+          GROUP BY "term"
+        ) teacher_counts ON s."term" = teacher_counts."term"
+        LEFT JOIN (
+          SELECT "term", COUNT(*)::int as "studentCount"
+          FROM "Student"
+          GROUP BY "term"
+        ) student_counts ON s."term" = student_counts."term"
         ORDER BY s."startDate" DESC
       `;
       return {
@@ -105,7 +117,7 @@ class SemesterService {
       }
 
       let updatedSemester;
-      
+
       if (data.startDate !== undefined && data.endDate !== undefined) {
         updatedSemester = await prisma.$queryRaw`
           UPDATE "Semester" 
@@ -144,6 +156,28 @@ class SemesterService {
 
   async deleteSemester(term: string) {
     try {
+      // Validar si hay profesores, estudiantes o casos asociados
+      const counts = await prisma.$queryRaw`
+        SELECT 
+          (SELECT COUNT(*)::int FROM "Teacher" WHERE "term" = ${term}) as "teacherCount",
+          (SELECT COUNT(*)::int FROM "Student" WHERE "term" = ${term}) as "studentCount",
+          (SELECT COUNT(*)::int FROM "Case" WHERE "term" = ${term}) as "caseCount"
+      ` as any[];
+
+      const { teacherCount, studentCount, caseCount } = counts[0];
+
+      if (teacherCount > 0 || studentCount > 0 || caseCount > 0) {
+        const reasons = [];
+        if (teacherCount > 0) reasons.push(`${teacherCount} profesor(es)`);
+        if (studentCount > 0) reasons.push(`${studentCount} estudiante(s)`);
+        if (caseCount > 0) reasons.push(`${caseCount} caso(s)`);
+
+        return {
+          success: false,
+          message: `No se puede eliminar el semestre porque tiene ${reasons.join(', ')} asociados.`
+        };
+      }
+
       const deletedSemester = await prisma.$queryRaw`
         DELETE FROM "Semester" WHERE "term" = ${term} RETURNING *
       `;

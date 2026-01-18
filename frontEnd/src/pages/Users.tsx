@@ -16,6 +16,7 @@ function Users() {
   const { importStudents, loading: importLoading } = useImportStudents()
   const { notyError, notyMessage } = useNotifications()
   const [searchValue, setSearchValue] = useState('')
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   const filteredUsers = useMemo(() => {
@@ -27,7 +28,11 @@ function Users() {
         'fullName',
         'email',
         'type'
-      ]
+      ],
+      threshold: 0.3,
+      location: 0,
+      distance: 100,
+      minMatchCharLength: 1
     })
 
     return fuse.search(searchValue).map((result) => result.item)
@@ -55,9 +60,11 @@ function Users() {
     <div className="flex flex-col h-full min-h-0 max-w-5xl">
       <section className="mb-4 flex items-center justify-between gap-6">
         <SearchBar
-          isOpen={true}
+          isOpen={isSearchOpen}
+          onToggle={setIsSearchOpen}
           placeholder="Buscar usuario..."
           onChange={setSearchValue}
+          onSearch={setSearchValue}
         />
         <div className="flex items-center gap-3">
           <Button

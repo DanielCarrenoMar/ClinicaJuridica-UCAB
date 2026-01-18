@@ -11,6 +11,7 @@ import appointmentRoutes from './appointment.routes.js';
 import supportDocumentRoutes from './supportDocument.routes.js';
 import loginRoutes from './login.routes.js';
 import semesterRoutes from './semester.routes.js';
+import nucleusRoutes from './nucleus.routes.js';
 
 const router = Router();
 
@@ -26,6 +27,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/support-documents', supportDocumentRoutes);
 router.use('/auth', loginRoutes);
 router.use('/semesters', semesterRoutes);
+router.use('/nuclei', nucleusRoutes);
 
 // Ruta raíz de la API v1
 router.get('/', (req, res) => {

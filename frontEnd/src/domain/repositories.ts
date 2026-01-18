@@ -21,6 +21,9 @@ import type { UserDAO } from "#database/daos/userDAO.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
 import type { SemesterModel } from "./models/semester";
+import type { NucleusModel } from "./models/nucleus";
+import type { NucleusDAO } from "#database/daos/nucleusDAO.ts";
+import type { SemesterDAO } from "#database/daos/semesterDAO.ts";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -107,7 +110,15 @@ export interface SemesterRepository {
     findAllSemesters(): Promise<SemesterModel[]>;
     findCurrentSemester(): Promise<SemesterModel | null>;
     findSemesterById(term: string): Promise<SemesterModel | null>;
-    createSemester(data: { term: string; startDate: Date; endDate: Date }): Promise<SemesterModel>;
-    updateSemester(term: string, data: { startDate?: Date; endDate?: Date }): Promise<SemesterModel>;
+    createSemester(data: SemesterDAO): Promise<SemesterModel>;
+    updateSemester(term: string, data: Partial<SemesterDAO>): Promise<SemesterModel>;
     deleteSemester(term: string): Promise<void>;
+}
+
+export interface NucleusRepository {
+    findAllNuclei(): Promise<NucleusModel[]>;
+    findNucleusById(id: string): Promise<NucleusModel | null>;
+    createNucleus(data: NucleusDAO): Promise<NucleusModel>;
+    updateNucleus(id: string, data: Partial<NucleusDAO>): Promise<NucleusModel>;
+    deleteNucleus(id: string): Promise<void>;
 }

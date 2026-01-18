@@ -16,3 +16,4 @@ export const WORK_CONDITION_URL = "http://localhost:3000/api/v1/catalogs/work-co
 export const ACTIVITY_CONDITION_URL = "http://localhost:3000/api/v1/catalogs/activity-conditions";
 export const FAMILY_HOME_URL = "http://localhost:3000/api/v1/family-homes";
 export const HOUSING_URL = "http://localhost:3000/api/v1/housings";
+export const NUCLEUS_URL = "http://localhost:3000/api/v1/nuclei";

@@ -2,20 +2,32 @@ import { useState, useMemo } from 'react';
 import Fuse from 'fuse.js';
 import { Plus } from "flowbite-react-icons/outline";
 import SearchBar from '#components/SearchBar.tsx';
-import { useGetAllSemesters } from '#domain/useCaseHooks/useSemester.ts';
+import { useFindAllSemesters, useDeleteSemester, useCreateSemester } from '#domain/useCaseHooks/useSemester.ts';
 import SemesterListRow from '#components/SemesterListRow.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import Button from '#components/Button.tsx';
+import AddSemesterDialog from '#components/dialogs/AddSemesterDialog.tsx';
+
+import ConfirmDialog from '#components/dialogs/ConfirmDialog.tsx';
 
 function Semesters() {
-    const { semesters, loading, error, refresh } = useGetAllSemesters();
+    const { semesters, loading, error, refresh } = useFindAllSemesters();
+    const { deleteSemester } = useDeleteSemester();
+    const { createSemester } = useCreateSemester();
     const [searchValue, setSearchValue] = useState('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [semesterToDelete, setSemesterToDelete] = useState<string | null>(null);
 
     const filteredSemesters = useMemo(() => {
         if (searchValue === '') return semesters;
 
         const fuse = new Fuse(semesters, {
-            keys: ['term']
+            keys: ['term'],
+            threshold: 0.3,
+            location: 0,
+            distance: 100,
+            minMatchCharLength: 1
         });
 
         return fuse.search(searchValue).map((result) => result.item);
@@ -27,28 +39,36 @@ function Semesters() {
         });
     }, [filteredSemesters]);
 
-    const handleAddSemester = () => {
-        console.log('Adding new semester...');
+    const handleDeleteClick = (term: string) => {
+        setSemesterToDelete(term);
     };
 
-    const handleDeleteSemester = (term: string) => {
-        console.log('Deleting semester:', term);
-        // TODO: Implementar eliminación de semestre
+    const confirmDelete = async () => {
+        if (!semesterToDelete) return;
+        try {
+            await deleteSemester(semesterToDelete);
+            refresh();
+            setSemesterToDelete(null);
+        } catch (error: any) {
+            alert(error.message);
+            setSemesterToDelete(null);
+        }
     };
 
     return (
         <div className="flex flex-col h-full min-h-0 max-w-5xl">
-            <h1 className="text-headline-small text-onSurface mb-4">Semestres</h1>
             <section className="mb-4 flex items-center justify-between gap-6">
                 <SearchBar
-                    isOpen={true}
+                    isOpen={isSearchOpen}
+                    onToggle={setIsSearchOpen}
                     placeholder="Buscar semestre..."
                     onChange={setSearchValue}
+                    onSearch={setSearchValue}
                 />
                 <div className="flex items-center gap-3">
                     <Button
                         icon={<Plus />}
-                        onClick={handleAddSemester}
+                        onClick={() => setIsAddDialogOpen(true)}
                         variant='outlined'
                     >
                         Añadir
@@ -56,7 +76,7 @@ function Semesters() {
                 </div>
             </section>
             <section className="flex-1 min-h-0">
-                <div className="h-full flex flex-col gap-2 overflow-y-auto">
+                <div className="h-full flex flex-col gap-2 overflow-y-auto pb-8">
                     {loading && (
                         <div className="flex justify-center py-8">
                             <LoadingSpinner />
@@ -78,13 +98,37 @@ function Semesters() {
                                 <SemesterListRow
                                     key={semester.term}
                                     semester={semester}
-                                    onDelete={handleDeleteSemester}
+                                    onDelete={handleDeleteClick}
                                 />
                             ))}
                         </div>
                     )}
                 </div>
             </section>
+
+            <AddSemesterDialog
+                open={isAddDialogOpen}
+                onClose={() => setIsAddDialogOpen(false)}
+                onAdd={async (data) => {
+                    try {
+                        await createSemester(data);
+                        refresh();
+                        setIsAddDialogOpen(false);
+                    } catch (error: any) {
+                        alert(error.message);
+                    }
+                }}
+            />
+
+            <ConfirmDialog
+                open={!!semesterToDelete}
+                title="Eliminar Semestre"
+                message={`¿Está seguro de que desea eliminar el semestre "${semesterToDelete}"? Esta acción no se puede deshacer.`}
+                confirmLabel="Eliminar"
+                cancelLabel="Cancelar"
+                onConfirm={confirmDelete}
+                onCancel={() => setSemesterToDelete(null)}
+            />
         </div>
     );
 }

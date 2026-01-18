@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight } from "flowbite-react-icons/outline";
 function ActionsHistory() {
     const { caseActions, refresh, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
     const [searchQuery, setSearchQuery] = useState('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
     const [page, setPage] = useState(1);
@@ -36,6 +37,9 @@ function ActionsHistory() {
                 'idCase'
             ],
             threshold: 0.3,
+            location: 0,
+            distance: 100,
+            minMatchCharLength: 1
         });
 
         return fuse.search(searchQuery).map(result => result.item);
@@ -48,9 +52,11 @@ function ActionsHistory() {
         <div className="flex flex-col h-full min-h-0">
             <section className="mb-4 max-w-5xl">
                 <SearchBar
-                    isOpen={true}
+                    isOpen={isSearchOpen}
+                    onToggle={setIsSearchOpen}
                     placeholder="Buscar acción por usuario, ID de caso o descripción..."
                     onChange={setSearchQuery}
+                    onSearch={setSearchQuery}
                 />
             </section>
             <section className="flex-1 min-h-0 overflow-y-auto">
