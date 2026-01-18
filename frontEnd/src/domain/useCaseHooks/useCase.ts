@@ -118,6 +118,7 @@ export function useUpdateCaseWithCaseModel(userId: string) {
             setError(null);
         } catch (err) {
             setError(err as Error);
+            throw err;
         } finally {
             setLoading(false);
         }

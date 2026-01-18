@@ -100,6 +100,11 @@ export function getCaseRepository(): CaseRepository {
                 body: JSON.stringify(data)
             });
             const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Error updating case');
+            }
+
             return result.data;
         },
         deleteCase: async (id) => {
