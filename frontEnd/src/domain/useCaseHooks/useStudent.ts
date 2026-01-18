@@ -21,7 +21,7 @@ export function useGetAllStudents() {
         } finally {
             setLoading(false);
         }
-    }, [findAllStudents]);
+    }, []);
 
     useEffect(() => {
         loadStudents();
