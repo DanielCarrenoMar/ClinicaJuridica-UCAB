@@ -5,31 +5,32 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por tipo
-const mockCaseTypeData = [
-  { label: 'Asesoría', value: 45, color: '#45B7D1' },
-  { label: 'Representación', value: 38, color: '#FF6B6B' },
-  { label: 'Consultoría', value: 25, color: '#5DADE2' },
-  { label: 'Mediación', value: 20, color: '#EC7063' },
+// Datos de prueba para distribución de profesores involucrados por tipo
+const mockProfessorData = [
+  { label: 'Asesor', value: 34, color: '#45B7D1' },
+  { label: 'Supervisor', value: 28, color: '#FF6B6B' },
+  { label: 'Coordinador', value: 22, color: '#5DADE2' },
+  { label: 'Tutor', value: 19, color: '#EC7063' },
+  { label: 'Evaluador', value: 15, color: '#48C9B0' },
 ];
 
 // Calcular porcentajes dinámicamente
-const totalCasos = mockCaseTypeData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockCaseTypeData.map(item => ({
+const totalProfesores = mockProfessorData.reduce((sum, item) => sum + item.value, 0);
+const dataWithPercentages = mockProfessorData.map(item => ({
   ...item,
-  porcentaje: (item.value / totalCasos) * 100
+  porcentaje: (item.value / totalProfesores) * 100
 }));
 
-function ReportCaseType() {
+function ReportProfessorInvolvement() {
   return (
     <>
-      <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
+      <Text style={styleDocument.title}>Distribución de Profesores Involucrados por Tipo</Text>
       
       <View style={{ ...styleDocument.section, backgroundColor: "transparent", flexDirection: 'column', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockCaseTypeData}
+              data={mockProfessorData}
               width={320}
               height={220}
               barWidth={25}
@@ -61,4 +62,4 @@ function ReportCaseType() {
   );
 }
 
-export default ReportCaseType;
+export default ReportProfessorInvolvement;
