@@ -42,11 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         void (async () => {
             const loggedInUser = await loginUser(email, password);
-            if (loggedInUser) {
-                setUser(loggedInUser);
-            } else {
-                localStorage.removeItem('user');
-            }
+            setUser(loggedInUser);
         })();
     }, [loginUser]);
 
