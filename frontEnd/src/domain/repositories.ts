@@ -20,6 +20,7 @@ import type { CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
+import type { SemesterModel } from "./models/semester";
 export interface BeneficiaryRepository {
     findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -100,4 +101,13 @@ export interface TeacherRepository {
     findTeacherById(id: string): Promise<TeacherModel | null>;
     updateTeacher(id: string, data: Partial<TeacherDAO>): Promise<TeacherModel>;
     getCasesByTeacherId(id: string): Promise<CaseModel[]>;
+}
+
+export interface SemesterRepository {
+    findAllSemesters(): Promise<SemesterModel[]>;
+    findCurrentSemester(): Promise<SemesterModel | null>;
+    findSemesterById(term: string): Promise<SemesterModel | null>;
+    createSemester(data: { term: string; startDate: Date; endDate: Date }): Promise<SemesterModel>;
+    updateSemester(term: string, data: { startDate?: Date; endDate?: Date }): Promise<SemesterModel>;
+    deleteSemester(term: string): Promise<void>;
 }
