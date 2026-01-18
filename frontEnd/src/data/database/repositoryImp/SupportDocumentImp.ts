@@ -21,26 +21,24 @@ export function getSupportDocumentRepository(): SupportDocumentRepository {
             const supportDocumentDAO: SupportDocumentInfoDAO = supportDocumentData.data;
             return daoToSupportDocumentModel(supportDocumentDAO);
         },
-        createSupportDocument: async (data) => {
+        createSupportDocument: async (data: any) => {
+            const isFormData = data instanceof FormData;
             const response = await fetch(SUPPORT_DOCUMENT_URL, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
+                headers: isFormData ? {} : { "Content-Type": "application/json" },
+                body: isFormData ? data : JSON.stringify(data),
             });
             if (!response.ok) throw new Error("Error creating support document");
             const datas = await response.json();
             const supportDocumentDAO: SupportDocumentInfoDAO = datas.data;
             return daoToSupportDocumentModel(supportDocumentDAO);
         },
-        updateSupportDocument: async (id, data) => {
+        updateSupportDocument: async (id, data: any) => {
+            const isFormData = data instanceof FormData;
             const response = await fetch(`${SUPPORT_DOCUMENT_URL}/${id}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
+                headers: isFormData ? {} : { "Content-Type": "application/json" },
+                body: isFormData ? data : JSON.stringify(data),
             });
             const result = await response.json();
             return result.data;

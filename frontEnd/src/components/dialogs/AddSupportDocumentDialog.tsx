@@ -6,7 +6,7 @@ import Dialog from '#components/dialogs/Dialog.tsx';
 interface AddSupportDocumentDialogProps {
     open: boolean;
     onClose: () => void;
-    onAdd: (document: { title: string; description: string; submissionDate: Date; fileUrl?: string }) => void;
+    onAdd: (document: { title: string; description: string; submissionDate: Date; file?: File }) => void;
 }
 
 export default function AddSupportDocumentDialog({
@@ -16,7 +16,7 @@ export default function AddSupportDocumentDialog({
 }: AddSupportDocumentDialogProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [fileUrl, setFileUrl] = useState("");
+    const [file, setFile] = useState<File | null>(null);
 
     if (!open) return null;
 
@@ -27,13 +27,13 @@ export default function AddSupportDocumentDialog({
             title,
             description,
             submissionDate: new Date(),
-            fileUrl: fileUrl || undefined
+            file: file || undefined
         });
 
         // Reset form
         setTitle("");
         setDescription("");
-        setFileUrl("");
+        setFile(null);
         onClose();
     };
 
@@ -62,6 +62,32 @@ export default function AddSupportDocumentDialog({
                         value={description}
                         className="min-h-25"
                     />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <label className="flex items-center px-1.5 w-full text-label-small">
+                        Documento Adjunto
+                    </label>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="file"
+                            id="file-upload"
+                            className="hidden"
+                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        />
+                        <Button
+                            variant="outlined"
+                            onClick={() => document.getElementById('file-upload')?.click()}
+                            className="flex-1"
+                        >
+                            {file ? 'Cambiar Archivo' : 'Seleccionar Archivo'}
+                        </Button>
+                        {file && (
+                            <span className="text-body-small truncate max-w-[150px]" title={file.name}>
+                                {file.name}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 

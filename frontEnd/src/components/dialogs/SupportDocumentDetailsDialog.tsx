@@ -87,6 +87,43 @@ export default function SupportDocumentDetailsDialog({
                     </p>
                 </div>
 
+                {document.fileUrl && (
+                    <div className="flex flex-col gap-2">
+                        <header className="flex items-center gap-2">
+                            <h4 className="text-label-small ps-7">
+                                Archivo Adjunto
+                            </h4>
+                        </header>
+                        <div className="ps-7 flex flex-col gap-3">
+                            <div className="flex items-center gap-2 p-2 px-3 border rounded-lg bg-surface-variant/5 w-fit group hover:bg-surface-variant/10 transition-colors">
+                                <FileSearch className="text-primary/70" />
+                                <span className="text-body-small font-medium truncate max-w-[200px] md:max-w-xs">
+                                    {decodeURIComponent(document.fileUrl.split('/').pop() || 'documento')}
+                                </span>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => window.open(document.fileUrl!, '_blank')}
+                                    className="ms-2 scale-90"
+                                >
+                                    Ver
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Image Preview for visual impact */}
+                        {document.fileUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) && (
+                            <div className="mt-2 ps-7 flex justify-center border rounded-xl overflow-hidden bg-surface-variant/10 group cursor-pointer"
+                                onClick={() => window.open(document.fileUrl!, '_blank')}>
+                                <img
+                                    src={document.fileUrl}
+                                    alt={document.title}
+                                    className="max-h-64 object-contain transition-transform group-hover:scale-[1.02]"
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <div className="flex justify-end mt-4">
                     {onEdit && (
                         <Button

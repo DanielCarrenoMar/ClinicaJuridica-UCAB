@@ -15,6 +15,15 @@ export default function SupportDocumentCard({ document, onClick, onDownload }: S
         timeZone: 'UTC'
     });
 
+    const handleDownload = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (document.fileUrl) {
+            window.open(document.fileUrl, '_blank');
+        } else {
+            onDownload(e);
+        }
+    };
+
     return (
         <div
             onClick={onClick}
@@ -28,13 +37,15 @@ export default function SupportDocumentCard({ document, onClick, onDownload }: S
                     <span className="text-body-medium">
                         <strong className='text-body-large'>Recibido el</strong> {dateString}
                     </span>
-                    <button
-                        onClick={onDownload}
-                        className="shrink-0 w-8 h-8 rounded-full border border-onSurface/20 flex items-center justify-center text-onSurface hover:bg-surfaceVariant/20 hover:border-onSurface/50 transition-colors z-10"
-                        title="Descargar documento"
-                    >
-                        <Download className="w-4 h-4" />
-                    </button>
+                    {document.fileUrl && (
+                        <button
+                            onClick={handleDownload}
+                            className="shrink-0 w-8 h-8 rounded-full border border-onSurface/20 flex items-center justify-center text-onSurface hover:bg-surfaceVariant/20 hover:border-onSurface/50 transition-colors z-10"
+                            title="Descargar documento"
+                        >
+                            <Download className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
             </header>
 

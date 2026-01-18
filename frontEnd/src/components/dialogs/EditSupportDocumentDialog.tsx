@@ -7,7 +7,7 @@ import Dialog from '#components/dialogs/Dialog.tsx';
 interface EditSupportDocumentDialogProps {
     open: boolean;
     onClose: () => void;
-    onSave: (idCase: number, supportNumber: number, data: Partial<SupportDocumentModel>) => void;
+    onSave: (idCase: number, supportNumber: number, data: { title: string; description: string; file?: File }) => void;
     document: SupportDocumentModel | null;
 }
 
@@ -19,13 +19,13 @@ export default function EditSupportDocumentDialog({
 }: EditSupportDocumentDialogProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [fileUrl, setFileUrl] = useState("");
+    const [file, setFile] = useState<File | null>(null);
 
     useEffect(() => {
         if (document) {
             setTitle(document.title);
             setDescription(document.description);
-            setFileUrl(document.fileUrl || "");
+            setFile(null);
         }
     }, [document]);
 
@@ -34,13 +34,11 @@ export default function EditSupportDocumentDialog({
     const handleSubmit = () => {
         if (!title || !description) return;
 
-        const updateData: Partial<SupportDocumentModel> = {
+        onSave(document.idCase, document.supportNumber, {
             title,
             description,
-            fileUrl: fileUrl || undefined
-        };
-
-        onSave(document.idCase, document.supportNumber, updateData);
+            file: file || undefined
+        });
         onClose();
     };
 
@@ -73,6 +71,32 @@ export default function EditSupportDocumentDialog({
                         value={description}
                         className="min-h-25"
                     />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <label className="flex items-center px-1.5 w-full text-label-small">
+                        Documento Adjunto
+                    </label>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="file"
+                            id="edit-file-upload"
+                            className="hidden"
+                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        />
+                        <Button
+                            variant="outlined"
+                            onClick={() => window.document.getElementById('edit-file-upload')?.click()}
+                            className="flex-1"
+                        >
+                            {file ? 'Cambiar Archivo' : document.fileUrl ? 'Reemplazar Archivo' : 'Seleccionar Archivo'}
+                        </Button>
+                        {(file || document.fileUrl) && (
+                            <span className="text-body-small truncate max-w-[150px]" title={file ? file.name : 'Archivo actual'}>
+                                {file ? file.name : '✓ Archivo adjunto'}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 

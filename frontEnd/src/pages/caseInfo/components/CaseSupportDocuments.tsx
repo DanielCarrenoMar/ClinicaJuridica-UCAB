@@ -6,7 +6,6 @@ import SupportDocumentDetailsDialog from '#components/dialogs/SupportDocumentDet
 import AddSupportDocumentDialog from '#components/dialogs/AddSupportDocumentDialog.tsx';
 import EditSupportDocumentDialog from '#components/dialogs/EditSupportDocumentDialog.tsx';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts';
-import type { SupportDocumentDAO } from '#database/daos/supportDocumentDAO.ts';
 import { useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import { useCreateSupportDocument, useUpdateSupportDocument, useDeleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import { useNotifications } from '#/context/NotificationsContext';
@@ -108,15 +107,24 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                 onClose={() => setIsAddSupportDialogOpen(false)}
                 onAdd={async (data) => {
                     try {
-                        const newDoc: SupportDocumentDAO = {
+                        let docData: any = {
                             idCase: caseId,
-                            supportNumber: 0,
                             title: data.title,
                             description: data.description,
-                            submissionDate: data.submissionDate,
-                            fileUrl: data.fileUrl || ""
+                            submissionDate: data.submissionDate.toISOString(),
                         };
-                        await createNewSupportDocument(newDoc);
+
+                        if (data.file) {
+                            const formData = new FormData();
+                            formData.append('idCase', String(caseId));
+                            formData.append('title', data.title);
+                            formData.append('description', data.description);
+                            formData.append('submissionDate', data.submissionDate.toISOString());
+                            formData.append('file', data.file);
+                            docData = formData;
+                        }
+
+                        await createNewSupportDocument(docData);
                         loadSupportDocuments(caseId);
                     } catch (error: any) {
                         console.error("Error creating support document:", error);
@@ -131,7 +139,23 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                 document={selectedSupportDocument}
                 onSave={async (idCase, supportNumber, data) => {
                     try {
-                        await updateSupDocument(idCase, { ...data, supportNumber });
+                        let docData: any = {
+                            title: data.title,
+                            description: data.description,
+                        };
+
+                        if (data.file) {
+                            const formData = new FormData();
+                            formData.append('supportNumber', String(supportNumber));
+                            formData.append('title', data.title);
+                            formData.append('description', data.description);
+                            formData.append('file', data.file);
+                            docData = formData;
+                        } else {
+                            docData.supportNumber = supportNumber;
+                        }
+
+                        await updateSupDocument(idCase, docData);
                         loadSupportDocuments(caseId);
                         setIsEditSupportDialogOpen(false);
                     } catch (error: any) {
