@@ -87,9 +87,13 @@ class SemesterService {
           return { success: false, message: 'Ya existe un semestre con este término' };
         }
 
-        // Eliminar todas las asignaciones de estudiantes a casos
         await tx.$executeRaw`
           DELETE FROM "AssignedStudent"
+        `;
+
+        await tx.$executeRaw`
+          UPDATE "Case"
+          SET "teacherId" = NULL, "teacherTerm" = NULL
         `;
 
         // Crear el nuevo semestre
