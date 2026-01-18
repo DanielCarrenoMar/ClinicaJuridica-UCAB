@@ -10,12 +10,12 @@ interface BarChartProps {
 
 const BarChart: React.FC<BarChartProps> = ({ 
   data, 
-  width = 350, 
-  height = 250, 
-  barWidth = 30 
+  width = 400, 
+  height = 280, 
+  barWidth = 20 
 }) => {
   const maxValue = Math.max(...data.map(item => item.value));
-  const chartHeight = height - 60; // Leave more space for labels
+  const chartHeight = height - 70; // Leave more space for labels
   const leftMargin = 65; // Increased left margin for Y-axis labels
   const rightMargin = 30;
   const chartWidth = width - leftMargin - rightMargin; // Dynamic width calculation
@@ -76,13 +76,13 @@ const BarChart: React.FC<BarChartProps> = ({
               {item.value}
             </Text>
             
-            {/* X-axis label - split into two lines if needed */}
+            {/* X-axis label - split into multiple lines if needed */}
             <Text
               x={x + barWidth / 2}
-              y={chartHeight + 18}
+              y={chartHeight + 12}
               fill="#000000"
               style={{
-                fontSize: 8,
+                fontSize: 5,
                 textAlign: 'center'
               }}
             >
@@ -90,14 +90,25 @@ const BarChart: React.FC<BarChartProps> = ({
             </Text>
             <Text
               x={x + barWidth / 2}
-              y={chartHeight + 28}
+              y={chartHeight + 19}
               fill="#000000"
               style={{
-                fontSize: 8,
+                fontSize: 5,
                 textAlign: 'center'
               }}
             >
-              {item.label.split(' ').slice(1).join(' ')}
+              {item.label.split(' ')[1] || ''}
+            </Text>
+            <Text
+              x={x + barWidth / 2}
+              y={chartHeight + 26}
+              fill="#000000"
+              style={{
+                fontSize: 5,
+                textAlign: 'center'
+              }}
+            >
+              {item.label.split(' ').slice(2).join(' ') || ''}
             </Text>
           </React.Fragment>
         );

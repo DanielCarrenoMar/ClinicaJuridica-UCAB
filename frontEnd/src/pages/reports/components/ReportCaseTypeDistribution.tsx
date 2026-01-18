@@ -5,12 +5,14 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por tipo
+// Datos de prueba para distribución por tipo de caso
 const mockCaseTypeData = [
-  { label: 'Asesoría', value: 45, color: '#45B7D1' },
-  { label: 'Representación', value: 38, color: '#FF6B6B' },
-  { label: 'Consultoría', value: 25, color: '#5DADE2' },
-  { label: 'Mediación', value: 20, color: '#EC7063' },
+  { label: 'Consulta', value: 245, color: '#45B7D1' },
+  { label: 'Asesoría', value: 189, color: '#FF6B6B' },
+  { label: 'Representación', value: 156, color: '#5DADE2' },
+  { label: 'Mediación', value: 134, color: '#EC7063' },
+  { label: 'Defensa', value: 98, color: '#48C9B0' },
+  { label: 'Peritación', value: 67, color: '#F1948A' },
 ];
 
 // Calcular porcentajes dinámicamente
@@ -20,7 +22,7 @@ const dataWithPercentages = mockCaseTypeData.map(item => ({
   porcentaje: (item.value / totalCasos) * 100
 }));
 
-function ReportCaseType() {
+function ReportCaseTypeDistribution() {
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
@@ -30,13 +32,13 @@ function ReportCaseType() {
           <View style={{ alignItems: 'center' }}>
             <BarChart 
               data={mockCaseTypeData}
-              width={320}
-              height={220}
+              width={350}
+              height={250}
               barWidth={25}
             />
           </View>
         </View>
-        <View style={{ flexDirection: 'column', gap: 6, width: 320, flexShrink: 0, marginTop: 20 }}>
+        <View style={{ flexDirection: 'column', gap: 6, width: 350, flexShrink: 0, marginTop: 20 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
@@ -61,4 +63,4 @@ function ReportCaseType() {
   );
 }
 
-export default ReportCaseType;
+export default ReportCaseTypeDistribution;

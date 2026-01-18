@@ -5,38 +5,41 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por tipo
-const mockCaseTypeData = [
-  { label: 'Asesoría', value: 45, color: '#45B7D1' },
-  { label: 'Representación', value: 38, color: '#FF6B6B' },
-  { label: 'Consultoría', value: 25, color: '#5DADE2' },
-  { label: 'Mediación', value: 20, color: '#EC7063' },
+// Datos de prueba para distribución de beneficiarios por parroquia
+const mockBeneficiaryParishData = [
+  { label: 'Altagracia', value: 48, color: '#45B7D1' },
+  { label: 'Catedral', value: 45, color: '#FF6B6B' },
+  { label: 'San José', value: 41, color: '#5DADE2' },
+  { label: 'Santa Teresa', value: 33, color: '#EC7063' },
+  { label: 'San Juan', value: 36, color: '#48C9B0' },
+  { label: 'San Pedro', value: 29, color: '#F1948A' },
+  { label: 'Santa Rosalía', value: 27, color: '#76D7C4' },
 ];
 
 // Calcular porcentajes dinámicamente
-const totalCasos = mockCaseTypeData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockCaseTypeData.map(item => ({
+const totalBeneficiarios = mockBeneficiaryParishData.reduce((sum, item) => sum + item.value, 0);
+const dataWithPercentages = mockBeneficiaryParishData.map(item => ({
   ...item,
-  porcentaje: (item.value / totalCasos) * 100
+  porcentaje: (item.value / totalBeneficiarios) * 100
 }));
 
-function ReportCaseType() {
+function ReportBeneficiaryParishDistribution() {
   return (
     <>
-      <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
+      <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
       
       <View style={{ ...styleDocument.section, backgroundColor: "transparent", flexDirection: 'column', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockCaseTypeData}
-              width={320}
-              height={220}
-              barWidth={25}
+              data={mockBeneficiaryParishData}
+              width={380}
+              height={250}
+              barWidth={22}
             />
           </View>
         </View>
-        <View style={{ flexDirection: 'column', gap: 6, width: 320, flexShrink: 0, marginTop: 20 }}>
+        <View style={{ flexDirection: 'column', gap: 6, width: 380, flexShrink: 0, marginTop: 20 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
@@ -61,4 +64,4 @@ function ReportCaseType() {
   );
 }
 
-export default ReportCaseType;
+export default ReportBeneficiaryParishDistribution;

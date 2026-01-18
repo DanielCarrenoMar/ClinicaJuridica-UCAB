@@ -5,38 +5,42 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por tipo
-const mockCaseTypeData = [
-  { label: 'Asesoría', value: 45, color: '#45B7D1' },
-  { label: 'Representación', value: 38, color: '#FF6B6B' },
-  { label: 'Consultoría', value: 25, color: '#5DADE2' },
-  { label: 'Mediación', value: 20, color: '#EC7063' },
+// Datos de prueba para distribución por estado
+const mockStateData = [
+  { label: 'Solicitantes Distrito Capital', value: 95, color: '#45B7D1' },
+  { label: 'Solicitantes Miranda', value: 78, color: '#FF6B6B' },
+  { label: 'Solicitantes Carabobo', value: 62, color: '#5DADE2' },
+  { label: 'Solicitantes Aragua', value: 45, color: '#EC7063' },
+  { label: 'Beneficiarios Distrito Capital', value: 112, color: '#48C9B0' },
+  { label: 'Beneficiarios Miranda', value: 89, color: '#F1948A' },
+  { label: 'Beneficiarios Carabobo', value: 73, color: '#76D7C4' },
+  { label: 'Beneficiarios Aragua', value: 56, color: '#F5B7B1' },
 ];
 
 // Calcular porcentajes dinámicamente
-const totalCasos = mockCaseTypeData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockCaseTypeData.map(item => ({
+const totalPersonas = mockStateData.reduce((sum, item) => sum + item.value, 0);
+const dataWithPercentages = mockStateData.map(item => ({
   ...item,
-  porcentaje: (item.value / totalCasos) * 100
+  porcentaje: (item.value / totalPersonas) * 100
 }));
 
-function ReportCaseType() {
+function ReportStateDistribution() {
   return (
     <>
-      <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
+      <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Estado</Text>
       
       <View style={{ ...styleDocument.section, backgroundColor: "transparent", flexDirection: 'column', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockCaseTypeData}
-              width={320}
-              height={220}
-              barWidth={25}
+              data={mockStateData}
+              width={400}
+              height={280}
+              barWidth={20}
             />
           </View>
         </View>
-        <View style={{ flexDirection: 'column', gap: 6, width: 320, flexShrink: 0, marginTop: 20 }}>
+        <View style={{ flexDirection: 'column', gap: 6, width: 400, flexShrink: 0, marginTop: 20 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
@@ -61,4 +65,4 @@ function ReportCaseType() {
   );
 }
 
-export default ReportCaseType;
+export default ReportStateDistribution;

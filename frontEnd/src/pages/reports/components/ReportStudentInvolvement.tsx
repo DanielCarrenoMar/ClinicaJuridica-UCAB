@@ -6,10 +6,10 @@ import { styleDocument } from "./ReportDocument";
 
 // Datos de prueba para estudiantes involucrados por tipo
 const mockStudentData = [
-  { tipo: 'Asistente', cantidad: 156, horasPromedio: 45 },
-  { tipo: 'Investigador', cantidad: 89, horasPromedio: 78 },
-  { tipo: 'Redactor', cantidad: 67, horasPromedio: 62 },
-  { tipo: 'Representante', cantidad: 34, horasPromedio: 95 },
+  { tipo: 'Asistente', cantidad: 167, horasPromedio: 58 },
+  { tipo: 'Investigador', cantidad: 94, horasPromedio: 72 },
+  { tipo: 'Redactor', cantidad: 52, horasPromedio: 49 },
+  { tipo: 'Representante', cantidad: 33, horasPromedio: 89 },
 ];
 
 const totalEstudiantes = mockStudentData.reduce((sum, item) => sum + item.cantidad, 0);

@@ -19,6 +19,11 @@ import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
 import ReportDocument from './components/ReportDocument';
 import ReportCaseType from './components/ReportCaseType';
 import ReportGenderDistribution from './components/ReportGenderDistribution';
+import ReportStateDistribution from './components/ReportStateDistribution';
+import ReportParishDistribution from './components/ReportParishDistribution';
+import ReportCaseTypeDistribution from './components/ReportCaseTypeDistribution';
+import ReportBeneficiaryParishDistribution from './components/ReportBeneficiaryParishDistribution';
+import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
 import ReportStudentInvolvement from './components/ReportStudentInvolvement';
 import LinkButton from '#components/LinkButton.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
@@ -50,14 +55,14 @@ const reportOptions = [
         title: 'Solicitantes y beneficiarios por estado',
         description: 'Cantidad de solicitantes y beneficiarios separados por estado',
         icon: <ChartPie />,
-        component: null
+        component: <ReportStateDistribution />
     },
     {
         id: 5,
         title: 'Solicitantes y beneficiarios por parroquia',
         description: 'Cantidad de solicitantes y beneficiarios separados por parroquia',
         icon: <ChartPie />,
-        component: null
+        component: <ReportParishDistribution />
     },
     {
         id: 6,
@@ -71,7 +76,7 @@ const reportOptions = [
         title: 'Beneficiarios por parroquia',
         description: 'Cantidad de beneficiarios separados por parroquia',
         icon: <ChartPie />,
-        component: null
+        component: <ReportBeneficiaryParishDistribution />
     },
     {
         id: 8,
@@ -82,10 +87,17 @@ const reportOptions = [
     },
     {
         id: 9,
+        title: 'Casos por tipo de servicio',
+        description: 'Cantidad de casos separados por tipo de servicio legal',
+        icon: <ChartPie />,
+        component: <ReportCaseTypeDistribution />
+    },
+    {
+        id: 10,
         title: 'Profesores involucrados por tipo',
         description: 'Cantidad de profesores involucrados separados por tipo',
         icon: <ChartPie />,
-        component: null
+        component: <ReportProfessorInvolvement />
     },
 ];
 
@@ -109,10 +121,20 @@ function Reports() {
                 return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} />;
             case 3:
                 return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} />;
+            case 4:
+                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} />;
+            case 5:
+                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} />;
             case 6:
                 return <ReportCaseType key={`fresh-6-${Date.now()}`} />;
+            case 7:
+                return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} />;
             case 8:
                 return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} />;
+            case 9:
+                return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} />;
+            case 10:
+                return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} />;
             default:
                 return null;
         }
