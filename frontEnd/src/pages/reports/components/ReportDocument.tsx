@@ -2,7 +2,7 @@ import { Document, Page, StyleSheet, View, Text } from "@react-pdf/renderer";
 
 export const styleDocument = StyleSheet.create({
   page: {
-    backgroundColor: "#E4E4E4",
+    backgroundColor: "#FFFFFF",
     padding: 30,
     fontSize: 12,
   },

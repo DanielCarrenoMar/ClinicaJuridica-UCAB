@@ -73,7 +73,7 @@ const reportOptions = [
     },
     {
         id: 7,
-        title: 'Beneficiarios por parroquia',
+        title: 'Beneficiarios directos por parroquia',
         description: 'Cantidad de beneficiarios separados por parroquia',
         icon: <ChartPie />,
         component: <ReportBeneficiaryParishDistribution />
