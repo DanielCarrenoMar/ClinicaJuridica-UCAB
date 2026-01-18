@@ -10,6 +10,7 @@ import healthRoutes from './health.routes.js'; // Asegúrate de crear este archi
 import appointmentRoutes from './appointment.routes.js';
 import supportDocumentRoutes from './supportDocument.routes.js';
 import loginRoutes from './login.routes.js';
+import semesterRoutes from './semester.routes.js';
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.use('/salud', healthRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/support-documents', supportDocumentRoutes);
 router.use('/auth', loginRoutes);
+router.use('/semesters', semesterRoutes);
 
 // Ruta raíz de la API v1
 router.get('/', (req, res) => {
@@ -37,7 +39,8 @@ router.get('/', (req, res) => {
       casos: '/api/v1/cases',
       beneficiarios: '/api/v1/beneficiary',
       salud: '/api/v1/salud',
-      auth: '/api/v1/auth'
+      auth: '/api/v1/auth',
+      semestres: '/api/v1/semesters'
     },
     documentacion: 'Disponible en cada endpoint',
     contacto: 'Equipo de desarrollo - UCAB'
