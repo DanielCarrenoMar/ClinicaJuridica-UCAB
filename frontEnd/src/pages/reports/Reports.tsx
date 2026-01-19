@@ -11,8 +11,6 @@ import {
     FileChartBar,
     CalendarEdit,
 } from 'flowbite-react-icons/solid';
-import DropdownCheck from '#components/DropdownCheck/DropdownCheck.tsx';
-import DropdownOptionCheck from '#components/DropdownCheck/DropdownOptionCheck.tsx';
 import { PDFViewer, pdf } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
 import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
@@ -27,6 +25,8 @@ import ReportProfessorInvolvement from './components/ReportProfessorInvolvement'
 import ReportStudentInvolvement from './components/ReportStudentInvolvement';
 import LinkButton from '#components/LinkButton.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
+import DatePicker from '#components/DatePicker.tsx';
+import { parseDate, validateDateRange } from '../../utils/dateUtils';
 
 const reportOptions = [
     {
@@ -101,14 +101,10 @@ const reportOptions = [
     },
 ];
 
-const dateRanges = [
-    { value: '2025-15', label: '2025-15' },
-    { value: '2025-30', label: '2025-30' },
-];
-
 function Reports() {
     const [selectedReportIds, setSelectedReportIds] = useState<number[]>([1]);
-    const [selectedRanges, setSelectedRanges] = useState<(string | number)[]>(['2025-15']);
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
     const [isGenerating, setIsGenerating] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
@@ -144,8 +140,27 @@ function Reports() {
         const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
         const timestamp = Date.now();
         
+        // Parse dates if available
+        let parsedStartDate: Date | undefined;
+        let parsedEndDate: Date | undefined;
+        
+        if (startDate && endDate) {
+            try {
+                parsedStartDate = parseDate(startDate);
+                parsedEndDate = parseDate(endDate);
+                
+                if (!validateDateRange(parsedStartDate, parsedEndDate)) {
+                    console.warn('Invalid date range: start date must be before end date');
+                    parsedStartDate = undefined;
+                    parsedEndDate = undefined;
+                }
+            } catch (error) {
+                console.error('Error parsing dates:', error);
+            }
+        }
+        
         return (
-            <ReportDocument key={`doc-${timestamp}`}>
+            <ReportDocument key={`doc-${timestamp}`} startDate={parsedStartDate} endDate={parsedEndDate}>
                 {selectedReports.map(report => (
                     <Fragment key={`frag-${report.id}-${timestamp}`}>
                         {createFreshComponent(report.id)}
@@ -153,7 +168,7 @@ function Reports() {
                 ))}
             </ReportDocument>
         );
-    }, [selectedReportIds]);
+    }, [selectedReportIds, startDate, endDate]);
 
     const handleReportSelect = (id: number) => {
         const newSelection = selectedReportIds.includes(id) 
@@ -235,19 +250,20 @@ function Reports() {
                             <h3 className="text-label-small font-normal">Rango del informe</h3>
                         </div>
 
-                        <div className="w-full">
-                            <DropdownCheck
-                                label="Seleccionar rango"
-                                selectedValues={selectedRanges}
-                                onSelectionChange={setSelectedRanges}
-                                showSelectedCountBadge={true}
-                            >
-                                {dateRanges.map((range) => (
-                                    <DropdownOptionCheck key={range.value} value={range.value}>
-                                        {range.label}
-                                    </DropdownOptionCheck>
-                                ))}
-                            </DropdownCheck>
+                        <div className="w-full space-y-3">
+                            <DatePicker
+                                label="Fecha de inicio"
+                                value={startDate}
+                                onChange={setStartDate}
+                                id="start-date"
+                            />
+                            <DatePicker
+                                label="Fecha de fin"
+                                value={endDate}
+                                onChange={setEndDate}
+                                id="end-date"
+                                min={startDate}
+                            />
                         </div>
                     </section>
 
