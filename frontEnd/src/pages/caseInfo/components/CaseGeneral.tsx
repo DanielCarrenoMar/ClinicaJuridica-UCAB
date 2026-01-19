@@ -9,6 +9,15 @@ interface CaseGeneralProps {
     onChange: (updateField: Partial<CaseModel>) => void;
 }
 
+const courts = [
+    'Civil',
+    'Penal',
+    'Agrario',
+    'Contencioso Administrativo',
+    'Protección de niños, niñas y adolescentes',
+    'Laboral'
+]
+
 export default function CaseGeneral({ caseData, localCaseData, onChange }: CaseGeneralProps) {
     return (
         <div className="flex flex-col gap-6">
@@ -40,14 +49,14 @@ export default function CaseGeneral({ caseData, localCaseData, onChange }: CaseG
                     </header>
                     <Dropdown
                         selectedValue={localCaseData?.idCourt}
-                        onSelectionChange={(val) => onChange({ idCourt: val as number })}
+                        onSelectionChange={(val) => {
+                            onChange({ idCourt: val as number })
+                            onChange({ courtName: courts[(val as number) - 1]})
+                        }}
                     >
-                        <DropdownOption value={1}>Civil</DropdownOption>
-                        <DropdownOption value={2}>Penal</DropdownOption>
-                        <DropdownOption value={3}>Agrario</DropdownOption>
-                        <DropdownOption value={4}>Contencioso Administrativo</DropdownOption>
-                        <DropdownOption value={5}>Protección de niños, niñas y adolescentes</DropdownOption>
-                        <DropdownOption value={6}>Laboral</DropdownOption>
+                        {courts.map((courtName, index) => (
+                            <DropdownOption key={index} value={index + 1}>{courtName}</DropdownOption>
+                        ))}
                     </Dropdown>
                 </article>
             </section>

@@ -20,6 +20,8 @@ import CaseAppointments from '#pages/caseInfo/components/CaseAppointments.tsx';
 import CaseSupportDocuments from '#pages/caseInfo/components/CaseSupportDocuments.tsx';
 import CaseHistory from '#pages/caseInfo/components/CaseHistory.tsx';
 import CaseInvolucrados from '#pages/caseInfo/components/CaseInvolucrados.tsx';
+import { useCreateCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
+import type { CaseActionDAO } from '#database/daos/caseActionDAO.ts';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -40,6 +42,7 @@ export default function CaseInfo() {
     const { notyError } = useNotifications()
     const { caseData, loading, error, loadCase } = useGetCaseById(safeId);
     const { updateCase, loading: updating } = useUpdateCaseWithCaseModel(user?.identityCard || "");
+    const { createCaseAction } = useCreateCaseAction();
 
     // Leer el parámetro 'tab' de la URL, validar que sea una tab válida
     const tabFromUrl = searchParams.get('tab') as CaseInfoTabs | null;
@@ -86,9 +89,57 @@ export default function CaseInfo() {
     async function saveChanges() {
         if (!localCaseData || !caseData) return;
         try {
+            const changeDetails: string[] = [];
+            const formatValue = (value: string | number | undefined | null) => (value ?? '—');
+            const addChange = (label: string, from?: string | number | null, to?: string | number | null) => {
+                if (from !== to) {
+                    changeDetails.push(`${label}: ${formatValue(from)} → ${formatValue(to)}`);
+                }
+            };
+
+            addChange('Resumen del problema', caseData.problemSummary, localCaseData.problemSummary);
+            addChange('Estado', caseData.caseStatus, localCaseData.caseStatus);
+            addChange('Tipo de proceso', caseData.processType, localCaseData.processType);
+            addChange('Núcleo', caseData.idNucleus, localCaseData.idNucleus);
+            addChange('Período', caseData.term, localCaseData.term);
+            addChange('Área legal', caseData.legalAreaName, localCaseData.legalAreaName);
+            addChange('Profesor', caseData.teacherName, localCaseData.teacherName);
+            addChange('Tribunal', caseData.courtName ?? null, localCaseData.courtName ?? null);
+
+            const oldStudentIds = new Set(caseStudents.map(s => s.identityCard));
+            const newStudentIds = new Set(localCaseStudents.map(s => s.identityCard));
+            const addedStudents = localCaseStudents.filter(s => !oldStudentIds.has(s.identityCard)).map(s => s.identityCard);
+            const removedStudents = caseStudents.filter(s => !newStudentIds.has(s.identityCard)).map(s => s.identityCard);
+            if (addedStudents.length || removedStudents.length) {
+                const addedText = addedStudents.length ? `+${addedStudents.length} (${addedStudents.join(', ')})` : '';
+                const removedText = removedStudents.length ? `-${removedStudents.length} (${removedStudents.join(', ')})` : '';
+                changeDetails.push(`Estudiantes: ${[addedText, removedText].filter(Boolean).join(' ')}`);
+            }
+
+            const oldBeneficiaryIds = new Set(caseBeneficiaries.map(b => b.identityCard));
+            const newBeneficiaryIds = new Set(localCaseBeneficiaries.map(b => b.identityCard));
+            const addedBeneficiaries = localCaseBeneficiaries.filter(b => !oldBeneficiaryIds.has(b.identityCard)).map(b => b.identityCard);
+            const removedBeneficiaries = caseBeneficiaries.filter(b => !newBeneficiaryIds.has(b.identityCard)).map(b => b.identityCard);
+            if (addedBeneficiaries.length || removedBeneficiaries.length) {
+                const addedText = addedBeneficiaries.length ? `+${addedBeneficiaries.length} (${addedBeneficiaries.join(', ')})` : '';
+                const removedText = removedBeneficiaries.length ? `-${removedBeneficiaries.length} (${removedBeneficiaries.join(', ')})` : '';
+                changeDetails.push(`Beneficiarios: ${[addedText, removedText].filter(Boolean).join(' ')}`);
+            }
+
             await setStudentsToCase(caseData.idCase, localCaseStudents.map(s => s.identityCard));
             await setBeneficiariesToCase(caseData.idCase, localCaseBeneficiaries.map(caseBeneficiaryModelToDao));
             await updateCase(caseData.idCase, localCaseData)
+
+            if (user && changeDetails.length > 0) {
+                const newAction: CaseActionDAO = {
+                    idCase: caseData.idCase,
+                    actionNumber: 0,
+                    description: changeDetails.join('\n'),
+                    userId: user.identityCard,
+                    registryDate: ""
+                };
+                await createCaseAction(newAction);
+            }
             loadCase(safeId);
             loadCaseStudents(safeId);
             loadCaseBeneficiaries(safeId);
@@ -202,7 +253,6 @@ export default function CaseInfo() {
                 {activeTab === 'Historial' && (
                     <CaseHistory
                         caseId={caseData.idCase}
-                        caseCompoundKey={caseData.compoundKey}
                         user={user}
                     />
                 )}

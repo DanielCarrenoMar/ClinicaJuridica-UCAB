@@ -54,7 +54,7 @@ export default function CaseActionCard({
           {dateString}
         </span>
       </header>
-      <p className="text-body-small text-onSurface/70 line-clamp-3 text-ellipsis max-w-full">
+      <p className="text-body-small text-onSurface/70 line-clamp-3 text-ellipsis max-w-full whitespace-pre-line">
         {caseAction.description}
       </p>
     </span>

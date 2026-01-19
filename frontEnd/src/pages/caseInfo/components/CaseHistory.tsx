@@ -6,21 +6,20 @@ import AddCaseActionDialog from '#components/dialogs/AddCaseActionDialog.tsx';
 import CaseActionDetailsDialog from '#components/dialogs/CaseActionDetailsDialog.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
-import type { CaseActionInfoDAO } from '#database/daos/caseActionInfoDAO.ts';
 import type { UserModel } from '#domain/models/user.ts';
 import { useGetCaseActionsByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import { useCreateCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import { useNotifications } from '#/context/NotificationsContext';
 import Fuse from 'fuse.js';
 import { ArrowLeft, ArrowRight } from 'flowbite-react-icons/outline';
+import type { CaseActionDAO } from '#database/daos/caseActionDAO.ts';
 
 interface CaseHistoryProps {
     caseId: number;
-    caseCompoundKey: string;
     user: UserModel | null;
 }
 
-export default function CaseHistory({ caseId, caseCompoundKey, user }: CaseHistoryProps) {
+export default function CaseHistory({ caseId, user }: CaseHistoryProps) {
     const { notyError } = useNotifications();
     const { caseActions, loading: caseActionsLoading, error: caseActionsError, loadCaseActions } = useGetCaseActionsByCaseId(caseId);
     const { createCaseAction: createAction } = useCreateCaseAction();
@@ -130,15 +129,13 @@ export default function CaseHistory({ caseId, caseCompoundKey, user }: CaseHisto
                 onAdd={async (actionData) => {
                     if (!user) return;
                     try {
-                        const newAction: CaseActionInfoDAO = {
+                        const newAction: CaseActionDAO = {
                             idCase: caseId,
-                            caseCompoundKey,
                             actionNumber: 0,
                             description: actionData.description,
                             notes: actionData.notes,
                             userId: user.identityCard,
-                            userName: user.fullName,
-                            registryDate: new Date()
+                            registryDate: ""
                         };
                         await createAction(newAction);
                         loadCaseActions(caseId, { page, limit: pageSize });
