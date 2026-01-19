@@ -108,6 +108,10 @@ class CaseService {
 
   async getCaseById(id: number) {
     try {
+      const actualTerm = (await prisma.$queryRaw`
+        SELECT "term" FROM "Semester" ORDER BY "startDate" DESC LIMIT 1
+      `)[0]?.term;
+
       const caseData = await prisma.$queryRaw`
         SELECT 
           c.*,
@@ -127,7 +131,7 @@ class CaseService {
         JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
         JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
         JOIN "Subject" s ON sc."idSubject" = s."idSubject"
-        LEFT JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND c."teacherTerm" = t."term"
+        LEFT JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND ${actualTerm} = t."term"
         LEFT JOIN "User" u ON t."identityCard" = u."identityCard"
         LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
         LEFT JOIN LATERAL (
@@ -223,7 +227,8 @@ class CaseService {
           "processType" = COALESCE(${data.processType}, "processType"),
           "idLegalArea" = COALESCE(${data.idLegalArea}, "idLegalArea"),
           "idCourt" = ${data.idCourt !== undefined ? data.idCourt : "idCourt"},
-          "teacherId" = COALESCE(${data.teacherId}, "teacherId")
+          "teacherId" = ${data.teacherId ?? null},
+          "teacherTerm" = ${data.teacherTerm ?? null}
         WHERE "idCase" = ${id}
         RETURNING *
       `;

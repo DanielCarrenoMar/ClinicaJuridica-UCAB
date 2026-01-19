@@ -116,14 +116,27 @@ export default function CaseInvolucrados({
                                 )}
                             </header>
                             {localCaseData?.teacherName ? (
-                                <PersonCard
-                                    icon={<UserCircle />}
-                                    to={`/usuario/${localCaseData.teacherId}`}
-                                    person={{
-                                        identityCard: String(localCaseData.teacherId ?? ''),
-                                        fullName: localCaseData.teacherName,
-                                    }}
-                                />
+                                <span className="flex items-center justify-between">
+                                    <PersonCard
+                                        icon={<UserCircle />}
+                                        to={`/usuario/${localCaseData.teacherId}`}
+                                        person={{
+                                            identityCard: String(localCaseData.teacherId ?? ''),
+                                            fullName: localCaseData.teacherName,
+                                        }}
+                                    />
+                                    {permissionLevel < 3 && (
+                                        <Button
+                                            onClick={() => {
+                                                onChange({ teacherId: undefined });
+                                                onChange({ teacherName: undefined });
+                                            }}
+                                            icon={<Close />}
+                                            className='p-2!'
+                                            variant='outlined'
+                                        />
+                                    )}
+                                </span>
                             ) : (
                                 <p className="text-body-small">Sin Profesor Asignado</p>
                             )}
@@ -180,7 +193,11 @@ export default function CaseInvolucrados({
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsTeacherSearchDialogOpen(false)}
                             users={teachers.filter(t => t.identityCard !== localCaseData?.teacherId)}
-                            onSelect={(teacher) => { onChange({ teacherId: teacher.identityCard }); onChange({ teacherName: teacher.fullName }); setIsTeacherSearchDialogOpen(false); }}
+                            onSelect={(teacher) => { 
+                                onChange({ teacherId: teacher.identityCard });
+                                onChange({ teacherName: teacher.fullName });
+                                setIsTeacherSearchDialogOpen(false);
+                            }}
                         />
                     </div>
                 </article>
