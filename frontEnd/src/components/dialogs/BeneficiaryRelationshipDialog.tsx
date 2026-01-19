@@ -27,6 +27,7 @@ export default function BeneficiaryRelationshipDialog({
 
   const [type, setType] = useState<CaseBeneficiaryTypeModel>();
   const [relationship, setRelationship] = useState("");
+  const [description, setDescription] = useState("");
 
   const resetForm = () => {
     setType(undefined);
@@ -49,7 +50,7 @@ export default function BeneficiaryRelationshipDialog({
     onCreate({
       type,
       relationship: relationship.trim(),
-      description: "",
+      description: description.trim(),
     });
 
     onClose();
@@ -87,12 +88,12 @@ export default function BeneficiaryRelationshipDialog({
           placeholder="Ej: Hijo, cónyuge, representante..."
         />
 
-        {/*<TitleTextInput
+        <TitleTextInput
           label="Descripción"
           value={description}
           onChange={setDescription}
           placeholder="Ej: Hijo del solicitante"
-        />*/}
+        />
       </div>
 
       <div className="flex justify-end gap-3 mt-2">
