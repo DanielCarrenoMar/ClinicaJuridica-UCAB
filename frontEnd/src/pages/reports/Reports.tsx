@@ -30,6 +30,7 @@ import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
 import { useBeneficiaryTypeStats } from '../../hooks/useBeneficiaryTypeStats';
 import { useCaseSubjectStats } from '../../hooks/useCaseSubjectStats';
+import { useCaseSubjectScopeStats } from '../../hooks/useCaseSubjectScopeStats';
 import { useGenderStats } from '../../hooks/useGenderStats';
 import { useStateStats } from '../../hooks/useStateStats';
 import { useParishStats } from '../../hooks/useParishStats';
@@ -128,6 +129,9 @@ function Reports() {
     // Obtener datos de casos por materia
     const { data: caseSubjectData } = useCaseSubjectStats(startDate, endDate);
     
+    // Obtener datos de casos por materia y ámbito
+    const { data: caseSubjectScopeData } = useCaseSubjectScopeStats(startDate, endDate);
+    
     // Obtener datos de género
     const { data: genderData } = useGenderStats(startDate, endDate);
     
@@ -146,7 +150,7 @@ function Reports() {
             case 1:
                 return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={caseSubjectData} />;
             case 2:
-                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} />;
+                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={caseSubjectScopeData} />;
             case 3:
                 return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderData} />;
             case 4:

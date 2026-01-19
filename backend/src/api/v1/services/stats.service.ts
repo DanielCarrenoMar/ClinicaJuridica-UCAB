@@ -170,14 +170,18 @@ class StatsService {
 
       const result = await prisma.$queryRaw`
         SELECT 
-          cs.name as subject,
-          cs.scope,
+          s.name as subject,
+          sc.name as scope,
+          la.name as legal_area,
           COUNT(*) as count
         FROM "Case" c
-        INNER JOIN "CaseSubject" cs ON c."idCaseSubject" = cs."idCaseSubject"
+        INNER JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+        INNER JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" 
+          AND la."categoryNumber" = sc."categoryNumber"
+        INNER JOIN "Subject" s ON sc."idSubject" = s."idSubject"
         WHERE 1=1 ${dateFilter}
-        GROUP BY cs.name, cs.scope
-        ORDER BY cs.name, cs.scope
+        GROUP BY s.name, sc.name, la.name
+        ORDER BY s.name, sc.name, la.name
       `;
 
       const stats = Array.isArray(result) ? result : [];
@@ -185,6 +189,7 @@ class StatsService {
       const formattedStats = stats.map((s: any) => ({
         subject: s.subject || 'Sin Materia',
         scope: s.scope || 'Sin Ámbito',
+        legal_area: s.legal_area || 'Sin Área Legal',
         value: Number(s.count || 0),
         color: this.getRandomColor()
       }));
