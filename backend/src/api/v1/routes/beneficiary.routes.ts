@@ -10,5 +10,6 @@ router.put('/:id', beneficiaryController.updateBeneficiary);
 router.delete('/:id', beneficiaryController.deleteBeneficiary);
 
 router.get('/:id/cases', beneficiaryController.getBeneficiaryCases);
+router.get('/stats/type-distribution', beneficiaryController.getBeneficiaryTypeStats);
 
 export default router;

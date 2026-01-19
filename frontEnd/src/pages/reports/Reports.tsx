@@ -28,6 +28,7 @@ import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
+import { useBeneficiaryTypeStats } from '../../hooks/useBeneficiaryTypeStats';
 
 const reportOptions = [
     {
@@ -116,6 +117,9 @@ function Reports() {
     const [isGenerating, setIsGenerating] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
+    // Obtener datos de beneficiarios por tipo
+    const { data: beneficiaryTypeData } = useBeneficiaryTypeStats(startDate, endDate);
+
     // Crear componentes frescos cada vez
     const createFreshComponent = (reportId: number) => {
         switch(reportId) {
@@ -140,7 +144,7 @@ function Reports() {
             case 10:
                 return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} />;
             case 11:
-                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} />;
+                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={beneficiaryTypeData} />;
             default:
                 return null;
         }

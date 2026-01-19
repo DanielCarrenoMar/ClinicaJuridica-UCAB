@@ -78,3 +78,17 @@ export async function getBeneficiaryCases(req: Request, res: Response): Promise<
     res.status(500).json({ success: false, error: errorMessage });
   }
 }
+
+export async function getBeneficiaryTypeStats(req: Request, res: Response): Promise<void> {
+  try {
+    const { startDate, endDate } = req.query;
+    const result = await beneficiaryService.getBeneficiaryTypeStats(
+      startDate as string,
+      endDate as string
+    );
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
