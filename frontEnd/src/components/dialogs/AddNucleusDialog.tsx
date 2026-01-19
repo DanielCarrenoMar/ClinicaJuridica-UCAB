@@ -6,6 +6,7 @@ import Button from '../Button.tsx';
 import Dialog from './Dialog.tsx';
 import { locationData } from '#domain/seedData.ts';
 import type { NucleusDAO } from '#database/daos/nucleusDAO.ts';
+import { useFindAllNuclei } from '#domain/useCaseHooks/useNucleus.ts';
 
 type Props = {
     open: boolean;
@@ -19,6 +20,12 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
     const [munIndex, setMunIndex] = useState<number | null>(null);
     const [parishName, setParishName] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(false);
+    const { nuclei } = useFindAllNuclei()
+
+    const normalizeName = (value: string) => value.trim().toLowerCase();
+    const hasDuplicateName = nuclei?.some(
+        (nucleus) => normalizeName(nucleus.idNucleus) === normalizeName(idNucleus)
+    ) ?? false;
 
     const states = locationData;
     const municipalities = stateIndex !== null ? states[stateIndex].municipalities : [];
@@ -35,6 +42,11 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
     const handleSubmit = async () => {
         if (!idNucleus || stateIndex === null || munIndex === null || !parishName) {
             alert('Por favor, complete todos los campos.');
+            return;
+        }
+
+        if (hasDuplicateName) {
+            alert('Ya existe un núcleo con ese nombre.');
             return;
         }
 
@@ -109,11 +121,16 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
                     </TitleDropdown>
                 </div>
 
-                <div className="flex justify-end w-full mt-4">
+                <div className="flex justify-end w-full mt-4 align-middle gap-2">
+                    {hasDuplicateName && (
+                        <p className="text-body-small text-error self-center">
+                            Ya existe un núcleo con ese nombre.
+                        </p>
+                    )}
                     <Button
                         variant="resalted"
                         onClick={handleSubmit}
-                        disabled={loading || !idNucleus || stateIndex === null || munIndex === null || !parishName}
+                        disabled={loading || !idNucleus || stateIndex === null || munIndex === null || !parishName || hasDuplicateName}
                         className="min-w-48 w-1/2"
                     >
                         Añadir Núcleo
