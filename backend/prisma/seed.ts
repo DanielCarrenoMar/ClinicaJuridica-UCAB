@@ -605,6 +605,48 @@ async function main() {
         }
     }
 
+    console.log('Creating trigger for CaseStatus -> CaseAction');
+    await prisma.$executeRawUnsafe(`
+        CREATE OR REPLACE FUNCTION case_status_insert_action()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            INSERT INTO "CaseAction" (
+                "idCase",
+                "actionNumber",
+                "description",
+                "notes",
+                "userId",
+                "registryDate"
+            )
+            VALUES (
+                NEW."idCase",
+                COALESCE(
+                    (SELECT MAX("actionNumber") FROM "CaseAction" WHERE "idCase" = NEW."idCase"),
+                    0
+                ) + 1,
+                'Cambio de estado: ' ||
+                CASE NEW."status"::text
+                    WHEN 'A' THEN 'Abierto'
+                    WHEN 'T' THEN 'En Trámite'
+                    WHEN 'P' THEN 'En Pausa'
+                    WHEN 'C' THEN 'Cerrado'
+                    ELSE NEW."status"::text
+                END,
+                NEW."reason",
+                NEW."userId",
+                NEW."registryDate"
+            );
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        DROP TRIGGER IF EXISTS trg_case_status_insert_action ON "CaseStatus";
+        CREATE TRIGGER trg_case_status_insert_action
+        AFTER INSERT ON "CaseStatus"
+        FOR EACH ROW
+        EXECUTE FUNCTION case_status_insert_action();
+    `);
+
 
 }
 main()
