@@ -5,55 +5,71 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por tipo
-const mockCaseTypeData = [
-  { label: 'Asesoría', value: 45, color: '#45B7D1' },
-  { label: 'Representación', value: 38, color: '#FF6B6B' },
-  { label: 'Consultoría', value: 25, color: '#5DADE2' },
-  { label: 'Mediación', value: 20, color: '#EC7063' },
-];
+interface CaseTypeData {
+  label: string;
+  value: number;
+  color: string;
+}
 
-// Calcular porcentajes dinámicamente
-const totalCasos = mockCaseTypeData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockCaseTypeData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalCasos) * 100
-}));
+interface ReportCaseTypeProps {
+  data?: CaseTypeData[];
+}
 
-function ReportCaseType() {
+function ReportCaseType({ data }: ReportCaseTypeProps) {
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Calcular porcentajes dinámicamente
+  const totalCasos = data.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = data.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalCasos) * 100
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
       
-      <View style={{ ...styleDocument.section, backgroundColor: "transparent", flexDirection: 'column', alignItems: 'center' }}>
+      <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockCaseTypeData}
-              width={320}
-              height={220}
+              data={data}
+              width={300}
+              height={200}
               barWidth={25}
             />
           </View>
-        </View>
-        <View style={{ flexDirection: 'column', gap: 6, width: 320, flexShrink: 0, marginTop: 20 }}>
-          <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
-            Leyenda
-          </Text>
-          {dataWithPercentages.map((item, index) => (
-            <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-              <View style={{
-                width: 12,
-                height: 12,
-                backgroundColor: item.color,
-                marginRight: 8,
-                flexShrink: 0
-              }} />
-              <Text style={{ fontSize: 10, flex: 1 }}>
-                {item.label}: {item.value} ({item.porcentaje.toFixed(1)}%)
-              </Text>
-            </View>
-          ))}
+          <View style={{ flexDirection: 'column', gap: 6, width: 280, flexShrink: 0 }}>
+            <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
+              Leyenda
+            </Text>
+            {dataWithPercentages.map((item, index) => (
+              <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <View style={{
+                  width: 12,
+                  height: 12,
+                  backgroundColor: item.color,
+                  marginRight: 8,
+                  flexShrink: 0
+                }} />
+                <Text style={{ fontSize: 10, flex: 1 }}>
+                  {item.label}: {item.value} ({item.porcentaje.toFixed(1)}%)
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
       </View>
 

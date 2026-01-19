@@ -5,23 +5,38 @@ import {
 import PieChart from './PieChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por materia
-const mockCaseSubjectData = [
-  { materia: 'Materia Civil', cantidad: 1099, color: '#90EE90' },
-  { materia: 'Otros', cantidad: 187, color: '#4169E1' },
-  { materia: 'Materia Penal', cantidad: 41, color: '#9370DB' },
-  { materia: 'Materia Mercantil', cantidad: 18, color: '#FFD700' },
-  { materia: 'Materia Laboral', cantidad: 10, color: '#8B4513' },
-];
+interface CaseSubjectData {
+  label: string;
+  value: number;
+  color: string;
+}
 
-// Calcular porcentajes dinámicamente
-const totalCasos = mockCaseSubjectData.reduce((sum, item) => sum + item.cantidad, 0);
-const dataWithPercentages = mockCaseSubjectData.map(item => ({
-  ...item,
-  porcentaje: (item.cantidad / totalCasos) * 100
-}));
+interface ReportCaseSubjectProps {
+  data?: CaseSubjectData[];
+}
 
-function ReportCaseSubject() {
+function ReportCaseSubject({ data }: ReportCaseSubjectProps) {
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Calcular porcentajes dinámicamente
+  const totalCasos = data.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = data.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalCasos) * 100
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
@@ -30,11 +45,7 @@ function ReportCaseSubject() {
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
           <View style={{ alignItems: 'center' }}>
             <PieChart 
-              data={mockCaseSubjectData.map(item => ({
-                label: item.materia,
-                value: item.cantidad,
-                color: item.color
-              }))}
+              data={data}
               size={150}
               is3D={false}
               showLabels={false}
@@ -53,7 +64,7 @@ function ReportCaseSubject() {
                   marginRight: 8
                 }} />
                 <Text style={{ fontSize: 10 }}>
-                  {item.materia}: {item.cantidad} ({item.porcentaje.toFixed(1)}%)
+                  {item.label}: {item.value} ({item.porcentaje.toFixed(1)}%)
                 </Text>
               </View>
             ))}

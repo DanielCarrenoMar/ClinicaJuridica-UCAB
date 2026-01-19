@@ -29,6 +29,11 @@ import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
 import { useBeneficiaryTypeStats } from '../../hooks/useBeneficiaryTypeStats';
+import { useCaseSubjectStats } from '../../hooks/useCaseSubjectStats';
+import { useGenderStats } from '../../hooks/useGenderStats';
+import { useStateStats } from '../../hooks/useStateStats';
+import { useParishStats } from '../../hooks/useParishStats';
+import { useCaseTypeStats } from '../../hooks/useCaseTypeStats';
 
 const reportOptions = [
     {
@@ -119,22 +124,37 @@ function Reports() {
 
     // Obtener datos de beneficiarios por tipo
     const { data: beneficiaryTypeData } = useBeneficiaryTypeStats(startDate, endDate);
+    
+    // Obtener datos de casos por materia
+    const { data: caseSubjectData } = useCaseSubjectStats(startDate, endDate);
+    
+    // Obtener datos de género
+    const { data: genderData } = useGenderStats(startDate, endDate);
+    
+    // Obtener datos por estado
+    const { data: stateData } = useStateStats(startDate, endDate);
+    
+    // Obtener datos por parroquia
+    const { data: parishData } = useParishStats(startDate, endDate);
+    
+    // Obtener datos de casos por tipo
+    const { data: caseTypeData } = useCaseTypeStats(startDate, endDate);
 
     // Crear componentes frescos cada vez
     const createFreshComponent = (reportId: number) => {
         switch(reportId) {
             case 1:
-                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} />;
+                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={caseSubjectData} />;
             case 2:
                 return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} />;
             case 3:
-                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} />;
+                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderData} />;
             case 4:
-                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} />;
+                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={stateData} />;
             case 5:
-                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} />;
+                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={parishData} />;
             case 6:
-                return <ReportCaseType key={`fresh-6-${Date.now()}`} />;
+                return <ReportCaseType key={`fresh-6-${Date.now()}`} data={caseTypeData} />;
             case 7:
                 return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} />;
             case 8:

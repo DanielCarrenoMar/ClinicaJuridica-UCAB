@@ -12,6 +12,7 @@ import supportDocumentRoutes from './supportDocument.routes.js';
 import loginRoutes from './login.routes.js';
 import semesterRoutes from './semester.routes.js';
 import nucleusRoutes from './nucleus.routes.js';
+import statsRoutes from './stats.routes.js';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.use('/support-documents', supportDocumentRoutes);
 router.use('/auth', loginRoutes);
 router.use('/semesters', semesterRoutes);
 router.use('/nuclei', nucleusRoutes);
+router.use('/stats', statsRoutes);
 
 // Ruta raíz de la API v1
 router.get('/', (req, res) => {
