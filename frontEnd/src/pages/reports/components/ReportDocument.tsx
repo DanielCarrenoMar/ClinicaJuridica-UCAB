@@ -1,31 +1,42 @@
-import { Document, Page, StyleSheet, View, Text } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, View, Text, Image } from "@react-pdf/renderer";
 import { formatReportTitle } from "../../../utils/dateUtils";
+import ucabLogoTipo from "#assets/ucabLogoTipo.jpg";
 
 export const styleDocument = StyleSheet.create({
   page: {
     backgroundColor: "#FFFFFF",
     padding: 30,
     fontSize: 12,
+    justifyContent: "center",
   },
   header: {
     textAlign: "center",
     marginBottom: 30,
+    alignItems: "center",
   },
   mainTitle: {
-    fontSize: 24,
+    fontSize: 28,
     textAlign: "center",
     fontWeight: "bold",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 16,
+    letterSpacing: 0.6,
+    lineHeight: 1.25,
   },
   logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
+    width: 120,
+    height: 40,
+    marginRight: 12,
+  },
+  subtitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 6,
+  },
+  subtitleText: {
+    fontSize: 14,
+    textAlign: "left",
+    letterSpacing: 1.2,
   },
   title: {
     fontSize: 20,
@@ -59,37 +70,36 @@ export const styleDocument = StyleSheet.create({
 });
 
 interface DocumentProps {
-    startDate?: Date;
-    endDate?: Date;
-    children?: React.ReactNode;
+  startDate?: Date;
+  endDate?: Date;
+  children?: React.ReactNode;
 }
 
-export default function ReportDocument({children, startDate, endDate}: DocumentProps) {
-    // Convert children to array and render each section on its own page
-    const childrenArray = Array.isArray(children) ? children : [children];
-    
-    // Generate report title with date range
-    const reportTitle = startDate && endDate ? formatReportTitle(startDate, endDate) : "ESTADÍSTICAS CCJ";
-    
-    return (
-        <Document>
-            {childrenArray.map((child, index) => (
-                <Page key={index} style={styleDocument.page} size="A4" orientation="landscape">
-                    {/* Header with title and logo - only on first page */}
-                    {index === 0 && (
-                        <View style={styleDocument.header}>
-                            <Text style={styleDocument.mainTitle}>{reportTitle}</Text>
-                            <Text style={styleDocument.subtitle}>CENTRO DE CLÍNICA JURÍDICA</Text>
-                        </View>
-                    )}
-                    
-                    {child}
-                    
-                    <View style={styleDocument.pageNumber}>
-                        <Text render={({pageNumber, totalPages}) => `${pageNumber}/${totalPages}`} />
-                    </View>
-                </Page>
-            ))}
-        </Document>
-    )
+export default function ReportDocument({ children, startDate, endDate }: DocumentProps) {
+  const childrenArray = Array.isArray(children) ? children : [children];
+  const reportTitle = startDate && endDate ? formatReportTitle(startDate, endDate) : "ESTADÍSTICAS CCJ";
+
+  return (
+    <Document>
+      <Page style={styleDocument.page} size="A4" orientation="landscape">
+        <View style={styleDocument.header}>
+          <Text style={styleDocument.mainTitle}>{reportTitle}</Text>
+          <View style={styleDocument.subtitleRow}>
+            <Image style={styleDocument.logo} src={ucabLogoTipo} />
+            <Text style={styleDocument.subtitleText}>CENTRO{"\n"}DE CLÍNICA JURÍDICA</Text>
+          </View>
+        </View>
+      </Page>
+      {childrenArray.map((child, index) => (
+        <Page key={index} style={styleDocument.page} size="A4" orientation="landscape">
+
+          {child}
+
+          <View style={styleDocument.pageNumber}>
+            <Text render={({ pageNumber, totalPages }) => `${pageNumber}/${totalPages}`} />
+          </View>
+        </Page>
+      ))}
+    </Document>
+  )
 }
