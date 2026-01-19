@@ -14,6 +14,8 @@ import type { CaseActionInfoDAO } from "#database/daos/caseActionInfoDAO.ts";
 import { daoToCaseActionModel } from "#domain/models/caseAction.ts";
 import type { CaseBeneficiaryInfoDAO } from "#database/daos/caseBeneficiaryInfoDAO.ts";
 import { daoToCaseBeneficiaryModel } from "#domain/models/caseBeneficiary.ts";
+import type { CaseStatusInfoDAO } from "#database/daos/caseStatusInfoDAO.ts";
+import { daoToCaseStatusModel } from "#domain/models/caseStatus.ts";
 
 export function getCaseRepository(): CaseRepository {
     return {
