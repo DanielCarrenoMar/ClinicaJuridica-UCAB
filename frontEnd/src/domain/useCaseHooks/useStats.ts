@@ -27,7 +27,7 @@ export function useGetCasesBySubject(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -58,7 +58,7 @@ export function useGetCasesBySubjectScope(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -89,7 +89,7 @@ export function useGetGenderDistribution(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -120,7 +120,7 @@ export function useGetStateDistribution(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -151,7 +151,7 @@ export function useGetParishDistribution(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -182,7 +182,7 @@ export function useGetCasesByType(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -213,7 +213,7 @@ export function useGetBeneficiariesByParish(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -244,7 +244,7 @@ export function useGetStudentInvolvement(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -275,7 +275,7 @@ export function useGetCasesByServiceType(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -306,7 +306,7 @@ export function useGetProfessorInvolvement(startDate?: Date, endDate?: Date) {
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
@@ -337,7 +337,7 @@ export function useGetBeneficiaryTypeDistribution(startDate?: Date, endDate?: Da
 
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, []);
 
     return { data, loading, error, refresh: loadData };
 }
