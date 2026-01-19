@@ -87,7 +87,7 @@ function ReportCaseSubjectScope() {
         
         return (
           <View key={materia} style={styleDocument.section}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' }}>
               {materia}
             </Text>
             

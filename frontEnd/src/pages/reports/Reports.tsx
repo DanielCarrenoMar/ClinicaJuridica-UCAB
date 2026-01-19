@@ -24,7 +24,7 @@ import ReportBeneficiaryParishDistribution from './components/ReportBeneficiaryP
 import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
 import ReportStudentInvolvement from './components/ReportStudentInvolvement';
 import ReportBeneficiaryTypeDistribution from './components/ReportBeneficiaryTypeDistribution';
-import LinkButton from '#components/LinkButton.tsx';
+import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
@@ -110,7 +110,7 @@ const reportOptions = [
 ];
 
 function Reports() {
-    const [selectedReportIds, setSelectedReportIds] = useState<number[]>([1]);
+    const [selectedReportIds, setSelectedReportIds] = useState<number[]>([]);
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -232,9 +232,9 @@ function Reports() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
-                    <LinkButton to="#" onClick={handleDownloadPDF} download={generateFileName()} variant="outlined" icon={<FilePdf />}>
+                    <Button onClick={handleDownloadPDF} variant="outlined" icon={<FilePdf />}>
                         {isGenerating ? 'Generando...' : 'Exportar PDF'}
-                    </LinkButton>
+                    </Button>
                 </span>
             </header>
 
