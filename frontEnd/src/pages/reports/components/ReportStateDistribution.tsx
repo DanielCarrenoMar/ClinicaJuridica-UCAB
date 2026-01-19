@@ -5,26 +5,38 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución por estado
-const mockStateData = [
-  { label: 'Solicitantes Distrito Capital', value: 95, color: '#45B7D1' },
-  { label: 'Solicitantes Miranda', value: 78, color: '#FF6B6B' },
-  { label: 'Solicitantes Carabobo', value: 62, color: '#5DADE2' },
-  { label: 'Solicitantes Aragua', value: 45, color: '#EC7063' },
-  { label: 'Beneficiarios Distrito Capital', value: 112, color: '#48C9B0' },
-  { label: 'Beneficiarios Miranda', value: 89, color: '#F1948A' },
-  { label: 'Beneficiarios Carabobo', value: 73, color: '#76D7C4' },
-  { label: 'Beneficiarios Aragua', value: 56, color: '#F5B7B1' },
-];
+interface StateData {
+  label: string;
+  value: number;
+  color: string;
+}
 
-// Calcular porcentajes dinámicamente
-const totalPersonas = mockStateData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockStateData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalPersonas) * 100
-}));
+interface ReportStateDistributionProps {
+  data?: StateData[];
+}
 
-function ReportStateDistribution() {
+function ReportStateDistribution({ data }: ReportStateDistributionProps) {
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Estado</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Calcular porcentajes dinámicamente
+  const totalPersonas = data.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = data.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalPersonas) * 100
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Estado</Text>
@@ -33,7 +45,7 @@ function ReportStateDistribution() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockStateData}
+              data={data}
               width={400}
               height={280}
               barWidth={20}

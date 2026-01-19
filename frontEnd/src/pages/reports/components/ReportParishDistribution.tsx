@@ -5,28 +5,38 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución por parroquia
-const mockParishData = [
-  { label: 'Solicitantes Altagracia', value: 42, color: '#45B7D1' },
-  { label: 'Solicitantes Catedral', value: 38, color: '#FF6B6B' },
-  { label: 'Solicitantes San José', value: 35, color: '#5DADE2' },
-  { label: 'Solicitantes Santa Teresa', value: 28, color: '#EC7063' },
-  { label: 'Solicitantes San Juan', value: 31, color: '#48C9B0' },
-  { label: 'Beneficiarios Altagracia', value: 48, color: '#F1948A' },
-  { label: 'Beneficiarios Catedral', value: 45, color: '#76D7C4' },
-  { label: 'Beneficiarios San José', value: 41, color: '#F5B7B1' },
-  { label: 'Beneficiarios Santa Teresa', value: 33, color: '#85C1E2' },
-  { label: 'Beneficiarios San Juan', value: 36, color: '#F8C471' },
-];
+interface ParishData {
+  label: string;
+  value: number;
+  color: string;
+}
 
-// Calcular porcentajes dinámicamente
-const totalPersonas = mockParishData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockParishData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalPersonas) * 100
-}));
+interface ReportParishDistributionProps {
+  data?: ParishData[];
+}
 
-function ReportParishDistribution() {
+function ReportParishDistribution({ data }: ReportParishDistributionProps) {
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Calcular porcentajes dinámicamente
+  const totalPersonas = data.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = data.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalPersonas) * 100
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Parroquia</Text>
@@ -35,7 +45,7 @@ function ReportParishDistribution() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockParishData}
+              data={data}
               width={480}
               height={320}
               barWidth={16}

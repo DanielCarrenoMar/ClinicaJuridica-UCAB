@@ -671,7 +671,23 @@ async function main() {
         END $$;
     `);
 
-    
+    console.log('Creating check constraint for Appointment planned/execution dates');
+    await prisma.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'appointment_planned_before_execution_check'
+            ) THEN
+                ALTER TABLE "Appointment"
+                ADD CONSTRAINT appointment_planned_before_execution_check
+                CHECK (
+                    "executionDate" IS NULL OR "plannedDate" <= "executionDate"
+                );
+            END IF;
+        END $$;
+    `);
 }
 main()
     .catch((e) => {

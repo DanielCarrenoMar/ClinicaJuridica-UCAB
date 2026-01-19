@@ -5,54 +5,34 @@ import {
 import PieChart from './PieChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por materia y ámbito
-const mockCaseSubjectScopeData = [
-  // Materia Civil - Sucesiones
-  { materia: 'Materia Civil', ambito: 'Sucesiones', subambito: 'Cesión de derecho sucesorales', cantidad: 5, color: '#90EE90' },
-  { materia: 'Materia Civil', ambito: 'Sucesiones', subambito: 'Justificativos únicos y Universales Herederos', cantidad: 14, color: '#87CEEB' },
-  { materia: 'Materia Civil', ambito: 'Sucesiones', subambito: 'Particiones', cantidad: 8, color: '#4169E1' },
-  
-  // Materia Civil - Familia Tribunales Ordinarios
-  { materia: 'Materia Civil', ambito: 'Familia Tribunales Ordinarios', subambito: 'Divorcios', cantidad: 12, color: '#6495ED' },
-  { materia: 'Materia Civil', ambito: 'Familia Tribunales Ordinarios', subambito: 'Pensiones alimenticias', cantidad: 18, color: '#9370DB' },
-  { materia: 'Materia Civil', ambito: 'Familia Tribunales Ordinarios', subambito: 'Filiación', cantidad: 6, color: '#BA55D3' },
-  
-  // Materia Civil - Personas
-  { materia: 'Materia Civil', ambito: 'Personas', subambito: 'Cambios de nombre', cantidad: 3, color: '#FF6347' },
-  { materia: 'Materia Civil', ambito: 'Personas', subambito: 'Interdicciones', cantidad: 4, color: '#FFD700' },
-  { materia: 'Materia Civil', ambito: 'Personas', subambito: 'Tutelas', cantidad: 7, color: '#FFA500' },
-  
-  // Materia Civil - Otros
-  { materia: 'Materia Civil', ambito: 'Otros', subambito: 'Contratos', cantidad: 9, color: '#8B4513' },
-  { materia: 'Materia Civil', ambito: 'Otros', subambito: 'Arrendamientos', cantidad: 11, color: '#D2691E' },
-  
-  // Otras materias
-  { materia: 'Materia Penal', ambito: 'Judicial', subambito: 'Delitos contra la propiedad', cantidad: 15, color: '#DC143C' },
-  { materia: 'Materia Penal', ambito: 'Judicial', subambito: 'Delitos contra las personas', cantidad: 20, color: '#B22222' },
-  
-  { materia: 'Materia Laboral', ambito: 'Judicial', subambito: 'Despidos injustificados', cantidad: 25, color: '#4682B4' },
-  { materia: 'Materia Laboral', ambito: 'Judicial', subambito: 'Accidentes laborales', cantidad: 13, color: '#5F9EA0' },
-  
-  { materia: 'Materia Mercantil', ambito: 'Judicial', subambito: 'Quiebras', cantidad: 4, color: '#CD853F' },
-  { materia: 'Materia Mercantil', ambito: 'Judicial', subambito: 'Sociedades comerciales', cantidad: 7, color: '#DEB887' },
-];
+interface CaseSubjectScopeData {
+  subject: string;
+  scope: string;
+  legal_area: string;
+  value: number;
+  color: string;
+}
+
+interface ReportCaseSubjectScopeProps {
+  data?: CaseSubjectScopeData[];
+}
 
 // Funciones para agrupar y procesar datos
-const groupByMateria = (data: typeof mockCaseSubjectScopeData) => {
-  const grouped: Record<string, typeof mockCaseSubjectScopeData> = {};
+const groupBySubject = (data: CaseSubjectScopeData[]) => {
+  const grouped: Record<string, CaseSubjectScopeData[]> = {};
   data.forEach(item => {
-    if (!grouped[item.materia]) {
-      grouped[item.materia] = [];
+    if (!grouped[item.subject]) {
+      grouped[item.subject] = [];
     }
-    grouped[item.materia].push(item);
+    grouped[item.subject].push(item);
   });
   return grouped;
 };
 
-const groupByAmbito = (data: typeof mockCaseSubjectScopeData) => {
-  const grouped: Record<string, typeof mockCaseSubjectScopeData> = {};
+const groupByScope = (data: CaseSubjectScopeData[]) => {
+  const grouped: Record<string, CaseSubjectScopeData[]> = {};
   data.forEach(item => {
-    const key = `${item.materia} - ${item.ambito}`;
+    const key = `${item.subject} - ${item.scope}`;
     if (!grouped[key]) {
       grouped[key] = [];
     }
@@ -61,41 +41,55 @@ const groupByAmbito = (data: typeof mockCaseSubjectScopeData) => {
   return grouped;
 };
 
-const calculatePercentages = (data: typeof mockCaseSubjectScopeData) => {
-  const total = data.reduce((sum, item) => sum + item.cantidad, 0);
+const calculatePercentages = (data: CaseSubjectScopeData[]) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
   return data.map(item => ({
     ...item,
-    porcentaje: (item.cantidad / total) * 100
+    porcentaje: (item.value / total) * 100
   }));
 };
 
-function ReportCaseSubjectScope() {
-  const groupedByMateria = groupByMateria(mockCaseSubjectScopeData);
+function ReportCaseSubjectScope({ data }: ReportCaseSubjectScopeProps) {
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia y Ámbito</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  const groupedBySubject = groupBySubject(data);
   
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Materia y Ámbito</Text>
       
-      {Object.entries(groupedByMateria).map(([materia, materiaData]) => {
+      {Object.entries(groupedBySubject).map(([subject, subjectData]) => {
         // Gráfico principal de la materia (agrupado por ámbito)
-        const ambitoGroups = groupByAmbito(materiaData);
-        const materiaChartData = Object.entries(ambitoGroups).map(([ambitoKey, ambitoData]) => ({
-          label: ambitoKey.split(' - ')[1], // Solo el nombre del ámbito
-          value: ambitoData.reduce((sum, item) => sum + item.cantidad, 0),
-          color: ambitoData[0].color
+        const scopeGroups = groupByScope(subjectData);
+        const subjectChartData = Object.entries(scopeGroups).map(([scopeKey, scopeData]) => ({
+          label: scopeKey.split(' - ')[1], // Solo el nombre del ámbito
+          value: (scopeData as CaseSubjectScopeData[]).reduce((sum: number, item: CaseSubjectScopeData) => sum + item.value, 0),
+          color: (scopeData as CaseSubjectScopeData[])[0].color
         }));
         
         return (
-          <View key={materia} style={styleDocument.section}>
+          <View key={subject} style={styleDocument.section}>
             <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' }}>
-              {materia}
+              {subject}
             </Text>
             
             {/* Gráfico principal de la materia por ámbito */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginBottom: 20 }}>
               <View style={{ alignItems: 'center' }}>
                 <PieChart 
-                  data={materiaChartData}
+                  data={subjectChartData}
                   size={120}
                   is3D={false}
                   showLabels={false}
@@ -105,8 +99,8 @@ function ReportCaseSubjectScope() {
                 <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 3 }}>
                   Distribución por Ámbito
                 </Text>
-                {materiaChartData.map((item, index) => {
-                  const total = materiaChartData.reduce((sum, i) => sum + i.value, 0);
+                {subjectChartData.map((item, index) => {
+                  const total = subjectChartData.reduce((sum, i) => sum + i.value, 0);
                   const porcentaje = (item.value / total) * 100;
                   return (
                     <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 3 }}>
@@ -125,26 +119,26 @@ function ReportCaseSubjectScope() {
               </View>
             </View>
             
-            {/* Gráficos individuales por ámbito con subambitos */}
-            {Object.entries(ambitoGroups).map(([ambitoKey, ambitoData]) => {
-              const ambitoName = ambitoKey.split(' - ')[1];
-              const subambitoChartData = ambitoData.map(item => ({
-                label: item.subambito,
-                value: item.cantidad,
+            {/* Gráficos individuales por ámbito */}
+            {Object.entries(scopeGroups).map(([scopeKey, scopeData]) => {
+              const scopeName = scopeKey.split(' - ')[1];
+              const scopeChartData = (scopeData as CaseSubjectScopeData[]).map(item => ({
+                label: item.legal_area,
+                value: item.value,
                 color: item.color
               }));
-              const subambitoWithPercentages = calculatePercentages(ambitoData);
+              const scopeWithPercentages = calculatePercentages(scopeData as CaseSubjectScopeData[]);
               
               return (
-                <View key={ambitoKey} style={{ marginTop: 15, paddingTop: 10, borderTop: '1pt solid #ccc' }}>
+                <View key={scopeKey} style={{ marginTop: 15, paddingTop: 10, borderTop: '1pt solid #ccc' }}>
                   <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>
-                    {ambitoName}
+                    {scopeName}
                   </Text>
                   
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
                     <View style={{ alignItems: 'center' }}>
                       <PieChart 
-                        data={subambitoChartData}
+                        data={scopeChartData}
                         size={100}
                         is3D={false}
                         showLabels={false}
@@ -152,9 +146,9 @@ function ReportCaseSubjectScope() {
                     </View>
                     <View style={{ flexDirection: 'column', gap: 4, maxWidth: 160 }}>
                       <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 2 }}>
-                        Detalle
+                        Áreas Legales
                       </Text>
-                      {subambitoWithPercentages.map((item, index) => (
+                      {scopeWithPercentages.map((item, index) => (
                         <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 2 }}>
                           <View style={{
                             width: 8,
@@ -163,7 +157,7 @@ function ReportCaseSubjectScope() {
                             marginRight: 4
                           }} />
                           <Text style={{ fontSize: 8 }}>
-                            {item.subambito}: {item.cantidad} ({item.porcentaje.toFixed(1)}%)
+                            {item.legal_area}: {item.value} ({item.porcentaje.toFixed(1)}%)
                           </Text>
                         </View>
                       ))}
