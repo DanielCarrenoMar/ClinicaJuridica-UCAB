@@ -28,13 +28,19 @@ import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
-import { useBeneficiaryTypeStats } from '../../hooks/useBeneficiaryTypeStats';
-import { useCaseSubjectStats } from '../../hooks/useCaseSubjectStats';
-import { useCaseSubjectScopeStats } from '../../hooks/useCaseSubjectScopeStats';
-import { useGenderStats } from '../../hooks/useGenderStats';
-import { useStateStats } from '../../hooks/useStateStats';
-import { useParishStats } from '../../hooks/useParishStats';
-import { useCaseTypeStats } from '../../hooks/useCaseTypeStats';
+import {
+    useGetCasesBySubject,
+    useGetCasesBySubjectScope,
+    useGetGenderDistribution,
+    useGetStateDistribution,
+    useGetParishDistribution,
+    useGetCasesByType,
+    useGetBeneficiariesByParish,
+    useGetStudentInvolvement,
+    useGetCasesByServiceType,
+    useGetProfessorInvolvement,
+    useGetBeneficiaryTypeDistribution
+} from '#domain/useCaseHooks/useStats.ts';
 
 const reportOptions = [
     {
@@ -123,58 +129,60 @@ function Reports() {
     const [isGenerating, setIsGenerating] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
-    // Obtener datos de beneficiarios por tipo
-    const { data: beneficiaryTypeData } = useBeneficiaryTypeStats(startDate, endDate);
-    
-    // Obtener datos de casos por materia
-    const { data: caseSubjectData } = useCaseSubjectStats(startDate, endDate);
-    
-    // Obtener datos de casos por materia y ámbito
-    const { data: caseSubjectScopeData } = useCaseSubjectScopeStats(startDate, endDate);
-    
-    // Obtener datos de género
-    const { data: genderData } = useGenderStats(startDate, endDate);
-    
-    // Obtener datos por estado
-    const { data: stateData } = useStateStats(startDate, endDate);
-    
-    // Obtener datos por parroquia
-    const { data: parishData } = useParishStats(startDate, endDate);
-    
-    // Obtener datos de casos por tipo
-    const { data: caseTypeData } = useCaseTypeStats(startDate, endDate);
+    // Parse dates for hooks
+    const parsedStartDate = startDate ? parseDate(startDate) : undefined;
+    const parsedEndDate = endDate ? parseDate(endDate) : undefined;
+    const hasValidDates = parsedStartDate && parsedEndDate && validateDateRange(parsedStartDate, parsedEndDate);
 
-    // Crear componentes frescos cada vez
+    // Load data for each report type
+    const casesBySubject = useGetCasesBySubject(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const casesBySubjectScope = useGetCasesBySubjectScope(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const genderDistribution = useGetGenderDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const stateDistribution = useGetStateDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const parishDistribution = useGetParishDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const casesByType = useGetCasesByType(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const beneficiariesByParish = useGetBeneficiariesByParish(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const studentInvolvement = useGetStudentInvolvement(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const casesByServiceType = useGetCasesByServiceType(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const professorInvolvement = useGetProfessorInvolvement(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const beneficiaryTypeDistribution = useGetBeneficiaryTypeDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+
+    // Crear componentes frescos cada vez con datos
     const createFreshComponent = (reportId: number) => {
         switch(reportId) {
             case 1:
-                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={caseSubjectData} />;
+                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={casesBySubject.data} loading={casesBySubject.loading} />;
             case 2:
-                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={caseSubjectScopeData} />;
+                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={casesBySubjectScope.data} loading={casesBySubjectScope.loading} />;
             case 3:
-                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderData} />;
+                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderDistribution.data} loading={genderDistribution.loading} />;
             case 4:
-                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={stateData} />;
+                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={stateDistribution.data} loading={stateDistribution.loading} />;
             case 5:
-                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={parishData} />;
+                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={parishDistribution.data} loading={parishDistribution.loading} />;
             case 6:
-                return <ReportCaseType key={`fresh-6-${Date.now()}`} data={caseTypeData} />;
+                return <ReportCaseType key={`fresh-6-${Date.now()}`} data={casesByType.data} loading={casesByType.loading} />;
             case 7:
-                return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} />;
+                return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} data={beneficiariesByParish.data} loading={beneficiariesByParish.loading} />;
             case 8:
-                return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} />;
+                return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} data={studentInvolvement.data} loading={studentInvolvement.loading} />;
             case 9:
-                return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} />;
+                return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} data={casesByServiceType.data} loading={casesByServiceType.loading} />;
             case 10:
-                return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} />;
+                return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} data={professorInvolvement.data} loading={professorInvolvement.loading} />;
             case 11:
-                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={beneficiaryTypeData} />;
+                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={beneficiaryTypeDistribution.data} loading={beneficiaryTypeDistribution.loading} />;
             default:
                 return null;
         }
     };
 
     const reportDoc = useMemo(() => {
+        // Solo generar el documento si ambas fechas están seleccionadas
+        if (!startDate || !endDate) {
+            return null;
+        }
+
         const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
         const timestamp = Date.now();
         
@@ -182,19 +190,17 @@ function Reports() {
         let parsedStartDate: Date | undefined;
         let parsedEndDate: Date | undefined;
         
-        if (startDate && endDate) {
-            try {
-                parsedStartDate = parseDate(startDate);
-                parsedEndDate = parseDate(endDate);
-                
-                if (!validateDateRange(parsedStartDate, parsedEndDate)) {
-                    console.warn('Invalid date range: start date must be before end date');
-                    parsedStartDate = undefined;
-                    parsedEndDate = undefined;
-                }
-            } catch (error) {
-                console.error('Error parsing dates:', error);
+        try {
+            parsedStartDate = parseDate(startDate);
+            parsedEndDate = parseDate(endDate);
+            
+            if (!validateDateRange(parsedStartDate, parsedEndDate)) {
+                console.warn('Invalid date range: start date must be before end date');
+                return null;
             }
+        } catch (error) {
+            console.error('Error parsing dates:', error);
+            return null;
         }
         
         return (
@@ -226,6 +232,21 @@ function Reports() {
 
     const handleDownloadPDF = async () => {
         if (isGenerating) return;
+        
+        // Validar que ambas fechas estén seleccionadas
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        // Validar que haya reportes seleccionados
+        if (selectedReportIds.length === 0) {
+            return;
+        }
+
+        // Validar que el documento esté disponible
+        if (!reportDoc) {
+            return;
+        }
         
         setIsGenerating(true);
         try {
@@ -260,7 +281,12 @@ function Reports() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
-                    <Button onClick={handleDownloadPDF} variant="outlined" icon={<FilePdf />}>
+                    <Button 
+                        onClick={handleDownloadPDF} 
+                        variant="outlined" 
+                        icon={<FilePdf />}
+                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating}
+                    >
                         {isGenerating ? 'Generando...' : 'Exportar PDF'}
                     </Button>
                 </span>
@@ -312,10 +338,42 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && (
+                        {!isGenerating && !startDate && !endDate && (
+                            <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
+                                <div className="text-center p-6">
+                                    <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
+                                    <p className="text-body-medium text-onSurface/70">
+                                        Selecciona las fechas de inicio y fin para visualizar los reportes
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {!isGenerating && (startDate || endDate) && (!startDate || !endDate) && (
+                            <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
+                                <div className="text-center p-6">
+                                    <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
+                                    <p className="text-body-medium text-onSurface/70">
+                                        Por favor, completa ambas fechas (inicio y fin) para visualizar los reportes
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {!isGenerating && startDate && endDate && reportDoc && (
                             <PDFViewer className="w-full h-full" showToolbar={false}>
                                 {reportDoc}
                             </PDFViewer>
+                        )}
+
+                        {!isGenerating && startDate && endDate && !reportDoc && (
+                            <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
+                                <div className="text-center p-6">
+                                    <p className="text-body-medium text-onSurface/70">
+                                        Selecciona al menos un reporte para visualizar
+                                    </p>
+                                </div>
+                            </div>
                         )}
                     </section>
                 </div>

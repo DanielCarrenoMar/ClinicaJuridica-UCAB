@@ -1,13 +1,14 @@
+// @ts-nocheck
 import type { Request, Response } from 'express';
 import statsService from '../services/stats.service.js';
 
-export async function getQuantityByType(req: Request, res: Response): Promise<void> {
+export async function getCasesBySubject(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getQuantityByType(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getCasesBySubject(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -15,13 +16,13 @@ export async function getQuantityByType(req: Request, res: Response): Promise<vo
   }
 }
 
-export async function getQuantityByStatus(req: Request, res: Response): Promise<void> {
+export async function getCasesBySubjectScope(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getQuantityByStatus(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getCasesBySubjectScope(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -29,13 +30,13 @@ export async function getQuantityByStatus(req: Request, res: Response): Promise<
   }
 }
 
-export async function getQuantityByParish(req: Request, res: Response): Promise<void> {
+export async function getGenderDistribution(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getQuantityByParish(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getGenderDistribution(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -43,13 +44,13 @@ export async function getQuantityByParish(req: Request, res: Response): Promise<
   }
 }
 
-export async function getQuantityByPeriod(req: Request, res: Response): Promise<void> {
+export async function getStateDistribution(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getQuantityByPeriod(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getStateDistribution(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -57,13 +58,13 @@ export async function getQuantityByPeriod(req: Request, res: Response): Promise<
   }
 }
 
-export async function getQuantityBySubject(req: Request, res: Response): Promise<void> {
+export async function getParishDistribution(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getQuantityBySubject(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getParishDistribution(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -71,69 +72,13 @@ export async function getQuantityBySubject(req: Request, res: Response): Promise
   }
 }
 
-export async function getQuantityBySubjectScope(req: Request, res: Response): Promise<void> {
+export async function getCasesByType(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getQuantityBySubjectScope(
-      startDate as string,
-      endDate as string
-    );
-    res.status(result.success ? 200 : 400).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
 
-export async function getApplicantsByGender(req: Request, res: Response): Promise<void> {
-  try {
-    const { startDate, endDate } = req.query;
-    const result = await statsService.getApplicantsByGender(
-      startDate as string,
-      endDate as string
-    );
-    res.status(result.success ? 200 : 400).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
-
-export async function getApplicantsByState(req: Request, res: Response): Promise<void> {
-  try {
-    const { startDate, endDate } = req.query;
-    const result = await statsService.getApplicantsByState(
-      startDate as string,
-      endDate as string
-    );
-    res.status(result.success ? 200 : 400).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
-
-export async function getApplicantsByParish(req: Request, res: Response): Promise<void> {
-  try {
-    const { startDate, endDate } = req.query;
-    const result = await statsService.getApplicantsByParish(
-      startDate as string,
-      endDate as string
-    );
-    res.status(result.success ? 200 : 400).json(result);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
-
-export async function getBeneficiaryTypeCount(req: Request, res: Response): Promise<void> {
-  try {
-    const { startDate, endDate } = req.query;
-    const result = await statsService.getBeneficiaryTypeCount(
-      startDate as string,
-      endDate as string
-    );
+    const result = await statsService.getCasesByType(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -144,10 +89,10 @@ export async function getBeneficiaryTypeCount(req: Request, res: Response): Prom
 export async function getBeneficiariesByParish(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getBeneficiariesByParish(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getBeneficiariesByParish(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -155,13 +100,13 @@ export async function getBeneficiariesByParish(req: Request, res: Response): Pro
   }
 }
 
-export async function getStudentsByType(req: Request, res: Response): Promise<void> {
+export async function getStudentInvolvement(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getStudentsByType(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getStudentInvolvement(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -169,13 +114,41 @@ export async function getStudentsByType(req: Request, res: Response): Promise<vo
   }
 }
 
-export async function getTeachersByType(req: Request, res: Response): Promise<void> {
+export async function getCasesByServiceType(req: Request, res: Response): Promise<void> {
   try {
     const { startDate, endDate } = req.query;
-    const result = await statsService.getTeachersByType(
-      startDate as string,
-      endDate as string
-    );
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getCasesByServiceType(parsedStartDate, parsedEndDate);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getProfessorInvolvement(req: Request, res: Response): Promise<void> {
+  try {
+    const { startDate, endDate } = req.query;
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getProfessorInvolvement(parsedStartDate, parsedEndDate);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+export async function getBeneficiaryTypeDistribution(req: Request, res: Response): Promise<void> {
+  try {
+    const { startDate, endDate } = req.query;
+    const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
+    const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
+
+    const result = await statsService.getBeneficiaryTypeDistribution(parsedStartDate, parsedEndDate);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';

@@ -46,6 +46,11 @@ export async function createSupportDocument(req: Request, res: Response): Promis
 
         // If a file was uploaded, upload to Supabase
         if (req.file) {
+            if (!supabase) {
+                res.status(500).json({ success: false, message: 'Supabase no está configurado. No se pueden subir archivos.' });
+                return;
+            }
+
             const fileName = `${Date.now()}-${req.file.originalname}`;
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('recaudos')
@@ -96,6 +101,11 @@ export async function updateSupportDocument(req: Request, res: Response): Promis
 
         // If a file was uploaded, upload to Supabase and CLEAN UP the old one
         if (req.file) {
+            if (!supabase) {
+                res.status(500).json({ success: false, message: 'Supabase no está configurado. No se pueden subir archivos.' });
+                return;
+            }
+
             // 1. Get the current document to find the OLD fileUrl
             const currentDoc = await supportDocumentService.getSupportDocumentById(idCase, supportNumber);
 
@@ -154,7 +164,7 @@ export async function deleteSupportDocument(req: Request, res: Response): Promis
         // 1. Get the document to find the fileUrl
         const document = await supportDocumentService.getSupportDocumentById(idCaseInt, supportNumberInt);
 
-        if (document.success && document.data.fileUrl) {
+        if (document.success && document.data.fileUrl && supabase) {
             const fileUrl: string = document.data.fileUrl;
             // Extract the filename and decode it (to handle spaces/special chars)
             const fileNameEncoded = fileUrl.split('/').pop();
