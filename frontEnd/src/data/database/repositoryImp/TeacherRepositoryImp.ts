@@ -26,8 +26,14 @@ export function getTeacherRepository(): TeacherRepository {
             return daoToTeacherModel(teacherDAO);
         },
 
-        getCasesByTeacherId: async (id) => {
-            const response = await fetch(`${TEACHER_URL}/${id}/cases`);
+        getCasesByTeacherId: async (id, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${TEACHER_URL}/${id}/cases?${query.toString()}`
+                : `${TEACHER_URL}/${id}/cases`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: CaseInfoDAO[] = result.data;

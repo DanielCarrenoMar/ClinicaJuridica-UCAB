@@ -67,12 +67,12 @@ export function useGetActionsByUserId(userId: string) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadActions = useCallback(async () => {
+    const loadActions = useCallback(async (params?: { page?: number; limit?: number }) => {
         if (!userId) return;
 
         setLoading(true);
         try {
-            const data = await findActionsByUserId(userId);
+            const data = await findActionsByUserId(userId, params);
             setActions(data);
             setError(null);
         } catch (err) {

@@ -25,8 +25,14 @@ export function getStudentRepository(): StudentRepository {
             return daoToStudentModel(studentDAO);
         },
 
-        getCasesByStudentId: async (id) => {
-            const response = await fetch(`${STUDENT_URL}/${id}/cases`);
+        getCasesByStudentId: async (id, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${STUDENT_URL}/${id}/cases?${query.toString()}`
+                : `${STUDENT_URL}/${id}/cases`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: CaseInfoDAO[] = result.data;

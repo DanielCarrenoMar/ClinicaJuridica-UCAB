@@ -43,18 +43,17 @@ export interface ApplicantRepository {
 export interface CaseRepository {
     findAllCases(params?: { page?: number; limit?: number }): Promise<CaseModel[]>;
     findCaseById(id: number): Promise<CaseModel | null>;
-    findBeneficiariesByCaseId(idCase: number): Promise<CaseBeneficiaryModel[]>;
-    findCaseStatusByCaseId(idCase: number): Promise<CaseStatusModel[]>;
-    findStudentsByCaseId(idCase: number): Promise<StudentModel[]>;
+    findBeneficiariesByCaseId(idCase: number, params?: { page?: number; limit?: number }): Promise<CaseBeneficiaryModel[]>;
+    findStudentsByCaseId(idCase: number, params?: { page?: number; limit?: number }): Promise<StudentModel[]>;
     getStatusCaseAmount(): Promise<StatusCaseAmountModel[]>;
     createCase(data: CaseDAO): Promise<CaseModel>;
     createCaseStatusFromCaseId(id: number, data: CaseStatusDAO): Promise<CaseStatusModel>;
     updateCase(id: number, data: Partial<CaseDAO>): Promise<CaseModel>;
     deleteCase(id: number): Promise<void>;
     findStatusCaseAmounts(): Promise<StatusCaseAmountModel>;
-    findCaseActionsByCaseId(idCase: number): Promise<CaseActionModel[]>;
-    findAppointmentByCaseId(idCase: number): Promise<AppointmentModel[]>;
-    findSupportDocumentByCaseId(idCase: number): Promise<SupportDocumentModel[]>;
+    findCaseActionsByCaseId(idCase: number, params?: { page?: number; limit?: number }): Promise<CaseActionModel[]>;
+    findAppointmentByCaseId(idCase: number, params?: { page?: number; limit?: number }): Promise<AppointmentModel[]>;
+    findSupportDocumentByCaseId(idCase: number, params?: { page?: number; limit?: number }): Promise<SupportDocumentModel[]>;
     addStudentToCase(idCase: number, identityCard: string): Promise<void>;
     removeStudentFromCase(idCase: number, identityCard: string): Promise<void>;
     addBeneficiaryToCase(idCase: number, idBeneficiary: string, caseType: CaseBeneficiaryTypeDAO, relationship: string, description: string): Promise<void>;
@@ -65,7 +64,7 @@ export interface CaseActionRepository {
     findAllCaseActions(params?: { page?: number; limit?: number }): Promise<CaseActionModel[]>;
     findCaseActionById(id: string): Promise<CaseActionModel | null>;
     createCaseAction(data: CaseActionDAO): Promise<CaseActionModel>;
-    findActionsByUserId(userId: string): Promise<CaseActionModel[]>;
+    findActionsByUserId(userId: string, params?: { page?: number; limit?: number }): Promise<CaseActionModel[]>;
 }
 
 
@@ -97,7 +96,7 @@ export interface StudentRepository {
     findAllStudents(params?: { page?: number; limit?: number }): Promise<StudentModel[]>;
     findStudentById(id: string): Promise<StudentModel | null>;
     updateStudent(id: string, data: Partial<StudentDAO>): Promise<StudentModel>;
-    getCasesByStudentId(id: string): Promise<CaseModel[]>;
+    getCasesByStudentId(id: string, params?: { page?: number; limit?: number }): Promise<CaseModel[]>;
     importStudents(file: File): Promise<any>;
     createStudent(data: Omit<StudentDAO, 'term'>): Promise<any>;
 }
@@ -106,7 +105,7 @@ export interface TeacherRepository {
     findAllTeachers(params?: { page?: number; limit?: number }): Promise<TeacherModel[]>;
     findTeacherById(id: string): Promise<TeacherModel | null>;
     updateTeacher(id: string, data: Partial<TeacherDAO>): Promise<TeacherModel>;
-    getCasesByTeacherId(id: string): Promise<CaseModel[]>;
+    getCasesByTeacherId(id: string, params?: { page?: number; limit?: number }): Promise<CaseModel[]>;
     createTeacher(data: Omit<TeacherDAO, 'term'>): Promise<any>;
 }
 

@@ -56,9 +56,15 @@ export function getCaseActionRepository(): CaseActionRepository {
 			}
 		},
 
-		findActionsByUserId: async (userId: string) => {
+		findActionsByUserId: async (userId: string, params) => {
 			try {
-				const response = await fetch(`${CASE_ACTION_URL}/user/${userId}`);
+				const query = new URLSearchParams();
+				if (params?.page !== undefined) query.set('page', String(params.page));
+				if (params?.limit !== undefined) query.set('limit', String(params.limit));
+				const url = query.toString()
+					? `${CASE_ACTION_URL}/user/${userId}?${query.toString()}`
+					: `${CASE_ACTION_URL}/user/${userId}`;
+				const response = await fetch(url);
 				if (!response.ok) return [];
 
 				const result = await response.json();

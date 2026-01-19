@@ -78,10 +78,10 @@ export function useGetCasesByStudentId(id?: string) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadCases = useCallback(async (studentId: string) => {
+    const loadCases = useCallback(async (studentId: string, params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await getCasesByStudentId(studentId);
+            const data = await getCasesByStudentId(studentId, params);
             setCases(data);
             setError(null);
         } catch (err) {

@@ -197,10 +197,10 @@ export function useGetStudentsByCaseId(id: number) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadStudents = useCallback(async (id: number) => {
+    const loadStudents = useCallback(async (id: number, params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findStudentsByCaseId(id);
+            const data = await findStudentsByCaseId(id, params);
             setStudents(data);
             setError(null);
         } catch (err) {
@@ -228,10 +228,10 @@ export function useGetBeneficiariesByCaseId(id: number) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadBeneficiaries = useCallback(async (id: number) => {
+    const loadBeneficiaries = useCallback(async (id: number, params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findBeneficiariesByCaseId(id);
+            const data = await findBeneficiariesByCaseId(id, params);
             setBeneficiaries(data);
             setError(null);
         } catch (err) {
@@ -259,10 +259,10 @@ export function useGetCaseActionsByCaseId(id: number) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadCaseActions = useCallback(async (id: number) => {
+    const loadCaseActions = useCallback(async (id: number, params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findCaseActionsByCaseId(id);
+            const data = await findCaseActionsByCaseId(id, params);
             setCaseActions(data);
             setError(null);
         } catch (err) {
@@ -290,10 +290,10 @@ export function useGetAppointmentByCaseId(id: number) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadAppointments = useCallback(async (id: number) => {
+    const loadAppointments = useCallback(async (id: number, params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findAppointmentByCaseId(id);
+            const data = await findAppointmentByCaseId(id, params);
             setAppointments(data);
             setError(null);
         } catch (err) {
@@ -321,10 +321,10 @@ export function useGetSupportDocumentByCaseId(id: number) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
-    const loadSupportDocuments = useCallback(async (id: number) => {
+    const loadSupportDocuments = useCallback(async (id: number, params?: { page?: number; limit?: number }) => {
         setLoading(true);
         try {
-            const data = await findSupportDocumentByCaseId(id);
+            const data = await findSupportDocumentByCaseId(id, params);
             setSupportDocuments(data);
             setError(null);
         } catch (err) {

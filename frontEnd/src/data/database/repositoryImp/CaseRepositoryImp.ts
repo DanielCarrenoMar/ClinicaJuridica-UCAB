@@ -4,10 +4,8 @@ import { CASE_URL } from "./apiUrl";
 import type { CaseInfoDAO } from "#database/daos/caseInfoDAO.ts";
 import type { StatusCaseAmountDAO } from "#database/daos/statusCaseAmountDAO.ts";
 import { daoToStatusCaseAmountModel } from "#domain/models/statusCaseAmount.ts";
-import { daoToCaseStatusModel } from "#domain/models/caseStatus.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import { daoToStudentModel } from "#domain/models/student.ts";
-import type { CaseStatusInfoDAO } from "#database/daos/caseStatusInfoDAO.ts";
 import { daoToAppointmentModel } from "#domain/models/appointment.ts";
 import type { AppointmentInfoDAO } from "#database/daos/appointmentInfoDAO.ts";
 import { daoToSupportDocumentModel } from "#domain/models/supportDocument.ts";
@@ -38,22 +36,27 @@ export function getCaseRepository(): CaseRepository {
 
             return daoToCaseModel(caseDAO);
         },
-        findBeneficiariesByCaseId: async (idCase) => {
-            const response = await fetch(`${CASE_URL}/${idCase}/beneficiaries`);
+        findBeneficiariesByCaseId: async (idCase, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${CASE_URL}/${idCase}/beneficiaries?${query.toString()}`
+                : `${CASE_URL}/${idCase}/beneficiaries`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: CaseBeneficiaryInfoDAO[] = result.data;
             return daoList.map(daoToCaseBeneficiaryModel);
         },
-        findCaseStatusByCaseId: async (idCase) => {
-            const response = await fetch(`${CASE_URL}/${idCase}/status`);
-            if (!response.ok) return [];
-            const result = await response.json();
-            const daoList: CaseStatusInfoDAO[] = result.data;
-            return daoList.map(daoToCaseStatusModel);
-        },
-        findStudentsByCaseId: async (idCase) => {
-            const response = await fetch(`${CASE_URL}/${idCase}/students`);
+        findStudentsByCaseId: async (idCase, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${CASE_URL}/${idCase}/students?${query.toString()}`
+                : `${CASE_URL}/${idCase}/students`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: StudentDAO[] = result.data;
@@ -119,22 +122,40 @@ export function getCaseRepository(): CaseRepository {
             const dao: StatusCaseAmountDAO = result.data;
             return daoToStatusCaseAmountModel(dao);
         },
-        findCaseActionsByCaseId: async (idCase) => {
-            const response = await fetch(`${CASE_URL}/${idCase}/actions`);
+        findCaseActionsByCaseId: async (idCase, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${CASE_URL}/${idCase}/actions?${query.toString()}`
+                : `${CASE_URL}/${idCase}/actions`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: CaseActionInfoDAO[] = result.data;
             return daoList.map(daoToCaseActionModel);
         },
-        findAppointmentByCaseId: async (idCase) => {
-            const response = await fetch(`${CASE_URL}/${idCase}/appointments`);
+        findAppointmentByCaseId: async (idCase, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${CASE_URL}/${idCase}/appointments?${query.toString()}`
+                : `${CASE_URL}/${idCase}/appointments`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: AppointmentInfoDAO[] = result.data;
             return daoList.map(daoToAppointmentModel);
         },
-        findSupportDocumentByCaseId: async (idCase) => {
-            const response = await fetch(`${CASE_URL}/${idCase}/support-documents`);
+        findSupportDocumentByCaseId: async (idCase, params) => {
+            const query = new URLSearchParams();
+            if (params?.page !== undefined) query.set('page', String(params.page));
+            if (params?.limit !== undefined) query.set('limit', String(params.limit));
+            const url = query.toString()
+                ? `${CASE_URL}/${idCase}/support-documents?${query.toString()}`
+                : `${CASE_URL}/${idCase}/support-documents`;
+            const response = await fetch(url);
             if (!response.ok) return [];
             const result = await response.json();
             const daoList: SupportDocumentDAO[] = result.data;
