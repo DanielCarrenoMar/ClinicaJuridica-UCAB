@@ -206,9 +206,7 @@ export default function CaseInvolucrados({
             <section className="flex-1 flex flex-col">
                 <header className="flex justify-between items-center mb-4">
                     <h4 className="text-label-small ">Beneficiarios</h4>
-                    {permissionLevel < 3 && (
-                        <Button variant="outlined" className='h-10' onClick={() => setIsBeneficiarySearchDialogOpen(true)}>Añadir</Button>
-                    )}
+                    <Button variant="outlined" className='h-10' onClick={() => setIsBeneficiarySearchDialogOpen(true)}>Añadir</Button>
                 </header>
                 <InBox>
                     <ul className='flex flex-col gap-3'>
