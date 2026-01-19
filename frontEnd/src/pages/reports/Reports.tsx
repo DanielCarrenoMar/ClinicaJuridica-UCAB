@@ -23,6 +23,7 @@ import ReportCaseTypeDistribution from './components/ReportCaseTypeDistribution'
 import ReportBeneficiaryParishDistribution from './components/ReportBeneficiaryParishDistribution';
 import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
 import ReportStudentInvolvement from './components/ReportStudentInvolvement';
+import ReportBeneficiaryTypeDistribution from './components/ReportBeneficiaryTypeDistribution';
 import LinkButton from '#components/LinkButton.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
@@ -99,6 +100,13 @@ const reportOptions = [
         icon: <ChartPie />,
         component: <ReportProfessorInvolvement />
     },
+    {
+        id: 11,
+        title: 'Beneficiarios directos e indirectos',
+        description: 'Distribución de beneficiarios por tipo (directos e indirectos)',
+        icon: <ChartPie />,
+        component: <ReportBeneficiaryTypeDistribution />
+    },
 ];
 
 function Reports() {
@@ -131,6 +139,8 @@ function Reports() {
                 return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} />;
             case 10:
                 return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} />;
+            case 11:
+                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} />;
             default:
                 return null;
         }
