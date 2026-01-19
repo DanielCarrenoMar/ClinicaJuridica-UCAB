@@ -647,7 +647,31 @@ async function main() {
         EXECUTE FUNCTION case_status_insert_action();
     `);
 
+    console.log('Creating check constraint for FamilyHome member counts');
+    await prisma.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'familyhome_membercount_check'
+            ) THEN
+                ALTER TABLE "FamilyHome"
+                ADD CONSTRAINT familyhome_membercount_check
+                CHECK (
+                    ("memberCount" IS NULL AND "workingMemberCount" IS NULL AND "children7to12Count" IS NULL AND "studentChildrenCount" IS NULL)
+                    OR (
+                        "memberCount" IS NOT NULL
+                        AND "memberCount" >= COALESCE("workingMemberCount", 0)
+                        AND "memberCount" >= COALESCE("children7to12Count", 0)
+                        AND "memberCount" >= COALESCE("studentChildrenCount", 0)
+                    )
+                );
+            END IF;
+        END $$;
+    `);
 
+    
 }
 main()
     .catch((e) => {
