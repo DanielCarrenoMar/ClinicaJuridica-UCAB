@@ -34,6 +34,101 @@ class StatsService {
     }
   }
 
+  async getQuantityByStatus(startDate?: string, endDate?: string) {
+    try {
+      let dateFilter = '';
+      if (startDate && endDate) {
+        dateFilter = `AND c."createdAt" >= CAST(${startDate} AS DATE) AND c."createdAt" <= CAST(${endDate} AS DATE)`;
+      }
+
+      const result = await prisma.$queryRaw`
+        SELECT 
+          cs.name,
+          COUNT(*) as count
+        FROM "Case" c
+        INNER JOIN "CaseStatus" cs ON c."idCaseStatus" = cs."idCaseStatus"
+        WHERE 1=1 ${dateFilter}
+        GROUP BY cs.name
+        ORDER BY count DESC
+      `;
+
+      const stats = Array.isArray(result) ? result : [];
+      
+      const formattedStats = stats.map((s: any) => ({
+        label: s.name || 'Sin Estado',
+        value: Number(s.count || 0),
+        color: this.getRandomColor()
+      }));
+
+      return { success: true, data: formattedStats };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async getQuantityByParish(startDate?: string, endDate?: string) {
+    try {
+      let dateFilter = '';
+      if (startDate && endDate) {
+        dateFilter = `AND c."createdAt" >= CAST(${startDate} AS DATE) AND c."createdAt" <= CAST(${endDate} AS DATE)`;
+      }
+
+      const result = await prisma.$queryRaw`
+        SELECT 
+          p.name,
+          COUNT(*) as count
+        FROM "Case" c
+        INNER JOIN "Parish" p ON c."idParish" = p."idParish"
+        WHERE 1=1 ${dateFilter}
+        GROUP BY p.name
+        ORDER BY count DESC
+      `;
+
+      const stats = Array.isArray(result) ? result : [];
+      
+      const formattedStats = stats.map((s: any) => ({
+        label: s.name || 'Sin Parroquia',
+        value: Number(s.count || 0),
+        color: this.getRandomColor()
+      }));
+
+      return { success: true, data: formattedStats };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async getQuantityByPeriod(startDate?: string, endDate?: string) {
+    try {
+      let dateFilter = '';
+      if (startDate && endDate) {
+        dateFilter = `AND c."createdAt" >= CAST(${startDate} AS DATE) AND c."createdAt" <= CAST(${endDate} AS DATE)`;
+      }
+
+      const result = await prisma.$queryRaw`
+        SELECT 
+          DATE_TRUNC('month', c."createdAt") as period,
+          COUNT(*) as count
+        FROM "Case" c
+        WHERE 1=1 ${dateFilter}
+        GROUP BY DATE_TRUNC('month', c."createdAt")
+        ORDER BY period ASC
+      `;
+
+      const stats = Array.isArray(result) ? result : [];
+      
+      const formattedStats = stats.map((s: any) => ({
+        label: new Date(s.period).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' }),
+        value: Number(s.count || 0),
+        color: this.getRandomColor()
+      }));
+
+      return { success: true, data: formattedStats };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async getQuantityBySubject(startDate?: string, endDate?: string) {
     try {
       let dateFilter = '';
