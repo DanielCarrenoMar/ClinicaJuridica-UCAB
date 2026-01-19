@@ -71,6 +71,31 @@ export function useGetUserById(id: string) {
 	};
 }
 
+export function useFindUser() {
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<Error | null>(null);
+
+	const findUser = useCallback(async (id: string): Promise<UserModel | null> => {
+		const { findUserById } = getUserRepository();
+		setLoading(true);
+		try {
+			const user = await findUserById(id);
+			return user;
+		} catch (err) {
+			setError(err as Error);
+			return null;
+		} finally {
+			setLoading(false);
+		}
+	}, []);
+
+	return {
+		findUser,
+		loading,
+		error
+	};
+}
+
 export function useLoginUser() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -105,7 +130,7 @@ export function useLoginUser() {
 }
 
 export function useUpdateUserById() {
-	const { updateUser: updateUserData  } = getUserRepository();
+	const { updateUser: updateUserData } = getUserRepository();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
@@ -118,11 +143,37 @@ export function useUpdateUserById() {
 			setError(err as Error);
 		} finally {
 			setLoading(false);
-		}	
+		}
 	}, [updateUserData]);
 
 	return {
 		updateUserById,
+		loading,
+		error,
+	};
+}
+
+export function useCreateUser() {
+	const { createUser: createUserRepo } = getUserRepository();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<Error | null>(null);
+
+	const createUser = useCallback(async (data: any) => {
+		setLoading(true);
+		try {
+			const result = await createUserRepo(data);
+			setError(null);
+			return result;
+		} catch (err) {
+			setError(err as Error);
+			throw err;
+		} finally {
+			setLoading(false);
+		}
+	}, [createUserRepo]);
+
+	return {
+		createUser,
 		loading,
 		error,
 	};

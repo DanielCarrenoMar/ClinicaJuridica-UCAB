@@ -137,7 +137,7 @@ class UserService {
       `;
 
       if (existing.length > 0) {
-        return { success: false, message: 'CÃ©dula o Email ya registrado' };
+        return { success: false, message: 'Cedula o Email ya registrado' };
       }
 
       const type = this.normalizeType(data.type);
@@ -153,10 +153,41 @@ class UserService {
       // Hash password
       const hashedPass = await PasswordUtil.hash(data.password);
 
-      await prisma.$executeRaw`
-        INSERT INTO "User" ("identityCard", "fullName", "email", "password", "isActive", "type", "gender")
-        VALUES (${data.identityCard}, ${fullName}, ${data.email}, ${hashedPass}, ${data.isActive ?? true}, ${type}, ${gender})
-      `;
+      // Map UserType explicitly for DB (Enum values are 'E', 'P', 'C')
+      let userTypeDB = 'E';
+      if (type === 'P' || type === 'TEACHER') userTypeDB = 'P';
+      else if (type === 'C' || type === 'COORDINATOR') userTypeDB = 'C';
+      else userTypeDB = 'E'; // Default Student
+
+      // Get current term for Teacher record (needed if Coordinator)
+      let currentTerm = '';
+      if (userTypeDB === 'C') {
+        const semester = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' }, take: 1 });
+        if (!semester) return { success: false, message: 'No hay semestres activos para registrar al coordinador como profesor.' };
+        currentTerm = semester.term;
+      }
+
+      await prisma.$transaction(async (tx) => {
+        await tx.$executeRaw`
+          INSERT INTO "User" ("identityCard", "fullName", "email", "password", "isActive", "type", "gender")
+          VALUES (${data.identityCard}, ${fullName}, ${data.email}, ${hashedPass}, ${data.isActive ?? true}, ${userTypeDB}::"UserType", ${gender}::"Gender")
+        `;
+
+        if (userTypeDB === 'C') {
+          await tx.$executeRaw`
+                INSERT INTO "Coordinator" ("identityCard")
+                VALUES (${data.identityCard})
+            `;
+
+          // Also register as Teacher (Coordinator is always REGULAR)
+          const teacherTypeDB = 'R';
+
+          await tx.$executeRaw`
+            INSERT INTO "Teacher" ("identityCard", "term", "type")
+            VALUES (${data.identityCard}, ${currentTerm}, ${teacherTypeDB}::"TeacherType")
+          `;
+        }
+      });
 
       return { success: true, message: 'Creado exitosamente' };
     } catch (error: any) {

@@ -158,3 +158,29 @@ export function useImportStudents() {
         error,
     };
 }
+
+export function useCreateStudent() {
+    const { createStudent: createStudentRepo } = getStudentRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const createStudent = useCallback(async (data: any) => {
+        setLoading(true);
+        try {
+            const result = await createStudentRepo(data);
+            setError(null);
+            return result;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [createStudentRepo]);
+
+    return {
+        createStudent,
+        loading,
+        error,
+    };
+}

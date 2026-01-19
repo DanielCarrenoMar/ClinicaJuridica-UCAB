@@ -51,3 +51,17 @@ export async function updateTeacher(req: Request, res: Response): Promise<void> 
     res.status(500).json({ success: false, error: msg });
   }
 }
+export async function createTeacher(req: Request, res: Response): Promise<void> {
+  try {
+    const data = req.body;
+    if (!data.identityCard || !data.password) {
+      res.status(400).json({ success: false, message: 'Faltan campos requeridos (cedula, contraseña)' });
+      return;
+    }
+    const result = await teacherService.createTeacher(data);
+    res.status(result.success ? 201 : 400).json(result);
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}

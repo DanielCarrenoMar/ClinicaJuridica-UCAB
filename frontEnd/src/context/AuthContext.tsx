@@ -29,24 +29,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserModel | null>(null);
     const [authLoading, setAuthLoading] = useState(true);
 
-    const { login: loginUser, loading:loginLoading, error, clearError } = useLoginUser();
+    const { login: loginUser, loading: loginLoading, error, clearError } = useLoginUser();
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
-        if (!storedUser) return;
+        if (!storedUser) {
+            setAuthLoading(false);
+            return;
+        }
 
         const { email, password } = JSON.parse(storedUser) as { email?: string; password?: string };
         if (!email || !password) {
             localStorage.removeItem('user');
+            setAuthLoading(false);
             return;
         }
 
         void (async () => {
-            const loggedInUser = await loginUser(email, password);
-            setUser(loggedInUser);
-            setAuthLoading(false);
+            try {
+                const loggedInUser = await loginUser(email, password);
+                if (loggedInUser) {
+                    setUser(loggedInUser);
+                } else {
+                    // If login fails (e.g. credential change), clear storage
+                    localStorage.removeItem('user');
+                }
+            } catch (e) {
+                console.error("Auto-login failed:", e);
+                localStorage.removeItem('user');
+            } finally {
+                setAuthLoading(false);
+            }
         })();
-    }, [loginUser]);
+    }, []); // Removed [loginUser] dependency to avoid re-running on loginUser change which shouldn't happen but is safer empty
 
     const login = async (mail: string, password: string) => {
         const loggedInUser = await loginUser(mail, password);

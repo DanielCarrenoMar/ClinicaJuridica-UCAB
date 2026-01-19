@@ -132,3 +132,29 @@ export function useUpdateTeacherById() {
         error,
     };
 }
+
+export function useCreateTeacher() {
+    const { createTeacher: createTeacherRepo } = getTeacherRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const createTeacher = useCallback(async (data: any) => {
+        setLoading(true);
+        try {
+            const result = await createTeacherRepo(data);
+            setError(null);
+            return result;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [createTeacherRepo]);
+
+    return {
+        createTeacher,
+        loading,
+        error,
+    };
+}

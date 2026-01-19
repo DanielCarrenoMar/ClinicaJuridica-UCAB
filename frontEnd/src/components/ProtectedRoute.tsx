@@ -11,7 +11,11 @@ export default function ProtectedRoute({ requiredLevel, redirectPath = '/' }: Pr
 
     // Assuming lower number = higher permission
     // If user's level is greater than required level, they don't have permission
-    if (permissionLevel > requiredLevel && !loading) {
+    if (loading) {
+        return <div className="flex h-screen w-full items-center justify-center bg-background"><div className="size-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>;
+    }
+
+    if (!permissionLevel || permissionLevel > requiredLevel) {
         return <Navigate to={redirectPath} replace />;
     }
 

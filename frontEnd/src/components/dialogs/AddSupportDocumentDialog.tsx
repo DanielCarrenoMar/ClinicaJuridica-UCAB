@@ -17,6 +17,7 @@ export default function AddSupportDocumentDialog({
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     if (!open) return null;
 
@@ -68,7 +69,27 @@ export default function AddSupportDocumentDialog({
                     <label className="flex items-center px-1.5 w-full text-label-small">
                         Documento Adjunto
                     </label>
-                    <div className="flex items-center gap-3">
+                    <div
+                        className={`flex items-center gap-3 p-2 rounded-xl border-2 border-dashed transition-all ${isDragging ? 'border-primary bg-primary/5' : 'border-transparent'}`}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDragging(true);
+                        }}
+                        onDragLeave={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDragging(false);
+                        }}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDragging(false);
+                            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                                setFile(e.dataTransfer.files[0]);
+                            }
+                        }}
+                    >
                         <input
                             type="file"
                             id="file-upload"
@@ -78,12 +99,12 @@ export default function AddSupportDocumentDialog({
                         <Button
                             variant="outlined"
                             onClick={() => document.getElementById('file-upload')?.click()}
-                            className="flex-1"
+                            className={file ? "min-w-24 px-3" : "flex-1"}
                         >
                             {file ? 'Cambiar Archivo' : 'Seleccionar Archivo'}
                         </Button>
                         {file && (
-                            <span className="text-body-small truncate max-w-[150px]" title={file.name}>
+                            <span className="text-body-small truncate max-w-[180px]" title={file.name}>
                                 {file.name}
                             </span>
                         )}

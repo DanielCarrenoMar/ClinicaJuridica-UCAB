@@ -38,7 +38,7 @@ export function getUserRepository(): UserRepository {
             }
 
             const result = await response.json();
-            
+
             if (!result.success) {
                 throw new Error(result.message || 'Credenciales inválidas');
             }
@@ -59,6 +59,19 @@ export function getUserRepository(): UserRepository {
             const result = await response.json();
             const updatedUserDAO: UserDAO = result.data;
             return daoToUserModel(updatedUserDAO);
+        },
+
+        createUser: async (data: UserDAO) => {
+            const response = await fetch(USER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al crear usuario');
+            }
+            return await response.json();
         }
     } as UserRepository;
 }

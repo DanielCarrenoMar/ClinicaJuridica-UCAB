@@ -19,6 +19,7 @@ export default function ImportStudentsDialog({
 }: ImportStudentsDialogProps) {
     const [file, setFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
     const [importResult, setImportResult] = useState<any | null>(null);
     const [generalError, setGeneralError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +90,27 @@ export default function ImportStudentsDialog({
 
                         <div
                             onClick={() => fileInputRef.current?.click()}
-                            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all ${file ? 'border-primary/50 bg-primary/5' : 'border-onSurface/20 hover:border-primary/30 hover:bg-surface-variant/20'}`}
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsDragging(true);
+                            }}
+                            onDragLeave={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsDragging(false);
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsDragging(false);
+                                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                                    setFile(e.dataTransfer.files[0]);
+                                    setImportResult(null);
+                                    setGeneralError(null);
+                                }
+                            }}
+                            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all ${isDragging ? 'border-primary bg-primary/10' : (file ? 'border-primary/50 bg-primary/5' : 'border-onSurface/20 hover:border-primary/30 hover:bg-surface-variant/20')}`}
                         >
                             <input
                                 type="file"
@@ -102,7 +123,7 @@ export default function ImportStudentsDialog({
                                 <div className="flex items-center gap-3">
                                     <File className="size-10 text-primary" />
                                     <div className="flex flex-col">
-                                        <span className="text-body-large font-medium">{file.name}</span>
+                                        <span className="text-body-large font-medium truncate max-w-[280px]" title={file.name}>{file.name}</span>
                                         <span className="text-body-small text-onSurface/60">{(file.size / 1024).toFixed(2)} KB</span>
                                     </div>
                                 </div>

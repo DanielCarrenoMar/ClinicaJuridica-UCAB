@@ -9,6 +9,7 @@ import Button from '#components/Button.tsx'
 import LoadingSpinner from '#components/LoadingSpinner.tsx'
 import UserListRow from '#components/UserListRow.tsx'
 import ImportStudentsDialog from '#components/dialogs/ImportStudentsDialog.tsx'
+import AddUserDialog from '#components/dialogs/AddUserDialog.tsx'
 import { useNotifications } from '#/context/NotificationsContext'
 
 function Users() {
@@ -18,6 +19,7 @@ function Users() {
   const [searchValue, setSearchValue] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
 
   const filteredUsers = useMemo(() => {
     if (searchValue === '') return users
@@ -43,7 +45,7 @@ function Users() {
   }
 
   const handleAddUser = () => {
-    console.log('Adding new user...')
+    setIsAddUserDialogOpen(true)
   }
 
   const handleImport = async (file: File) => {
@@ -98,6 +100,12 @@ function Users() {
         onClose={() => setIsImportDialogOpen(false)}
         onImport={handleImport}
         isLoading={importLoading}
+      />
+
+      <AddUserDialog
+        open={isAddUserDialogOpen}
+        onClose={() => setIsAddUserDialogOpen(false)}
+        onSuccess={refresh}
       />
     </div>
   )

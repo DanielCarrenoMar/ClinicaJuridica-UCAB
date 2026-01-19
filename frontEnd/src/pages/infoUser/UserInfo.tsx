@@ -17,9 +17,11 @@ import { useGetTeacherById, useUpdateTeacherById } from '#domain/useCaseHooks/us
 import { useGetStudentById, useUpdateStudentById } from '#domain/useCaseHooks/useStudent.ts'
 import { modelToStudentDao, type StudentModel } from '#domain/models/student.ts'
 import { useNotifications } from '#/context/NotificationsContext.tsx'
+import { useAuth } from '#/context/AuthContext.tsx'
 
 function UserInfo() {
   const { userId } = useParams<{ userId: string }>()
+  const { user: currentUser, permissionLevel } = useAuth()
 
   const { user, loading: userLoading } = useGetUserById(userId ?? '')
   const { users } = useGetAllUsers()
@@ -34,6 +36,7 @@ function UserInfo() {
   const [localUser, setLocalUser] = useState<UserModel>();
   const [localStudent, setLocalStudent] = useState<StudentModel>();
   const [localTeacher, setLocalTeacher] = useState<TeacherModel>();
+  const [newPassword, setNewPassword] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState('General')
   const [isDataModified, setIsDataModified] = useState(false)
@@ -48,7 +51,10 @@ function UserInfo() {
   }, [user, loadStudent, loadTeacher])
 
   useEffect(() => {
-    if (user) setLocalUser(user)
+    if (user) {
+      setLocalUser(user)
+      setNewPassword('')
+    }
   }, [user])
 
   useEffect(() => {
@@ -64,13 +70,24 @@ function UserInfo() {
   }, [teacher])
 
   useEffect(() => {
+    if (user) {
+      setLocalUser(user)
+      setNewPassword('') // Reset password field
+    }
+  }, [user])
+
+  // ... other useEffects
+
+  // Data modified check needed. Include newPassword check.
+  useEffect(() => {
     const isUserChanged = JSON.stringify(localUser) !== JSON.stringify(user);
     const isStudentChanged = student && localStudent ? JSON.stringify(localStudent) !== JSON.stringify(student) : false;
     const isTeacherChanged = teacher && localTeacher ? JSON.stringify(localTeacher) !== JSON.stringify(teacher) : false;
+    const isPasswordChanged = newPassword !== '';
 
-    const hasChanges = isUserChanged || isStudentChanged || isTeacherChanged;
+    const hasChanges = isUserChanged || isStudentChanged || isTeacherChanged || isPasswordChanged;
     setIsDataModified(hasChanges);
-  }, [localUser, user, localStudent, student, localTeacher, teacher])
+  }, [localUser, user, localStudent, student, localTeacher, teacher, newPassword])
 
   useEffect(() => {
     if (!localUser) return;
@@ -104,7 +121,7 @@ function UserInfo() {
     return <div className='p-8 text-center text-error'>ID de usuario no proporcionado</div>
   }
 
-  if (userLoading) return <div className='p-8 text-center text-gray-500'>Cargando informaci�n del usuario...</div>
+  if (userLoading) return <div className='p-8 text-center text-gray-500'>Cargando información del usuario...</div>
   if (!user) return <div className='p-8 text-center text-red-500'>Usuario no encontrado</div>
 
   if (user.type === 'Estudiante' && !student && studentLoading) return <div className='p-8 text-center text-gray-500'>Cargando datos de estudiante...</div>
@@ -136,6 +153,7 @@ function UserInfo() {
     setLocalUser(user ?? undefined);
     setLocalStudent(student ?? undefined);
     setLocalTeacher(teacher ?? undefined);
+    setNewPassword('');
     setIsDataModified(false);
   }
 
@@ -143,18 +161,60 @@ function UserInfo() {
     if (!localUser) return;
     if (!user) return;
     if (validationErrors.identityCard) return;
+
+    // Prepare password update
+    // We modify localUser temporarily or create a special payload
+    let finalUserDao: any = modelToUserDao(localUser);
+    if (newPassword) {
+      finalUserDao.password = newPassword;
+    } else {
+      delete finalUserDao.password; // Ensure we don't send hash or empty string if that's what modelToUserDao produces
+    }
+
+    // Student/Teacher updates don't involve password usually, but User update does.
+
     if (user.type === 'Estudiante' && localStudent) {
-      updateStudentById(localStudent.identityCard, modelToStudentDao(localStudent)).catch(notyError)
+      // If updating student, we might need to update USER part too if user fields changed or password changed.
+      // updateStudentById usually updates student fields. 
+      // If we used updateStudentById, does it update user fields? 
+      // Checked backend student.service.updateStudent: calls userService.updateUser!
+      // So use updateStudentById with merged data is better?
+      // modelToStudentDao returns StudentDAO. Does it include User fields?
+      // StudentDAO extends Omit<UserDAO, 'type'>. It SHOULD include password.
+
+      const studentDao: any = modelToStudentDao(localStudent);
+      // Merge user fields into studentDao just in case localUser has changes (fullName etc)
+      studentDao.fullName = localUser.fullName;
+      studentDao.email = localUser.email;
+      studentDao.gender = modelToUserDao(localUser).gender; // use helper
+
+      if (newPassword) studentDao.password = newPassword;
+      else delete studentDao.password;
+
+      updateStudentById(localStudent.identityCard, studentDao).catch(notyError)
       setIsDataModified(false);
       return
     } else if (user.type === 'Profesor' && localTeacher) {
-      updateTeacherById(localTeacher.identityCard, modelToTeacherDao(localTeacher)).catch(notyError)
+      // Similar logic for teacher
+      const teacherDao: any = modelToTeacherDao(localTeacher);
+      teacherDao.fullName = localUser.fullName;
+      teacherDao.email = localUser.email;
+      teacherDao.gender = modelToUserDao(localUser).gender;
+
+      if (newPassword) teacherDao.password = newPassword;
+      else delete teacherDao.password;
+
+      updateTeacherById(localTeacher.identityCard, teacherDao).catch(notyError)
       setIsDataModified(false);
       return
     }
-    updateUserById(localUser.identityCard, modelToUserDao(localUser)).catch(notyError)
+
+    // Regular User / Coordinator / direct User update
+    updateUserById(localUser.identityCard, finalUserDao).catch(notyError)
     setIsDataModified(false);
   }
+
+  const canEditPassword = currentUser?.identityCard === user?.identityCard;
 
   let content = null;
   switch (activeTab) {
@@ -170,10 +230,14 @@ function UserInfo() {
             handleTeacherChange={handleTeacherChange}
             handleStudentChange={handleStudentChange}
             validationErrors={validationErrors}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            canEditPassword={canEditPassword}
           />
         );
       }
       break;
+
     case 'Casos Asociados':
       content = (
         <UserCases userId={userId} userType={user.type ?? 'Estudiante'} />
@@ -218,6 +282,7 @@ function UserInfo() {
               triggerClassName={getActiveColor(localUser?.isActive ?? false)}
               selectedValue={localUser?.isActive ? 'Activo' : 'Inactivo'}
               onSelectionChange={(result) => { handleUserChange({ isActive: result === 'Activo' }) }}
+              disabled={permissionLevel > 2}
             >
               <DropdownOption value='Activo'>Activo</DropdownOption>
               <DropdownOption value='Inactivo'>Inactivo</DropdownOption>

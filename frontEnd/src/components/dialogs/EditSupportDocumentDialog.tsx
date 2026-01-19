@@ -20,6 +20,7 @@ export default function EditSupportDocumentDialog({
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         if (document) {
@@ -77,7 +78,27 @@ export default function EditSupportDocumentDialog({
                     <label className="flex items-center px-1.5 w-full text-label-small">
                         Documento Adjunto
                     </label>
-                    <div className="flex items-center gap-3">
+                    <div
+                        className={`flex items-center gap-3 p-2 rounded-xl border-2 border-dashed transition-all ${isDragging ? 'border-primary bg-primary/5' : 'border-transparent'}`}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDragging(true);
+                        }}
+                        onDragLeave={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDragging(false);
+                        }}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsDragging(false);
+                            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                                setFile(e.dataTransfer.files[0]);
+                            }
+                        }}
+                    >
                         <input
                             type="file"
                             id="edit-file-upload"
@@ -87,7 +108,7 @@ export default function EditSupportDocumentDialog({
                         <Button
                             variant="outlined"
                             onClick={() => window.document.getElementById('edit-file-upload')?.click()}
-                            className="flex-1"
+                            className={file ? "min-w-24 px-3" : "flex-1"}
                         >
                             {file ? 'Cambiar Archivo' : document.fileUrl ? 'Reemplazar Archivo' : 'Seleccionar Archivo'}
                         </Button>

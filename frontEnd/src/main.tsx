@@ -41,8 +41,9 @@ const router = createBrowserRouter(
 
           <Route element={<ProtectedRoute requiredLevel={2} />}>
             <Route path="/usuarios" element={<Users />} />
-            <Route path="/usuario/:userId" element={<UserInfo />} />
           </Route>
+
+          <Route path="/usuario/:userId" element={<UserInfo />} />
 
           <Route element={<ProtectedRoute requiredLevel={1} />}>
             <Route path="/semestres" element={<Semesters />} />

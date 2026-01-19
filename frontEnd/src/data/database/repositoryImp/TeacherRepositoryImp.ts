@@ -47,6 +47,19 @@ export function getTeacherRepository(): TeacherRepository {
             const result = await response.json();
             const updatedTeacherDAO: TeacherDAO = result.data;
             return daoToTeacherModel(updatedTeacherDAO);
+        },
+
+        createTeacher: async (data: Omit<TeacherDAO, 'term'>) => {
+            const response = await fetch(TEACHER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al crear profesor');
+            }
+            return await response.json();
         }
 
     } as TeacherRepository;

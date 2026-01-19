@@ -1,17 +1,18 @@
 import prisma from '#src/config/database.js';
 import userService from './user.service.js';
+import { PasswordUtil } from '../utils/password.util.js';
 
 class TeacherService {
   async getAllTeachers(term?: string, pagination?: { page: number; limit: number; all: boolean }) {
     try {
       let resolvedTerm = term;
-      
+
       if (!resolvedTerm) {
         const termRows = await prisma.$queryRaw`
           SELECT MAX("term") as term
           FROM "Semester"
         ` as Array<{ term: string | null }>;
-        
+
         resolvedTerm = termRows?.[0]?.term ?? undefined;
       }
 
@@ -197,7 +198,7 @@ class TeacherService {
 
   async updateTeacher(id: string, data: any) {
     try {
-      const userUpdate = await userService.updateUser(id, {...data, type: 'P' });
+      const userUpdate = await userService.updateUser(id, { ...data, type: 'P' });
       if (!userUpdate.success) {
         return userUpdate;
       }
@@ -223,6 +224,52 @@ class TeacherService {
       }
 
       return { success: true, message: 'Profesor actualizado correctamente' };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async createTeacher(data: any) {
+    try {
+      const semester = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' }, take: 1 });
+      if (!semester) return { success: false, message: 'No hay semestres activos' };
+      const currentTerm = semester.term;
+
+      const userExists = await prisma.user.findUnique({ where: { identityCard: data.identityCard } });
+      if (userExists) return { success: false, message: 'El usuario ya existe' };
+
+      const hashedPassword = await PasswordUtil.hash(data.password);
+      const gender = data.gender === 'F' ? 'F' : (data.gender === 'M' ? 'M' : null);
+
+      // Map TeacherType to DB Enum values
+      let teacherTypeDB = 'R'; // Default REGULAR -> R
+      if (data.type === 'VOLUNTEER' || data.type === 'V') teacherTypeDB = 'V';
+      else if (data.type === 'REGULAR' || data.type === 'R') teacherTypeDB = 'R';
+
+      await prisma.$transaction(async (tx) => {
+        await tx.$executeRaw`
+            INSERT INTO "User" ("identityCard", "fullName", "email", "password", "type", "gender", "isActive")
+            VALUES (
+                ${data.identityCard},
+                ${data.fullName},
+                ${data.email},
+                ${hashedPassword},
+                'P'::"UserType",
+                ${gender}::"Gender",
+                true
+            )
+          `;
+
+        await tx.$executeRaw`
+            INSERT INTO "Teacher" ("identityCard", "term", "type")
+            VALUES (
+                ${data.identityCard},
+                ${currentTerm},
+                ${teacherTypeDB}::"TeacherType"
+            )
+          `;
+      });
+      return { success: true, message: 'Profesor creado exitosamente' };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

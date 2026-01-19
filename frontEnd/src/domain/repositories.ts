@@ -24,6 +24,7 @@ import type { SemesterModel } from "./models/semester";
 import type { NucleusModel } from "./models/nucleus";
 import type { NucleusDAO } from "#database/daos/nucleusDAO.ts";
 import type { SemesterDAO } from "#database/daos/semesterDAO.ts";
+
 export interface BeneficiaryRepository {
     findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -89,6 +90,7 @@ export interface UserRepository {
     findUserById(id: string): Promise<UserModel | null>;
     updateUser(id: string, data: Partial<UserDAO>): Promise<UserModel>;
     authenticate(email: string, password: string): Promise<UserModel>;
+    createUser(data: UserDAO): Promise<any>;
 }
 
 export interface StudentRepository {
@@ -97,6 +99,7 @@ export interface StudentRepository {
     updateStudent(id: string, data: Partial<StudentDAO>): Promise<StudentModel>;
     getCasesByStudentId(id: string): Promise<CaseModel[]>;
     importStudents(file: File): Promise<any>;
+    createStudent(data: Omit<StudentDAO, 'term'>): Promise<any>;
 }
 
 export interface TeacherRepository {
@@ -104,6 +107,7 @@ export interface TeacherRepository {
     findTeacherById(id: string): Promise<TeacherModel | null>;
     updateTeacher(id: string, data: Partial<TeacherDAO>): Promise<TeacherModel>;
     getCasesByTeacherId(id: string): Promise<CaseModel[]>;
+    createTeacher(data: Omit<TeacherDAO, 'term'>): Promise<any>;
 }
 
 export interface SemesterRepository {

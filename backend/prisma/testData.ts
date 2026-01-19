@@ -183,17 +183,24 @@ async function main() {
             type: 'COORDINATOR' as any
         }
     });
-    
+
     await prisma.coordinator.upsert({
         where: { identityCard: coordinadorUser.identityCard },
         update: {},
         create: { identityCard: coordinadorUser.identityCard }
     });
 
+    // Coordinator is also a Teacher
+    await prisma.teacher.upsert({
+        where: { identityCard_term: { identityCard: coordinadorUser.identityCard, term: semester.term } },
+        update: {},
+        create: { identityCard: coordinadorUser.identityCard, term: semester.term, type: 'REGULAR' as any }
+    });
+
     console.log('Creando 18 estudiantes...');
     const students = [];
     const studentPass = await bcrypt.hash('seeded-student', SALT_ROUNDS);
-    
+
     for (let i = 1; i <= 18; i++) {
         const idCard = (27000000 + i).toString();
         const user = await prisma.user.upsert({
@@ -226,7 +233,7 @@ async function main() {
     console.log('Creando beneficiarios y solicitantes...');
     // We'll create 5 base applicants to distribute cases among them, plus the 2 specific ones requested before
     const applicants = [];
-    
+
     // Original 2 applicants
     const appInfoUnique = [
         { id: '80010001', name: 'Laura Campos', gender: Gender.F, email: 'laura.campos@example.com' },
@@ -234,7 +241,7 @@ async function main() {
     ];
 
     // Generic additional applicants
-    for(let i=3; i<=10; i++) {
+    for (let i = 3; i <= 10; i++) {
         appInfoUnique.push({
             id: (80010000 + i).toString(),
             name: `Solicitante ${i}`,
@@ -290,7 +297,7 @@ async function main() {
     const justificativoSolteria = await getLegalArea('Materia Civil', 'Personas', 'Justificativo de Soltería');
     const divorcioSeparacion = await getLegalArea('Materia Civil', 'Familia - Tribunales Ordinarios', 'Divorcio por separación de hechos (185-A)');
     const areas = [justificativoSolteria, divorcioSeparacion];
-    
+
     // We will create cases now
     // We mix problem summaries and applicants
     const allCases = [];
@@ -300,13 +307,13 @@ async function main() {
         const summary = PROBLEM_SUMMARIES[i % PROBLEM_SUMMARIES.length];
         const applicant = applicants[i % applicants.length];
         const area = areas[i % areas.length];
-        
+
         // Vary process type
         const processTypes = ['IN_PROGRESS', 'ADVICE', 'MEDIATION', 'DRAFTING'];
         const pType = processTypes[i % processTypes.length];
 
         const newCase = await ensureCase({
-            problemSummary: `${summary} (Caso ${i+1})`,
+            problemSummary: `${summary} (Caso ${i + 1})`,
             processType: pType as any,
             applicantId: applicant.identityCard,
             idNucleus: nucleus.idNucleus,
@@ -316,7 +323,7 @@ async function main() {
             teacherTerm: teacher.term,
             idCourt: null
         });
-        
+
         allCases.push(newCase);
 
         // Case Status
@@ -336,9 +343,9 @@ async function main() {
         const beneficiary = applicants[(i + 1) % applicants.length];
 
         const checkBen = await prisma.caseBeneficiary.findUnique({
-             where: { idCase_beneficiaryId: { idCase: newCase.idCase, beneficiaryId: beneficiary.identityCard } }
+            where: { idCase_beneficiaryId: { idCase: newCase.idCase, beneficiaryId: beneficiary.identityCard } }
         });
-        
+
         if (!checkBen) {
             await prisma.caseBeneficiary.create({
                 data: {
@@ -358,7 +365,7 @@ async function main() {
             // (i + s) ensures distribution.
             const studentIndex = (i + s) % students.length;
             const student = students[studentIndex];
-            
+
             const existingAssignment = await prisma.assignedStudent.findUnique({
                 where: {
                     idCase_studentId_term: {
@@ -384,14 +391,14 @@ async function main() {
     console.log('Agregando acciones aleatorias a 3 casos...');
     // Pick 3 random cases (e.g. index 0, 5, 10 or random)
     const casesWithActions = [allCases[0], allCases[5], allCases[10]];
-    
+
     for (const c of casesWithActions) {
-        if(!c) continue;
+        if (!c) continue;
         const numActions = Math.floor(Math.random() * 5) + 3; // 3 to 7 actions
-        
-        for(let j=1; j<=numActions; j++) {
+
+        for (let j = 1; j <= numActions; j++) {
             const actionDesc = ACTION_PHRASES[Math.floor(Math.random() * ACTION_PHRASES.length)];
-            
+
             // Avoid duplicate action numbers if re-running
             const existingAction = await prisma.caseAction.findUnique({
                 where: { idCase_actionNumber: { idCase: c.idCase, actionNumber: j } }

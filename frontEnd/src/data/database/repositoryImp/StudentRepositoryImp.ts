@@ -63,6 +63,19 @@ export function getStudentRepository(): StudentRepository {
             }
 
             return await response.json();
+        },
+
+        createStudent: async (data: Omit<StudentDAO, 'term'>) => {
+            const response = await fetch(STUDENT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al crear estudiante');
+            }
+            return await response.json();
         }
 
     } as StudentRepository;

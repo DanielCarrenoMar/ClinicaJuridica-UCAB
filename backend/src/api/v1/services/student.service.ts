@@ -235,6 +235,56 @@ class StudentService {
     }
   }
 
+  async createStudent(data: any) {
+    try {
+      const semester = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' }, take: 1 });
+      if (!semester) return { success: false, message: 'No hay semestres activos' };
+      const currentTerm = semester.term;
+
+      const userExists = await prisma.user.findUnique({ where: { identityCard: data.identityCard } });
+      if (userExists) return { success: false, message: 'El usuario ya existe' };
+
+      const hashedPassword = await PasswordUtil.hash(data.password);
+      const gender = data.gender === 'F' ? 'F' : (data.gender === 'M' ? 'M' : null);
+
+      // Map StudentType to DB Enum values
+      let studentTypeDB = 'R';
+      const t = data.type || 'REGULAR';
+      if (t === 'REGULAR') studentTypeDB = 'R';
+      else if (t === 'VOLUNTEER') studentTypeDB = 'V';
+      else if (t === 'GRADUATE') studentTypeDB = 'E';
+      else if (t === 'SERVICE') studentTypeDB = 'S';
+
+      await prisma.$transaction(async (tx) => {
+        await tx.$executeRaw`
+            INSERT INTO "User" ("identityCard", "fullName", "email", "password", "type", "gender", "isActive")
+            VALUES (
+                ${data.identityCard},
+                ${data.fullName},
+                ${data.email},
+                ${hashedPassword},
+                'E'::"UserType",
+                ${gender}::"Gender",
+                true
+            )
+          `;
+
+        await tx.$executeRaw`
+            INSERT INTO "Student" ("identityCard", "term", "nrc", "type")
+            VALUES (
+                ${data.identityCard},
+                ${currentTerm},
+                ${data.nrc || null},
+                ${studentTypeDB}::"StudentType"
+            )
+          `;
+      });
+      return { success: true, message: 'Estudiante creado exitosamente' };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async importStudents(studentsData: any[]) {
     const results = {
       total: studentsData.length,
@@ -280,7 +330,7 @@ class StudentService {
           await prisma.$transaction(async (tx) => {
             // Upsert User
             const defaultPass = await PasswordUtil.hash(data.identityCard);
-            const gender = data.gender === 'F' ? 'F' : 'M';
+            const gender = data.gender === 'F' ? 'F' : (data.gender === 'M' ? 'M' : null);
 
             await tx.$executeRaw`
               INSERT INTO "User" ("identityCard", "fullName", "email", "password", "type", "gender", "isActive")

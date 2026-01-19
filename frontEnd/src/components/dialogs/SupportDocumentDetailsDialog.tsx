@@ -97,7 +97,7 @@ export default function SupportDocumentDetailsDialog({
                         <div className="ps-7 flex flex-col gap-3">
                             <div className="flex items-center gap-2 p-2 px-3 border rounded-lg bg-surface-variant/5 w-fit group hover:bg-surface-variant/10 transition-colors">
                                 <FileSearch className="text-primary/70" />
-                                <span className="text-body-small font-medium truncate max-w-[200px] md:max-w-xs">
+                                <span className="text-body-small font-medium truncate max-w-[150px] md:max-w-[200px]" title={decodeURIComponent(document.fileUrl.split('/').pop() || '')}>
                                     {decodeURIComponent(document.fileUrl.split('/').pop() || 'documento')}
                                 </span>
                                 <Button

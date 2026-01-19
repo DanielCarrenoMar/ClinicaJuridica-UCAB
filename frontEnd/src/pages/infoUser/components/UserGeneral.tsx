@@ -17,10 +17,13 @@ interface UserGeneralProps {
     handleStudentChange: (updatedFields: Partial<StudentModel>) => void;
     handleTeacherChange: (updatedFields: Partial<TeacherModel>) => void;
     validationErrors: Record<string, string>;
+    newPassword?: string;
+    setNewPassword?: (pass: string) => void;
+    canEditPassword?: boolean;
 }
 
-export default function UserGeneral({ localUser, localStudent, localTeacher, handleUserChange, handleStudentChange, handleTeacherChange, validationErrors }: UserGeneralProps) {
-    
+export default function UserGeneral({ localUser, localStudent, localTeacher, handleUserChange, handleStudentChange, handleTeacherChange, validationErrors, newPassword, setNewPassword, canEditPassword }: UserGeneralProps) {
+
     if (!localUser) {
         return <LoadingSpinner />;
     }
@@ -28,7 +31,7 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
     const { permissionLevel } = useAuth();
 
 
-    const isInputsDisabled = permissionLevel > roleToPermissionLevel(localUser.type); 
+    const isInputsDisabled = permissionLevel > roleToPermissionLevel(localUser.type);
 
     return (
         <div className="grid grid-cols-3 items-start gap-x-6 gap-y-6">
@@ -61,13 +64,25 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                     />
                     {validationErrors.email && <span className="text-xs text-error mt-1">{validationErrors.email}</span>}
                 </div>
+                {canEditPassword && setNewPassword && (
+                    <div>
+                        <TitleTextInput
+                            label="Contraseña"
+                            value={newPassword}
+                            onChange={(text) => setNewPassword(text)}
+                            placeholder="********"
+                            type="password"
+                        />
+                        <span className="text-xs text-onSurface/60 ml-1">Dejar en blanco para mantener la actual</span>
+                    </div>
+                )}
             </div>
             <div className="col-span-1">
                 <TitleDropdown
                     label="Sexo"
                     disabled={isInputsDisabled}
                     selectedValue={localUser.gender}
-                    onSelectionChange={(value) => {handleUserChange({gender: value as GenderTypeModel})}}
+                    onSelectionChange={(value) => { handleUserChange({ gender: value as GenderTypeModel }) }}
                 >
                     <DropdownOption value="Masculino">Masculino</DropdownOption>
                     <DropdownOption value="Femenino">Femenino</DropdownOption>
