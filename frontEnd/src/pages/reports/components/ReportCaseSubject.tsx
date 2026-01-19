@@ -5,23 +5,51 @@ import {
 import PieChart from './PieChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de casos por materia
-const mockCaseSubjectData = [
-  { materia: 'Materia Civil', cantidad: 1099, color: '#90EE90' },
-  { materia: 'Otros', cantidad: 187, color: '#4169E1' },
-  { materia: 'Materia Penal', cantidad: 41, color: '#9370DB' },
-  { materia: 'Materia Mercantil', cantidad: 18, color: '#FFD700' },
-  { materia: 'Materia Laboral', cantidad: 10, color: '#8B4513' },
-];
+// Colores predefinidos para las materias
+const colors = ['#90EE90', '#4169E1', '#9370DB', '#FFD700', '#8B4513', '#FF6347', '#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063'];
 
-// Calcular porcentajes dinámicamente
-const totalCasos = mockCaseSubjectData.reduce((sum, item) => sum + item.cantidad, 0);
-const dataWithPercentages = mockCaseSubjectData.map(item => ({
-  ...item,
-  porcentaje: (item.cantidad / totalCasos) * 100
-}));
+interface ReportCaseSubjectProps {
+  data?: Array<{ materia: string; cantidad: number }>;
+  loading?: boolean;
+}
 
-function ReportCaseSubject() {
+function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProps) {
+  // Transformar datos de la API al formato esperado
+  const caseSubjectData = data.map((item, index) => ({
+    materia: item.materia || 'Sin nombre',
+    cantidad: Number(item.cantidad) || 0,
+    color: colors[index % colors.length]
+  }));
+
+  // Calcular porcentajes dinámicamente
+  const totalCasos = caseSubjectData.reduce((sum, item) => sum + item.cantidad, 0);
+  const dataWithPercentages = caseSubjectData.map(item => ({
+    ...item,
+    porcentaje: totalCasos > 0 ? (item.cantidad / totalCasos) * 100 : 0
+  }));
+
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>Cargando datos...</Text>
+        </View>
+      </>
+    );
+  }
+
+  if (caseSubjectData.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>No hay datos disponibles para el período seleccionado</Text>
+        </View>
+      </>
+    );
+  }
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
@@ -30,7 +58,7 @@ function ReportCaseSubject() {
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
           <View style={{ alignItems: 'center' }}>
             <PieChart 
-              data={mockCaseSubjectData.map(item => ({
+              data={caseSubjectData.map(item => ({
                 label: item.materia,
                 value: item.cantidad,
                 color: item.color
