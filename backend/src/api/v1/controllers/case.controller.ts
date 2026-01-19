@@ -125,7 +125,8 @@ export async function getActionsInfoFromCaseId(req: Request, res: Response): Pro
       return;
     }
 
-    const result = await caseService.getActionsInfoFromCaseId(caseId);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseService.getActionsInfoFromCaseId(caseId, pagination);
     res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -162,7 +163,8 @@ export async function getBeneficiariesFromCaseId(req: Request, res: Response): P
       return;
     }
 
-    const result = await caseService.getBeneficiariesFromCaseId(caseId);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseService.getBeneficiariesFromCaseId(caseId, pagination);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -289,7 +291,8 @@ export async function getStudentsFromCaseId(req: Request, res: Response): Promis
       return;
     }
 
-    const result = await caseService.getStudentsFromCaseId(caseId);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseService.getStudentsFromCaseId(caseId, pagination);
     
     if (!result.success) {
       res.status(404).json(result);
@@ -313,7 +316,8 @@ export async function getAppoitmentByCaseId(req: Request, res: Response): Promis
       return;
     }
 
-    const result = await caseService.getAppoitmentByCaseId(caseId);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseService.getAppoitmentByCaseId(caseId, pagination);
     
     if (!result.success) {
       res.status(404).json(result);
@@ -379,7 +383,8 @@ export async function getSupportDocumentsById(req: Request, res: Response): Prom
       return;
     }
 
-    const result = await caseService.getSupportDocumentsById(caseId);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseService.getSupportDocumentsById(caseId, pagination);
     
     if (!result.success) {
       res.status(404).json(result);

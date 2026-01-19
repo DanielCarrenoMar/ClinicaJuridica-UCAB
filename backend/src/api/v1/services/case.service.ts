@@ -353,44 +353,125 @@ class CaseService {
     }
   }
 
-  async getActionsInfoFromCaseId(idCase) {
+  async getActionsInfoFromCaseId(idCase, pagination?: { page: number; limit: number; all: boolean }) {
     try {
-      const actions = await prisma.$queryRaw`
-        SELECT 
-          a.*, 
-          u."fullName" as "userName",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-        FROM "CaseAction" a
-        JOIN "User" u ON a."userId" = u."identityCard"
-        JOIN "Case" c ON a."idCase" = c."idCase"
-        WHERE a."idCase" = ${idCase}
-        ORDER BY a."registryDate" DESC
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "CaseAction"
+        WHERE "idCase" = ${idCase}
       `;
-      return { success: true, data: actions };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const actions = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            a.*, 
+            u."fullName" as "userName",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "CaseAction" a
+          JOIN "User" u ON a."userId" = u."identityCard"
+          JOIN "Case" c ON a."idCase" = c."idCase"
+          WHERE a."idCase" = ${idCase}
+          ORDER BY a."registryDate" DESC
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            a.*, 
+            u."fullName" as "userName",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "CaseAction" a
+          JOIN "User" u ON a."userId" = u."identityCard"
+          JOIN "Case" c ON a."idCase" = c."idCase"
+          WHERE a."idCase" = ${idCase}
+          ORDER BY a."registryDate" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: actions,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
   }
 
-  async getBeneficiariesFromCaseId(idCase) {
+  async getBeneficiariesFromCaseId(idCase, pagination?: { page: number; limit: number; all: boolean }) {
     try {
-      const beneficiaries = await prisma.$queryRaw`
-        SELECT 
-          cb."idCase",
-          cb."relationship", 
-          cb."type" AS "caseType", 
-          cb."description",
-          b."identityCard",
-          b."fullName",
-          b."gender",
-          b."birthDate",
-          b."idNationality",
-          b."hasId"
-        FROM "CaseBeneficiary" cb
-        JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
-        WHERE cb."idCase" = ${idCase}
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
+
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "CaseBeneficiary"
+        WHERE "idCase" = ${idCase}
       `;
-      return { success: true, data: beneficiaries };
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const beneficiaries = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            cb."idCase",
+            cb."relationship", 
+            cb."type" AS "caseType", 
+            cb."description",
+            b."identityCard",
+            b."fullName",
+            b."gender",
+            b."birthDate",
+            b."idNationality",
+            b."hasId"
+          FROM "CaseBeneficiary" cb
+          JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
+          WHERE cb."idCase" = ${idCase}
+          ORDER BY b."fullName"
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            cb."idCase",
+            cb."relationship", 
+            cb."type" AS "caseType", 
+            cb."description",
+            b."identityCard",
+            b."fullName",
+            b."gender",
+            b."birthDate",
+            b."idNationality",
+            b."hasId"
+          FROM "CaseBeneficiary" cb
+          JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
+          WHERE cb."idCase" = ${idCase}
+          ORDER BY b."fullName"
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: beneficiaries,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -452,26 +533,65 @@ class CaseService {
     }
   }
 
-  async getStudentsFromCaseId(caseId) {
+  async getStudentsFromCaseId(caseId, pagination?: { page: number; limit: number; all: boolean }) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
 
-      const students = await prisma.$queryRaw`
-        SELECT 
-          s."identityCard",
-          s."term",
-          s."nrc",
-          s."type",
-          u."fullName",
-          u."email"
-        FROM "AssignedStudent" asg
-        JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
-        JOIN "User" u ON s."identityCard" = u."identityCard"
-        WHERE asg."idCase" = ${id}
-        ORDER BY u."fullName"
-      `;
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
 
-      return { success: true, data: students };
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "AssignedStudent"
+        WHERE "idCase" = ${id}
+      `;
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const students = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            s."identityCard",
+            s."term",
+            s."nrc",
+            s."type",
+            u."fullName",
+            u."email"
+          FROM "AssignedStudent" asg
+          JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
+          JOIN "User" u ON s."identityCard" = u."identityCard"
+          WHERE asg."idCase" = ${id}
+          ORDER BY u."fullName"
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            s."identityCard",
+            s."term",
+            s."nrc",
+            s."type",
+            u."fullName",
+            u."email"
+          FROM "AssignedStudent" asg
+          JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
+          JOIN "User" u ON s."identityCard" = u."identityCard"
+          WHERE asg."idCase" = ${id}
+          ORDER BY u."fullName"
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: students,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -510,30 +630,73 @@ class CaseService {
     }
   }
 
-  async getAppoitmentByCaseId(caseId) {
+  async getAppoitmentByCaseId(caseId, pagination?: { page: number; limit: number; all: boolean }) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
 
-      const appointments = await prisma.$queryRaw`
-        SELECT 
-          a."idCase",
-          a."appointmentNumber",
-          a."plannedDate",
-          a."executionDate",
-          a."status",
-          a."guidance",
-          a."registryDate",
-          u."fullName" as "userName",
-          u."email" as "userEmail",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-        FROM "Appointment" a
-        JOIN "User" u ON a."userId" = u."identityCard"
-        JOIN "Case" c ON a."idCase" = c."idCase"
-        WHERE a."idCase" = ${id}
-        ORDER BY a."plannedDate" DESC
-      `;
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
 
-      return { success: true, data: appointments };
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "Appointment"
+        WHERE "idCase" = ${id}
+      `;
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const appointments = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            a."idCase",
+            a."appointmentNumber",
+            a."plannedDate",
+            a."executionDate",
+            a."status",
+            a."guidance",
+            a."registryDate",
+            u."fullName" as "userName",
+            u."email" as "userEmail",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "Appointment" a
+          JOIN "User" u ON a."userId" = u."identityCard"
+          JOIN "Case" c ON a."idCase" = c."idCase"
+          WHERE a."idCase" = ${id}
+          ORDER BY a."plannedDate" DESC
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            a."idCase",
+            a."appointmentNumber",
+            a."plannedDate",
+            a."executionDate",
+            a."status",
+            a."guidance",
+            a."registryDate",
+            u."fullName" as "userName",
+            u."email" as "userEmail",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "Appointment" a
+          JOIN "User" u ON a."userId" = u."identityCard"
+          JOIN "Case" c ON a."idCase" = c."idCase"
+          WHERE a."idCase" = ${id}
+          ORDER BY a."plannedDate" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: appointments,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -572,26 +735,65 @@ class CaseService {
     }
   }
 
-  async getSupportDocumentsById(caseId) {
+  async getSupportDocumentsById(caseId, pagination?: { page: number; limit: number; all: boolean }) {
     try {
       const id = typeof caseId === 'string' ? parseInt(caseId) : caseId;
 
-      const documents = await prisma.$queryRaw`
-        SELECT 
-          sd."idCase",
-          sd."supportNumber",
-          sd."title",
-          sd."description",
-          sd."submissionDate",
-          sd."fileUrl",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-        FROM "SupportDocument" sd
-        JOIN "Case" c ON sd."idCase" = c."idCase"
-        WHERE sd."idCase" = ${id}
-        ORDER BY sd."submissionDate" DESC
-      `;
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
 
-      return { success: true, data: documents };
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "SupportDocument"
+        WHERE "idCase" = ${id}
+      `;
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const documents = all
+        ? await prisma.$queryRaw`
+          SELECT 
+            sd."idCase",
+            sd."supportNumber",
+            sd."title",
+            sd."description",
+            sd."submissionDate",
+            sd."fileUrl",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "SupportDocument" sd
+          JOIN "Case" c ON sd."idCase" = c."idCase"
+          WHERE sd."idCase" = ${id}
+          ORDER BY sd."submissionDate" DESC
+        `
+        : await prisma.$queryRaw`
+          SELECT 
+            sd."idCase",
+            sd."supportNumber",
+            sd."title",
+            sd."description",
+            sd."submissionDate",
+            sd."fileUrl",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "SupportDocument" sd
+          JOIN "Case" c ON sd."idCase" = c."idCase"
+          WHERE sd."idCase" = ${id}
+          ORDER BY sd."submissionDate" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: documents,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }

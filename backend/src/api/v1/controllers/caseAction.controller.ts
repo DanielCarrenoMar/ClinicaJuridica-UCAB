@@ -16,7 +16,8 @@ export async function getAllCaseActions(req: Request, res: Response): Promise<vo
 export async function getCaseActionsByUserId(req: Request, res: Response): Promise<void> {
   try {
     const { userId } = req.params;
-    const result = await caseActionService.getCaseActionsByUserId(userId);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await caseActionService.getCaseActionsByUserId(userId, pagination);
     res.status(result.success ? 200 : 500).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';

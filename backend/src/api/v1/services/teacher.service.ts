@@ -125,7 +125,7 @@ class TeacherService {
     }
   }
 
-  async getCasesByTeacherId(identityCard: string) {
+  async getCasesByTeacherId(identityCard: string, pagination?: { page: number; limit: number; all: boolean }) {
     try {
       const userRows = (await prisma.$queryRaw`
         SELECT 1 as "ok" FROM "User" WHERE "identityCard" = ${identityCard} LIMIT 1
@@ -140,57 +140,131 @@ class TeacherService {
         FROM "Semester"
       ` as Array<{ term: string | null }>)?.[0]?.term;
 
-      const cases = await prisma.$queryRaw`
-        SELECT
-          c."idCase",
-          c."problemSummary",
-          c."createdAt",
-          c."processType",
-          c."applicantId",
-          c."idNucleus",
-          c."term",
-          c."idLegalArea",
-          c."teacherId",
-          c."teacherTerm",
-          c."idCourt",
-          b."fullName" as "applicantName",
-          la."name" as "legalAreaName",
-          COALESCE(u_teacher."fullName", '') as "teacherName",
-          ct."subject" as "courtName",
-          cs."status" as "caseStatus",
-          ca."registryDate" as "lastActionDate",
-          ca."description" as "lastActionDescription",
-          s."name" as "subjectName",
-          sc."name" as "subjectCategoryName",
-          (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-        FROM "Case" c
-        JOIN "Applicant" a ON c."applicantId" = a."identityCard"
-        JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
-        JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
-        JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
-        JOIN "Subject" s ON sc."idSubject" = s."idSubject"
-        LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
-        LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
-        LEFT JOIN LATERAL (
-          SELECT cs1."status"
-          FROM "CaseStatus" cs1
-          WHERE cs1."idCase" = c."idCase"
-          ORDER BY cs1."statusNumber" DESC
-          LIMIT 1
-        ) cs ON TRUE
-        LEFT JOIN LATERAL (
-          SELECT ca1."registryDate", ca1."description"
-          FROM "CaseAction" ca1
-          WHERE ca1."idCase" = c."idCase"
-          ORDER BY ca1."registryDate" DESC
-          LIMIT 1
-        ) ca ON TRUE
-        WHERE c."teacherId" = ${identityCard}
-          AND c."teacherTerm" = ${lastTerm}
-        ORDER BY c."createdAt" DESC
-      `;
+      const page = pagination?.page ?? 1;
+      const limit = pagination?.limit ?? 15;
+      const all = pagination?.all ?? false;
+      const offset = (page - 1) * limit;
 
-      return { success: true, data: cases };
+      const totalRows = await prisma.$queryRaw`
+        SELECT COUNT(*)::int as total
+        FROM "Case"
+        WHERE "teacherId" = ${identityCard} AND "teacherTerm" = ${lastTerm}
+      `;
+      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+
+      const cases = all
+        ? await prisma.$queryRaw`
+          SELECT
+            c."idCase",
+            c."problemSummary",
+            c."createdAt",
+            c."processType",
+            c."applicantId",
+            c."idNucleus",
+            c."term",
+            c."idLegalArea",
+            c."teacherId",
+            c."teacherTerm",
+            c."idCourt",
+            b."fullName" as "applicantName",
+            la."name" as "legalAreaName",
+            COALESCE(u_teacher."fullName", '') as "teacherName",
+            ct."subject" as "courtName",
+            cs."status" as "caseStatus",
+            ca."registryDate" as "lastActionDate",
+            ca."description" as "lastActionDescription",
+            s."name" as "subjectName",
+            sc."name" as "subjectCategoryName",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "Case" c
+          JOIN "Applicant" a ON c."applicantId" = a."identityCard"
+          JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+          JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+          JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
+          JOIN "Subject" s ON sc."idSubject" = s."idSubject"
+          LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
+          LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
+          LEFT JOIN LATERAL (
+            SELECT cs1."status"
+            FROM "CaseStatus" cs1
+            WHERE cs1."idCase" = c."idCase"
+            ORDER BY cs1."statusNumber" DESC
+            LIMIT 1
+          ) cs ON TRUE
+          LEFT JOIN LATERAL (
+            SELECT ca1."registryDate", ca1."description"
+            FROM "CaseAction" ca1
+            WHERE ca1."idCase" = c."idCase"
+            ORDER BY ca1."registryDate" DESC
+            LIMIT 1
+          ) ca ON TRUE
+          WHERE c."teacherId" = ${identityCard}
+            AND c."teacherTerm" = ${lastTerm}
+          ORDER BY c."createdAt" DESC
+        `
+        : await prisma.$queryRaw`
+          SELECT
+            c."idCase",
+            c."problemSummary",
+            c."createdAt",
+            c."processType",
+            c."applicantId",
+            c."idNucleus",
+            c."term",
+            c."idLegalArea",
+            c."teacherId",
+            c."teacherTerm",
+            c."idCourt",
+            b."fullName" as "applicantName",
+            la."name" as "legalAreaName",
+            COALESCE(u_teacher."fullName", '') as "teacherName",
+            ct."subject" as "courtName",
+            cs."status" as "caseStatus",
+            ca."registryDate" as "lastActionDate",
+            ca."description" as "lastActionDescription",
+            s."name" as "subjectName",
+            sc."name" as "subjectCategoryName",
+            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
+          FROM "Case" c
+          JOIN "Applicant" a ON c."applicantId" = a."identityCard"
+          JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
+          JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
+          JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
+          JOIN "Subject" s ON sc."idSubject" = s."idSubject"
+          LEFT JOIN "User" u_teacher ON c."teacherId" = u_teacher."identityCard"
+          LEFT JOIN "Court" ct ON c."idCourt" = ct."idCourt"
+          LEFT JOIN LATERAL (
+            SELECT cs1."status"
+            FROM "CaseStatus" cs1
+            WHERE cs1."idCase" = c."idCase"
+            ORDER BY cs1."statusNumber" DESC
+            LIMIT 1
+          ) cs ON TRUE
+          LEFT JOIN LATERAL (
+            SELECT ca1."registryDate", ca1."description"
+            FROM "CaseAction" ca1
+            WHERE ca1."idCase" = c."idCase"
+            ORDER BY ca1."registryDate" DESC
+            LIMIT 1
+          ) ca ON TRUE
+          WHERE c."teacherId" = ${identityCard}
+            AND c."teacherTerm" = ${lastTerm}
+          ORDER BY c."createdAt" DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+      return {
+        success: true,
+        data: cases,
+        pagination: {
+          page,
+          limit: all ? total : limit,
+          total,
+          totalPages,
+          all
+        }
+      };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

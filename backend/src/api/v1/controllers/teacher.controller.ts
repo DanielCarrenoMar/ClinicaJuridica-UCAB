@@ -30,8 +30,8 @@ export async function getTeacherById(req: Request, res: Response): Promise<void>
 export async function getCasesByTeacherId(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
-
-    const result = await teacherService.getCasesByTeacherId(id);
+    const pagination = parsePagination(req.query as Record<string, unknown>);
+    const result = await teacherService.getCasesByTeacherId(id, pagination);
     res.status(result.success ? 200 : 404).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
