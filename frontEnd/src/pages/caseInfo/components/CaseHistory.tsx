@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SearchBar from '#components/SearchBar.tsx';
 import Button from '#components/Button.tsx';
 import CaseActionCard from '#components/CaseActionCard.tsx';
@@ -12,6 +12,7 @@ import { useGetCaseActionsByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import { useCreateCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import { useNotifications } from '#/context/NotificationsContext';
 import Fuse from 'fuse.js';
+import { ArrowLeft, ArrowRight } from 'flowbite-react-icons/outline';
 
 interface CaseHistoryProps {
     caseId: number;
@@ -28,6 +29,16 @@ export default function CaseHistory({ caseId, caseCompoundKey, user }: CaseHisto
     const [isAddCaseActionDialogOpen, setIsAddCaseActionDialogOpen] = useState(false);
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+
+    useEffect(() => {
+        loadCaseActions(caseId, { page, limit: pageSize });
+    }, [caseId, loadCaseActions, page, pageSize]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [caseActionSearchQuery]);
 
     const caseActionsFuse = useMemo(() => {
         return new Fuse(caseActions, {
@@ -47,6 +58,9 @@ export default function CaseHistory({ caseId, caseCompoundKey, user }: CaseHisto
         if (trimmed.length === 0) return caseActions;
         return caseActionsFuse.search(trimmed).map(r => r.item);
     }, [caseActions, caseActionsFuse, caseActionSearchQuery]);
+
+    const canGoPrev = page > 1;
+    const canGoNext = !caseActionsLoading && !caseActionsError && caseActions.length === pageSize;
 
     return (
         <div className="flex flex-col h-full gap-6">
@@ -90,6 +104,26 @@ export default function CaseHistory({ caseId, caseCompoundKey, user }: CaseHisto
                 </div>
             </section>
 
+            <section className="mt-4 flex items-center justify-between max-w-5xl">
+                <Button
+                    variant="outlined"
+                    icon={<ArrowLeft />}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                    disabled={!canGoPrev || caseActionsLoading}
+                >
+                    Anterior
+                </Button>
+                <span className="text-body-small text-onSurface/70">Página {page}</span>
+                <Button
+                    variant="outlined"
+                    icon={<ArrowRight />}
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={!canGoNext || caseActionsLoading}
+                >
+                    Siguiente
+                </Button>
+            </section>
+
             <AddCaseActionDialog
                 open={isAddCaseActionDialogOpen}
                 onClose={() => setIsAddCaseActionDialogOpen(false)}
@@ -107,7 +141,7 @@ export default function CaseHistory({ caseId, caseCompoundKey, user }: CaseHisto
                             registryDate: new Date()
                         };
                         await createAction(newAction);
-                        loadCaseActions(caseId);
+                        loadCaseActions(caseId, { page, limit: pageSize });
                     } catch (error: any) {
                         notyError(error.message || "Error al crear la acción del caso");
                         console.error("Error creating case action:", error);

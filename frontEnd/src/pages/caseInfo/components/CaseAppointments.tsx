@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SearchBar from '#components/SearchBar.tsx';
 import Button from '#components/Button.tsx';
 import AppointmentCard from '#components/AppointmentCard.tsx';
@@ -13,6 +13,7 @@ import { useGetAppointmentByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import { useCreateAppointment, useUpdateAppointment, useDeleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import { useNotifications } from '#/context/NotificationsContext';
 import Fuse from 'fuse.js';
+import { ArrowLeft, ArrowRight } from 'flowbite-react-icons/outline';
 
 interface CaseAppointmentsProps {
     caseId: number;
@@ -32,6 +33,16 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
     const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
     const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = useState(false);
     const [isEditAppointmentDialogOpen, setIsEditAppointmentDialogOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+
+    useEffect(() => {
+        loadAppointments(caseId, { page, limit: pageSize });
+    }, [caseId, loadAppointments, page, pageSize]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [searchQuery]);
 
     const appointmentsFuse = useMemo(() => {
         return new Fuse(appointments, {
@@ -60,6 +71,9 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
             .map(x => x.appointment);
     }, [appointments, appointmentsFuse, searchQuery]);
 
+    const canGoPrev = page > 1;
+    const canGoNext = appointments.length === pageSize;
+
     return (
         <div className="flex flex-col h-full gap-6">
             <section className="flex justify-between items-center gap-4 max-w-5xl">
@@ -76,7 +90,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                 </Button>
             </section>
 
-            <section className="flex flex-col gap-4 pb-20 overflow-y-auto">
+            <section className="flex-1 flex flex-col gap-4 pb-20 overflow-y-auto">
                 {visibleAppointments
                     .map(apt => (
                         <AppointmentCard
@@ -91,6 +105,26 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                     ))}
             </section>
 
+            <section className="mt-4 flex items-center justify-between max-w-5xl">
+                <Button
+                    variant="outlined"
+                    icon={<ArrowLeft />}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                    disabled={!canGoPrev}
+                >
+                    Anterior
+                </Button>
+                <span className="text-body-small text-onSurface/70">Página {page}</span>
+                <Button
+                    variant="outlined"
+                    icon={<ArrowRight />}
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={!canGoNext}
+                >
+                    Siguiente
+                </Button>
+            </section>
+
             <AppointmentDetailsDialog
                 open={isAppointmentDialogOpen}
                 onClose={() => setIsAppointmentDialogOpen(false)}
@@ -103,7 +137,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                     if (!selectedAppointment) return;
                     try {
                         await deleteAppt(selectedAppointment.idCase, selectedAppointment.appointmentNumber);
-                        loadAppointments(caseId);
+                        loadAppointments(caseId, { page, limit: pageSize });
                         setIsAppointmentDialogOpen(false);
                         setSelectedAppointment(null);
                     } catch (error: any) {
@@ -131,7 +165,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                             registryDate: ""
                         };
                         await createNewAppointment(newAppt);
-                        loadAppointments(caseId);
+                        loadAppointments(caseId, { page, limit: pageSize });
                     } catch (error: any) {
                         console.error("Error creating appointment:", error);
                         notyError(error.message || "Error al crear la cita");
@@ -146,7 +180,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                 onSave={async (daoAppointment) => {
                     try {
                         await updateAppt(daoAppointment.idCase, daoAppointment);
-                        loadAppointments(daoAppointment.idCase);
+                        loadAppointments(daoAppointment.idCase, { page, limit: pageSize });
                         setIsEditAppointmentDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating appointment:", error);

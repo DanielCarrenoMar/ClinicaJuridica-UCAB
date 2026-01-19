@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SearchBar from '#components/SearchBar.tsx';
 import Button from '#components/Button.tsx';
 import SupportDocumentCard from '#components/SupportDocumentCard.tsx';
@@ -10,6 +10,7 @@ import { useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import { useCreateSupportDocument, useUpdateSupportDocument, useDeleteSupportDocument } from '#domain/useCaseHooks/useSupportDocument.ts';
 import { useNotifications } from '#/context/NotificationsContext';
 import Fuse from 'fuse.js';
+import { ArrowLeft, ArrowRight } from 'flowbite-react-icons/outline';
 
 interface CaseSupportDocumentsProps {
     caseId: number;
@@ -27,6 +28,16 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
     const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
     const [isAddSupportDialogOpen, setIsAddSupportDialogOpen] = useState(false);
     const [isEditSupportDialogOpen, setIsEditSupportDialogOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+
+    useEffect(() => {
+        loadSupportDocuments(caseId, { page, limit: pageSize });
+    }, [caseId, loadSupportDocuments, page, pageSize]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [supportSearchQuery]);
 
     const supportDocumentsFuse = useMemo(() => {
         return new Fuse(supportDocuments, {
@@ -46,6 +57,9 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
         return supportDocumentsFuse.search(trimmed).map(r => r.item);
     }, [supportDocuments, supportDocumentsFuse, supportSearchQuery]);
 
+    const canGoPrev = page > 1;
+    const canGoNext = supportDocuments.length === pageSize;
+
     return (
         <div className="flex flex-col h-full gap-6">
             <section className="flex justify-between items-center gap-4 max-w-5xl">
@@ -62,7 +76,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                 </Button>
             </section>
 
-            <section className="flex flex-col gap-4 pb-20 overflow-y-auto">
+            <section className="flex-1 flex flex-col gap-4 pb-20 overflow-y-auto">
                 {visibleSupportDocuments
                     .map(doc => (
                         <SupportDocumentCard
@@ -80,6 +94,26 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                     ))}
             </section>
 
+            <section className="mt-4 flex items-center justify-between max-w-5xl">
+                <Button
+                    variant="outlined"
+                    icon={<ArrowLeft />}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                    disabled={!canGoPrev}
+                >
+                    Anterior
+                </Button>
+                <span className="text-body-small text-onSurface/70">Página {page}</span>
+                <Button
+                    variant="outlined"
+                    icon={<ArrowRight />}
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={!canGoNext}
+                >
+                    Siguiente
+                </Button>
+            </section>
+
             <SupportDocumentDetailsDialog
                 open={isSupportDialogOpen}
                 onClose={() => setIsSupportDialogOpen(false)}
@@ -92,7 +126,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                     if (!selectedSupportDocument) return;
                     try {
                         await deleteSupDocument(selectedSupportDocument.idCase, selectedSupportDocument.supportNumber);
-                        loadSupportDocuments(caseId);
+                        loadSupportDocuments(caseId, { page, limit: pageSize });
                         setIsSupportDialogOpen(false);
                         setSelectedSupportDocument(null);
                     } catch (error: any) {
@@ -125,7 +159,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                         }
 
                         await createNewSupportDocument(docData);
-                        loadSupportDocuments(caseId);
+                        loadSupportDocuments(caseId, { page, limit: pageSize });
                     } catch (error: any) {
                         console.error("Error creating support document:", error);
                         notyError(error.message || "Error al crear el recaudo");
@@ -156,7 +190,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                         }
 
                         await updateSupDocument(idCase, docData);
-                        loadSupportDocuments(caseId);
+                        loadSupportDocuments(caseId, { page, limit: pageSize });
                         setIsEditSupportDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating support document:", error);

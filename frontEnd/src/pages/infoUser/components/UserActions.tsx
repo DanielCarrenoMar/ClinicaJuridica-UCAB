@@ -1,22 +1,35 @@
 import CaseActionCard from '#components/CaseActionCard.tsx'
 import CaseActionDetailsDialog from '#components/dialogs/CaseActionDetailsDialog.tsx';
 import type { CaseActionModel } from '#domain/models/caseAction.ts'
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Fuse from 'fuse.js';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import { useGetActionsByUserId } from '#domain/useCaseHooks/useCaseActions.ts';
 import SearchBar from '#components/SearchBar.tsx';
+import Button from '#components/Button.tsx';
+import { ArrowLeft, ArrowRight } from 'flowbite-react-icons/outline';
 
 interface UserActionsProps {
   userId: string;
 }
 
 export default function UserActions({ userId }: UserActionsProps) {
-  const { actions, loading, error } = useGetActionsByUserId(userId);
+  const { actions, loading, error, refresh } = useGetActionsByUserId(userId);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showCaseActionDetails, setShowCaseActionDetails] = useState(false);
   const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
+
+  useEffect(() => {
+    if (!userId) return;
+    refresh({ page, limit: pageSize });
+  }, [page, pageSize, refresh, userId]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
 
   const filteredActions: CaseActionModel[] = useMemo(() => {
     if (!searchQuery) return actions;
@@ -33,6 +46,9 @@ export default function UserActions({ userId }: UserActionsProps) {
 
     return fuse.search(searchQuery).map(result => result.item);
   }, [actions, searchQuery]);
+
+  const canGoPrev = page > 1;
+  const canGoNext = !loading && !error && actions.length === pageSize;
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -71,6 +87,26 @@ export default function UserActions({ userId }: UserActionsProps) {
             onClose={() => setShowCaseActionDetails(false)}
             caseAction={selectedCaseAction}
           />
+      </section>
+
+      <section className="mt-4 flex items-center justify-between max-w-5xl">
+        <Button
+          variant="outlined"
+          icon={<ArrowLeft />}
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={!canGoPrev || loading}
+        >
+          Anterior
+        </Button>
+        <span className="text-body-small text-onSurface/70">Página {page}</span>
+        <Button
+          variant="outlined"
+          icon={<ArrowRight />}
+          onClick={() => setPage((prev) => prev + 1)}
+          disabled={!canGoNext || loading}
+        >
+          Siguiente
+        </Button>
       </section>
     </div>
   )
