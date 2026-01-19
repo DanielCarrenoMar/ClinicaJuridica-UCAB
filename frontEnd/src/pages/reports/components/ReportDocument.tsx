@@ -74,7 +74,7 @@ export default function ReportDocument({children, startDate, endDate}: DocumentP
     return (
         <Document>
             {childrenArray.map((child, index) => (
-                <Page key={index} style={styleDocument.page}>
+                <Page key={index} style={styleDocument.page} size="A4" orientation="landscape">
                     {/* Header with title and logo - only on first page */}
                     {index === 0 && (
                         <View style={styleDocument.header}>
