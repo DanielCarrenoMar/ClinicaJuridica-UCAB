@@ -28,9 +28,6 @@ import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
-import {
-    useAllStats,
-} from '#domain/useCaseHooks/useAllStats.ts';
 
 const reportOptions = [
     {
@@ -119,48 +116,44 @@ function Reports() {
     const [isGenerating, setIsGenerating] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
-    const allStats = useAllStats(undefined, undefined);
-
     // Crear componentes frescos cada vez con datos
     const createFreshComponent = useCallback((reportId: number) => {
-        const reportData = allStats.getReportData(reportId);
-        
         if (reportId === 1) {
-            return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseSubject key={`fresh-1-${Date.now()}`} />;
         }
         if (reportId === 2) {
-            return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} />;
         }
         if (reportId === 3) {
-            return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} />;
         }
         if (reportId === 4) {
-            return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportStateDistribution key={`fresh-4-${Date.now()}`} />;
         }
         if (reportId === 5) {
-            return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportParishDistribution key={`fresh-5-${Date.now()}`} />;
         }
         if (reportId === 6) {
-            return <ReportCaseType key={`fresh-6-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseType key={`fresh-6-${Date.now()}`} />;
         }
         if (reportId === 7) {
-            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`}/>;
         }
         if (reportId === 8) {
-            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`}/>;
         }
         if (reportId === 9) {
-            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`}/>;
         }
         if (reportId === 10) {
-            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`}/>;
         }
         if (reportId === 11) {
-            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`}/>;
         }
         
         return null;
-    }, [allStats]);
+    }, []);
 
     const reportDoc = useMemo(() => {
         if (!startDate || !endDate || selectedReportIds.length === 0) {
@@ -194,7 +187,7 @@ function Reports() {
                 ))}
             </ReportDocument>
         );
-    }, [selectedReportIds, startDate, endDate, allStats, createFreshComponent]);
+    }, [selectedReportIds, startDate, endDate, createFreshComponent]);
 
     const handleReportSelect = (id: number) => {
         const newSelection = selectedReportIds.includes(id) 
@@ -267,7 +260,7 @@ function Reports() {
                         onClick={handleDownloadPDF} 
                         variant="outlined" 
                         icon={<FilePdf />}
-                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating || allStats.isAnyLoading}
+                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating}
                     >
                         {isGenerating ? 'Generando...' : 'Exportar PDF'}
                     </Button>
@@ -315,7 +308,7 @@ function Reports() {
 
                     <section className="flex flex-col gap-3 overflow-hidden h-full relative">
                         {/* Mostrar estado de carga general de todas las estadísticas */}
-                        {allStats.isAnyLoading && (
+                        {isGenerating && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/50 backdrop-blur-sm">
                                 <div className="text-center">
                                     <LoadingSpinner />
@@ -327,7 +320,7 @@ function Reports() {
                         )}
 
                         {/* Mostrar errores si los hay */}
-                        {/*!isGenerating && !allStats.isAnyLoading && allStats.hasAnyError && (
+                        {/*!isGenerating && !allReports.isAnyLoading && allReports.hasAnyError && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <div className="text-red-500 mb-3">
@@ -342,7 +335,7 @@ function Reports() {
                             </div>
                         )*/}
 
-                        {!isGenerating && !allStats.isAnyLoading && !startDate && !endDate && (
+                        {!isGenerating && !startDate && !endDate && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -364,13 +357,13 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && !allStats.isAnyLoading && startDate && endDate && reportDoc && (
+                        {!isGenerating && startDate && endDate && reportDoc && (
                             <PDFViewer className="w-full h-full" showToolbar={false}>
                                 {reportDoc}
                             </PDFViewer>
                         )}
 
-                        {!isGenerating && !allStats.isAnyLoading && startDate && endDate && !reportDoc && (
+                        {!isGenerating && startDate && endDate && !reportDoc && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <p className="text-body-medium text-onSurface/70">
