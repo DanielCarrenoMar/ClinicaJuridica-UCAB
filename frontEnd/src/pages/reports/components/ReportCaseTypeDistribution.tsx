@@ -3,7 +3,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import BarChart from './charts/BarChart';
-import { styleDocument } from "./ReportDocument";
+import { styleDocument } from "./styleData";
 
 interface CaseTypeDistributionData {
   tipo_servicio?: string;

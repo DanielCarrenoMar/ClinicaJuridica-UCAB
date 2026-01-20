@@ -2,7 +2,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import { styleDocument } from "./ReportDocument";
+import { styleDocument } from "./styleData";
 
 interface NotImplementedReportProps {
   reportId: number;
