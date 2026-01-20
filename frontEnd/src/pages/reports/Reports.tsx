@@ -1,6 +1,6 @@
 
 
-import { useState, useMemo, Fragment, useRef, useCallback, useEffect } from 'react';
+import { useState, useMemo, Fragment, useCallback, useEffect } from 'react';
 import Box from '#components/Box.tsx';
 import OptionCard from '#components/OptionCard.tsx';
 import {
@@ -11,7 +11,7 @@ import {
     FileChartBar,
     CalendarEdit,
 } from 'flowbite-react-icons/solid';
-import { PDFViewer, pdf } from '@react-pdf/renderer';
+import { Document, Page, usePDF } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
 import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
 import ReportGenderDistribution from './components/ReportGenderDistribution';
@@ -113,9 +113,13 @@ function Reports() {
     const [selectedReportIds, setSelectedReportIds] = useState<number[]>([]);
     const [startDate, setStartDate] = useState<Date | undefined>(new Date("2023-01-01"));
     const [endDate, setEndDate] = useState<Date | undefined>(new Date());
-    const [isGenerating, setIsGenerating] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const pdfRef = useRef<string | null>(null);
+
+    const dummyDoc = useMemo(() => (
+        <Document>
+            <Page />
+        </Document>
+    ), []);
 
     // Efecto para simular carga al cambiar filtros y dar retroalimentación visual
     useEffect(() => {
@@ -197,13 +201,17 @@ function Reports() {
         );
     }, [selectedReportIds, startDate, endDate, createFreshComponent]);
 
+    const [pdfInstance, updatePdfInstance] = usePDF({ document: reportDoc || dummyDoc });
+
+    useEffect(() => {
+        updatePdfInstance(reportDoc || dummyDoc);
+    }, [reportDoc, updatePdfInstance, dummyDoc]);
+
     const handleReportSelect = (id: number) => {
         const newSelection = selectedReportIds.includes(id) 
             ? selectedReportIds.filter(item => item !== id) 
             : [...selectedReportIds, id];
         setSelectedReportIds(newSelection);
-        // Limpiar PDF cacheado cuando cambia la selección
-        pdfRef.current = null;
     };
 
     const generateFileName = () => {
@@ -213,45 +221,15 @@ function Reports() {
         return `reporte_${reportTitles.join('_')}_${timestamp}.pdf`;
     };
 
-    const handleDownloadPDF = async () => {
-        if (isGenerating) return;
-        
-        // Validar que ambas fechas estén seleccionadas
-        if (!startDate || !endDate) {
-            return;
-        }
+    const handleDownloadPDF = () => {
+        if (pdfInstance.loading || !pdfInstance.url) return;
 
-        // Validar que haya reportes seleccionados
-        if (selectedReportIds.length === 0) {
-            return;
-        }
-
-        // Validar que el documento esté disponible
-        if (!reportDoc) {
-            return;
-        }
-        
-        setIsGenerating(true);
-        try {
-            // Generar PDF fresh cada vez
-            const blob = await pdf(reportDoc).toBlob();
-            const url = URL.createObjectURL(blob);
-            
-            // Forzar descarga
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = generateFileName();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Limpiar URL object
-            URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Error generando PDF:', error);
-        } finally {
-            setIsGenerating(false);
-        }
+        const link = document.createElement('a');
+        link.href = pdfInstance.url;
+        link.download = generateFileName();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -268,9 +246,9 @@ function Reports() {
                         onClick={handleDownloadPDF} 
                         variant="outlined" 
                         icon={<FilePdf />}
-                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating}
+                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || pdfInstance.loading}
                     >
-                        {isGenerating ? 'Generando...' : 'Exportar PDF'}
+                        {pdfInstance.loading ? 'Generando...' : 'Exportar PDF'}
                     </Button>
                 </span>
             </header>
@@ -316,18 +294,18 @@ function Reports() {
 
                     <section className="flex flex-col gap-3 overflow-hidden h-full relative">
 
-                        {isLoading && (
+                        {(isLoading || (pdfInstance.loading && reportDoc)) && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/50 backdrop-blur-sm">
                                 <div className="text-center">
                                     <LoadingSpinner />
                                     <p className="text-body-medium text-onSurface/70 mt-3">
-                                        {isGenerating ? 'Generando PDF...' : 'Cargando estadísticas...'}
+                                        {pdfInstance.loading ? 'Generando PDF...' : 'Cargando estadísticas...'}
                                     </p>
                                 </div>
                             </div>
                         )}
 
-                        {!isGenerating && !isLoading && !startDate && !endDate && (
+                        {!pdfInstance.loading && !isLoading && !startDate && !endDate && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -338,7 +316,7 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && !isLoading && (startDate || endDate) && (!startDate || !endDate) && (
+                        {!pdfInstance.loading && !isLoading && (startDate || endDate) && (!startDate || !endDate) && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -349,13 +327,15 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && !isLoading && startDate && endDate && reportDoc && (
-                            <PDFViewer className="w-full h-full" showToolbar={false}>
-                                {reportDoc}
-                            </PDFViewer>
+                        {!isLoading && startDate && endDate && reportDoc && pdfInstance.url && (
+                            <iframe
+                                title="Reporte PDF"
+                                src={`${pdfInstance.url}#toolbar=0`}
+                                className="w-full h-full rounded-xl border-none"
+                            />
                         )}
 
-                        {!isGenerating && !isLoading && startDate && endDate && !reportDoc && (
+                        {!pdfInstance.loading && !isLoading && startDate && endDate && !reportDoc && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <p className="text-body-medium text-onSurface/70">
