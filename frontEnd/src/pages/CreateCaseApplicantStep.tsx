@@ -331,7 +331,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <DatePicker
-                    label="Fecha Nacimiento*"
+                    label="Fecha Nacimiento"
                     value={applicantModel.birthDate ? applicantModel.birthDate.toISOString().split('T')[0] : undefined}
                     onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
                     disabled={isFieldDisabled('birthDate')}
