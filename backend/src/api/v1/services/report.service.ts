@@ -1,7 +1,7 @@
 // @ts-nocheck
 import prisma from '#src/config/database.js';
 
-class StatsService {
+class ReportService {
   /**
    * Obtiene casos agrupados por materia (Subject)
    */
@@ -528,4 +528,4 @@ class StatsService {
   }
 }
 
-export default new StatsService();
+export default new ReportService();
