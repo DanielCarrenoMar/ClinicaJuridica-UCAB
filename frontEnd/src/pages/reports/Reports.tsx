@@ -1,6 +1,6 @@
 
 
-import { useState, useMemo, Fragment, useRef, useCallback } from 'react';
+import { useState, useMemo, Fragment, useRef, useCallback, useEffect } from 'react';
 import Box from '#components/Box.tsx';
 import OptionCard from '#components/OptionCard.tsx';
 import {
@@ -27,10 +27,7 @@ import ReportDocument from './components/ReportDocument';
 import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
-import { parseDate, validateDateRange } from '../../utils/dateUtils';
-import {
-    useAllStats,
-} from '#domain/useCaseHooks/useAllStats.ts';
+import { validateDateRange } from '../../utils/dateUtils';
 
 const reportOptions = [
     {
@@ -117,50 +114,58 @@ function Reports() {
     const [startDate, setStartDate] = useState<Date | undefined>(new Date("2023-01-01"));
     const [endDate, setEndDate] = useState<Date | undefined>(new Date());
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
-    const allStats = useAllStats(undefined, undefined);
+    // Efecto para simular carga al cambiar filtros y dar retroalimentación visual
+    useEffect(() => {
+        if (selectedReportIds.length > 0 && startDate && endDate) {
+            setIsLoading(true);
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedReportIds, startDate, endDate]);
 
     // Crear componentes frescos cada vez con datos
-    const createFreshComponent = useCallback((reportId: number) => {
-        const reportData = allStats.getReportData(reportId);
-        
+    const createFreshComponent = useCallback((reportId: number, start?: Date, end?: Date) => {
         if (reportId === 1) {
-            return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseSubject key={`fresh-1-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 2) {
-            return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 3) {
-            return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 4) {
-            return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportStateDistribution key={`fresh-4-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 5) {
-            return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportParishDistribution key={`fresh-5-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 6) {
-            return <ReportCaseType key={`fresh-6-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseType key={`fresh-6-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 7) {
-            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} startDate={start} endDate={end}/>;
         }
         if (reportId === 8) {
-            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} startDate={start} endDate={end}/>;
         }
         if (reportId === 9) {
-            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} startDate={start} endDate={end}/>;
         }
         if (reportId === 10) {
-            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} startDate={start} endDate={end}/>;
         }
         if (reportId === 11) {
-            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} startDate={start} endDate={end}/>;
         }
         
         return null;
-    }, [allStats]);
+    }, []);
 
     const reportDoc = useMemo(() => {
         if (!startDate || !endDate || selectedReportIds.length === 0) {
@@ -169,10 +174,6 @@ function Reports() {
 
         const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
         const timestamp = Date.now();
-        
-        // Parse dates if available
-        let parsedStartDate: Date | undefined;
-        let parsedEndDate: Date | undefined;
         
         try {
             
@@ -186,15 +187,15 @@ function Reports() {
         }
         
         return (
-            <ReportDocument key={`doc-${timestamp}`} startDate={parsedStartDate} endDate={parsedEndDate}>
+            <ReportDocument key={`doc-${timestamp}`} startDate={startDate} endDate={endDate}>
                 {selectedReports.map(report => (
                     <Fragment key={`frag-${report.id}-${timestamp}`}>
-                        {createFreshComponent(report.id)}
+                        {createFreshComponent(report.id, startDate, endDate)}
                     </Fragment>
                 ))}
             </ReportDocument>
         );
-    }, [selectedReportIds, startDate, endDate, allStats, createFreshComponent]);
+    }, [selectedReportIds, startDate, endDate, createFreshComponent]);
 
     const handleReportSelect = (id: number) => {
         const newSelection = selectedReportIds.includes(id) 
@@ -267,7 +268,7 @@ function Reports() {
                         onClick={handleDownloadPDF} 
                         variant="outlined" 
                         icon={<FilePdf />}
-                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating || allStats.isAnyLoading}
+                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating}
                     >
                         {isGenerating ? 'Generando...' : 'Exportar PDF'}
                     </Button>
@@ -314,35 +315,19 @@ function Reports() {
                     </section>
 
                     <section className="flex flex-col gap-3 overflow-hidden h-full relative">
-                        {/* Mostrar estado de carga general de todas las estadísticas */}
-                        {allStats.isAnyLoading && (
+
+                        {isLoading && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/50 backdrop-blur-sm">
                                 <div className="text-center">
                                     <LoadingSpinner />
                                     <p className="text-body-medium text-onSurface/70 mt-3">
-                                        Cargando estadísticas...
+                                        {isGenerating ? 'Generando PDF...' : 'Cargando estadísticas...'}
                                     </p>
                                 </div>
                             </div>
                         )}
 
-                        {/* Mostrar errores si los hay */}
-                        {/*!isGenerating && !allStats.isAnyLoading && allStats.hasAnyError && (
-                            <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
-                                <div className="text-center p-6">
-                                    <div className="text-red-500 mb-3">
-                                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <p className="text-body-medium text-onSurface/70">
-                                        Error al cargar algunas estadísticas. Por favor, intenta nuevamente.
-                                    </p>
-                                </div>
-                            </div>
-                        )*/}
-
-                        {!isGenerating && !allStats.isAnyLoading && !startDate && !endDate && (
+                        {!isGenerating && !isLoading && !startDate && !endDate && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -353,7 +338,7 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && (startDate || endDate) && (!startDate || !endDate) && (
+                        {!isGenerating && !isLoading && (startDate || endDate) && (!startDate || !endDate) && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -364,13 +349,13 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && !allStats.isAnyLoading && startDate && endDate && reportDoc && (
+                        {!isGenerating && !isLoading && startDate && endDate && reportDoc && (
                             <PDFViewer className="w-full h-full" showToolbar={false}>
                                 {reportDoc}
                             </PDFViewer>
                         )}
 
-                        {!isGenerating && !allStats.isAnyLoading && startDate && endDate && !reportDoc && (
+                        {!isGenerating && !isLoading && startDate && endDate && !reportDoc && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <p className="text-body-medium text-onSurface/70">

@@ -25,6 +25,18 @@ import type { NucleusModel } from "./models/nucleus";
 import type { NucleusDAO } from "#database/daos/nucleusDAO.ts";
 import type { SemesterDAO } from "#database/daos/semesterDAO.ts";
 
+import type { CasesBySubjectModel } from "./models/reports/casesBySubject";
+import type { CasesBySubjectScopeModel } from "./models/reports/casesBySubjectScope";
+import type { GenderDistributionModel } from "./models/reports/genderDistribution";
+import type { StateDistributionModel } from "./models/reports/stateDistribution";
+import type { ParishDistributionModel } from "./models/reports/parishDistribution";
+import type { CasesByTypeModel } from "./models/reports/casesByType";
+import type { BeneficiariesByParishModel } from "./models/reports/beneficiariesByParish";
+import type { StudentInvolvementModel } from "./models/reports/studentInvolvement";
+import type { CasesByServiceTypeModel } from "./models/reports/casesByServiceType";
+import type { ProfessorInvolvementModel } from "./models/reports/professorInvolvement";
+import type { BeneficiaryTypeDistributionModel } from "./models/reports/beneficiaryTypeDistribution";
+
 export interface BeneficiaryRepository {
     findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
     findBeneficiaryById(id: string): Promise<BeneficiaryModel | null>;
@@ -124,4 +136,18 @@ export interface NucleusRepository {
     createNucleus(data: NucleusDAO): Promise<NucleusModel>;
     updateNucleus(id: string, data: Partial<NucleusDAO>): Promise<NucleusModel>;
     deleteNucleus(id: string): Promise<void>;
+}
+
+export interface ReportRepository {
+    getCasesBySubject(startDate?: Date, endDate?: Date): Promise<CasesBySubjectModel[]>;
+    getCasesBySubjectScope(startDate?: Date, endDate?: Date): Promise<CasesBySubjectScopeModel[]>;
+    getGenderDistribution(startDate?: Date, endDate?: Date): Promise<GenderDistributionModel[]>;
+    getStateDistribution(startDate?: Date, endDate?: Date): Promise<StateDistributionModel[]>;
+    getParishDistribution(startDate?: Date, endDate?: Date): Promise<ParishDistributionModel[]>;
+    getCasesByType(startDate?: Date, endDate?: Date): Promise<CasesByTypeModel[]>;
+    getBeneficiariesByParish(startDate?: Date, endDate?: Date): Promise<BeneficiariesByParishModel[]>;
+    getStudentInvolvement(startDate?: Date, endDate?: Date): Promise<StudentInvolvementModel[]>;
+    getCasesByServiceType(startDate?: Date, endDate?: Date): Promise<CasesByServiceTypeModel[]>;
+    getProfessorInvolvement(startDate?: Date, endDate?: Date): Promise<ProfessorInvolvementModel[]>;
+    getBeneficiaryTypeDistribution(startDate?: Date, endDate?: Date): Promise<BeneficiaryTypeDistributionModel[]>;
 }

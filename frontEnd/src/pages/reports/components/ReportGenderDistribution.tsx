@@ -2,55 +2,18 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportGenderDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-// Interfaz para los datos del backend
-interface GenderDataItem {
-  tipo: string;
-  genero: string;
-  cantidad: number;
+
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-// Interfaz para los datos transformados (formato original)
-interface GenderData {
-  label: string;
-  value: number;
-  color: string;
-}
-
-interface ReportGenderDistributionProps {
-  data?: GenderDataItem[];
-  loading?: boolean;
-  error?: Error | null;
-}
-
-// Colores predefinidos para géneros
-const genderColors = {
-  'Masculino': '#4169E1',
-  'Femenino': '#FF69B4',
-  'Otro': '#9370DB',
-  'No especifica': '#808080'
-};
-
-function ReportGenderDistribution({ data = [], loading = false, error = null }: ReportGenderDistributionProps) {
-  // Transformar datos del backend al formato esperado
-  const transformedData: GenderData[] = data.map((item) => ({
-    label: `${item.tipo} - ${item.genero}`,
-    value: Number(item.cantidad) || 0,
-    color: genderColors[item.genero as keyof typeof genderColors] || '#808080'
-  }));
-
-  if (loading) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Género</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>Cargando datos...</Text>
-        </View>
-      </>
-    );
-  }
+function ReportGenderDistribution({ startDate, endDate }: ReportProps) {
+  const { genderDistribution, error } = useGetReportGenderDistribution(startDate, endDate);
 
   if (error) {
     return (
@@ -65,24 +28,12 @@ function ReportGenderDistribution({ data = [], loading = false, error = null }: 
     );
   }
 
-  if (transformedData.length === 0) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Género</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para el período seleccionado
-          </Text>
-        </View>
-      </>
-    );
-  }
-
-  // Calcular porcentajes dinámicamente
-  const totalPersonas = transformedData.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = transformedData.map(item => ({
-    ...item,
-    porcentaje: totalPersonas > 0 ? (item.value / totalPersonas) * 100 : 0
+  const totalPersonas = genderDistribution.reduce((sum, item) => sum + item.count, 0);
+  const transformedData = genderDistribution.map((item, index) => ({
+    label: `${item.type} - ${item.gender}`,
+    value: Number(item.count) || 0,
+    color: colors[index % colors.length],
+    porcentaje: totalPersonas > 0 ? (item.count / totalPersonas) * 100 : 0
   }));
 
   return (
@@ -103,7 +54,7 @@ function ReportGenderDistribution({ data = [], loading = false, error = null }: 
             <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
               Leyenda
             </Text>
-            {dataWithPercentages.map((item, index) => (
+            {transformedData.map((item, index) => (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                 <View style={{
                   width: 12,

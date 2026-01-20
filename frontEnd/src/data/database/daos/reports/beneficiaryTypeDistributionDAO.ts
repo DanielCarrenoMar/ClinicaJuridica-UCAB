@@ -1,4 +1,6 @@
+import type{ CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
+
 export interface BeneficiaryTypeDistribution {
-  type: string; 
+  type: CaseBeneficiaryTypeDAO; 
   count: number;
 }

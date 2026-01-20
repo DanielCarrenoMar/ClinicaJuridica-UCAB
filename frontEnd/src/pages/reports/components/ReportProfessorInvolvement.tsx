@@ -2,38 +2,18 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportProfessorInvolvement } from "#domain/useCaseHooks/userReport.ts";
 
-interface ProfessorInvolvementData {
-  tipo?: string;
-  label?: string;
-  cantidad?: number;
-  value?: number;
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-interface ReportProfessorInvolvementProps {
-  data?: ProfessorInvolvementData[];
-  loading?: boolean;
-  error?: Error | null;
-}
+function ReportProfessorInvolvement({ startDate, endDate }: ReportProps) {
+  const { professorInvolvement, error } = useGetReportProfessorInvolvement(startDate, endDate);
 
-function ReportProfessorInvolvement({ data, loading, error }: ReportProfessorInvolvementProps) {
-  // Si está cargando, mostrar mensaje
-  if (loading) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Profesores Involucrados por Tipo</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            Cargando datos...
-          </Text>
-        </View>
-      </>
-    );
-  }
-
-  // Si hay error, mostrar mensaje de error
   if (error) {
     return (
       <>
@@ -47,41 +27,18 @@ function ReportProfessorInvolvement({ data, loading, error }: ReportProfessorInv
     );
   }
 
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Profesores Involucrados por Tipo</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
-          </Text>
-        </View>
-      </>
-    );
-  }
+  const totalProfesores = professorInvolvement.reduce((sum, item) => sum + item.count, 0);
+  const data = professorInvolvement.map((item, index) => ({
+    label: item.type,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalProfesores > 0 ? (item.count / totalProfesores) * 100 : 0
+  }));
 
-  // Transformar los datos del backend al formato que espera BarChart
-  const transformedData = data.map((item, index) => {
-    const label = item.tipo || item.label || `Tipo ${index + 1}`;
-    const value = item.cantidad || item.value || 0;
-    
-    // Generar colores consistentes
-    const colors = ['#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063', '#48C9B0'];
-    const color = colors[index % colors.length];
-    
-    return {
-      label,
-      value,
-      color
-    };
-  });
-
-  // Calcular porcentajes dinámicamente
-  const totalProfesores = transformedData.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = transformedData.map(item => ({
-    ...item,
-    porcentaje: (item.value / totalProfesores) * 100
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
   }));
 
   return (
@@ -92,7 +49,7 @@ function ReportProfessorInvolvement({ data, loading, error }: ReportProfessorInv
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={transformedData}
+              data={barChartData}
               width={320}
               height={220}
               barWidth={18}
@@ -103,7 +60,7 @@ function ReportProfessorInvolvement({ data, loading, error }: ReportProfessorInv
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
-          {dataWithPercentages.map((item, index) => (
+          {data.map((item, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <View style={{
                 width: 12,

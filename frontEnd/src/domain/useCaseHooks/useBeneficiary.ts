@@ -46,6 +46,7 @@ export function useGetAllBeneficiaries() {
             setError(null);
         } catch (err) {
             setError(err as Error);
+            throw err;
         } finally {
             setLoading(false);
         }

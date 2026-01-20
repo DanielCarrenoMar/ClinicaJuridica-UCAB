@@ -1,4 +1,6 @@
+import type { ProcessTypeDAO } from "#database/typesDAO.ts";
+
 export interface CasesByType {
-  type: string;
+  type: ProcessTypeDAO;
   count: number;
 }
