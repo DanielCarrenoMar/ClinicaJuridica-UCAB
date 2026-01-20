@@ -37,8 +37,6 @@ export default function TextInput({
   };
 
   const isControlled = value !== undefined;
-  // Si es controlado, siempre usar string (nunca undefined) para evitar el warning de React
-  const controlledValue = isControlled ? (value ?? '') : undefined;
 
   return (
     <div className={`w-full relative ${className}`}>
@@ -46,7 +44,7 @@ export default function TextInput({
         multiline ? (
           <textarea
             disabled={disabled}
-            value={controlledValue}
+            value={isControlled ? value : undefined}
             defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
@@ -57,7 +55,7 @@ export default function TextInput({
           <input
             type={type}
             disabled={disabled}
-            value={controlledValue}
+            value={isControlled ? value : undefined}
             defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
