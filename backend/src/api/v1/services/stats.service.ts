@@ -7,8 +7,11 @@ class StatsService {
    */
   async getCasesBySubject(startDate?: Date, endDate?: Date) {
     try {
+      console.log('getCasesBySubject llamado con:', { startDate, endDate });
+      
       let result;
       if (startDate && endDate) {
+        console.log('Ejecutando consulta con rango de fechas');
         result = await prisma.$queryRaw`
           SELECT 
             s."name" as materia,
@@ -17,10 +20,13 @@ class StatsService {
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "Subject" s ON la."idSubject" = s."idSubject"
           WHERE c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
+            AND s."isActive" = true
+            AND la."isActive" = true
           GROUP BY s."idSubject", s."name"
           ORDER BY cantidad DESC
         `;
       } else {
+        console.log('Ejecutando consulta sin rango de fechas');
         result = await prisma.$queryRaw`
           SELECT 
             s."name" as materia,
@@ -28,13 +34,18 @@ class StatsService {
           FROM "Case" c
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "Subject" s ON la."idSubject" = s."idSubject"
+          WHERE s."isActive" = true
+            AND la."isActive" = true
           GROUP BY s."idSubject", s."name"
           ORDER BY cantidad DESC
         `;
       }
 
+      console.log('Resultado de la consulta:', result);
+      
       return { success: true, data: result };
     } catch (error) {
+      console.error('Error en getCasesBySubject:', error);
       return { success: false, error: error.message };
     }
   }

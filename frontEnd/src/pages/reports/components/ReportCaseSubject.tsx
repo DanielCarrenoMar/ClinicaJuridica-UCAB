@@ -11,9 +11,10 @@ const colors = ['#90EE90', '#4169E1', '#9370DB', '#FFD700', '#8B4513', '#FF6347'
 interface ReportCaseSubjectProps {
   data?: Array<{ materia: string; cantidad: number }>;
   loading?: boolean;
+  error?: Error | null;
 }
 
-function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProps) {
+function ReportCaseSubject({ data = [], loading = false, error = null }: ReportCaseSubjectProps) {
   // Transformar datos de la API al formato esperado
   const caseSubjectData = data.map((item, index) => ({
     materia: item.materia || 'Sin nombre',
@@ -34,6 +35,19 @@ function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProp
         <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
           <Text style={{ fontSize: 12, textAlign: 'center' }}>Cargando datos...</Text>
+        </View>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
         </View>
       </>
     );

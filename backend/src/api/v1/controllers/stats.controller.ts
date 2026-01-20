@@ -8,9 +8,34 @@ export async function getCasesBySubject(req: Request, res: Response): Promise<vo
     const parsedStartDate = startDate ? new Date(startDate as string) : undefined;
     const parsedEndDate = endDate ? new Date(endDate as string) : undefined;
 
+    // Validar que si se proporciona una fecha, ambas estén presentes
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+      res.status(400).json({ 
+        success: false, 
+        error: 'Se deben proporcionar ambas fechas (inicio y fin) o ninguna' 
+      });
+      return;
+    }
+
+    // Validar que la fecha de inicio sea anterior a la fecha de fin
+    if (parsedStartDate && parsedEndDate && parsedStartDate > parsedEndDate) {
+      res.status(400).json({ 
+        success: false, 
+        error: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+      });
+      return;
+    }
+
     const result = await statsService.getCasesBySubject(parsedStartDate, parsedEndDate);
-    res.status(result.success ? 200 : 400).json(result);
+    
+    if (!result.success) {
+      res.status(500).json({ success: false, error: result.error });
+      return;
+    }
+    
+    res.status(200).json(result);
   } catch (error: unknown) {
+    console.error('Error en getCasesBySubject:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: errorMessage });
   }

@@ -13,33 +13,14 @@ import {
 } from 'flowbite-react-icons/solid';
 import { PDFViewer, pdf } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
-import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
 import ReportDocument from './components/ReportDocument';
-import ReportCaseType from './components/ReportCaseType';
-import ReportGenderDistribution from './components/ReportGenderDistribution';
-import ReportStateDistribution from './components/ReportStateDistribution';
-import ReportParishDistribution from './components/ReportParishDistribution';
-import ReportCaseTypeDistribution from './components/ReportCaseTypeDistribution';
-import ReportBeneficiaryParishDistribution from './components/ReportBeneficiaryParishDistribution';
-import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
-import ReportStudentInvolvement from './components/ReportStudentInvolvement';
-import ReportBeneficiaryTypeDistribution from './components/ReportBeneficiaryTypeDistribution';
+import NotImplementedReport from './components/NotImplementedReport';
 import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
 import {
     useGetCasesBySubject,
-    useGetCasesBySubjectScope,
-    useGetGenderDistribution,
-    useGetStateDistribution,
-    useGetParishDistribution,
-    useGetCasesByType,
-    useGetBeneficiariesByParish,
-    useGetStudentInvolvement,
-    useGetCasesByServiceType,
-    useGetProfessorInvolvement,
-    useGetBeneficiaryTypeDistribution
 } from '#domain/useCaseHooks/useStats.ts';
 
 const reportOptions = [
@@ -55,70 +36,70 @@ const reportOptions = [
         title: 'Casos por materia y ambito',
         description: 'Cantidad de casos agrupados por materia y separados en ambito',
         icon: <ChartPie />,
-        component: <ReportCaseSubjectScope />
+        component: <NotImplementedReport reportId={2} />
     },
     {
         id: 3,
         title: 'Solicitantes y beneficiarios por sexo',
         description: 'Cantidad de solicitantes y beneficiarios separados por sexo',
         icon: <ChartPie />,
-        component: <ReportGenderDistribution />
+        component: <NotImplementedReport reportId={3} />
     },
     {
         id: 4,
         title: 'Solicitantes y beneficiarios por estado',
         description: 'Cantidad de solicitantes y beneficiarios separados por estado',
         icon: <ChartPie />,
-        component: <ReportStateDistribution />
+        component: <NotImplementedReport reportId={4} />
     },
     {
         id: 5,
         title: 'Solicitantes y beneficiarios por parroquia',
         description: 'Cantidad de solicitantes y beneficiarios separados por parroquia',
         icon: <ChartPie />,
-        component: <ReportParishDistribution />
+        component: <NotImplementedReport reportId={5} />
     },
     {
         id: 6,
         title: 'Casos por tipo',
         description: 'Cantidad de casos separados por tipo',
         icon: <ChartPie />,
-        component: <ReportCaseType />
+        component: <NotImplementedReport reportId={6} />
     },
     {
         id: 7,
         title: 'Beneficiarios directos por parroquia',
         description: 'Cantidad de beneficiarios separados por parroquia',
         icon: <ChartPie />,
-        component: <ReportBeneficiaryParishDistribution />
+        component: <NotImplementedReport reportId={7} />
     },
     {
         id: 8,
         title: 'Estudiantes involucrados por tipo',
         description: 'Cantidad de estudiantes involucrados separados por tipo',
         icon: <ChartPie />,
-        component: <ReportStudentInvolvement />
+        component: <NotImplementedReport reportId={8} />
     },
     {
         id: 9,
         title: 'Casos por tipo de servicio',
         description: 'Cantidad de casos separados por tipo de servicio legal',
         icon: <ChartPie />,
-        component: <ReportCaseTypeDistribution />
+        component: <NotImplementedReport reportId={9} />
     },
     {
         id: 10,
         title: 'Profesores involucrados por tipo',
         description: 'Cantidad de profesores involucrados separados por tipo',
         icon: <ChartPie />,
-        component: <ReportProfessorInvolvement />
+        component: <NotImplementedReport reportId={10} />
     },
     {
         id: 11,
         title: 'Beneficiarios directos e indirectos',
         description: 'Distribución de beneficiarios por tipo (directos e indirectos)',
         icon: <ChartPie />,
-        component: <ReportBeneficiaryTypeDistribution />
+        component: <NotImplementedReport reportId={11} />
     },
 ];
 
@@ -134,44 +115,25 @@ function Reports() {
     const parsedEndDate = endDate ? parseDate(endDate) : undefined;
     const hasValidDates = parsedStartDate && parsedEndDate && validateDateRange(parsedStartDate, parsedEndDate);
 
-    // Load data for each report type
+    // Solo cargamos los datos que necesitamos para evitar warnings
     const casesBySubject = useGetCasesBySubject(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const casesBySubjectScope = useGetCasesBySubjectScope(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const genderDistribution = useGetGenderDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const stateDistribution = useGetStateDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const parishDistribution = useGetParishDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const casesByType = useGetCasesByType(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const beneficiariesByParish = useGetBeneficiariesByParish(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const studentInvolvement = useGetStudentInvolvement(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const casesByServiceType = useGetCasesByServiceType(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const professorInvolvement = useGetProfessorInvolvement(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const beneficiaryTypeDistribution = useGetBeneficiaryTypeDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
 
     // Crear componentes frescos cada vez con datos
     const createFreshComponent = (reportId: number) => {
         switch(reportId) {
             case 1:
-                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={casesBySubject.data} loading={casesBySubject.loading} />;
+                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={casesBySubject.data} loading={casesBySubject.loading} error={casesBySubject.error} />;
             case 2:
-                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={casesBySubjectScope.data} loading={casesBySubjectScope.loading} />;
             case 3:
-                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderDistribution.data} loading={genderDistribution.loading} />;
             case 4:
-                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={stateDistribution.data} loading={stateDistribution.loading} />;
             case 5:
-                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={parishDistribution.data} loading={parishDistribution.loading} />;
             case 6:
-                return <ReportCaseType key={`fresh-6-${Date.now()}`} data={casesByType.data} loading={casesByType.loading} />;
             case 7:
-                return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} data={beneficiariesByParish.data} loading={beneficiariesByParish.loading} />;
             case 8:
-                return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} data={studentInvolvement.data} loading={studentInvolvement.loading} />;
             case 9:
-                return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} data={casesByServiceType.data} loading={casesByServiceType.loading} />;
             case 10:
-                return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} data={professorInvolvement.data} loading={professorInvolvement.loading} />;
             case 11:
-                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={beneficiaryTypeDistribution.data} loading={beneficiaryTypeDistribution.loading} />;
+                return <NotImplementedReport key={`not-implemented-${reportId}-${Date.now()}`} reportId={reportId} />;
             default:
                 return null;
         }
