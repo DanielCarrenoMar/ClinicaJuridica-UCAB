@@ -51,7 +51,7 @@ export default function AddCaseActionDialog({
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <label className="flex items-center px-1.5 w-full text-label-small text-onSurface">
-                        Descripción
+                        Descripción*
                     </label>
                     <TextInput
                         multiline
@@ -63,7 +63,7 @@ export default function AddCaseActionDialog({
 
                 <div className="flex flex-col gap-2">
                     <label className="flex items-center px-1.5 w-full text-label-small text-onSurface">
-                        Notas*
+                        Notas
                     </label>
                     <TextInput
                         multiline

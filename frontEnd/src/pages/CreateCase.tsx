@@ -80,9 +80,22 @@ function CreateCase() {
                 return;
             }
 
-            if (isApplicantExisting) {
+            // Check if this user is a beneficiary (has type property from getApplicantOrBeneficiaryById)
+            const isBeneficiary = (applicantModel as any).type === "Beneficiario";
+
+            // If it's a beneficiary trying to create a case, we need to promote them to applicant first
+            if (isBeneficiary && isApplicantExisting) {
+                // Beneficiary exists but needs to be converted to applicant to create a case
+                const created = await createApplicant(applicantModel as any);
+                if (!created) {
+                    throw new Error("Failed to promote beneficiary to applicant.");
+                }
+                // After creation, it's no longer just existing, we created the applicant record
+            } else if (isApplicantExisting) {
+                // Regular applicant update
                 await updateApplicant(applicantId, applicantModel as ApplicantModel);
             } else {
+                // New applicant creation
                 const created = await createApplicant(applicantModel as any);
                 if (!created) {
                     throw new Error("Applicant creation failed.");

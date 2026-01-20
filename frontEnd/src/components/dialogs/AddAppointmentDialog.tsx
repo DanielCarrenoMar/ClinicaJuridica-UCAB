@@ -9,7 +9,7 @@ import DateTimePicker from '#components/DateTimePicker.tsx';
 interface AddAppointmentDialogProps {
     open: boolean;
     onClose: () => void;
-    onAdd: (daoAppointment:  Omit<AppointmentDAO, "appointmentNumber" | "idCase" | "userId" | "registryDate">) => void;
+    onAdd: (daoAppointment: Omit<AppointmentDAO, "appointmentNumber" | "idCase" | "userId" | "registryDate">) => void;
 }
 
 export default function AddAppointmentDialog({
@@ -52,7 +52,7 @@ export default function AddAppointmentDialog({
         <Dialog open={open} title="Nueva Cita" onClose={onClose}>
             <div className="flex flex-col gap-4">
                 <DateTimePicker
-                    label="Planificada para"
+                    label="Planificada para*"
                     value={plannedDate}
                     onChange={setPlannedDate}
                     min={today}

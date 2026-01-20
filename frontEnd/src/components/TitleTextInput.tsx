@@ -10,6 +10,9 @@ interface TitleTextInputProps {
   placeholder?: string;
   disabled?: boolean;
   type?: string;
+  multiline?: boolean;
+  rows?: number;
+  resize?: boolean;
 }
 
 export default function TitleTextInput({
@@ -19,7 +22,10 @@ export default function TitleTextInput({
   className = '',
   placeholder = "",
   disabled = false,
-  type = "text"
+  type = "text",
+  multiline = false,
+  rows = 3,
+  resize = false
 }: TitleTextInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -40,6 +46,9 @@ export default function TitleTextInput({
         className="w-full"
         disabled={disabled}
         type={inputType}
+        multiline={multiline}
+        rows={rows}
+        resize={resize}
         rightIcon={isPassword ? (showPassword ? <EyeSlash className="size-5" /> : <Eye className="size-5" />) : undefined}
         onRightIconClick={isPassword ? () => setShowPassword(!showPassword) : undefined}
       />

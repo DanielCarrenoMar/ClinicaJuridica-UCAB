@@ -120,7 +120,7 @@ export default function CreateBeneficiaryDialog({
           <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
             <div>
               <TitleTextInput
-                label="Cédula*"
+                label="Cédula"
                 value={identityCard}
                 onChange={setIdentityCard}
               />

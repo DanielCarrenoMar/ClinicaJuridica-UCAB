@@ -255,6 +255,7 @@ function CreateCaseCaseStep() {
                         defaultText={caseDAO.problemSummary}
                         onChangeText={(text) => { updateCaseDAO({ problemSummary: text }); }}
                         multiline={true}
+                        rows={8}
                         placeholder="Detalle o descripcion del problema"
                     />
                 </article>

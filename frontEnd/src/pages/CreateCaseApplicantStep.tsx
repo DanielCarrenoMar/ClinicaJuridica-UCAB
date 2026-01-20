@@ -173,8 +173,13 @@ function CreateCaseApplicantStep() {
             }
         }
 
+        // Validate identity card contains only numbers
+        if (applicantModel.identityCard && /[^0-9]/.test(applicantModel.identityCard)) {
+            errors.identityCard = "La cédula solo debe contener números";
+        }
+
         setValidationErrors(errors);
-    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount]);
+    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount, applicantModel.identityCard]);
 
     useEffect(() => {
         return () => {
@@ -287,6 +292,7 @@ function CreateCaseApplicantStep() {
 
                         disabled={isFieldDisabled('identityCard')}
                     />
+                    {validationErrors.identityCard && <span className="text-xs text-error mt-1">{validationErrors.identityCard}</span>}
                 </div>
                 <div>
                     <TitleTextInput

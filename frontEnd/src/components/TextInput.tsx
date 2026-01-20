@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ChangeEvent, type ReactNode } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 
 interface TextInputProps {
   defaultText?: string;
@@ -7,6 +7,8 @@ interface TextInputProps {
   className?: string;
   placeholder?: string;
   multiline?: boolean;
+  rows?: number;
+  resize?: boolean;
   type?: string;
   disabled?: boolean;
   rightIcon?: ReactNode;
@@ -20,29 +22,13 @@ export default function TextInput({
   className = '',
   placeholder = "Lorem ipsum dolor sit amet...",
   multiline = false,
+  rows = 3,
+  resize = false,
   type = "text",
   disabled = false,
   rightIcon,
   onRightIconClick
 }: TextInputProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (!multiline || !textareaRef.current) return;
-
-    const textarea = textareaRef.current;
-    const scrollContainer = textarea.closest('.overflow-y-auto');
-
-    if (!scrollContainer) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      // Ensure the textarea stays in view when manually resized using the handle
-      textarea.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-    });
-
-    resizeObserver.observe(textarea);
-    return () => resizeObserver.disconnect();
-  }, [multiline]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (onChangeText) {
@@ -57,14 +43,13 @@ export default function TextInput({
       {
         multiline ? (
           <textarea
-            ref={textareaRef}
             disabled={disabled}
             value={isControlled ? value : undefined}
             defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
-            className="w-full disabled:opacity-70 bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 resize-y min-h-[200px]"
-            rows={8}
+            className={`w-full disabled:opacity-70 bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 ${resize ? 'resize-y' : 'resize-none'}`}
+            rows={rows}
           />
         ) : (
           <input

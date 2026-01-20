@@ -52,7 +52,7 @@ export default function EditSupportDocumentDialog({
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <label className="flex items-center px-1.5 w-full text-label-small">
-                        Título
+                        Título*
                     </label>
                     <TextInput
                         placeholder="Ingrese el título del recaudo..."
@@ -63,7 +63,7 @@ export default function EditSupportDocumentDialog({
 
                 <div className="flex flex-col gap-2">
                     <label className="flex items-center px-1.5 w-full text-label-small">
-                        Descripción
+                        Descripción*
                     </label>
                     <TextInput
                         multiline

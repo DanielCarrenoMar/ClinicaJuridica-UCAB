@@ -51,7 +51,7 @@ export default function CaseGeneral({ caseData, localCaseData, onChange }: CaseG
                         selectedValue={localCaseData?.idCourt}
                         onSelectionChange={(val) => {
                             onChange({ idCourt: val as number })
-                            onChange({ courtName: courts[(val as number) - 1]})
+                            onChange({ courtName: courts[(val as number) - 1] })
                         }}
                     >
                         {courts.map((courtName, index) => (
@@ -68,6 +68,7 @@ export default function CaseGeneral({ caseData, localCaseData, onChange }: CaseG
                     multiline
                     value={localCaseData?.problemSummary || ''}
                     onChangeText={(val) => onChange({ problemSummary: val })}
+                    rows={8}
                 />
             </section>
         </div>
