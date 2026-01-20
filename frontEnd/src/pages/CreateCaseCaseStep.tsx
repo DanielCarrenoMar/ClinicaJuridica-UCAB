@@ -87,7 +87,7 @@ function CreateCaseCaseStep() {
 
     return (
         <>
-            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16">
+            <header className="bg-surface/70 flex items-center justify-between rounded-t-xl px-4 h-16 shrink-0">
                 <div className="flex items-center gap-2.5">
                     <UserEdit className="size-8!" />
                     <h1 className="text-label-medium">Caso</h1>
@@ -97,7 +97,7 @@ function CreateCaseCaseStep() {
                     <Button onClick={submitCreateCase} variant="resalted" icon={<ChevronRight />} disabled={isSubmittingCreateCase || !isFormValid} className="w-32">Aceptar</Button>
                 </div>
             </header>
-            <div className="px-4 py-2 flex flex-col gap-4">
+            <div className="px-4 py-2 flex flex-col gap-4 overflow-y-auto">
                 <article className="grid grid-cols-4 grid-rows-4 gap-y-4 h-98">
                     <section className="col-span-2">
                         <h3 className="text-label-small mb-2">
@@ -137,7 +137,7 @@ function CreateCaseCaseStep() {
                     </section>
                     <section className="flex gap-3 col-span-2">
                         <TitleDropdown
-                            label="Tipo de tramite"
+                            label="Tipo de tramite*"
                             selectedValue={caseDAO.processType}
                             onSelectionChange={(value) => { updateCaseDAO({ processType: value as ProcessTypeDAO }); }}
                         >
@@ -147,7 +147,7 @@ function CreateCaseCaseStep() {
                             <DropdownOption value="R">Redacción</DropdownOption>
                         </TitleDropdown>
                         <TitleDropdown
-                            label="Nucleo"
+                            label="Nucleo*"
                             selectedValue={caseDAO.idNucleus}
                             onSelectionChange={(value) => { updateCaseDAO({ idNucleus: value as string }) }}
                         >
@@ -156,7 +156,7 @@ function CreateCaseCaseStep() {
                     </section>
                     <section className="col-span-2 row-span-3">
                         <h4 className="text-body-large mb-2">
-                            Ambito Legal
+                            Ambito Legal*
                         </h4>
                         <span className="flex flex-col gap-2">
                             <div className="flex gap-2">
@@ -201,7 +201,6 @@ function CreateCaseCaseStep() {
                         </span>
                     </section>
                 </article>
-
                 <PersonSearchDialog
                     open={isBeneficiarySearchDialogOpen}
                     title="Buscar Beneficiario"
@@ -224,7 +223,7 @@ function CreateCaseCaseStep() {
 
                 <CreateBeneficiaryDialog
                     open={isCreateBeneficiaryDialogOpen}
-                    onClose={() =>{ setIsCreateBeneficiaryDialogOpen(false); setIsBeneficiarySearchDialogOpen(true);}}
+                    onClose={() => { setIsCreateBeneficiaryDialogOpen(false); setIsBeneficiarySearchDialogOpen(true); }}
                     onCreate={async (data: BeneficiaryDAO) => {
                         const created = await createBeneficiary(data);
                         await refreshBeneficiaries();
@@ -248,7 +247,7 @@ function CreateCaseCaseStep() {
                 <article>
                     <header className="flex justify-between items-center w-full">
                         <h3 className="text-label-small mb-2">
-                            Sintesis del problema
+                            Sintesis del problema*
                         </h3>
                     </header>
 
@@ -256,9 +255,10 @@ function CreateCaseCaseStep() {
                         defaultText={caseDAO.problemSummary}
                         onChangeText={(text) => { updateCaseDAO({ problemSummary: text }); }}
                         multiline={true}
-                        placeholder="Detalle rapido del caso"
+                        placeholder="Detalle o descripcion del problema"
                     />
                 </article>
+                <footer className="h-72"></footer>
             </div>
         </>
     );

@@ -35,7 +35,7 @@ export default function CreateBeneficiaryDialog({
   const [parishName, setParishName] = useState<string>();
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const { getBeneficiaryById, loading:isChecking } = useGetBeneficiaryById()
+  const { getBeneficiaryById, loading: isChecking } = useGetBeneficiaryById()
 
   const resetForm = () => {
     setIdentityCard("");
@@ -120,7 +120,7 @@ export default function CreateBeneficiaryDialog({
           <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
             <div>
               <TitleTextInput
-                label="Cédula"
+                label="Cédula*"
                 value={identityCard}
                 onChange={setIdentityCard}
               />
@@ -128,7 +128,7 @@ export default function CreateBeneficiaryDialog({
             </div>
             <div>
               <TitleTextInput
-                label="Nombre y apellido"
+                label="Nombre y apellido*"
                 value={fullName}
                 onChange={setFullName}
               />
@@ -137,7 +137,7 @@ export default function CreateBeneficiaryDialog({
 
           <div className="col-span-1">
             <TitleDropdown
-              label="Sexo"
+              label="Sexo*"
               selectedValue={gender || undefined}
               onSelectionChange={(value) => setGender(value as GenderTypeModel)}
             >
@@ -147,14 +147,14 @@ export default function CreateBeneficiaryDialog({
           </div>
           <div className="col-span-1">
             <DatePicker
-              label="Fecha Nacimiento"
+              label="Fecha Nacimiento*"
               value={birthDate}
               onChange={(text) => setBirthDate(text)}
             />
           </div>
           <div className="col-span-1">
             <TitleDropdown
-              label="Nacionalidad"
+              label="Nacionalidad*"
               selectedValue={idNationality ?? undefined}
               onSelectionChange={(value) => setNationality(value as BeneficiaryDAO["idNationality"])}
             >
@@ -166,7 +166,7 @@ export default function CreateBeneficiaryDialog({
 
           <div className="col-span-1">
             <TitleDropdown
-              label="Estado*"
+              label="Estado"
               selectedValue={stateIndex !== null ? stateIndex : undefined}
               onSelectionChange={(value) => {
                 const idx = value as number;
@@ -182,7 +182,7 @@ export default function CreateBeneficiaryDialog({
           </div>
           <div className="col-span-1">
             <TitleDropdown
-              label="Municipio*"
+              label="Municipio"
               selectedValue={munIndex !== null ? munIndex : undefined}
               onSelectionChange={(value) => {
                 const idx = value as number;
@@ -198,7 +198,7 @@ export default function CreateBeneficiaryDialog({
           </div>
           <div className="col-span-1">
             <TitleDropdown
-              label="Parroquia*"
+              label="Parroquia"
               selectedValue={parishName || undefined}
               onSelectionChange={(value) => {
                 setParishName(value as string);
