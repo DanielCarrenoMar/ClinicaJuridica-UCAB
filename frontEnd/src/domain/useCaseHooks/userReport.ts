@@ -12,7 +12,7 @@ import type { CasesByServiceTypeModel } from "#domain/models/reports/casesByServ
 import type { ProfessorInvolvementModel } from "#domain/models/reports/professorInvolvement.ts";
 import type { BeneficiaryTypeDistributionModel } from "#domain/models/reports/beneficiaryTypeDistribution.ts";
 
-export const useGetCasesBySubject = (startDate?: Date, endDate?: Date) => {
+export const useGetReportCasesBySubject = (startDate?: Date, endDate?: Date) => {
     const { getCasesBySubject } = getReportRepository();
     const [casesBySubject, setCasesBySubject] = useState<CasesBySubjectModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ export const useGetCasesBySubject = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetCasesBySubjectScope = (startDate?: Date, endDate?: Date) => {
+export const useGetReportCasesBySubjectScope = (startDate?: Date, endDate?: Date) => {
     const { getCasesBySubjectScope } = getReportRepository();
     const [casesBySubjectScope, setCasesBySubjectScope] = useState<CasesBySubjectScopeModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -76,7 +76,7 @@ export const useGetCasesBySubjectScope = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetGenderDistribution = (startDate?: Date, endDate?: Date) => {
+export const useGetReportGenderDistribution = (startDate?: Date, endDate?: Date) => {
     const { getGenderDistribution } = getReportRepository();
     const [genderDistribution, setGenderDistribution] = useState<GenderDistributionModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -108,7 +108,7 @@ export const useGetGenderDistribution = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetStateDistribution = (startDate?: Date, endDate?: Date) => {
+export const useGetReportStateDistribution = (startDate?: Date, endDate?: Date) => {
     const { getStateDistribution } = getReportRepository();
     const [stateDistribution, setStateDistribution] = useState<StateDistributionModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -140,7 +140,7 @@ export const useGetStateDistribution = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetParishDistribution = (startDate?: Date, endDate?: Date) => {
+export const useGetReportParishDistribution = (startDate?: Date, endDate?: Date) => {
     const { getParishDistribution } = getReportRepository();
     const [parishDistribution, setParishDistribution] = useState<ParishDistributionModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -172,7 +172,7 @@ export const useGetParishDistribution = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetCasesByType = (startDate?: Date, endDate?: Date) => {
+export const useGetReportCasesByType = (startDate?: Date, endDate?: Date) => {
     const { getCasesByType } = getReportRepository();
     const [casesByType, setCasesByType] = useState<CasesByTypeModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -204,7 +204,7 @@ export const useGetCasesByType = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetBeneficiariesByParish = (startDate?: Date, endDate?: Date) => {
+export const useGetReportBeneficiariesByParish = (startDate?: Date, endDate?: Date) => {
     const { getBeneficiariesByParish } = getReportRepository();
     const [beneficiariesByParish, setBeneficiariesByParish] = useState<BeneficiariesByParishModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -236,7 +236,7 @@ export const useGetBeneficiariesByParish = (startDate?: Date, endDate?: Date) =>
     };
 };
 
-export const useGetStudentInvolvement = (startDate?: Date, endDate?: Date) => {
+export const useGetReportStudentInvolvement = (startDate?: Date, endDate?: Date) => {
     const { getStudentInvolvement } = getReportRepository();
     const [studentInvolvement, setStudentInvolvement] = useState<StudentInvolvementModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -268,7 +268,7 @@ export const useGetStudentInvolvement = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetCasesByServiceType = (startDate?: Date, endDate?: Date) => {
+export const useGetReportCasesByServiceType = (startDate?: Date, endDate?: Date) => {
     const { getCasesByServiceType } = getReportRepository();
     const [casesByServiceType, setCasesByServiceType] = useState<CasesByServiceTypeModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -300,7 +300,7 @@ export const useGetCasesByServiceType = (startDate?: Date, endDate?: Date) => {
     };
 };
 
-export const useGetProfessorInvolvement = (startDate?: Date, endDate?: Date) => {
+export const useGetReportProfessorInvolvement = (startDate?: Date, endDate?: Date) => {
     const { getProfessorInvolvement } = getReportRepository();
     const [professorInvolvement, setProfessorInvolvement] = useState<ProfessorInvolvementModel[]>([]);
     const [loading, setLoading] = useState(false);
@@ -332,7 +332,7 @@ export const useGetProfessorInvolvement = (startDate?: Date, endDate?: Date) => 
     };
 };
 
-export const useGetBeneficiaryTypeDistribution = (startDate?: Date, endDate?: Date) => {
+export const useGetReportBeneficiaryTypeDistribution = (startDate?: Date, endDate?: Date) => {
     const { getBeneficiaryTypeDistribution } = getReportRepository();
     const [beneficiaryTypeDistribution, setBeneficiaryTypeDistribution] = useState<BeneficiaryTypeDistributionModel[]>([]);
     const [loading, setLoading] = useState(false);
