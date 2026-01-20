@@ -114,14 +114,11 @@ const reportOptions = [
 
 function Reports() {
     const [selectedReportIds, setSelectedReportIds] = useState<number[]>([]);
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
+    const [startDate, setStartDate] = useState<Date | undefined>(new Date("2023-01-01"));
+    const [endDate, setEndDate] = useState<Date | undefined>(new Date());
     const [isGenerating, setIsGenerating] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
-    // Cargar TODAS las estadísticas al abrir la página (sin filtro para mostrar datos disponibles)
-    console.log('📱 [REPORTS] Página de reportes montada, iniciando carga de estadísticas...');
-    console.log('📊 [REPORTS] Estado actual de selección:', selectedReportIds);
     const allStats = useAllStats(undefined, undefined);
 
     // Crear componentes frescos cada vez con datos
@@ -166,8 +163,7 @@ function Reports() {
     }, [allStats]);
 
     const reportDoc = useMemo(() => {
-        // Solo generar el documento si ambas fechas están seleccionadas
-        if (!startDate || !endDate) {
+        if (!startDate || !endDate || selectedReportIds.length === 0) {
             return null;
         }
 
@@ -179,10 +175,8 @@ function Reports() {
         let parsedEndDate: Date | undefined;
         
         try {
-            parsedStartDate = parseDate(startDate);
-            parsedEndDate = parseDate(endDate);
             
-            if (!validateDateRange(parsedStartDate, parsedEndDate)) {
+            if (!validateDateRange(startDate, endDate)) {
                 console.warn('Invalid date range: start date must be before end date');
                 return null;
             }
@@ -203,11 +197,9 @@ function Reports() {
     }, [selectedReportIds, startDate, endDate, allStats, createFreshComponent]);
 
     const handleReportSelect = (id: number) => {
-        console.log('🔄 [REPORTS] Selección de reporte:', { id, currentSelection: selectedReportIds });
         const newSelection = selectedReportIds.includes(id) 
             ? selectedReportIds.filter(item => item !== id) 
             : [...selectedReportIds, id];
-        console.log('🔄 [REPORTS] Nueva selección:', newSelection);
         setSelectedReportIds(newSelection);
         // Limpiar PDF cacheado cuando cambia la selección
         pdfRef.current = null;
@@ -307,16 +299,16 @@ function Reports() {
                         <div className="w-full space-y-3">
                             <DatePicker
                                 label="Fecha de inicio"
-                                value={startDate}
-                                onChange={setStartDate}
+                                value={startDate?.toLocaleDateString() || undefined}
+                                onChange={(date) => setStartDate(new Date(date))}
                                 id="start-date"
                             />
                             <DatePicker
                                 label="Fecha de fin"
-                                value={endDate}
-                                onChange={setEndDate}
+                                value={endDate?.toLocaleDateString() || undefined}
+                                onChange={(date) => setEndDate(new Date(date))}
                                 id="end-date"
-                                min={startDate}
+                                min={startDate?.toLocaleDateString() || undefined}
                             />
                         </div>
                     </section>
@@ -335,7 +327,7 @@ function Reports() {
                         )}
 
                         {/* Mostrar errores si los hay */}
-                        {!isGenerating && !allStats.isAnyLoading && allStats.hasAnyError && (
+                        {/*!isGenerating && !allStats.isAnyLoading && allStats.hasAnyError && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <div className="text-red-500 mb-3">
@@ -348,7 +340,7 @@ function Reports() {
                                     </p>
                                 </div>
                             </div>
-                        )}
+                        )*/}
 
                         {!isGenerating && !allStats.isAnyLoading && !startDate && !endDate && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
