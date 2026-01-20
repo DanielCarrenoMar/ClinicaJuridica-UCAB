@@ -3,11 +3,10 @@ import {
   View,
 } from "@react-pdf/renderer";
 import PieChart from './charts/PieChart';
-import { styleDocument } from "./styleData";
+import { styleDocument, colors } from "./styleData";
 import { useGetReportCasesBySubject } from "#domain/useCaseHooks/userReport.ts";
 
-// Colores predefinidos para las materias
-const colors = ['#90EE90', '#4169E1', '#9370DB', '#FFD700', '#8B4513', '#FF6347', '#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063'];
+
 
 function ReportCaseSubject() {
   const { casesBySubject, error } = useGetReportCasesBySubject();

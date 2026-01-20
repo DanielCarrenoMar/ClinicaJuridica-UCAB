@@ -3,16 +3,10 @@ import {
   View,
 } from "@react-pdf/renderer";
 import BarChart from './charts/BarChart';
-import { styleDocument } from "./styleData";
+import { styleDocument, colors } from "./styleData";
 import { useGetReportGenderDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-// Colores predefinidos para géneros
-const genderColors = {
-  'Masculino': '#4169E1',
-  'Femenino': '#FF69B4',
-  'Otro': '#9370DB',
-  'No especifica': '#808080'
-};
+
 function ReportGenderDistribution() {
   const { genderDistribution, error } = useGetReportGenderDistribution();
 
@@ -30,10 +24,10 @@ function ReportGenderDistribution() {
   }
 
   const totalPersonas = genderDistribution.reduce((sum, item) => sum + item.count, 0);
-  const transformedData = genderDistribution.map((item) => ({
+  const transformedData = genderDistribution.map((item, index) => ({
     label: `${item.type} - ${item.gender}`,
     value: Number(item.count) || 0,
-    color: genderColors[item.gender as keyof typeof genderColors] || '#808080',
+    color: colors[index % colors.length],
     porcentaje: totalPersonas > 0 ? (item.count / totalPersonas) * 100 : 0
   }));
 
