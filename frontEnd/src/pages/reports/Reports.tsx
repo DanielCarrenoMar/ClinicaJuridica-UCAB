@@ -21,9 +21,8 @@ import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
 import {
-    useGetCasesBySubject,
-    useGetGenderDistribution,
-} from '#domain/useCaseHooks/useStats.ts';
+    useAllStats,
+} from '#domain/useCaseHooks/useAllStats.ts';
 
 const reportOptions = [
     {
@@ -117,15 +116,17 @@ function Reports() {
     const parsedEndDate = endDate ? parseDate(endDate) : undefined;
     const hasValidDates = parsedStartDate && parsedEndDate && validateDateRange(parsedStartDate, parsedEndDate);
 
-    // Solo cargamos los datos que necesitamos para evitar warnings
-    const casesBySubject = useGetCasesBySubject(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const genderDistribution = useGetGenderDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    // Cargar TODAS las estadísticas al abrir la página (sin filtro para mostrar datos disponibles)
+    console.log('📱 [REPORTS] Página de reportes montada, iniciando carga de estadísticas...');
+    const allStats = useAllStats(undefined, undefined);
 
     // Crear componentes frescos cada vez con datos
     const createFreshComponent = (reportId: number) => {
+        const reportData = allStats.getReportData(reportId);
+        
         switch(reportId) {
             case 1:
-                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={casesBySubject.data} loading={casesBySubject.loading} error={casesBySubject.error} />;
+                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
             case 2:
             case 4:
             case 5:
@@ -137,7 +138,7 @@ function Reports() {
             case 11:
                 return <NotImplementedReport key={`not-implemented-${reportId}-${Date.now()}`} reportId={reportId} />;
             case 3:
-                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderDistribution.data} loading={genderDistribution.loading} error={genderDistribution.error} />;
+                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
             default:
                 return null;
         }
@@ -251,7 +252,7 @@ function Reports() {
                         onClick={handleDownloadPDF} 
                         variant="outlined" 
                         icon={<FilePdf />}
-                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating}
+                        disabled={!startDate || !endDate || selectedReportIds.length === 0 || isGenerating || allStats.isAnyLoading}
                     >
                         {isGenerating ? 'Generando...' : 'Exportar PDF'}
                     </Button>
@@ -298,13 +299,35 @@ function Reports() {
                     </section>
 
                     <section className="flex flex-col gap-3 overflow-hidden h-full relative">
-                        {isGenerating && (
+                        {/* Mostrar estado de carga general de todas las estadísticas */}
+                        {allStats.isAnyLoading && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/50 backdrop-blur-sm">
-                                <LoadingSpinner />
+                                <div className="text-center">
+                                    <LoadingSpinner />
+                                    <p className="text-body-medium text-onSurface/70 mt-3">
+                                        Cargando estadísticas...
+                                    </p>
+                                </div>
                             </div>
                         )}
 
-                        {!isGenerating && !startDate && !endDate && (
+                        {/* Mostrar errores si los hay */}
+                        {!isGenerating && !allStats.isAnyLoading && allStats.hasAnyError && (
+                            <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
+                                <div className="text-center p-6">
+                                    <div className="text-red-500 mb-3">
+                                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-body-medium text-onSurface/70">
+                                        Error al cargar algunas estadísticas. Por favor, intenta nuevamente.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {!isGenerating && !allStats.isAnyLoading && !startDate && !endDate && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -326,13 +349,13 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && startDate && endDate && reportDoc && (
+                        {!isGenerating && !allStats.isAnyLoading && startDate && endDate && reportDoc && (
                             <PDFViewer className="w-full h-full" showToolbar={false}>
                                 {reportDoc}
                             </PDFViewer>
                         )}
 
-                        {!isGenerating && startDate && endDate && !reportDoc && (
+                        {!isGenerating && !allStats.isAnyLoading && startDate && endDate && !reportDoc && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <p className="text-body-medium text-onSurface/70">

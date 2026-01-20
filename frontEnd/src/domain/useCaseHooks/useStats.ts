@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getStatsRepository } from '#database/repositoryImp/StatsRepositoryImp.ts';
 
 // Interfaz para los datos de casos por materia
 interface CaseBySubject {
@@ -6,57 +7,33 @@ interface CaseBySubject {
   cantidad: number;
 }
 
-// Interfaz para la respuesta del API
-interface StatsResponse {
-  success: boolean;
-  data?: CaseBySubject[];
-  error?: string;
-}
-
 // Hook personalizado para obtener casos por materia
 export function useGetCasesBySubject(startDate?: Date, endDate?: Date) {
   const [data, setData] = useState<CaseBySubject[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
 
   const loadData = useCallback(async () => {
-    // Permitir carga sin fechas para mostrar todos los datos
+    console.log('🔄 [STATS] Iniciando carga de casos por materia:', { startDate, endDate });
     setLoading(true);
     setError(null);
     
     try {
-      const query = new URLSearchParams();
-      if (startDate) query.set('startDate', startDate.toISOString());
-      if (endDate) query.set('endDate', endDate.toISOString());
-      
-      const url = query.toString() 
-        ? `http://localhost:3000/api/v1/stats/cases/by-subject?${query.toString()}`
-        : `http://localhost:3000/api/v1/stats/cases/by-subject`;
-      
-      console.log('Haciendo petición a:', url);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const result = await statsRepository.getCasesBySubject(startDate, endDate);
+      console.log('✅ [STATS] Casos por materia cargados exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-      
-      const result: StatsResponse = await response.json();
-      console.log('Respuesta del API:', result);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Error del servidor');
-      }
-      
-      setData(result.data || []);
+      setData(result);
     } catch (err) {
-      console.error('Error cargando casos por materia:', err);
+      console.error('❌ [STATS] Error cargando casos por materia:', {
+        error: err,
+        startDate,
+        endDate
+      });
       setError(err instanceof Error ? err : new Error('Error desconocido'));
       setData([]);
     } finally {
@@ -71,9 +48,45 @@ export function useGetCasesBySubject(startDate?: Date, endDate?: Date) {
   return { data, loading, error, refresh: loadData };
 }
 
-// Funciones placeholder para los otros hooks (para no romper la importación)
-export function useGetCasesBySubjectScope(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener casos por materia y ambito
+export function useGetCasesBySubjectScope(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de casos por materia y ambito:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getCasesBySubjectScope(startDate, endDate);
+      console.log('✅ [STATS] Casos por materia y ambito cargados exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando casos por materia y ambito:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
 // Interfaz para los datos de distribución por género
@@ -83,56 +96,33 @@ interface GenderDistributionItem {
   cantidad: number;
 }
 
-// Interfaz para la respuesta del API de género
-interface GenderResponse {
-  success: boolean;
-  data?: GenderDistributionItem[];
-  error?: string;
-}
-
 // Hook personalizado para obtener distribución por género
 export function useGetGenderDistribution(startDate?: Date, endDate?: Date) {
   const [data, setData] = useState<GenderDistributionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
 
   const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de distribución por género:', { startDate, endDate });
     setLoading(true);
     setError(null);
     
     try {
-      const query = new URLSearchParams();
-      if (startDate) query.set('startDate', startDate.toISOString());
-      if (endDate) query.set('endDate', endDate.toISOString());
-      
-      const url = query.toString() 
-        ? `http://localhost:3000/api/v1/stats/gender-distribution?${query.toString()}`
-        : `http://localhost:3000/api/v1/stats/gender-distribution`;
-      
-      console.log('Haciendo petición a gender distribution:', url);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const result = await statsRepository.getGenderDistribution(startDate, endDate);
+      console.log('✅ [STATS] Distribución por género cargada exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-      
-      const result: GenderResponse = await response.json();
-      console.log('Respuesta del API gender distribution:', result);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Error del servidor');
-      }
-      
-      setData(result.data || []);
+      setData(result);
     } catch (err) {
-      console.error('Error cargando distribución por género:', err);
+      console.error('❌ [STATS] Error cargando distribución por género:', {
+        error: err,
+        startDate,
+        endDate
+      });
       setError(err instanceof Error ? err : new Error('Error desconocido'));
       setData([]);
     } finally {
@@ -147,34 +137,330 @@ export function useGetGenderDistribution(startDate?: Date, endDate?: Date) {
   return { data, loading, error, refresh: loadData };
 }
 
-export function useGetStateDistribution(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener distribución por estado
+export function useGetStateDistribution(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de distribución por estado:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getStateDistribution(startDate, endDate);
+      console.log('✅ [STATS] Distribución por estado cargada exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando distribución por estado:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetParishDistribution(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener distribución por parroquia
+export function useGetParishDistribution(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de distribución por parroquia:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getParishDistribution(startDate, endDate);
+      console.log('✅ [STATS] Distribución por parroquia cargada exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando distribución por parroquia:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetCasesByType(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener casos por tipo
+export function useGetCasesByType(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de casos por tipo:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getCasesByType(startDate, endDate);
+      console.log('✅ [STATS] Casos por tipo cargados exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando casos por tipo:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetBeneficiariesByParish(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener beneficiarios por parroquia
+export function useGetBeneficiariesByParish(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de beneficiarios por parroquia:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getBeneficiariesByParish(startDate, endDate);
+      console.log('✅ [STATS] Beneficiarios por parroquia cargados exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando beneficiarios por parroquia:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetStudentInvolvement(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener participación de estudiantes
+export function useGetStudentInvolvement(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de participación de estudiantes:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getStudentInvolvement(startDate, endDate);
+      console.log('✅ [STATS] Participación de estudiantes cargada exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando participación de estudiantes:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetCasesByServiceType(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener casos por tipo de servicio
+export function useGetCasesByServiceType(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de casos por tipo de servicio:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getCasesByServiceType(startDate, endDate);
+      console.log('✅ [STATS] Casos por tipo de servicio cargados exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando casos por tipo de servicio:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetProfessorInvolvement(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener participación de profesores
+export function useGetProfessorInvolvement(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de participación de profesores:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getProfessorInvolvement(startDate, endDate);
+      console.log('✅ [STATS] Participación de profesores cargada exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando participación de profesores:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
 
-export function useGetBeneficiaryTypeDistribution(_startDate?: Date, _endDate?: Date) {
-  return { data: [], loading: false, error: null, refresh: () => {} };
+// Hook personalizado para obtener distribución de tipos de beneficiarios
+export function useGetBeneficiaryTypeDistribution(startDate?: Date, endDate?: Date) {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const statsRepository = getStatsRepository();
+
+  const loadData = useCallback(async () => {
+    console.log('🔄 [STATS] Iniciando carga de distribución de tipos de beneficiarios:', { startDate, endDate });
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await statsRepository.getBeneficiaryTypeDistribution(startDate, endDate);
+      console.log('✅ [STATS] Distribución de tipos de beneficiarios cargada exitosamente:', {
+        count: result.length,
+        data: result,
+        startDate,
+        endDate
+      });
+      setData(result);
+    } catch (err) {
+      console.error('❌ [STATS] Error cargando distribución de tipos de beneficiarios:', {
+        error: err,
+        startDate,
+        endDate
+      });
+      setError(err instanceof Error ? err : new Error('Error desconocido'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, refresh: loadData };
 }
