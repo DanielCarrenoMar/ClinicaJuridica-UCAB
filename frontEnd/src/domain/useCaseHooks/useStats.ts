@@ -62,7 +62,7 @@ export function useGetCasesBySubject(startDate?: Date, endDate?: Date) {
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate]);
+  }, [startDate?.toISOString(), endDate?.toISOString()]);
 
   useEffect(() => {
     loadData();
