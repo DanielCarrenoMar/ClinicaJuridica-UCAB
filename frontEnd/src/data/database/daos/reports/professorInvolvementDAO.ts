@@ -1,4 +1,6 @@
+import type{ TeacherTypeDAO } from "#database/typesDAO.ts";
+
 export interface ProfessorInvolvement {
-  type: string;
+  type: TeacherTypeDAO;
   count: number;
 }
