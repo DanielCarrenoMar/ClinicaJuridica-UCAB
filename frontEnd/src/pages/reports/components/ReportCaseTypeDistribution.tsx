@@ -2,7 +2,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
+import BarChart from './charts/BarChart';
 import { styleDocument } from "./ReportDocument";
 
 interface CaseTypeDistributionData {
