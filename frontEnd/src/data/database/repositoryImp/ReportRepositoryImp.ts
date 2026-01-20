@@ -110,7 +110,7 @@ export function getReportRepository(): ReportRepository {
             const query = new URLSearchParams();
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
-            const url = query.toString() ? `${REPORT_URL}/student-involvement?${query.toString()}` : `${REPORT_URL}/student-involvement`;
+            const url = query.toString() ? `${REPORT_URL}/students/involvement?${query.toString()}` : `${REPORT_URL}/students/involvement`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Error fetching student involvement');
@@ -136,7 +136,7 @@ export function getReportRepository(): ReportRepository {
             const query = new URLSearchParams();
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
-            const url = query.toString() ? `${REPORT_URL}/professor-involvement?${query.toString()}` : `${REPORT_URL}/professor-involvement`;
+            const url = query.toString() ? `${REPORT_URL}/professors/involvement?${query.toString()}` : `${REPORT_URL}/professors/involvement`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Error fetching professor involvement');
@@ -149,7 +149,7 @@ export function getReportRepository(): ReportRepository {
             const query = new URLSearchParams();
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
-            const url = query.toString() ? `${REPORT_URL}/beneficiary-type-distribution?${query.toString()}` : `${REPORT_URL}/beneficiary-type-distribution`;
+            const url = query.toString() ? `${REPORT_URL}/beneficiaries/type-distribution?${query.toString()}` : `${REPORT_URL}/beneficiaries/type-distribution`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Error fetching beneficiary type distribution');
