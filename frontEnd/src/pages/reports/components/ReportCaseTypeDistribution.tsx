@@ -6,8 +6,13 @@ import BarChart from './charts/BarChart';
 import { styleDocument, colors } from "./styleData";
 import { useGetReportCasesByServiceType } from "#domain/useCaseHooks/userReport.ts";
 
-function ReportCaseTypeDistribution() {
-  const { casesByServiceType, error } = useGetReportCasesByServiceType();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportCaseTypeDistribution({ startDate, endDate }: ReportProps) {
+  const { casesByServiceType, error } = useGetReportCasesByServiceType(startDate, endDate);
 
   if (error) {
     return (

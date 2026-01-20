@@ -6,8 +6,13 @@ import BarChart from './charts/BarChart';
 import { styleDocument, colors } from "./styleData";
 import { useGetReportBeneficiaryTypeDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-function ReportBeneficiaryTypeDistribution() {
-  const { beneficiaryTypeDistribution, error } = useGetReportBeneficiaryTypeDistribution();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportBeneficiaryTypeDistribution({ startDate, endDate }: ReportProps) {
+  const { beneficiaryTypeDistribution, error } = useGetReportBeneficiaryTypeDistribution(startDate, endDate);
 
   if (error) {
     return (

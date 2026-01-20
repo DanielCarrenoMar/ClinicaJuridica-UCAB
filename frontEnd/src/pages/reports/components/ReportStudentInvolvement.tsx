@@ -6,8 +6,13 @@ import PieChart from './charts/PieChart';
 import { styleDocument, colors } from "./styleData";
 import { useGetReportStudentInvolvement } from "#domain/useCaseHooks/userReport.ts";
 
-function ReportStudentInvolvement() {
-  const { studentInvolvement, error } = useGetReportStudentInvolvement();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportStudentInvolvement({ startDate, endDate }: ReportProps) {
+  const { studentInvolvement, error } = useGetReportStudentInvolvement(startDate, endDate);
 
   if (error) {
     return (

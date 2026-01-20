@@ -6,8 +6,13 @@ import BarChart from './charts/BarChart';
 import { styleDocument, colors } from "./styleData";
 import { useGetReportStateDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-function ReportStateDistribution() {
-  const { stateDistribution, error } = useGetReportStateDistribution();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportStateDistribution({ startDate, endDate }: ReportProps) {
+  const { stateDistribution, error } = useGetReportStateDistribution(startDate, endDate);
 
   if (error) {
     return (

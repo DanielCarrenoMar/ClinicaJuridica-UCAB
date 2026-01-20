@@ -46,8 +46,13 @@ const calculatePercentages = (data: CaseSubjectScopeData[]) => {
   }));
 };
 
-function ReportCaseSubjectScope() {
-  const { casesBySubjectScope, error } = useGetReportCasesBySubjectScope();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportCaseSubjectScope({ startDate, endDate }: ReportProps) {
+  const { casesBySubjectScope, error } = useGetReportCasesBySubjectScope(startDate, endDate);
 
   if (error) {
     return (

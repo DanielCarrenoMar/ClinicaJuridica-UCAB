@@ -6,8 +6,13 @@ import BarChart from './charts/BarChart';
 import { styleDocument, colors } from "./styleData";
 import { useGetReportProfessorInvolvement } from "#domain/useCaseHooks/userReport.ts";
 
-function ReportProfessorInvolvement() {
-  const { professorInvolvement, error } = useGetReportProfessorInvolvement();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportProfessorInvolvement({ startDate, endDate }: ReportProps) {
+  const { professorInvolvement, error } = useGetReportProfessorInvolvement(startDate, endDate);
 
   if (error) {
     return (

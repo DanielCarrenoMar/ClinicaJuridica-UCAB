@@ -7,8 +7,13 @@ import { styleDocument } from "./styleData";
 import { useGetReportCasesByType } from "#domain/useCaseHooks/userReport.ts";
 import { colors } from "./styleData";
 
-function ReportCaseType() {
-  const { casesByType, error} = useGetReportCasesByType()
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportCaseType({ startDate, endDate }: ReportProps) {
+  const { casesByType, error} = useGetReportCasesByType(startDate, endDate)
   
   if (error) {
     return (

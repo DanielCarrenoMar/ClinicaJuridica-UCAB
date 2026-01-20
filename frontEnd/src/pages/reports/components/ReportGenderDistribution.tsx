@@ -7,8 +7,13 @@ import { styleDocument, colors } from "./styleData";
 import { useGetReportGenderDistribution } from "#domain/useCaseHooks/userReport.ts";
 
 
-function ReportGenderDistribution() {
-  const { genderDistribution, error } = useGetReportGenderDistribution();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportGenderDistribution({ startDate, endDate }: ReportProps) {
+  const { genderDistribution, error } = useGetReportGenderDistribution(startDate, endDate);
 
   if (error) {
     return (

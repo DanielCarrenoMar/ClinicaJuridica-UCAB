@@ -8,8 +8,13 @@ import { useGetReportCasesBySubject } from "#domain/useCaseHooks/userReport.ts";
 
 
 
-function ReportCaseSubject() {
-  const { casesBySubject, error } = useGetReportCasesBySubject();
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+function ReportCaseSubject({ startDate, endDate }: ReportProps) {
+  const { casesBySubject, error } = useGetReportCasesBySubject(startDate, endDate);
 
   if (error) {
     return (
