@@ -125,3 +125,17 @@ export interface NucleusRepository {
     updateNucleus(id: string, data: Partial<NucleusDAO>): Promise<NucleusModel>;
     deleteNucleus(id: string): Promise<void>;
 }
+
+export interface ReportRepository {
+    getCasesBySubject(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getCasesBySubjectScope(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getGenderDistribution(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getStateDistribution(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getParishDistribution(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getCasesByType(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getBeneficiariesByParish(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getStudentInvolvement(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getCasesByServiceType(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getProfessorInvolvement(startDate?: Date, endDate?: Date): Promise<any[]>;
+    getBeneficiaryTypeDistribution(startDate?: Date, endDate?: Date): Promise<any[]>;
+}
