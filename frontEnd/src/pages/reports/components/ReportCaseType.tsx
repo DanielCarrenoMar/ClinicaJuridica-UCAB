@@ -2,39 +2,43 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument } from "./styleData";
+import { useGetReportCasesByType } from "#domain/useCaseHooks/userReport.ts";
+import { colors } from "./styleData";
 
-interface CaseTypeData {
-  label: string;
-  value: number;
-  color: string;
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-interface ReportCaseTypeProps {
-  data?: CaseTypeData[];
-}
-
-function ReportCaseType({ data }: ReportCaseTypeProps) {
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
+function ReportCaseType({ startDate, endDate }: ReportProps) {
+  const { casesByType, error} = useGetReportCasesByType(startDate, endDate)
+  
+  if (error) {
     return (
       <>
         <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
           </Text>
         </View>
       </>
     );
   }
 
-  // Calcular porcentajes dinámicamente
-  const totalCasos = data.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = data.map(item => ({
+  const totalCasos = casesByType.reduce((sum, item) => sum + item.count, 0);
+  const data = casesByType.map((item, index) => ({
     ...item,
-    porcentaje: (item.value / totalCasos) * 100
+    porcentaje: (item.count / totalCasos) * 100,
+    color: colors[index % colors.length]
+  }));
+
+  const barChartData = data.map(item => ({
+    label: item.type,
+    value: item.count,
+    color: item.color
   }));
 
   return (
@@ -45,7 +49,7 @@ function ReportCaseType({ data }: ReportCaseTypeProps) {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={data}
+              data={barChartData}
               width={300}
               height={200}
               barWidth={25}
@@ -55,7 +59,7 @@ function ReportCaseType({ data }: ReportCaseTypeProps) {
             <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
               Leyenda
             </Text>
-            {dataWithPercentages.map((item, index) => (
+            {data.map((item, index) => (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                 <View style={{
                   width: 12,
@@ -65,7 +69,7 @@ function ReportCaseType({ data }: ReportCaseTypeProps) {
                   flexShrink: 0
                 }} />
                 <Text style={{ fontSize: 10, flex: 1 }}>
-                  {item.label}: {item.value} ({item.porcentaje.toFixed(1)}%)
+                  {item.type}: {item.count} ({item.porcentaje.toFixed(1)}%)
                 </Text>
               </View>
             ))}

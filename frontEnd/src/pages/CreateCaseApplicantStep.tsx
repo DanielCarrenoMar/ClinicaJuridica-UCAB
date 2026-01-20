@@ -173,8 +173,13 @@ function CreateCaseApplicantStep() {
             }
         }
 
+        // Validate identity card contains only numbers
+        if (applicantModel.identityCard && /[^0-9]/.test(applicantModel.identityCard)) {
+            errors.identityCard = "La cédula solo debe contener números";
+        }
+
         setValidationErrors(errors);
-    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount]);
+    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount, applicantModel.identityCard]);
 
     useEffect(() => {
         return () => {
@@ -281,16 +286,17 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
                 <div>
                     <TitleTextInput
-                        label="Cédula"
+                        label="Cédula*"
                         value={applicantModel.identityCard}
                         onChange={handleIdentityCardChange}
 
                         disabled={isFieldDisabled('identityCard')}
                     />
+                    {validationErrors.identityCard && <span className="text-xs text-error mt-1">{validationErrors.identityCard}</span>}
                 </div>
                 <div>
                     <TitleTextInput
-                        label="Nombre y apellido"
+                        label="Nombre y apellido*"
                         value={applicantModel.fullName}
                         onChange={(text) => { updateApplicantModel({ fullName: text }); }}
 
@@ -301,7 +307,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Sexo"
+                    label="Sexo*"
                     selectedValue={applicantModel.gender || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ gender: value as GenderTypeModel }); }}
                     disabled={isFieldDisabled('gender')}
@@ -312,7 +318,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <DatePicker
-                    label="Fecha Nacimiento"
+                    label="Fecha Nacimiento*"
                     value={applicantModel.birthDate ? applicantModel.birthDate.toISOString().split('T')[0] : ''}
                     onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
                     disabled={isFieldDisabled('birthDate')}
@@ -320,7 +326,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Nacionalidad"
+                    label="Nacionalidad*"
                     selectedValue={applicantModel.idNationality || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ idNationality: value as IdNacionalityTypeModel }); }}
                     disabled={isFieldDisabled('idNationality')}
@@ -333,7 +339,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Teléfono local*"
+                    label="Teléfono local"
                     value={applicantModel.homePhone}
                     onChange={(text) => { updateApplicantModel({ homePhone: text }); }}
 
@@ -342,7 +348,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Teléfono celular*"
+                    label="Teléfono celular"
                     value={applicantModel.cellPhone}
                     onChange={(text) => { updateApplicantModel({ cellPhone: text }); }}
 
@@ -351,7 +357,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Correo electrónico*"
+                    label="Correo electrónico"
                     value={applicantModel.email}
                     onChange={(text) => { updateApplicantModel({ email: text }); }}
 
@@ -361,7 +367,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Estado*"
+                    label="Estado"
                     selectedValue={stateIndex !== null ? stateIndex : undefined}
                     onSelectionChange={(value) => {
                         const idx = value as number;
@@ -381,7 +387,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Municipio*"
+                    label="Municipio"
                     selectedValue={munIndex !== null ? munIndex : undefined}
                     onSelectionChange={(value) => {
                         const idx = value as number;
@@ -400,7 +406,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Parroquia*"
+                    label="Parroquia"
                     selectedValue={applicantModel.parishName || undefined}
                     onSelectionChange={(value) => {
                         const parishList = stateIndex !== null && munIndex !== null ? locationData[stateIndex].municipalities[munIndex].parishes : [];
@@ -421,7 +427,7 @@ function CreateCaseApplicantStep() {
             {/* Estadubinato */}
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Estado Civil*"
+                    label="Estado Civil"
                     selectedValue={applicantModel.maritalStatus || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ maritalStatus: value as MaritalStatusTypeModel }); }}
                     disabled={isFieldDisabled('maritalStatus')}
@@ -434,7 +440,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-2">
                 <TitleDropdown
-                    label="Concubinato*"
+                    label="Concubinato"
                     selectedValue={applicantModel.isConcubine !== undefined ? (applicantModel.isConcubine ? 1 : 0) : undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ isConcubine: (value as number) === 1 }); }}
                     disabled={isFieldDisabled('isConcubine')}
@@ -446,7 +452,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-3">
                 <TitleDropdown
-                    label="Educación alcanzada*"
+                    label="Educación alcanzada"
                     selectedValue={applicantModel.applicantEducationLevel || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ applicantEducationLevel: value as number }); }}
                     disabled={isFieldDisabled('applicantEducationLevel')}
@@ -459,7 +465,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Condición Trabajo*"
+                    label="Condición Trabajo"
                     selectedValue={applicantModel.workConditionId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number, activityConditionId: undefined }); }}
                     disabled={isFieldDisabled('workConditionId')}
@@ -471,7 +477,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-2">
                 <TitleDropdown
-                    label="Condición Actividad*"
+                    label="Condición Actividad"
                     selectedValue={applicantModel.activityConditionId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number, workConditionId: undefined }); }}
                     disabled={isFieldDisabled('activityConditionId')}
@@ -492,7 +498,7 @@ function CreateCaseApplicantStep() {
             {/* Tipo de vivienda | habitaciones para dormir | baños */}
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Tipo de vivienda*"
+                    label="Tipo de vivienda"
                     selectedValue={applicantModel.houseType}
                     onSelectionChange={(value) => { updateApplicantModel({ houseType: value as number }); }}
                     disabled={isFieldDisabled('houseType')}
@@ -504,7 +510,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Habitaciones para dormir*"
+                    label="Habitaciones para dormir"
                     value={applicantModel.bedroomCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -516,7 +522,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Baños*"
+                    label="Baños"
                     value={applicantModel.bathroomCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -530,7 +536,7 @@ function CreateCaseApplicantStep() {
             {/* Material de piso | Material de paredes | material de techo */}
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Material de piso*"
+                    label="Material de piso"
                     selectedValue={applicantModel.floorMaterial}
                     onSelectionChange={(value) => { updateApplicantModel({ floorMaterial: value as number }); }}
                     disabled={isFieldDisabled('floorMaterial')}
@@ -542,7 +548,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Material de paredes*"
+                    label="Material de paredes"
                     selectedValue={applicantModel.wallMaterial}
                     onSelectionChange={(value) => { updateApplicantModel({ wallMaterial: value as number }); }}
                     disabled={isFieldDisabled('wallMaterial')}
@@ -554,7 +560,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Material de techo*"
+                    label="Material de techo"
                     selectedValue={applicantModel.roofMaterial}
                     onSelectionChange={(value) => { updateApplicantModel({ roofMaterial: value as number }); }}
                     disabled={isFieldDisabled('roofMaterial')}
@@ -567,7 +573,7 @@ function CreateCaseApplicantStep() {
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Servicio de agua potable*"
+                    label="Servicio de agua potable"
                     selectedValue={applicantModel.potableWaterService}
                     onSelectionChange={(value) => { updateApplicantModel({ potableWaterService: value as number }); }}
                     disabled={isFieldDisabled('potableWaterService')}
@@ -579,7 +585,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Aguas negras*"
+                    label="Aguas negras"
                     selectedValue={applicantModel.sewageService}
                     onSelectionChange={(value) => { updateApplicantModel({ sewageService: value as number }); }}
                     disabled={isFieldDisabled('sewageService')}
@@ -591,7 +597,7 @@ function CreateCaseApplicantStep() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Servicio de aseo*"
+                    label="Servicio de aseo"
                     selectedValue={applicantModel.cleaningService}
                     onSelectionChange={(value) => { updateApplicantModel({ cleaningService: value as number }); }}
                     disabled={isFieldDisabled('cleaningService')}
@@ -605,7 +611,7 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3">
                 <div className="flex flex-col gap-2">
                     <header>
-                        <h4 className="text-body-large ">Artefactos Domesticos, bienes o servicios del hogar*</h4>
+                        <h4 className="text-body-large ">Artefactos Domesticos, bienes o servicios del hogar</h4>
                     </header>
                     <DropdownCheck
                         label="Seleccionar"
@@ -644,7 +650,7 @@ function CreateCaseApplicantStep() {
         <>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Personas que viven en la vivienda*"
+                    label="Personas que viven en la vivienda"
                     value={applicantModel.memberCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -656,7 +662,7 @@ function CreateCaseApplicantStep() {
             <div className="col-span-1">
                 <div className="flex flex-col">
                     <TitleTextInput
-                        label="Personas que trabajan*"
+                        label="Personas que trabajan"
                         value={applicantModel.workingMemberCount?.toString() ?? ""}
                         onChange={(text) => {
                             const num = Number(text);
@@ -675,7 +681,7 @@ function CreateCaseApplicantStep() {
                 <div>
                     <div className="flex flex-col">
                         <TitleTextInput
-                            label="Número de niños entre 7 y 12 años*"
+                            label="Número de niños entre 7 y 12 años"
                             value={applicantModel.children7to12Count?.toString() ?? ""}
                             onChange={(text) => {
                                 const num = Number(text);
@@ -691,7 +697,7 @@ function CreateCaseApplicantStep() {
                 <div>
                     <div className="flex flex-col">
                         <TitleTextInput
-                            label="Cuántos niños estudian*"
+                            label="Cuántos niños estudian"
                             value={applicantModel.studentChildrenCount?.toString() ?? ""}
                             onChange={(text) => {
                                 const num = Number(text);
@@ -709,7 +715,7 @@ function CreateCaseApplicantStep() {
             {/* Ingresos mensuales del hogar */}
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Ingresos mensuales del hogar*"
+                    label="Ingresos mensuales del hogar"
                     value={applicantModel.monthlyIncome ?? ""}
                     onChange={(text) => { updateApplicantModel({ monthlyIncome: text }); }}
 
@@ -721,7 +727,7 @@ function CreateCaseApplicantStep() {
             <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
                 <div>
                     <TitleDropdown
-                        label="Es jefe de hogar*"
+                        label="Es jefe de hogar"
                         selectedValue={(applicantModel.isHeadOfHousehold ?? "").toString()}
                         onSelectionChange={(value) => { updateApplicantModel({ isHeadOfHousehold: value === "true" }); }}
                         disabled={isFieldDisabled('isHeadOfHousehold')}
@@ -732,7 +738,7 @@ function CreateCaseApplicantStep() {
                 </div>
                 <div>
                     <TitleDropdown
-                        label="Educación alcanzada por jefe del hogar*"
+                        label="Educación alcanzada por jefe del hogar"
                         selectedValue={applicantModel.headEducationLevelId || undefined}
                         onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
                         disabled={isFieldDisabled('headEducationLevelId') || applicantModel.isHeadOfHousehold !== false}

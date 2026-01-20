@@ -73,7 +73,7 @@ export default function BeneficiaryRelationshipDialog({
     >
       <div key={formKey} className="flex flex-col gap-4">
         <TitleDropdown
-          label="Tipo"
+          label="Tipo*"
           selectedValue={type ?? undefined}
           onSelectionChange={(value) => setType(value as CaseBeneficiaryTypeModel)}
         >
@@ -82,14 +82,14 @@ export default function BeneficiaryRelationshipDialog({
         </TitleDropdown>
 
         <TitleTextInput
-          label="Relación"
+          label="Relación*"
           value={relationship}
           onChange={setRelationship}
           placeholder="Ej: Hijo, cónyuge, representante..."
         />
 
         <TitleTextInput
-          label="Descripción"
+          label="Descripción*"
           value={description}
           onChange={setDescription}
           placeholder="Ej: Hijo del solicitante"

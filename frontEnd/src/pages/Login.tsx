@@ -32,7 +32,12 @@ export default function Login() {
         <div className="flex h-full w-full items-center justify-center bg-[var(--surface)]">
             <div className="flex w-full max-w-md flex-col items-center rounded-xl gap-8 bg-white p-8">
                 <div className="flex flex-col items-center gap-4">
-                    <Logo variant="logotype" />
+                    <span className='flex align-middle justify-center gap-24'>
+                        <Logo variant="logotype" />
+                        <div className='size-16'>
+                            <img src="/ods16.png" alt="ODS 16 Logo"/>
+                        </div>
+                    </span>
                     <h1 className="text-label-medium">Iniciar Sesión</h1>
                 </div>
 

@@ -19,7 +19,9 @@ import { UserEdit as UserEditS } from "flowbite-react-icons/solid";
 import { locationData, characteristicsData } from "#domain/seedData.ts";
 import { educationLevelData, workConditionData, activityConditionData } from "#domain/seedData.ts";
 import type { BeneficiaryTypeModel } from "#domain/typesModel.ts"
-import { useGetBeneficiaryById } from "#domain/useCaseHooks/useBeneficiary.ts";
+import { useGetBeneficiaryById, useUpdateBeneficiary } from "#domain/useCaseHooks/useBeneficiary.ts";
+import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
+import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
 
 export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
@@ -29,6 +31,7 @@ export default function ApplicantInfo() {
     const { getApplicantOrBeneficiaryById, loading, error } = useGetApplicantOrBeneficiaryById();
     const { updateApplicant, loading: updating } = useUpdateApplicant();
     const { createApplicant, loading: creating } = useCreateApplicant();
+    const { updateBeneficiary, loading: updatingBeneficiary } = useUpdateBeneficiary();
 
     const [applicantData, setApplicantData] = useState<ApplicantModel | null>(null);
     const [localApplicantData, setLocalApplicantData] = useState<ApplicantModel>();
@@ -194,6 +197,35 @@ export default function ApplicantInfo() {
 
         if (type === "Solicitante") {
             savedApplicant = await updateApplicant(applicantId, localApplicantData);
+        } else if (type === "Beneficiario") {
+            // Update beneficiary data - convert Model types to DAO types
+            const beneficiaryData = {
+                identityCard: localApplicantData.identityCard,
+                fullName: localApplicantData.fullName || "",
+                gender: localApplicantData.gender ? typeModelToGenderTypeDao(localApplicantData.gender) : "M",
+                birthDate: localApplicantData.birthDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+                idNationality: localApplicantData.idNationality || "V",
+                hasId: hasId ?? false,
+                type: "B" as BeneficiaryTypeDAO,
+                idState: localApplicantData.idState,
+                municipalityNumber: localApplicantData.municipalityNumber,
+                parishNumber: localApplicantData.parishNumber
+            };
+            const updatedBeneficiary = await updateBeneficiary(applicantId, beneficiaryData);
+            if (updatedBeneficiary) {
+                savedApplicant = {
+                    ...localApplicantData,
+                    identityCard: updatedBeneficiary.identityCard,
+                    fullName: updatedBeneficiary.fullName,
+                    gender: updatedBeneficiary.gender,
+                    birthDate: updatedBeneficiary.birthDate,
+                    idNationality: updatedBeneficiary.idNationality,
+                    idState: updatedBeneficiary.idState,
+                    municipalityNumber: updatedBeneficiary.municipalityNumber,
+                    parishNumber: updatedBeneficiary.parishNumber,
+                    createdAt: localApplicantData.createdAt || new Date()
+                };
+            }
         } else if (hasId === true) { // Si no tiene cedula no se puede crear un aplicant
             savedApplicant = await createApplicant(localApplicantData);
         }
@@ -217,14 +249,13 @@ export default function ApplicantInfo() {
     if (loading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
     if (error) return <div className="text-error">Error al cargar el solicitante: {error.message}</div>;
     if (!applicantData || !localApplicantData) return <div className="">No se encontró el solicitante</div>;
-    if (hasId === false) return <div className="">No se puede modificar la información de un beneficiario sin cédula</div>;
 
     const identificationInputs = (
         <>
             <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
                 <div>
                     <TitleTextInput
-                        label="Cédula"
+                        label="Cédula*"
                         value={localApplicantData.identityCard}
                         onChange={(text) => handleChange({ identityCard: text })}
                     />
@@ -232,7 +263,7 @@ export default function ApplicantInfo() {
                 </div>
                 <div>
                     <TitleTextInput
-                        label="Nombre y apellido"
+                        label="Nombre y apellido*"
                         value={localApplicantData.fullName || ""}
                         onChange={(text) => { handleChange({ fullName: text }); }}
                     />
@@ -242,7 +273,7 @@ export default function ApplicantInfo() {
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Sexo"
+                    label="Sexo*"
                     selectedValue={localApplicantData.gender || undefined}
                     onSelectionChange={(value) => { handleChange({ gender: value as GenderTypeModel }); }}
                 >
@@ -253,7 +284,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <DatePicker
-                    label="Fecha Nacimiento"
+                    label="Fecha Nacimiento*"
                     value={localApplicantData.birthDate ? localApplicantData.birthDate.toISOString().split('T')[0] : ''}
                     onChange={(text) => { handleChange({ birthDate: new Date(text) }); }}
                 />
@@ -261,7 +292,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Nacionalidad"
+                    label="Nacionalidad*"
                     selectedValue={localApplicantData.idNationality || undefined}
                     onSelectionChange={(value) => { handleChange({ idNationality: value as IdNacionalityTypeModel }); }}
                 >
@@ -272,31 +303,35 @@ export default function ApplicantInfo() {
                 {validationErrors.idNationality && <span className="text-xs text-error mt-1">{validationErrors.idNationality}</span>}
             </div>
 
-            <div className="col-span-1">
-                <TitleTextInput
-                    label="Teléfono local*"
-                    value={localApplicantData.homePhone || ""}
-                    onChange={(text) => { handleChange({ homePhone: text }); }}
-                />
-            </div>
-            <div className="col-span-1">
-                <TitleTextInput
-                    label="Teléfono celular*"
-                    value={localApplicantData.cellPhone || ""}
-                    onChange={(text) => { handleChange({ cellPhone: text }); }}
-                />
-            </div>
-            <div className="col-span-1">
-                <TitleTextInput
-                    label="Correo electrónico*"
-                    value={localApplicantData.email || ""}
-                    onChange={(text) => { handleChange({ email: text }); }}
-                />
-            </div>
+            {type === "Solicitante" && (
+                <>
+                    <div className="col-span-1">
+                        <TitleTextInput
+                            label="Teléfono local"
+                            value={localApplicantData.homePhone || ""}
+                            onChange={(text) => { handleChange({ homePhone: text }); }}
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <TitleTextInput
+                            label="Teléfono celular"
+                            value={localApplicantData.cellPhone || ""}
+                            onChange={(text) => { handleChange({ cellPhone: text }); }}
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <TitleTextInput
+                            label="Correo electrónico"
+                            value={localApplicantData.email || ""}
+                            onChange={(text) => { handleChange({ email: text }); }}
+                        />
+                    </div>
+                </>
+            )}
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Estado*"
+                    label="Estado"
                     selectedValue={stateIndex !== null ? stateIndex : undefined}
                     onSelectionChange={(value) => {
                         const idx = value as number;
@@ -316,7 +351,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Municipio*"
+                    label="Municipio"
                     selectedValue={munIndex !== null ? munIndex : undefined}
                     onSelectionChange={(value) => {
                         const idx = value as number;
@@ -336,7 +371,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Parroquia*"
+                    label="Parroquia"
                     selectedValue={localApplicantData.parishName || undefined}
                     onSelectionChange={(value) => {
                         const parishList = stateIndex !== null && munIndex !== null ? locationData[stateIndex].municipalities[munIndex].parishes : [];
@@ -355,64 +390,68 @@ export default function ApplicantInfo() {
                 {validationErrors.parishNumber && <span className="text-xs text-error mt-1">{validationErrors.parishNumber}</span>}
             </div>
 
-            {/* Estadubinato */}
-            <div className="col-span-1">
-                <TitleDropdown
-                    label="Estado Civil*"
-                    selectedValue={localApplicantData.maritalStatus || undefined}
-                    onSelectionChange={(value) => { handleChange({ maritalStatus: value as MaritalStatusTypeModel }); }}
-                >
-                    <DropdownOption value="Soltero">Soltero/a</DropdownOption>
-                    <DropdownOption value="Casado">Casado/a</DropdownOption>
-                    <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
-                    <DropdownOption value="Viudo">Viudo/a</DropdownOption>
-                </TitleDropdown>
-            </div>
-            <div className="col-span-2">
-                <TitleDropdown
-                    label="Concubinato*"
-                    selectedValue={localApplicantData.isConcubine !== undefined ? (localApplicantData.isConcubine ? 1 : 0) : undefined}
-                    onSelectionChange={(value) => { handleChange({ isConcubine: (value as number) === 1 }); }}
-                >
-                    <DropdownOption value={1}>Si</DropdownOption>
-                    <DropdownOption value={0}>No</DropdownOption>
-                </TitleDropdown>
-            </div>
+            {type === "Solicitante" && (
+                <>
+                    {/* Estadubinato */}
+                    <div className="col-span-1">
+                        <TitleDropdown
+                            label="Estado Civil"
+                            selectedValue={localApplicantData.maritalStatus || undefined}
+                            onSelectionChange={(value) => { handleChange({ maritalStatus: value as MaritalStatusTypeModel }); }}
+                        >
+                            <DropdownOption value="Soltero">Soltero/a</DropdownOption>
+                            <DropdownOption value="Casado">Casado/a</DropdownOption>
+                            <DropdownOption value="Divorciado">Divorciado/a</DropdownOption>
+                            <DropdownOption value="Viudo">Viudo/a</DropdownOption>
+                        </TitleDropdown>
+                    </div>
+                    <div className="col-span-2">
+                        <TitleDropdown
+                            label="Concubinato"
+                            selectedValue={localApplicantData.isConcubine !== undefined ? (localApplicantData.isConcubine ? 1 : 0) : undefined}
+                            onSelectionChange={(value) => { handleChange({ isConcubine: (value as number) === 1 }); }}
+                        >
+                            <DropdownOption value={1}>Si</DropdownOption>
+                            <DropdownOption value={0}>No</DropdownOption>
+                        </TitleDropdown>
+                    </div>
 
-            <div className="col-span-3">
-                <TitleDropdown
-                    label="Educación alcanzada*"
-                    selectedValue={localApplicantData.applicantEducationLevel || undefined}
-                    onSelectionChange={(value) => { handleChange({ applicantEducationLevel: value as number }); }}
-                >
-                    {educationLevelData.map((level, index) => (
-                        <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
+                    <div className="col-span-3">
+                        <TitleDropdown
+                            label="Educación alcanzada"
+                            selectedValue={localApplicantData.applicantEducationLevel || undefined}
+                            onSelectionChange={(value) => { handleChange({ applicantEducationLevel: value as number }); }}
+                        >
+                            {educationLevelData.map((level, index) => (
+                                <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
+                            ))}
+                        </TitleDropdown>
+                    </div>
 
-            <div className="col-span-1">
-                <TitleDropdown
-                    label="Condición Trabajo*"
-                    selectedValue={localApplicantData.workConditionId || undefined}
-                    onSelectionChange={(value) => { handleChange({ workConditionId: value as number, activityConditionId: undefined }); }}
-                >
-                    {workConditionData.map((condition, index) => (
-                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
-            <div className="col-span-2">
-                <TitleDropdown
-                    label="Condición Actividad*"
-                    selectedValue={localApplicantData.activityConditionId || undefined}
-                    onSelectionChange={(value) => { handleChange({ activityConditionId: value as number, workConditionId: undefined }); }}
-                >
-                    {activityConditionData.map((condition, index) => (
-                        <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
-                    ))}
-                </TitleDropdown>
-            </div>
+                    <div className="col-span-1">
+                        <TitleDropdown
+                            label="Condición Trabajo"
+                            selectedValue={localApplicantData.workConditionId || undefined}
+                            onSelectionChange={(value) => { handleChange({ workConditionId: value as number, activityConditionId: undefined }); }}
+                        >
+                            {workConditionData.map((condition, index) => (
+                                <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
+                            ))}
+                        </TitleDropdown>
+                    </div>
+                    <div className="col-span-2">
+                        <TitleDropdown
+                            label="Condición Actividad"
+                            selectedValue={localApplicantData.activityConditionId || undefined}
+                            onSelectionChange={(value) => { handleChange({ activityConditionId: value as number, workConditionId: undefined }); }}
+                        >
+                            {activityConditionData.map((condition, index) => (
+                                <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
+                            ))}
+                        </TitleDropdown>
+                    </div>
+                </>
+            )}
         </>
     );
 
@@ -424,7 +463,7 @@ export default function ApplicantInfo() {
             {/* Tipo de vivienda | habitaciones para dormir | baños */}
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Tipo de vivienda*"
+                    label="Tipo de vivienda"
                     selectedValue={localApplicantData.houseType}
                     onSelectionChange={(value) => { handleChange({ houseType: value as number }); }}
                 >
@@ -435,7 +474,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Habitaciones para dormir*"
+                    label="Habitaciones para dormir"
                     value={localApplicantData.bedroomCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -445,7 +484,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Baños*"
+                    label="Baños"
                     value={localApplicantData.bathroomCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -457,7 +496,7 @@ export default function ApplicantInfo() {
             {/* Material de piso | Material de paredes | material de techo */}
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Material de piso*"
+                    label="Material de piso"
                     selectedValue={localApplicantData.floorMaterial}
                     onSelectionChange={(value) => { handleChange({ floorMaterial: value as number }); }}
                 >
@@ -468,7 +507,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Material de paredes*"
+                    label="Material de paredes"
                     selectedValue={localApplicantData.wallMaterial}
                     onSelectionChange={(value) => { handleChange({ wallMaterial: value as number }); }}
                 >
@@ -479,7 +518,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Material de techo*"
+                    label="Material de techo"
                     selectedValue={localApplicantData.roofMaterial}
                     onSelectionChange={(value) => { handleChange({ roofMaterial: value as number }); }}
                 >
@@ -491,7 +530,7 @@ export default function ApplicantInfo() {
 
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Servicio de agua potable*"
+                    label="Servicio de agua potable"
                     selectedValue={localApplicantData.potableWaterService}
                     onSelectionChange={(value) => { handleChange({ potableWaterService: value as number }); }}
                 >
@@ -502,7 +541,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Aguas negras*"
+                    label="Aguas negras"
                     selectedValue={localApplicantData.sewageService}
                     onSelectionChange={(value) => { handleChange({ sewageService: value as number }); }}
                 >
@@ -513,7 +552,7 @@ export default function ApplicantInfo() {
             </div>
             <div className="col-span-1">
                 <TitleDropdown
-                    label="Servicio de aseo*"
+                    label="Servicio de aseo"
                     selectedValue={localApplicantData.cleaningService}
                     onSelectionChange={(value) => { handleChange({ cleaningService: value as number }); }}
                 >
@@ -526,7 +565,7 @@ export default function ApplicantInfo() {
             <div className="col-span-3">
                 <div className="flex flex-col gap-2">
                     <header>
-                        <h4 className="text-body-large ">Artefactos Domesticos, bienes o servicios del hogar*</h4>
+                        <h4 className="text-body-large ">Artefactos Domesticos, bienes o servicios del hogar</h4>
                     </header>
                     <DropdownCheck
                         label="Seleccionar"
@@ -564,7 +603,7 @@ export default function ApplicantInfo() {
         <>
             <div className="col-span-1">
                 <TitleTextInput
-                    label="Personas que viven en la vivienda*"
+                    label="Personas que viven en la vivienda"
                     value={localApplicantData.memberCount?.toString() ?? ""}
                     onChange={(text) => {
                         const num = Number(text);
@@ -575,7 +614,7 @@ export default function ApplicantInfo() {
             <div className="col-span-1">
                 <div className="flex flex-col">
                     <TitleTextInput
-                        label="Personas que trabajan*"
+                        label="Personas que trabajan"
                         value={localApplicantData.workingMemberCount?.toString() ?? ""}
                         onChange={(text) => {
                             const num = Number(text);
@@ -593,7 +632,7 @@ export default function ApplicantInfo() {
                 <div>
                     <div className="flex flex-col">
                         <TitleTextInput
-                            label="Número de niños entre 7 y 12 años*"
+                            label="Número de niños entre 7 y 12 años"
                             value={localApplicantData.children7to12Count?.toString() ?? ""}
                             onChange={(text) => {
                                 const num = Number(text);
@@ -608,7 +647,7 @@ export default function ApplicantInfo() {
                 <div>
                     <div className="flex flex-col">
                         <TitleTextInput
-                            label="Cuántos niños estudian*"
+                            label="Cuántos niños estudian"
                             value={localApplicantData.studentChildrenCount?.toString() ?? ""}
                             onChange={(text) => {
                                 const num = Number(text);
@@ -625,7 +664,7 @@ export default function ApplicantInfo() {
             {/* Ingresos mensuales del hogar */}
             <div className="col-span-3">
                 <TitleTextInput
-                    label="Ingresos mensuales del hogar*"
+                    label="Ingresos mensuales del hogar"
                     value={localApplicantData.monthlyIncome ?? ""}
                     onChange={(text) => { handleChange({ monthlyIncome: text }); }}
                 />
@@ -635,7 +674,7 @@ export default function ApplicantInfo() {
             <div className="col-span-3 grid grid-cols-2 gap-x-6 gap-y-6">
                 <div>
                     <TitleDropdown
-                        label="Es jefe de hogar*"
+                        label="Es jefe de hogar"
                         selectedValue={(localApplicantData.isHeadOfHousehold ?? "").toString()}
                         onSelectionChange={(value) => { handleChange({ isHeadOfHousehold: value === "true" }); }}
                     >
@@ -645,7 +684,7 @@ export default function ApplicantInfo() {
                 </div>
                 <div>
                     <TitleDropdown
-                        label="Educación alcanzada por jefe del hogar*"
+                        label="Educación alcanzada por jefe del hogar"
                         selectedValue={localApplicantData.headEducationLevelId || undefined}
                         onSelectionChange={(value) => { handleChange({ headEducationLevelId: value as number }); }}
                         disabled={localApplicantData.isHeadOfHousehold !== false}
@@ -681,7 +720,7 @@ export default function ApplicantInfo() {
                         isDataModified ? (
                             <Button
                                 onClick={saveChanges}
-                                disabled={updating || creating || Object.keys(validationErrors).length > 0 || loadingBeneficiary}
+                                disabled={updating || creating || updatingBeneficiary || Object.keys(validationErrors).length > 0 || loadingBeneficiary}
                                 variant="resalted"
                                 className="h-10 w-32"
                             >
@@ -698,8 +737,8 @@ export default function ApplicantInfo() {
             <section className="flex py-2">
                 <Tabs selectedId={activeSection} onChange={setActiveSection} className='pb-2'>
                     <Tabs.Item id="identificacion" label="Identificación" icon={<CaretDown />} />
-                    <Tabs.Item id="vivienda" label="Vivienda y Servicios" icon={<Home />} />
-                    <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />
+                    {type === "Solicitante" && <Tabs.Item id="vivienda" label="Vivienda y Servicios" icon={<Home />} />}
+                    {type === "Solicitante" && <Tabs.Item id="familia" label="Familia y Hogar" icon={<Users />} />}
                 </Tabs>
             </section>
             <section className="px-4 pb-6 overflow-y-auto grid grid-cols-3 items-start gap-x-6 gap-y-6">

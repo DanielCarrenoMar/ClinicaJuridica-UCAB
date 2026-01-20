@@ -1,6 +1,6 @@
 
 
-import { useState, useMemo, Fragment, useRef } from 'react';
+import { useState, useMemo, Fragment, useRef, useCallback, useEffect } from 'react';
 import Box from '#components/Box.tsx';
 import OptionCard from '#components/OptionCard.tsx';
 import {
@@ -14,33 +14,20 @@ import {
 import { PDFViewer, pdf } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
 import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
-import ReportDocument from './components/ReportDocument';
-import ReportCaseType from './components/ReportCaseType';
 import ReportGenderDistribution from './components/ReportGenderDistribution';
 import ReportStateDistribution from './components/ReportStateDistribution';
 import ReportParishDistribution from './components/ReportParishDistribution';
-import ReportCaseTypeDistribution from './components/ReportCaseTypeDistribution';
+import ReportCaseType from './components/ReportCaseType';
 import ReportBeneficiaryParishDistribution from './components/ReportBeneficiaryParishDistribution';
-import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
 import ReportStudentInvolvement from './components/ReportStudentInvolvement';
+import ReportCaseTypeDistribution from './components/ReportCaseTypeDistribution';
+import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
 import ReportBeneficiaryTypeDistribution from './components/ReportBeneficiaryTypeDistribution';
+import ReportDocument from './components/ReportDocument';
 import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
-import { parseDate, validateDateRange } from '../../utils/dateUtils';
-import {
-    useGetCasesBySubject,
-    useGetCasesBySubjectScope,
-    useGetGenderDistribution,
-    useGetStateDistribution,
-    useGetParishDistribution,
-    useGetCasesByType,
-    useGetBeneficiariesByParish,
-    useGetStudentInvolvement,
-    useGetCasesByServiceType,
-    useGetProfessorInvolvement,
-    useGetBeneficiaryTypeDistribution
-} from '#domain/useCaseHooks/useStats.ts';
+import { validateDateRange } from '../../utils/dateUtils';
 
 const reportOptions = [
     {
@@ -124,77 +111,73 @@ const reportOptions = [
 
 function Reports() {
     const [selectedReportIds, setSelectedReportIds] = useState<number[]>([]);
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
+    const [startDate, setStartDate] = useState<Date | undefined>(new Date("2023-01-01"));
+    const [endDate, setEndDate] = useState<Date | undefined>(new Date());
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
-    // Parse dates for hooks
-    const parsedStartDate = startDate ? parseDate(startDate) : undefined;
-    const parsedEndDate = endDate ? parseDate(endDate) : undefined;
-    const hasValidDates = parsedStartDate && parsedEndDate && validateDateRange(parsedStartDate, parsedEndDate);
-
-    // Load data for each report type
-    const casesBySubject = useGetCasesBySubject(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const casesBySubjectScope = useGetCasesBySubjectScope(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const genderDistribution = useGetGenderDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const stateDistribution = useGetStateDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const parishDistribution = useGetParishDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const casesByType = useGetCasesByType(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const beneficiariesByParish = useGetBeneficiariesByParish(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const studentInvolvement = useGetStudentInvolvement(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const casesByServiceType = useGetCasesByServiceType(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const professorInvolvement = useGetProfessorInvolvement(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
-    const beneficiaryTypeDistribution = useGetBeneficiaryTypeDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    // Efecto para simular carga al cambiar filtros y dar retroalimentación visual
+    useEffect(() => {
+        if (selectedReportIds.length > 0 && startDate && endDate) {
+            setIsLoading(true);
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedReportIds, startDate, endDate]);
 
     // Crear componentes frescos cada vez con datos
-    const createFreshComponent = (reportId: number) => {
-        switch(reportId) {
-            case 1:
-                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={casesBySubject.data} loading={casesBySubject.loading} />;
-            case 2:
-                return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={casesBySubjectScope.data} loading={casesBySubjectScope.loading} />;
-            case 3:
-                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderDistribution.data} loading={genderDistribution.loading} />;
-            case 4:
-                return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={stateDistribution.data} loading={stateDistribution.loading} />;
-            case 5:
-                return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={parishDistribution.data} loading={parishDistribution.loading} />;
-            case 6:
-                return <ReportCaseType key={`fresh-6-${Date.now()}`} data={casesByType.data} loading={casesByType.loading} />;
-            case 7:
-                return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} data={beneficiariesByParish.data} loading={beneficiariesByParish.loading} />;
-            case 8:
-                return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} data={studentInvolvement.data} loading={studentInvolvement.loading} />;
-            case 9:
-                return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} data={casesByServiceType.data} loading={casesByServiceType.loading} />;
-            case 10:
-                return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} data={professorInvolvement.data} loading={professorInvolvement.loading} />;
-            case 11:
-                return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={beneficiaryTypeDistribution.data} loading={beneficiaryTypeDistribution.loading} />;
-            default:
-                return null;
+    const createFreshComponent = useCallback((reportId: number, start?: Date, end?: Date) => {
+        if (reportId === 1) {
+            return <ReportCaseSubject key={`fresh-1-${Date.now()}`} startDate={start} endDate={end} />;
         }
-    };
+        if (reportId === 2) {
+            return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} startDate={start} endDate={end} />;
+        }
+        if (reportId === 3) {
+            return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} startDate={start} endDate={end} />;
+        }
+        if (reportId === 4) {
+            return <ReportStateDistribution key={`fresh-4-${Date.now()}`} startDate={start} endDate={end} />;
+        }
+        if (reportId === 5) {
+            return <ReportParishDistribution key={`fresh-5-${Date.now()}`} startDate={start} endDate={end} />;
+        }
+        if (reportId === 6) {
+            return <ReportCaseType key={`fresh-6-${Date.now()}`} startDate={start} endDate={end} />;
+        }
+        if (reportId === 7) {
+            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} startDate={start} endDate={end}/>;
+        }
+        if (reportId === 8) {
+            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} startDate={start} endDate={end}/>;
+        }
+        if (reportId === 9) {
+            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} startDate={start} endDate={end}/>;
+        }
+        if (reportId === 10) {
+            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} startDate={start} endDate={end}/>;
+        }
+        if (reportId === 11) {
+            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} startDate={start} endDate={end}/>;
+        }
+        
+        return null;
+    }, []);
 
     const reportDoc = useMemo(() => {
-        // Solo generar el documento si ambas fechas están seleccionadas
-        if (!startDate || !endDate) {
+        if (!startDate || !endDate || selectedReportIds.length === 0) {
             return null;
         }
 
         const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
         const timestamp = Date.now();
         
-        // Parse dates if available
-        let parsedStartDate: Date | undefined;
-        let parsedEndDate: Date | undefined;
-        
         try {
-            parsedStartDate = parseDate(startDate);
-            parsedEndDate = parseDate(endDate);
             
-            if (!validateDateRange(parsedStartDate, parsedEndDate)) {
+            if (!validateDateRange(startDate, endDate)) {
                 console.warn('Invalid date range: start date must be before end date');
                 return null;
             }
@@ -204,15 +187,15 @@ function Reports() {
         }
         
         return (
-            <ReportDocument key={`doc-${timestamp}`} startDate={parsedStartDate} endDate={parsedEndDate}>
+            <ReportDocument key={`doc-${timestamp}`} startDate={startDate} endDate={endDate}>
                 {selectedReports.map(report => (
                     <Fragment key={`frag-${report.id}-${timestamp}`}>
-                        {createFreshComponent(report.id)}
+                        {createFreshComponent(report.id, startDate, endDate)}
                     </Fragment>
                 ))}
             </ReportDocument>
         );
-    }, [selectedReportIds, startDate, endDate]);
+    }, [selectedReportIds, startDate, endDate, createFreshComponent]);
 
     const handleReportSelect = (id: number) => {
         const newSelection = selectedReportIds.includes(id) 
@@ -317,28 +300,34 @@ function Reports() {
                         <div className="w-full space-y-3">
                             <DatePicker
                                 label="Fecha de inicio"
-                                value={startDate}
-                                onChange={setStartDate}
+                                value={startDate?.toLocaleDateString() || undefined}
+                                onChange={(date) => setStartDate(new Date(date))}
                                 id="start-date"
                             />
                             <DatePicker
                                 label="Fecha de fin"
-                                value={endDate}
-                                onChange={setEndDate}
+                                value={endDate?.toLocaleDateString() || undefined}
+                                onChange={(date) => setEndDate(new Date(date))}
                                 id="end-date"
-                                min={startDate}
+                                min={startDate?.toLocaleDateString() || undefined}
                             />
                         </div>
                     </section>
 
                     <section className="flex flex-col gap-3 overflow-hidden h-full relative">
-                        {isGenerating && (
+
+                        {isLoading && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/50 backdrop-blur-sm">
-                                <LoadingSpinner />
+                                <div className="text-center">
+                                    <LoadingSpinner />
+                                    <p className="text-body-medium text-onSurface/70 mt-3">
+                                        {isGenerating ? 'Generando PDF...' : 'Cargando estadísticas...'}
+                                    </p>
+                                </div>
                             </div>
                         )}
 
-                        {!isGenerating && !startDate && !endDate && (
+                        {!isGenerating && !isLoading && !startDate && !endDate && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -349,7 +338,7 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && (startDate || endDate) && (!startDate || !endDate) && (
+                        {!isGenerating && !isLoading && (startDate || endDate) && (!startDate || !endDate) && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <CalendarEdit className="w-12 h-12 mx-auto mb-3 text-onSurface/50" />
@@ -360,13 +349,13 @@ function Reports() {
                             </div>
                         )}
 
-                        {!isGenerating && startDate && endDate && reportDoc && (
+                        {!isGenerating && !isLoading && startDate && endDate && reportDoc && (
                             <PDFViewer className="w-full h-full" showToolbar={false}>
                                 {reportDoc}
                             </PDFViewer>
                         )}
 
-                        {!isGenerating && startDate && endDate && !reportDoc && (
+                        {!isGenerating && !isLoading && startDate && endDate && !reportDoc && (
                             <div className="w-full h-full flex items-center justify-center bg-surface/30 rounded-xl">
                                 <div className="text-center p-6">
                                     <p className="text-body-medium text-onSurface/70">

@@ -2,53 +2,40 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import PieChart from './PieChart';
-import { styleDocument } from "./ReportDocument";
+import PieChart from './charts/PieChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportCasesBySubject } from "#domain/useCaseHooks/userReport.ts";
 
-// Colores predefinidos para las materias
-const colors = ['#90EE90', '#4169E1', '#9370DB', '#FFD700', '#8B4513', '#FF6347', '#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063'];
 
-interface ReportCaseSubjectProps {
-  data?: Array<{ materia: string; cantidad: number }>;
-  loading?: boolean;
+
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProps) {
-  // Transformar datos de la API al formato esperado
-  const caseSubjectData = data.map((item, index) => ({
-    materia: item.materia || 'Sin nombre',
-    cantidad: Number(item.cantidad) || 0,
-    color: colors[index % colors.length]
-  }));
+function ReportCaseSubject({ startDate, endDate }: ReportProps) {
+  const { casesBySubject, error } = useGetReportCasesBySubject(startDate, endDate);
 
-  // Calcular porcentajes dinámicamente
-  const totalCasos = caseSubjectData.reduce((sum, item) => sum + item.cantidad, 0);
-  const dataWithPercentages = caseSubjectData.map(item => ({
-    ...item,
-    porcentaje: totalCasos > 0 ? (item.cantidad / totalCasos) * 100 : 0
-  }));
-
-  if (loading) {
+  if (error) {
     return (
       <>
         <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>Cargando datos...</Text>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
         </View>
       </>
     );
   }
 
-  if (caseSubjectData.length === 0) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Casos por Materia Jurídica</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>No hay datos disponibles para el período seleccionado</Text>
-        </View>
-      </>
-    );
-  }
+  const totalCasos = casesBySubject.reduce((sum, item) => sum + item.count, 0);
+  const caseSubjectData = casesBySubject.map((item, index) => ({
+    subject: item.subject || 'Sin nombre',
+    count: Number(item.count) || 0,
+    color: colors[index % colors.length],
+    porcentaje: totalCasos > 0 ? (item.count / totalCasos) * 100 : 0
+  }));
 
   return (
     <>
@@ -59,8 +46,8 @@ function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProp
           <View style={{ alignItems: 'center' }}>
             <PieChart 
               data={caseSubjectData.map(item => ({
-                label: item.materia,
-                value: item.cantidad,
+                label: item.subject,
+                value: item.count,
                 color: item.color
               }))}
               size={150}
@@ -72,7 +59,7 @@ function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProp
             <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 5 }}>
               Leyenda
             </Text>
-            {dataWithPercentages.map((item, index) => (
+            {caseSubjectData.map((item, index) => (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 5 }}>
                 <View style={{
                   width: 12,
@@ -81,7 +68,7 @@ function ReportCaseSubject({ data = [], loading = false }: ReportCaseSubjectProp
                   marginRight: 8
                 }} />
                 <Text style={{ fontSize: 10 }}>
-                  {item.materia}: {item.cantidad} ({item.porcentaje.toFixed(1)}%)
+                  {item.subject}: {item.count} ({item.porcentaje.toFixed(1)}%)
                 </Text>
               </View>
             ))}

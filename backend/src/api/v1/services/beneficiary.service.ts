@@ -184,44 +184,6 @@ class BeneficiaryService {
     }
   }
 
-  async getBeneficiaryTypeStats(startDate?: string, endDate?: string) {
-    try {
-      let dateFilter = '';
-      if (startDate && endDate) {
-        dateFilter = `AND c."createdAt" >= CAST(${startDate} AS DATE) AND c."createdAt" <= CAST(${endDate} AS DATE)`;
-      }
-
-      const result = await prisma.$queryRaw`
-        SELECT 
-          cb.type,
-          COUNT(DISTINCT cb."beneficiaryId") as count
-        FROM "CaseBeneficiary" cb
-        INNER JOIN "Case" c ON cb."idCase" = c."idCase"
-        WHERE 1=1 ${dateFilter}
-        GROUP BY cb.type
-        ORDER BY cb.type
-      `;
-
-      const stats = Array.isArray(result) ? result : [];
-      
-      const formattedStats = [
-        {
-          label: 'Beneficiarios Directos',
-          value: Number(stats.find((s: any) => s.type === 'D')?.count || 0),
-          color: '#3498DB'
-        },
-        {
-          label: 'Beneficiarios Indirectos', 
-          value: Number(stats.find((s: any) => s.type === 'I')?.count || 0),
-          color: '#E74C3C'
-        }
-      ];
-
-      return { success: true, data: formattedStats };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }
 }
 
 export default new BeneficiaryService();

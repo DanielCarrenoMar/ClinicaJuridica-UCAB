@@ -90,7 +90,7 @@ export default function EditAppointmentDialog({
         >
             <div className="flex flex-col gap-4">
                 <TitleDropdown
-                    label="Estado"
+                    label="Estado*"
                     selectedValue={status}
                     onSelectionChange={(val) => setStatus(val as AppointmentStatusTypeModel)}
                 >
@@ -100,7 +100,7 @@ export default function EditAppointmentDialog({
                 </TitleDropdown>
 
                 <DateTimePicker
-                    label="Fecha Planificada"
+                    label="Fecha Planificada*"
                     value={plannedDate}
                     onChange={setPlannedDate}
                     required

@@ -419,15 +419,25 @@ class ApplicantService {
           const level = await tx.educationLevel.findUnique({ where: { name: data.applicantEducationLevel } });
           applicantEducationLevelId = level?.idLevel ?? null;
         }
-        await tx.$executeRaw`
-          INSERT INTO "Beneficiary" 
-          ("identityCard", "fullName", "gender", "birthDate", "idNationality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
-          VALUES (
-            ${data.identityCard}, ${data.fullName}, ${data.gender}, 
-            CAST(${data.birthDate} AS DATE), ${data.idNationality}, 
-            true, 'S', ${toDbValue(data.idState)}, ${toDbValue(data.municipalityNumber)}, ${toDbValue(data.parishNumber)}
-          )
+
+        // Check if Beneficiary already exists (e.g., when promoting an existing beneficiary to applicant)
+        const existingBeneficiary = await tx.$queryRaw<Array<{ identityCard: string }>>`
+          SELECT "identityCard" FROM "Beneficiary" WHERE "identityCard" = ${data.identityCard} LIMIT 1
         `;
+
+        // Only create Beneficiary if it doesn't already exist
+        if (!existingBeneficiary || existingBeneficiary.length === 0) {
+          await tx.$executeRaw`
+            INSERT INTO "Beneficiary" 
+            ("identityCard", "fullName", "gender", "birthDate", "idNationality", "hasId", "type", "idState", "municipalityNumber", "parishNumber")
+            VALUES (
+              ${data.identityCard}, ${data.fullName}, ${data.gender}, 
+              CAST(${data.birthDate} AS DATE), ${data.idNationality}, 
+              true, 'S', ${toDbValue(data.idState)}, ${toDbValue(data.municipalityNumber)}, ${toDbValue(data.parishNumber)}
+            )
+          `;
+        }
+
         await tx.$executeRaw`
           INSERT INTO "Applicant"
           (

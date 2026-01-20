@@ -7,6 +7,8 @@ interface TextInputProps {
   className?: string;
   placeholder?: string;
   multiline?: boolean;
+  rows?: number;
+  resize?: boolean;
   type?: string;
   disabled?: boolean;
   rightIcon?: ReactNode;
@@ -20,6 +22,8 @@ export default function TextInput({
   className = '',
   placeholder = "Lorem ipsum dolor sit amet...",
   multiline = false,
+  rows = 3,
+  resize = false,
   type = "text",
   disabled = false,
   rightIcon,
@@ -46,8 +50,8 @@ export default function TextInput({
             defaultValue={!isControlled ? (defaultText || '') : undefined}
             onChange={handleChange}
             placeholder={placeholder}
-            className="w-full disabled:opacity-70 bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 resize-y"
-            rows={3}
+            className={`w-full disabled:opacity-70 bg-surface/70 border border-onSurface/40 rounded-3xl px-3 py-2.5 text-body-small placeholder:text-onSurface/40 ${resize ? 'resize-y' : 'resize-none'}`}
+            rows={rows}
           />
         ) : (
           <input

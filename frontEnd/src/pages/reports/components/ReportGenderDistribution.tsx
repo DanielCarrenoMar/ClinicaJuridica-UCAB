@@ -2,39 +2,38 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportGenderDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-interface GenderData {
-  label: string;
-  value: number;
-  color: string;
+
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-interface ReportGenderDistributionProps {
-  data?: GenderData[];
-}
+function ReportGenderDistribution({ startDate, endDate }: ReportProps) {
+  const { genderDistribution, error } = useGetReportGenderDistribution(startDate, endDate);
 
-function ReportGenderDistribution({ data }: ReportGenderDistributionProps) {
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
+  if (error) {
     return (
       <>
         <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Género</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
           </Text>
         </View>
       </>
     );
   }
 
-  // Calcular porcentajes dinámicamente
-  const totalPersonas = data.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = data.map(item => ({
-    ...item,
-    porcentaje: (item.value / totalPersonas) * 100
+  const totalPersonas = genderDistribution.reduce((sum, item) => sum + item.count, 0);
+  const transformedData = genderDistribution.map((item, index) => ({
+    label: `${item.type} - ${item.gender}`,
+    value: Number(item.count) || 0,
+    color: colors[index % colors.length],
+    porcentaje: totalPersonas > 0 ? (item.count / totalPersonas) * 100 : 0
   }));
 
   return (
@@ -45,7 +44,7 @@ function ReportGenderDistribution({ data }: ReportGenderDistributionProps) {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={data}
+              data={transformedData}
               width={300}
               height={200}
               barWidth={25}
@@ -55,7 +54,7 @@ function ReportGenderDistribution({ data }: ReportGenderDistributionProps) {
             <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
               Leyenda
             </Text>
-            {dataWithPercentages.map((item, index) => (
+            {transformedData.map((item, index) => (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                 <View style={{
                   width: 12,

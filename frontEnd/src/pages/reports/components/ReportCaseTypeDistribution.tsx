@@ -2,27 +2,45 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportCasesByServiceType } from "#domain/useCaseHooks/userReport.ts";
 
-// Datos de prueba para distribución por tipo de caso
-const mockCaseTypeData = [
-  { label: 'Consulta', value: 245, color: '#45B7D1' },
-  { label: 'Asesoría', value: 189, color: '#FF6B6B' },
-  { label: 'Representación', value: 156, color: '#5DADE2' },
-  { label: 'Mediación', value: 134, color: '#EC7063' },
-  { label: 'Defensa', value: 98, color: '#48C9B0' },
-  { label: 'Peritación', value: 67, color: '#F1948A' },
-];
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
 
-// Calcular porcentajes dinámicamente
-const totalCasos = mockCaseTypeData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockCaseTypeData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalCasos) * 100
-}));
+function ReportCaseTypeDistribution({ startDate, endDate }: ReportProps) {
+  const { casesByServiceType, error } = useGetReportCasesByServiceType(startDate, endDate);
 
-function ReportCaseTypeDistribution() {
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Casos por Tipo de Servicio Legal</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  const totalCasos = casesByServiceType.reduce((sum, item) => sum + item.count, 0);
+  const data = casesByServiceType.map((item, index) => ({
+    label: item.serviceType,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalCasos > 0 ? (item.count / totalCasos) * 100 : 0
+  }));
+
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
@@ -31,10 +49,10 @@ function ReportCaseTypeDistribution() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockCaseTypeData}
+              data={barChartData}
               width={350}
               height={250}
-              barWidth={25}
+              barWidth={20}
             />
           </View>
         </View>
@@ -42,7 +60,7 @@ function ReportCaseTypeDistribution() {
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
-          {dataWithPercentages.map((item, index) => (
+          {data.map((item, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <View style={{
                 width: 12,

@@ -2,29 +2,45 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportBeneficiariesByParish } from "#domain/useCaseHooks/userReport.ts";
 
-// Datos de prueba para distribución de beneficiarios por parroquia
-const mockBeneficiaryParishData = [
-  { label: 'Altagracia', value: 48, color: '#45B7D1' },
-  { label: 'Catedral', value: 45, color: '#FF6B6B' },
-  { label: 'San José', value: 41, color: '#5DADE2' },
-  { label: 'Santa Teresa', value: 33, color: '#EC7063' },
-  { label: 'San Juan', value: 36, color: '#48C9B0' },
-  { label: 'San Pedro', value: 29, color: '#F1948A' },
-  { label: 'Santa Rosalía', value: 27, color: '#76D7C4' },
-];
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
 
-// Calcular porcentajes dinámicamente
-const totalBeneficiarios = mockBeneficiaryParishData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockBeneficiaryParishData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalBeneficiarios) * 100
-}));
+function ReportBeneficiaryParishDistribution({ startDate, endDate }: ReportProps) {
+  const { beneficiariesByParish, error } = useGetReportBeneficiariesByParish(startDate, endDate);
 
-function ReportBeneficiaryParishDistribution() {
-  return (
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  const totalBeneficiarios = beneficiariesByParish.reduce((sum, item) => sum + item.count, 0);
+  const data = beneficiariesByParish.map((item, index) => ({
+    label: item.parish,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalBeneficiarios > 0 ? (item.count / totalBeneficiarios) * 100 : 0
+  }));
+
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
+  }));
+    return (
     <>
       <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
       
@@ -32,7 +48,7 @@ function ReportBeneficiaryParishDistribution() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockBeneficiaryParishData}
+              data={barChartData}
               width={380}
               height={250}
               barWidth={22}
@@ -43,7 +59,7 @@ function ReportBeneficiaryParishDistribution() {
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
-          {dataWithPercentages.map((item, index) => (
+          {data.map((item, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <View style={{
                 width: 12,
@@ -59,7 +75,6 @@ function ReportBeneficiaryParishDistribution() {
           ))}
         </View>
       </View>
-
     </>
   );
 }

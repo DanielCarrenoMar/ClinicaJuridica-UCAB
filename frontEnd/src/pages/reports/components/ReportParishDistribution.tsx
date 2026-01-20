@@ -2,39 +2,43 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportParishDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-interface ParishData {
-  label: string;
-  value: number;
-  color: string;
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-interface ReportParishDistributionProps {
-  data?: ParishData[];
-}
+function ReportParishDistribution({ startDate, endDate }: ReportProps) {
+  const { parishDistribution, error } = useGetReportParishDistribution(startDate, endDate);
 
-function ReportParishDistribution({ data }: ReportParishDistributionProps) {
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
+  if (error) {
     return (
       <>
         <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Parroquia</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
           </Text>
         </View>
       </>
     );
   }
 
-  // Calcular porcentajes dinámicamente
-  const totalPersonas = data.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = data.map(item => ({
-    ...item,
-    porcentaje: (item.value / totalPersonas) * 100
+  const totalPersonas = parishDistribution.reduce((sum, item) => sum + item.count, 0);
+  const data = parishDistribution.map((item, index) => ({
+    label: `${item.type} - ${item.parish}`,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalPersonas > 0 ? (item.count / totalPersonas) * 100 : 0
+  }));
+
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
   }));
 
   return (
@@ -45,7 +49,7 @@ function ReportParishDistribution({ data }: ReportParishDistributionProps) {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={data}
+              data={barChartData}
               width={480}
               height={320}
               barWidth={16}
@@ -56,7 +60,7 @@ function ReportParishDistribution({ data }: ReportParishDistributionProps) {
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
-          {dataWithPercentages.map((item, index) => (
+          {data.map((item, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <View style={{
                 width: 12,

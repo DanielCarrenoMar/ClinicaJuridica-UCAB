@@ -2,39 +2,43 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportBeneficiaryTypeDistribution } from "#domain/useCaseHooks/userReport.ts";
 
-interface BeneficiaryData {
-  label: string;
-  value: number;
-  color: string;
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
 }
 
-interface ReportBeneficiaryTypeDistributionProps {
-  data?: BeneficiaryData[];
-}
+function ReportBeneficiaryTypeDistribution({ startDate, endDate }: ReportProps) {
+  const { beneficiaryTypeDistribution, error } = useGetReportBeneficiaryTypeDistribution(startDate, endDate);
 
-function ReportBeneficiaryTypeDistribution({ data }: ReportBeneficiaryTypeDistributionProps) {
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
+  if (error) {
     return (
       <>
         <Text style={styleDocument.title}>Distribución de Beneficiarios por Tipo</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
           </Text>
         </View>
       </>
     );
   }
 
-  // Calcular porcentajes dinámicamente
-  const totalBeneficiarios = data.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = data.map(item => ({
-    ...item,
-    porcentaje: (item.value / totalBeneficiarios) * 100
+  const totalBeneficiarios = beneficiaryTypeDistribution.reduce((sum, item) => sum + item.count, 0);
+  const data = beneficiaryTypeDistribution.map((item, index) => ({
+    label: item.type,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalBeneficiarios > 0 ? (item.count / totalBeneficiarios) * 100 : 0
+  }));
+
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
   }));
   return (
     <>
@@ -44,7 +48,7 @@ function ReportBeneficiaryTypeDistribution({ data }: ReportBeneficiaryTypeDistri
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={data}
+              data={barChartData}
               width={350}
               height={220}
               barWidth={40}
@@ -54,7 +58,7 @@ function ReportBeneficiaryTypeDistribution({ data }: ReportBeneficiaryTypeDistri
             <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 10 }}>
               Resumen de Beneficiarios
             </Text>
-            {dataWithPercentages.map((item, index) => (
+            {data.map((item, index) => (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                 <View style={{
                   width: 16,

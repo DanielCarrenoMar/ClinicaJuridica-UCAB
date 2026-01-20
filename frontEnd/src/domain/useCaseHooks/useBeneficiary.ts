@@ -46,6 +46,7 @@ export function useGetAllBeneficiaries() {
             setError(null);
         } catch (err) {
             setError(err as Error);
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -80,6 +81,32 @@ export function useCreateBeneficiary() {
 
     return {
         createBeneficiary,
+        loading,
+        error,
+    };
+}
+
+export function useUpdateBeneficiary() {
+    const { updateBeneficiary } = getBeneficiaryRepository();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const updateBeneficiaryData = async (id: string, data: any): Promise<BeneficiaryModel | null> => {
+        setLoading(true);
+        setError(null);
+        try {
+            const updated = await updateBeneficiary(id, data);
+            return updated;
+        } catch (err) {
+            setError(err as Error);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        updateBeneficiary: updateBeneficiaryData,
         loading,
         error,
     };

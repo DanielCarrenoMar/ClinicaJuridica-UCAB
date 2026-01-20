@@ -2,26 +2,45 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import BarChart from './BarChart';
-import { styleDocument } from "./ReportDocument";
+import BarChart from './charts/BarChart';
+import { styleDocument, colors } from "./styleData";
+import { useGetReportProfessorInvolvement } from "#domain/useCaseHooks/userReport.ts";
 
-// Datos de prueba para distribución de profesores involucrados por tipo
-const mockProfessorData = [
-  { label: 'Asesor', value: 34, color: '#45B7D1' },
-  { label: 'Supervisor', value: 28, color: '#FF6B6B' },
-  { label: 'Coordinador', value: 22, color: '#5DADE2' },
-  { label: 'Tutor', value: 19, color: '#EC7063' },
-  { label: 'Evaluador', value: 15, color: '#48C9B0' },
-];
+interface ReportProps {
+  startDate?: Date;
+  endDate?: Date;
+}
 
-// Calcular porcentajes dinámicamente
-const totalProfesores = mockProfessorData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockProfessorData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalProfesores) * 100
-}));
+function ReportProfessorInvolvement({ startDate, endDate }: ReportProps) {
+  const { professorInvolvement, error } = useGetReportProfessorInvolvement(startDate, endDate);
 
-function ReportProfessorInvolvement() {
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Profesores Involucrados por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  const totalProfesores = professorInvolvement.reduce((sum, item) => sum + item.count, 0);
+  const data = professorInvolvement.map((item, index) => ({
+    label: item.type,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalProfesores > 0 ? (item.count / totalProfesores) * 100 : 0
+  }));
+
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Profesores Involucrados por Tipo</Text>
@@ -30,10 +49,10 @@ function ReportProfessorInvolvement() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockProfessorData}
+              data={barChartData}
               width={320}
               height={220}
-              barWidth={25}
+              barWidth={18}
             />
           </View>
         </View>
@@ -41,7 +60,7 @@ function ReportProfessorInvolvement() {
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
-          {dataWithPercentages.map((item, index) => (
+          {data.map((item, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <View style={{
                 width: 12,
