@@ -254,7 +254,7 @@ export default function ApplicantInfo() {
             <div className="col-span-1">
                 <DatePicker
                     label="Fecha Nacimiento"
-                    value={localApplicantData.birthDate ? localApplicantData.birthDate.toISOString().split('T')[0] : undefined}
+                    value={localApplicantData.birthDate ? localApplicantData.birthDate.toISOString().split('T')[0] : ''}
                     onChange={(text) => { handleChange({ birthDate: new Date(text) }); }}
                 />
                 {validationErrors.birthDate && <span className="text-xs text-error mt-1">{validationErrors.birthDate}</span>}

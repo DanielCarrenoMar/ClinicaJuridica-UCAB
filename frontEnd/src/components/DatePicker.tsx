@@ -44,7 +44,7 @@ export default function DatePicker({
         type="date"
         id={id || name}
         name={name}
-        value={value}
+        value={value || ''}
         onChange={handleChange}
         required={required}
         min={min}
