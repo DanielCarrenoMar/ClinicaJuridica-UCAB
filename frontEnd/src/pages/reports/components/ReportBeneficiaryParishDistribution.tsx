@@ -3,37 +3,12 @@ import {
   View,
 } from "@react-pdf/renderer";
 import BarChart from './charts/BarChart';
-import { styleDocument } from "./styleData";
+import { styleDocument, colors } from "./styleData";
+import { useGetReportBeneficiariesByParish } from "#domain/useCaseHooks/userReport.ts";
 
-interface BeneficiaryParishData {
-  parroquia?: string;
-  label?: string;
-  cantidad?: number;
-  value?: number;
-}
+function ReportBeneficiaryParishDistribution() {
+  const { beneficiariesByParish, error } = useGetReportBeneficiariesByParish();
 
-interface ReportBeneficiaryParishDistributionProps {
-  data?: BeneficiaryParishData[];
-  loading?: boolean;
-  error?: Error | null;
-}
-
-function ReportBeneficiaryParishDistribution({ data, loading, error }: ReportBeneficiaryParishDistributionProps) {
-  // Si está cargando, mostrar mensaje
-  if (loading) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            Cargando datos...
-          </Text>
-        </View>
-      </>
-    );
-  }
-
-  // Si hay error, mostrar mensaje de error
   if (error) {
     return (
       <>
@@ -47,41 +22,18 @@ function ReportBeneficiaryParishDistribution({ data, loading, error }: ReportBen
     );
   }
 
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
-          </Text>
-        </View>
-      </>
-    );
-  }
+  const totalBeneficiarios = beneficiariesByParish.reduce((sum, item) => sum + item.count, 0);
+  const data = beneficiariesByParish.map((item, index) => ({
+    label: item.parish,
+    value: item.count,
+    color: colors[index % colors.length],
+    porcentaje: totalBeneficiarios > 0 ? (item.count / totalBeneficiarios) * 100 : 0
+  }));
 
-  // Transformar los datos del backend al formato que espera BarChart
-  const transformedData = data.map((item, index) => {
-    const label = item.parroquia || item.label || `Parroquia ${index + 1}`;
-    const value = item.cantidad || item.value || 0;
-    
-    // Generar colores consistentes
-    const colors = ['#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063', '#48C9B0', '#F1948A', '#76D7C4'];
-    const color = colors[index % colors.length];
-    
-    return {
-      label,
-      value,
-      color
-    };
-  });
-
-  // Calcular porcentajes dinámicamente
-  const totalBeneficiarios = transformedData.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = transformedData.map(item => ({
-    ...item,
-    porcentaje: (item.value / totalBeneficiarios) * 100
+  const barChartData = data.map(item => ({
+    label: item.label,
+    value: item.value,
+    color: item.color
   }));
     return (
     <>
@@ -91,7 +43,7 @@ function ReportBeneficiaryParishDistribution({ data, loading, error }: ReportBen
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={transformedData}
+              data={barChartData}
               width={380}
               height={250}
               barWidth={22}
@@ -102,7 +54,7 @@ function ReportBeneficiaryParishDistribution({ data, loading, error }: ReportBen
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>
             Leyenda
           </Text>
-          {dataWithPercentages.map((item, index) => (
+          {data.map((item, index) => (
             <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <View style={{
                 width: 12,

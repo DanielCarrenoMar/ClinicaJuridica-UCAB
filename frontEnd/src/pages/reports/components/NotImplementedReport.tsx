@@ -4,9 +4,9 @@ import {
 } from "@react-pdf/renderer";
 import { styleDocument } from "./styleData";
 
-interface NotImplementedReportProps {
+type NotImplementedReportProps = {
   reportId: number;
-}
+};
 
 function NotImplementedReport({ reportId }: NotImplementedReportProps) {
   return (

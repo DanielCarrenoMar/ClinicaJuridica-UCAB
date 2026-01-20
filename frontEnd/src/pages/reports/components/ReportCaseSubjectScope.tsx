@@ -3,21 +3,16 @@ import {
   View,
 } from "@react-pdf/renderer";
 import PieChart from './charts/PieChart';
-import { styleDocument } from "./styleData";
+import { styleDocument, colors } from "./styleData";
+import { useGetReportCasesBySubjectScope } from "#domain/useCaseHooks/userReport.ts";
 
-interface CaseSubjectScopeData {
+type CaseSubjectScopeData = {
   subject: string;
   scope: string;
   legal_area: string;
   value: number;
   color: string;
-}
-
-interface ReportCaseSubjectScopeProps {
-  data?: CaseSubjectScopeData[];
-  loading?: boolean;
-  error?: Error | null;
-}
+};
 
 // Funciones para agrupar y procesar datos
 const groupBySubject = (data: CaseSubjectScopeData[]) => {
@@ -47,26 +42,13 @@ const calculatePercentages = (data: CaseSubjectScopeData[]) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   return data.map(item => ({
     ...item,
-    porcentaje: (item.value / total) * 100
+    porcentaje: total > 0 ? (item.value / total) * 100 : 0
   }));
 };
 
-function ReportCaseSubjectScope({ data, loading, error }: ReportCaseSubjectScopeProps) {
-  // Si está cargando, mostrar mensaje
-  if (loading) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Casos por Materia y Ámbito</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            Cargando datos...
-          </Text>
-        </View>
-      </>
-    );
-  }
+function ReportCaseSubjectScope() {
+  const { casesBySubjectScope, error } = useGetReportCasesBySubjectScope();
 
-  // Si hay error, mostrar mensaje de error
   if (error) {
     return (
       <>
@@ -80,21 +62,15 @@ function ReportCaseSubjectScope({ data, loading, error }: ReportCaseSubjectScope
     );
   }
 
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
-    return (
-      <>
-        <Text style={styleDocument.title}>Distribución de Casos por Materia y Ámbito</Text>
-        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
-          <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
-          </Text>
-        </View>
-      </>
-    );
-  }
+  const normalizedData: CaseSubjectScopeData[] = casesBySubjectScope.map((item, index) => ({
+    subject: item.subject,
+    scope: item.scope,
+    legal_area: item.subScope,
+    value: item.count,
+    color: colors[index % colors.length]
+  }));
 
-  const groupedBySubject = groupBySubject(data);
+  const groupedBySubject = groupBySubject(normalizedData);
   
   return (
     <>
@@ -131,7 +107,7 @@ function ReportCaseSubjectScope({ data, loading, error }: ReportCaseSubjectScope
                 </Text>
                 {subjectChartData.map((item, index) => {
                   const total = subjectChartData.reduce((sum, i) => sum + i.value, 0);
-                  const porcentaje = (item.value / total) * 100;
+                  const porcentaje = total > 0 ? (item.value / total) * 100 : 0;
                   return (
                     <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10, marginBottom: 3 }}>
                       <View style={{

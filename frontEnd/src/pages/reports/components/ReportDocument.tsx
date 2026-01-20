@@ -3,11 +3,11 @@ import { formatReportTitle } from "../../../utils/dateUtils";
 import ucabLogoTipo from "#assets/ucabLogoTipo.jpg";
 import { styleDocument } from "./styleData";
 
-interface DocumentProps {
+type DocumentProps = {
   startDate?: Date;
   endDate?: Date;
   children?: React.ReactNode;
-}
+};
 
 export default function ReportDocument({ children, startDate, endDate }: DocumentProps) {
   const childrenArray = Array.isArray(children) ? children : [children];
