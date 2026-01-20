@@ -14,8 +14,8 @@ class ReportService {
         console.log('Ejecutando consulta con rango de fechas');
         result = await prisma.$queryRaw`
           SELECT 
-            s."name" as materia,
-            COUNT(*)::int as cantidad
+            s."name" as subject,
+            COUNT(*)::int as count
           FROM "Case" c
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "Subject" s ON la."idSubject" = s."idSubject"
@@ -23,21 +23,21 @@ class ReportService {
             AND s."isActive" = true
             AND la."isActive" = true
           GROUP BY s."idSubject", s."name"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         console.log('Ejecutando consulta sin rango de fechas');
         result = await prisma.$queryRaw`
           SELECT 
-            s."name" as materia,
-            COUNT(*)::int as cantidad
+            s."name" as subject,
+            COUNT(*)::int as count
           FROM "Case" c
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "Subject" s ON la."idSubject" = s."idSubject"
           WHERE s."isActive" = true
             AND la."isActive" = true
           GROUP BY s."idSubject", s."name"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
@@ -59,10 +59,10 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            s."name" as materia,
-            sc."name" as ambito,
-            la."name" as subambito,
-            COUNT(*)::int as cantidad
+            s."name" as subject,
+            sc."name" as scope,
+            la."name" as subScope,
+            COUNT(*)::int as count
           FROM "Case" c
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
@@ -74,10 +74,10 @@ class ReportService {
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            s."name" as materia,
-            sc."name" as ambito,
-            la."name" as subambito,
-            COUNT(*)::int as cantidad
+            s."name" as subject,
+            sc."name" as scope,
+            la."name" as subScope,
+            COUNT(*)::int as count
           FROM "Case" c
           JOIN "LegalArea" la ON c."idLegalArea" = la."idLegalArea"
           JOIN "SubjectCategory" sc ON la."idSubject" = sc."idSubject" AND la."categoryNumber" = sc."categoryNumber"
@@ -102,9 +102,9 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            'Solicitantes' as tipo,
-            b."gender" as genero,
-            COUNT(DISTINCT a."identityCard")::int as cantidad
+            'Applicants' as type,
+            b."gender" as gender,
+            COUNT(DISTINCT a."identityCard")::int as count
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -115,23 +115,23 @@ class ReportService {
           UNION ALL
           
           SELECT 
-            'Beneficiarios' as tipo,
-            b."gender" as genero,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            'Beneficiaries' as type,
+            b."gender" as gender,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
           WHERE b."gender" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY b."gender"
-          ORDER BY tipo, genero
+          ORDER BY type, gender
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            'Solicitantes' as tipo,
-            b."gender" as genero,
-            COUNT(DISTINCT a."identityCard")::int as cantidad
+            'Applicants' as type,
+            b."gender" as gender,
+            COUNT(DISTINCT a."identityCard")::int as count
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -141,15 +141,15 @@ class ReportService {
           UNION ALL
           
           SELECT 
-            'Beneficiarios' as tipo,
-            b."gender" as genero,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            'Beneficiaries' as type,
+            b."gender" as gender,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
           WHERE b."gender" IS NOT NULL
           GROUP BY b."gender"
-          ORDER BY tipo, genero
+          ORDER BY type, gender
         `;
       }
 
@@ -168,9 +168,9 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            'Solicitantes' as tipo,
-            st."name" as estado,
-            COUNT(DISTINCT a."identityCard")::int as cantidad
+            'Applicants' as type,
+            st."name" as state,
+            COUNT(DISTINCT a."identityCard")::int as count
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -184,9 +184,9 @@ class ReportService {
           UNION ALL
           
           SELECT 
-            'Beneficiarios' as tipo,
-            st."name" as estado,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            'Beneficiaries' as type,
+            st."name" as state,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
@@ -196,14 +196,14 @@ class ReportService {
           WHERE b."idState" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY st."idState", st."name"
-          ORDER BY tipo, estado
+          ORDER BY type, state
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            'Solicitantes' as tipo,
-            st."name" as estado,
-            COUNT(DISTINCT a."identityCard")::int as cantidad
+            'Applicants' as type,
+            st."name" as state,
+            COUNT(DISTINCT a."identityCard")::int as count
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -216,9 +216,9 @@ class ReportService {
           UNION ALL
           
           SELECT 
-            'Beneficiarios' as tipo,
-            st."name" as estado,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            'Beneficiaries' as type,
+            st."name" as state,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
@@ -227,7 +227,7 @@ class ReportService {
           JOIN "State" st ON m."idState" = st."idState"
           WHERE b."idState" IS NOT NULL
           GROUP BY st."idState", st."name"
-          ORDER BY tipo, estado
+          ORDER BY type, state
         `;
       }
 
@@ -246,9 +246,9 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            'Solicitantes' as tipo,
-            p."name" as parroquia,
-            COUNT(DISTINCT a."identityCard")::int as cantidad
+            'Applicants' as type,
+            p."name" as parish,
+            COUNT(DISTINCT a."identityCard")::int as count
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -260,9 +260,9 @@ class ReportService {
           UNION ALL
           
           SELECT 
-            'Beneficiarios' as tipo,
-            p."name" as parroquia,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            'Beneficiaries' as type,
+            p."name" as parish,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
@@ -270,14 +270,14 @@ class ReportService {
           WHERE b."idState" IS NOT NULL AND b."municipalityNumber" IS NOT NULL AND b."parishNumber" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY p."idState", p."municipalityNumber", p."parishNumber", p."name"
-          ORDER BY tipo, parroquia
+          ORDER BY type, parish
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            'Solicitantes' as tipo,
-            p."name" as parroquia,
-            COUNT(DISTINCT a."identityCard")::int as cantidad
+            'Applicants' as type,
+            p."name" as parish,
+            COUNT(DISTINCT a."identityCard")::int as count
           FROM "Case" c
           JOIN "Applicant" a ON c."applicantId" = a."identityCard"
           JOIN "Beneficiary" b ON a."identityCard" = b."identityCard"
@@ -288,16 +288,16 @@ class ReportService {
           UNION ALL
           
           SELECT 
-            'Beneficiarios' as tipo,
-            p."name" as parroquia,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            'Beneficiaries' as type,
+            p."name" as parish,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
           JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
           WHERE b."idState" IS NOT NULL AND b."municipalityNumber" IS NOT NULL AND b."parishNumber" IS NOT NULL
           GROUP BY p."idState", p."municipalityNumber", p."parishNumber", p."name"
-          ORDER BY tipo, parroquia
+          ORDER BY type, parish
         `;
       }
 
@@ -316,21 +316,21 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            c."processType" as tipo,
-            COUNT(*)::int as cantidad
+            c."processType" as type,
+            COUNT(*)::int as count
           FROM "Case" c
           WHERE c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY c."processType"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            c."processType" as tipo,
-            COUNT(*)::int as cantidad
+            c."processType" as type,
+            COUNT(*)::int as count
           FROM "Case" c
           GROUP BY c."processType"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
@@ -349,8 +349,8 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            p."name" as parroquia,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            p."name" as parish,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
@@ -358,20 +358,20 @@ class ReportService {
           WHERE cb."type" = 'D' AND b."idState" IS NOT NULL AND b."municipalityNumber" IS NOT NULL AND b."parishNumber" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY p."idState", p."municipalityNumber", p."parishNumber", p."name"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            p."name" as parroquia,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            p."name" as parish,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           JOIN "Beneficiary" b ON cb."beneficiaryId" = b."identityCard"
           JOIN "Parish" p ON b."idState" = p."idState" AND b."municipalityNumber" = p."municipalityNumber" AND b."parishNumber" = p."parishNumber"
           WHERE cb."type" = 'D' AND b."idState" IS NOT NULL AND b."municipalityNumber" IS NOT NULL AND b."parishNumber" IS NOT NULL
           GROUP BY p."idState", p."municipalityNumber", p."parishNumber", p."name"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
@@ -390,27 +390,27 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            s."type" as tipo,
-            COUNT(DISTINCT asg."studentId")::int as cantidad
+            s."type" as type,
+            COUNT(DISTINCT asg."studentId")::int as count
           FROM "Case" c
           JOIN "AssignedStudent" asg ON c."idCase" = asg."idCase"
           JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
           WHERE s."type" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY s."type"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            s."type" as tipo,
-            COUNT(DISTINCT asg."studentId")::int as cantidad
+            s."type" as type,
+            COUNT(DISTINCT asg."studentId")::int as count
           FROM "Case" c
           JOIN "AssignedStudent" asg ON c."idCase" = asg."idCase"
           JOIN "Student" s ON asg."studentId" = s."identityCard" AND asg."term" = s."term"
           WHERE s."type" IS NOT NULL
           GROUP BY s."type"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
@@ -429,21 +429,21 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            c."processType" as "tipoServicio",
-            COUNT(*)::int as cantidad
+            c."processType" as "serviceType",
+            COUNT(*)::int as count
           FROM "Case" c
           WHERE c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY c."processType"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            c."processType" as "tipoServicio",
-            COUNT(*)::int as cantidad
+            c."processType" as "serviceType",
+            COUNT(*)::int as count
           FROM "Case" c
           GROUP BY c."processType"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
@@ -462,25 +462,25 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            t."type" as tipo,
-            COUNT(DISTINCT t."identityCard")::int as cantidad
+            t."type" as type,
+            COUNT(DISTINCT t."identityCard")::int as count
           FROM "Case" c
           JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND c."teacherTerm" = t."term"
           WHERE t."type" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY t."type"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            t."type" as tipo,
-            COUNT(DISTINCT t."identityCard")::int as cantidad
+            t."type" as type,
+            COUNT(DISTINCT t."identityCard")::int as count
           FROM "Case" c
           JOIN "Teacher" t ON c."teacherId" = t."identityCard" AND c."teacherTerm" = t."term"
           WHERE t."type" IS NOT NULL
           GROUP BY t."type"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
@@ -499,25 +499,25 @@ class ReportService {
       if (startDate && endDate) {
         result = await prisma.$queryRaw`
           SELECT 
-            cb."type" as tipo,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            cb."type" as type,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           WHERE cb."type" IS NOT NULL
             AND c."createdAt" >= ${startDate} AND c."createdAt" <= ${endDate}
           GROUP BY cb."type"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       } else {
         result = await prisma.$queryRaw`
           SELECT 
-            cb."type" as tipo,
-            COUNT(DISTINCT cb."beneficiaryId")::int as cantidad
+            cb."type" as type,
+            COUNT(DISTINCT cb."beneficiaryId")::int as count
           FROM "Case" c
           JOIN "CaseBeneficiary" cb ON c."idCase" = cb."idCase"
           WHERE cb."type" IS NOT NULL
           GROUP BY cb."type"
-          ORDER BY cantidad DESC
+          ORDER BY count DESC
         `;
       }
 
