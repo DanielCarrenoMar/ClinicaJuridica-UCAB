@@ -56,9 +56,6 @@ interface AllStatsErrors {
 }
 
 export function useAllStats(startDate?: Date, endDate?: Date) {
-  console.log('🚀 [ALL_STATS] Iniciando carga de TODAS las estadísticas:', { startDate, endDate });
-  
-  // Usar todos los hooks individuales
   const casesBySubject = useGetCasesBySubject(startDate, endDate);
   const casesBySubjectScope = useGetCasesBySubjectScope(startDate, endDate);
   const genderDistribution = useGetGenderDistribution(startDate, endDate);
@@ -71,7 +68,6 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
   const professorInvolvement = useGetProfessorInvolvement(startDate, endDate);
   const beneficiaryTypeDistribution = useGetBeneficiaryTypeDistribution(startDate, endDate);
 
-  // Combinar todos los datos
   const data: AllStatsData = {
     casesBySubject: casesBySubject.data,
     casesBySubjectScope: casesBySubjectScope.data,
@@ -86,7 +82,6 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
     beneficiaryTypeDistribution: beneficiaryTypeDistribution.data,
   };
 
-  // Combinar todos los estados de carga
   const loading: AllStatsLoading = {
     casesBySubject: casesBySubject.loading,
     casesBySubjectScope: casesBySubjectScope.loading,
@@ -101,7 +96,6 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
     beneficiaryTypeDistribution: beneficiaryTypeDistribution.loading,
   };
 
-  // Combinar todos los errores
   const errors: AllStatsErrors = {
     casesBySubject: casesBySubject.error,
     casesBySubjectScope: casesBySubjectScope.error,
@@ -116,7 +110,6 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
     beneficiaryTypeDistribution: beneficiaryTypeDistribution.error,
   };
 
-  // Calcular estado general
   const isAnyLoading = Object.values(loading).some(Boolean);
   const hasAnyError = Object.values(errors).some(Boolean);
   const allLoaded = !isAnyLoading && !hasAnyError;
@@ -136,7 +129,6 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
     });
   }, [isAnyLoading, hasAnyError, data]);
 
-  // Log cuando todo se ha cargado exitosamente
   useEffect(() => {
     if (allLoaded) {
       console.log('🎉 [ALL_STATS] ¡TODAS las estadísticas se han cargado exitosamente!', {
@@ -147,7 +139,6 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
     }
   }, [allLoaded, data, startDate, endDate]);
 
-  // Función para refrescar todos los datos
   const refreshAll = useCallback(() => {
     console.log('🔄 [ALL_STATS] Refrescando TODAS las estadísticas...');
     casesBySubject.refresh();
@@ -175,7 +166,7 @@ export function useAllStats(startDate?: Date, endDate?: Date) {
     beneficiaryTypeDistribution.refresh,
   ]);
 
-  // Obtener datos para un reporte específico
+  
   const getReportData = useCallback((reportId: number) => {
     switch (reportId) {
       case 1:
