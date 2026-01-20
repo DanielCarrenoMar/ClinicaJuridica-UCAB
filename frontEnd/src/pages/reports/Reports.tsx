@@ -1,6 +1,6 @@
 
 
-import { useState, useMemo, Fragment, useRef } from 'react';
+import { useState, useMemo, Fragment, useRef, useCallback } from 'react';
 import Box from '#components/Box.tsx';
 import OptionCard from '#components/OptionCard.tsx';
 import {
@@ -13,9 +13,17 @@ import {
 } from 'flowbite-react-icons/solid';
 import { PDFViewer, pdf } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
+import ReportCaseSubjectScope from './components/ReportCaseSubjectScope';
 import ReportGenderDistribution from './components/ReportGenderDistribution';
+import ReportStateDistribution from './components/ReportStateDistribution';
+import ReportParishDistribution from './components/ReportParishDistribution';
+import ReportCaseType from './components/ReportCaseType';
+import ReportBeneficiaryParishDistribution from './components/ReportBeneficiaryParishDistribution';
+import ReportStudentInvolvement from './components/ReportStudentInvolvement';
+import ReportCaseTypeDistribution from './components/ReportCaseTypeDistribution';
+import ReportProfessorInvolvement from './components/ReportProfessorInvolvement';
+import ReportBeneficiaryTypeDistribution from './components/ReportBeneficiaryTypeDistribution';
 import ReportDocument from './components/ReportDocument';
-import NotImplementedReport from './components/NotImplementedReport';
 import Button from '#components/Button.tsx';
 import LoadingSpinner from '#components/LoadingSpinner.tsx';
 import DatePicker from '#components/DatePicker.tsx';
@@ -37,7 +45,7 @@ const reportOptions = [
         title: 'Casos por materia y ambito',
         description: 'Cantidad de casos agrupados por materia y separados en ambito',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={2} />
+        component: <ReportCaseSubjectScope />
     },
     {
         id: 3,
@@ -51,56 +59,56 @@ const reportOptions = [
         title: 'Solicitantes y beneficiarios por estado',
         description: 'Cantidad de solicitantes y beneficiarios separados por estado',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={4} />
+        component: <ReportStateDistribution />
     },
     {
         id: 5,
         title: 'Solicitantes y beneficiarios por parroquia',
         description: 'Cantidad de solicitantes y beneficiarios separados por parroquia',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={5} />
+        component: <ReportParishDistribution />
     },
     {
         id: 6,
         title: 'Casos por tipo',
         description: 'Cantidad de casos separados por tipo',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={6} />
+        component: <ReportCaseType />
     },
     {
         id: 7,
         title: 'Beneficiarios directos por parroquia',
         description: 'Cantidad de beneficiarios separados por parroquia',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={7} />
+        component: <ReportBeneficiaryParishDistribution />
     },
     {
         id: 8,
         title: 'Estudiantes involucrados por tipo',
         description: 'Cantidad de estudiantes involucrados separados por tipo',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={8} />
+        component: <ReportStudentInvolvement />
     },
     {
         id: 9,
         title: 'Casos por tipo de servicio',
         description: 'Cantidad de casos separados por tipo de servicio legal',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={9} />
+        component: <ReportCaseTypeDistribution />
     },
     {
         id: 10,
         title: 'Profesores involucrados por tipo',
         description: 'Cantidad de profesores involucrados separados por tipo',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={10} />
+        component: <ReportProfessorInvolvement />
     },
     {
         id: 11,
         title: 'Beneficiarios directos e indirectos',
         description: 'Distribución de beneficiarios por tipo (directos e indirectos)',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={11} />
+        component: <ReportBeneficiaryTypeDistribution />
     },
 ];
 
@@ -111,38 +119,51 @@ function Reports() {
     const [isGenerating, setIsGenerating] = useState(false);
     const pdfRef = useRef<string | null>(null);
 
-    // Parse dates for hooks
-    const parsedStartDate = startDate ? parseDate(startDate) : undefined;
-    const parsedEndDate = endDate ? parseDate(endDate) : undefined;
-    const hasValidDates = parsedStartDate && parsedEndDate && validateDateRange(parsedStartDate, parsedEndDate);
-
     // Cargar TODAS las estadísticas al abrir la página (sin filtro para mostrar datos disponibles)
     console.log('📱 [REPORTS] Página de reportes montada, iniciando carga de estadísticas...');
+    console.log('📊 [REPORTS] Estado actual de selección:', selectedReportIds);
     const allStats = useAllStats(undefined, undefined);
 
     // Crear componentes frescos cada vez con datos
-    const createFreshComponent = (reportId: number) => {
+    const createFreshComponent = useCallback((reportId: number) => {
         const reportData = allStats.getReportData(reportId);
         
-        switch(reportId) {
-            case 1:
-                return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
-            case 2:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-                return <NotImplementedReport key={`not-implemented-${reportId}-${Date.now()}`} reportId={reportId} />;
-            case 3:
-                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
-            default:
-                return null;
+        if (reportId === 1) {
+            return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
         }
-    };
+        if (reportId === 2) {
+            return <ReportCaseSubjectScope key={`fresh-2-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 3) {
+            return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 4) {
+            return <ReportStateDistribution key={`fresh-4-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 5) {
+            return <ReportParishDistribution key={`fresh-5-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 6) {
+            return <ReportCaseType key={`fresh-6-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 7) {
+            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 8) {
+            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 9) {
+            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 10) {
+            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        if (reportId === 11) {
+            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} data={reportData.data} loading={reportData.loading} error={reportData.error} />;
+        }
+        
+        return null;
+    }, [allStats]);
 
     const reportDoc = useMemo(() => {
         // Solo generar el documento si ambas fechas están seleccionadas
@@ -179,12 +200,14 @@ function Reports() {
                 ))}
             </ReportDocument>
         );
-    }, [selectedReportIds, startDate, endDate]);
+    }, [selectedReportIds, startDate, endDate, allStats, createFreshComponent]);
 
     const handleReportSelect = (id: number) => {
+        console.log('🔄 [REPORTS] Selección de reporte:', { id, currentSelection: selectedReportIds });
         const newSelection = selectedReportIds.includes(id) 
             ? selectedReportIds.filter(item => item !== id) 
             : [...selectedReportIds, id];
+        console.log('🔄 [REPORTS] Nueva selección:', newSelection);
         setSelectedReportIds(newSelection);
         // Limpiar PDF cacheado cuando cambia la selección
         pdfRef.current = null;

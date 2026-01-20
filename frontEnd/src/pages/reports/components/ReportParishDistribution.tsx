@@ -6,16 +6,47 @@ import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
 interface ParishData {
-  label: string;
-  value: number;
-  color: string;
+  parroquia?: string;
+  label?: string;
+  cantidad?: number;
+  value?: number;
 }
 
 interface ReportParishDistributionProps {
   data?: ParishData[];
+  loading?: boolean;
+  error?: Error | null;
 }
 
-function ReportParishDistribution({ data }: ReportParishDistributionProps) {
+function ReportParishDistribution({ data, loading, error }: ReportParishDistributionProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
   // Si no hay datos, mostrar mensaje
   if (!data || data.length === 0) {
     return (
@@ -30,9 +61,26 @@ function ReportParishDistribution({ data }: ReportParishDistributionProps) {
     );
   }
 
+  // Transformar los datos del backend al formato que espera BarChart
+  const transformedData = data.map((item, index) => {
+    // Asumir que los datos del backend vienen como { parroquia: string, cantidad: number }
+    const label = item.parroquia || item.label || `Parroquia ${index + 1}`;
+    const value = item.cantidad || item.value || 0;
+    
+    // Generar colores consistentes
+    const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
+    const color = colors[index % colors.length];
+    
+    return {
+      label,
+      value,
+      color
+    };
+  });
+
   // Calcular porcentajes dinámicamente
-  const totalPersonas = data.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = data.map(item => ({
+  const totalPersonas = transformedData.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = transformedData.map(item => ({
     ...item,
     porcentaje: (item.value / totalPersonas) * 100
   }));
@@ -45,7 +93,7 @@ function ReportParishDistribution({ data }: ReportParishDistributionProps) {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={data}
+              data={transformedData}
               width={480}
               height={320}
               barWidth={16}

@@ -13,9 +13,39 @@ interface CaseTypeData {
 
 interface ReportCaseTypeProps {
   data?: CaseTypeData[];
+  loading?: boolean;
+  error?: Error | null;
 }
 
-function ReportCaseType({ data }: ReportCaseTypeProps) {
+function ReportCaseType({ data, loading, error }: ReportCaseTypeProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
   // Si no hay datos, mostrar mensaje
   if (!data || data.length === 0) {
     return (

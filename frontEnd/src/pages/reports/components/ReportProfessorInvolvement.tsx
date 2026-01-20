@@ -5,23 +5,85 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de profesores involucrados por tipo
-const mockProfessorData = [
-  { label: 'Asesor', value: 34, color: '#45B7D1' },
-  { label: 'Supervisor', value: 28, color: '#FF6B6B' },
-  { label: 'Coordinador', value: 22, color: '#5DADE2' },
-  { label: 'Tutor', value: 19, color: '#EC7063' },
-  { label: 'Evaluador', value: 15, color: '#48C9B0' },
-];
+interface ProfessorInvolvementData {
+  tipo?: string;
+  label?: string;
+  cantidad?: number;
+  value?: number;
+}
 
-// Calcular porcentajes dinámicamente
-const totalProfesores = mockProfessorData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockProfessorData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalProfesores) * 100
-}));
+interface ReportProfessorInvolvementProps {
+  data?: ProfessorInvolvementData[];
+  loading?: boolean;
+  error?: Error | null;
+}
 
-function ReportProfessorInvolvement() {
+function ReportProfessorInvolvement({ data, loading, error }: ReportProfessorInvolvementProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Profesores Involucrados por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Profesores Involucrados por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Profesores Involucrados por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Transformar los datos del backend al formato que espera BarChart
+  const transformedData = data.map((item, index) => {
+    const label = item.tipo || item.label || `Tipo ${index + 1}`;
+    const value = item.cantidad || item.value || 0;
+    
+    // Generar colores consistentes
+    const colors = ['#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063', '#48C9B0'];
+    const color = colors[index % colors.length];
+    
+    return {
+      label,
+      value,
+      color
+    };
+  });
+
+  // Calcular porcentajes dinámicamente
+  const totalProfesores = transformedData.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = transformedData.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalProfesores) * 100
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Profesores Involucrados por Tipo</Text>
@@ -30,10 +92,10 @@ function ReportProfessorInvolvement() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockProfessorData}
+              data={transformedData}
               width={320}
               height={220}
-              barWidth={25}
+              barWidth={18}
             />
           </View>
         </View>

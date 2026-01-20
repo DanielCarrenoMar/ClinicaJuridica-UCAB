@@ -13,9 +13,39 @@ interface BeneficiaryData {
 
 interface ReportBeneficiaryTypeDistributionProps {
   data?: BeneficiaryData[];
+  loading?: boolean;
+  error?: Error | null;
 }
 
-function ReportBeneficiaryTypeDistribution({ data }: ReportBeneficiaryTypeDistributionProps) {
+function ReportBeneficiaryTypeDistribution({ data, loading, error }: ReportBeneficiaryTypeDistributionProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Beneficiarios por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Beneficiarios por Tipo</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
   // Si no hay datos, mostrar mensaje
   if (!data || data.length === 0) {
     return (

@@ -15,6 +15,8 @@ interface CaseSubjectScopeData {
 
 interface ReportCaseSubjectScopeProps {
   data?: CaseSubjectScopeData[];
+  loading?: boolean;
+  error?: Error | null;
 }
 
 // Funciones para agrupar y procesar datos
@@ -49,7 +51,35 @@ const calculatePercentages = (data: CaseSubjectScopeData[]) => {
   }));
 };
 
-function ReportCaseSubjectScope({ data }: ReportCaseSubjectScopeProps) {
+function ReportCaseSubjectScope({ data, loading, error }: ReportCaseSubjectScopeProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia y Ámbito</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Casos por Materia y Ámbito</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
   // Si no hay datos, mostrar mensaje
   if (!data || data.length === 0) {
     return (

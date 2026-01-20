@@ -5,24 +5,85 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución por tipo de caso
-const mockCaseTypeData = [
-  { label: 'Consulta', value: 245, color: '#45B7D1' },
-  { label: 'Asesoría', value: 189, color: '#FF6B6B' },
-  { label: 'Representación', value: 156, color: '#5DADE2' },
-  { label: 'Mediación', value: 134, color: '#EC7063' },
-  { label: 'Defensa', value: 98, color: '#48C9B0' },
-  { label: 'Peritación', value: 67, color: '#F1948A' },
-];
+interface CaseTypeDistributionData {
+  tipo_servicio?: string;
+  label?: string;
+  cantidad?: number;
+  value?: number;
+}
 
-// Calcular porcentajes dinámicamente
-const totalCasos = mockCaseTypeData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockCaseTypeData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalCasos) * 100
-}));
+interface ReportCaseTypeDistributionProps {
+  data?: CaseTypeDistributionData[];
+  loading?: boolean;
+  error?: Error | null;
+}
 
-function ReportCaseTypeDistribution() {
+function ReportCaseTypeDistribution({ data, loading, error }: ReportCaseTypeDistributionProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Casos por Tipo de Servicio Legal</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Casos por Tipo de Servicio Legal</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Casos por Tipo de Servicio Legal</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Transformar los datos del backend al formato que espera BarChart
+  const transformedData = data.map((item, index) => {
+    const label = item.tipo_servicio || item.label || `Tipo ${index + 1}`;
+    const value = item.cantidad || item.value || 0;
+    
+    // Generar colores consistentes
+    const colors = ['#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063', '#48C9B0', '#F1948A'];
+    const color = colors[index % colors.length];
+    
+    return {
+      label,
+      value,
+      color
+    };
+  });
+
+  // Calcular porcentajes dinámicamente
+  const totalCasos = transformedData.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = transformedData.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalCasos) * 100
+  }));
+
   return (
     <>
       <Text style={styleDocument.title}>Distribución de Casos por Tipo</Text>
@@ -31,10 +92,10 @@ function ReportCaseTypeDistribution() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockCaseTypeData}
+              data={transformedData}
               width={350}
               height={250}
-              barWidth={25}
+              barWidth={20}
             />
           </View>
         </View>

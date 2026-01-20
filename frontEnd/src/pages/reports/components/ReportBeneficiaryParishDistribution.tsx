@@ -5,26 +5,85 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
-// Datos de prueba para distribución de beneficiarios por parroquia
-const mockBeneficiaryParishData = [
-  { label: 'Altagracia', value: 48, color: '#45B7D1' },
-  { label: 'Catedral', value: 45, color: '#FF6B6B' },
-  { label: 'San José', value: 41, color: '#5DADE2' },
-  { label: 'Santa Teresa', value: 33, color: '#EC7063' },
-  { label: 'San Juan', value: 36, color: '#48C9B0' },
-  { label: 'San Pedro', value: 29, color: '#F1948A' },
-  { label: 'Santa Rosalía', value: 27, color: '#76D7C4' },
-];
+interface BeneficiaryParishData {
+  parroquia?: string;
+  label?: string;
+  cantidad?: number;
+  value?: number;
+}
 
-// Calcular porcentajes dinámicamente
-const totalBeneficiarios = mockBeneficiaryParishData.reduce((sum, item) => sum + item.value, 0);
-const dataWithPercentages = mockBeneficiaryParishData.map(item => ({
-  ...item,
-  porcentaje: (item.value / totalBeneficiarios) * 100
-}));
+interface ReportBeneficiaryParishDistributionProps {
+  data?: BeneficiaryParishData[];
+  loading?: boolean;
+  error?: Error | null;
+}
 
-function ReportBeneficiaryParishDistribution() {
-  return (
+function ReportBeneficiaryParishDistribution({ data, loading, error }: ReportBeneficiaryParishDistributionProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si no hay datos, mostrar mensaje
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            No hay datos disponibles para este reporte
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Transformar los datos del backend al formato que espera BarChart
+  const transformedData = data.map((item, index) => {
+    const label = item.parroquia || item.label || `Parroquia ${index + 1}`;
+    const value = item.cantidad || item.value || 0;
+    
+    // Generar colores consistentes
+    const colors = ['#45B7D1', '#FF6B6B', '#5DADE2', '#EC7063', '#48C9B0', '#F1948A', '#76D7C4'];
+    const color = colors[index % colors.length];
+    
+    return {
+      label,
+      value,
+      color
+    };
+  });
+
+  // Calcular porcentajes dinámicamente
+  const totalBeneficiarios = transformedData.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = transformedData.map(item => ({
+    ...item,
+    porcentaje: (item.value / totalBeneficiarios) * 100
+  }));
+    return (
     <>
       <Text style={styleDocument.title}>Distribución de Beneficiarios por Parroquia</Text>
       
@@ -32,7 +91,7 @@ function ReportBeneficiaryParishDistribution() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={mockBeneficiaryParishData}
+              data={transformedData}
               width={380}
               height={250}
               barWidth={22}
@@ -59,7 +118,6 @@ function ReportBeneficiaryParishDistribution() {
           ))}
         </View>
       </View>
-
     </>
   );
 }

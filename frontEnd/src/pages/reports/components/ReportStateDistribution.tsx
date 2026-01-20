@@ -13,9 +13,39 @@ interface StateData {
 
 interface ReportStateDistributionProps {
   data?: StateData[];
+  loading?: boolean;
+  error?: Error | null;
 }
 
-function ReportStateDistribution({ data }: ReportStateDistributionProps) {
+function ReportStateDistribution({ data, loading, error }: ReportStateDistributionProps) {
+  // Si está cargando, mostrar mensaje
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Estado</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>
+            Cargando datos...
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  // Si hay error, mostrar mensaje de error
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Estado</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
   // Si no hay datos, mostrar mensaje
   if (!data || data.length === 0) {
     return (
