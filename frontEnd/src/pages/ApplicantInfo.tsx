@@ -86,6 +86,11 @@ export default function ApplicantInfo() {
             setType(applicant.type);
             setHasId(applicant.hasId ?? null);
 
+            // Normalize head level if applicant is head of household to avoid dirty state on load
+            if (applicant.isHeadOfHousehold && applicant.applicantEducationLevel !== undefined) {
+                applicant.headEducationLevelId = applicant.applicantEducationLevel;
+            }
+
             setApplicantData(applicant);
             setLocalApplicantData(applicant);
         };
@@ -145,8 +150,38 @@ export default function ApplicantInfo() {
         localApplicantData?.children7to12Count, localApplicantData?.studentChildrenCount,
         localApplicantData?.fullName, localApplicantData?.identityCard,
         localApplicantData?.birthDate, localApplicantData?.idNationality, localApplicantData?.gender,
-        localApplicantData?.idState, localApplicantData?.municipalityNumber, localApplicantData?.parishNumber
+        localApplicantData?.idState, localApplicantData?.municipalityNumber, localApplicantData?.parishNumber,
+        localApplicantData?.stateName, localApplicantData?.municipalityName, localApplicantData?.parishName
     ]);
+
+    useEffect(() => {
+        if (localApplicantData?.stateName) {
+            const sIdx = locationData.findIndex(s => s.name === localApplicantData.stateName);
+            if (sIdx !== -1) {
+                setStateIndex(sIdx);
+                if (localApplicantData.municipalityName) {
+                    const mIdx = locationData[sIdx].municipalities.findIndex(m => m.name === localApplicantData.municipalityName);
+                    if (mIdx !== -1) {
+                        setMunIndex(mIdx);
+                    }
+                }
+            }
+        } else if (localApplicantData?.idState) {
+            // Fallback to ID if name is not present
+            setStateIndex(localApplicantData.idState - 1);
+            if (localApplicantData.municipalityNumber) {
+                setMunIndex(localApplicantData.municipalityNumber - 1);
+            }
+        }
+    }, [localApplicantData?.stateName, localApplicantData?.municipalityName, localApplicantData?.idState, localApplicantData?.municipalityNumber]);
+
+    useEffect(() => {
+        if (localApplicantData?.isHeadOfHousehold &&
+            localApplicantData.applicantEducationLevel !== undefined &&
+            localApplicantData.headEducationLevelId !== localApplicantData.applicantEducationLevel) {
+            handleChange({ headEducationLevelId: localApplicantData.applicantEducationLevel });
+        }
+    }, [localApplicantData?.isHeadOfHousehold, localApplicantData?.applicantEducationLevel]);
 
     // Check duplicate ID
     useEffect(() => {

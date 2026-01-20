@@ -240,6 +240,11 @@ function CreateCaseApplicantStep() {
             return;
         }
 
+        // Normalize head level if applicant is head of household to avoid dirty state
+        if (foundApplicant.isHeadOfHousehold && foundApplicant.applicantEducationLevel !== undefined) {
+            foundApplicant.headEducationLevelId = foundApplicant.applicantEducationLevel;
+        }
+
         setDbOriginalData({ ...foundApplicant });
 
         const normalizedBirthDate = foundApplicant.birthDate instanceof Date
@@ -280,6 +285,14 @@ function CreateCaseApplicantStep() {
             }
         }
     }, [applicantModel.stateName, applicantModel.municipalityName]);
+
+    useEffect(() => {
+        if (applicantModel.isHeadOfHousehold &&
+            applicantModel.applicantEducationLevel !== undefined &&
+            applicantModel.headEducationLevelId !== applicantModel.applicantEducationLevel) {
+            updateApplicantModel({ headEducationLevelId: applicantModel.applicantEducationLevel });
+        }
+    }, [applicantModel.isHeadOfHousehold, applicantModel.applicantEducationLevel]);
 
     const identificationInputs = (
         <>
