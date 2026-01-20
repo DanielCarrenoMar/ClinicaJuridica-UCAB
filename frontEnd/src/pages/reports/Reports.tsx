@@ -13,6 +13,7 @@ import {
 } from 'flowbite-react-icons/solid';
 import { PDFViewer, pdf } from '@react-pdf/renderer';
 import ReportCaseSubject from './components/ReportCaseSubject';
+import ReportGenderDistribution from './components/ReportGenderDistribution';
 import ReportDocument from './components/ReportDocument';
 import NotImplementedReport from './components/NotImplementedReport';
 import Button from '#components/Button.tsx';
@@ -21,6 +22,7 @@ import DatePicker from '#components/DatePicker.tsx';
 import { parseDate, validateDateRange } from '../../utils/dateUtils';
 import {
     useGetCasesBySubject,
+    useGetGenderDistribution,
 } from '#domain/useCaseHooks/useStats.ts';
 
 const reportOptions = [
@@ -43,7 +45,7 @@ const reportOptions = [
         title: 'Solicitantes y beneficiarios por sexo',
         description: 'Cantidad de solicitantes y beneficiarios separados por sexo',
         icon: <ChartPie />,
-        component: <NotImplementedReport reportId={3} />
+        component: <ReportGenderDistribution />
     },
     {
         id: 4,
@@ -117,6 +119,7 @@ function Reports() {
 
     // Solo cargamos los datos que necesitamos para evitar warnings
     const casesBySubject = useGetCasesBySubject(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
+    const genderDistribution = useGetGenderDistribution(hasValidDates ? parsedStartDate : undefined, hasValidDates ? parsedEndDate : undefined);
 
     // Crear componentes frescos cada vez con datos
     const createFreshComponent = (reportId: number) => {
@@ -124,7 +127,6 @@ function Reports() {
             case 1:
                 return <ReportCaseSubject key={`fresh-1-${Date.now()}`} data={casesBySubject.data} loading={casesBySubject.loading} error={casesBySubject.error} />;
             case 2:
-            case 3:
             case 4:
             case 5:
             case 6:
@@ -134,6 +136,8 @@ function Reports() {
             case 10:
             case 11:
                 return <NotImplementedReport key={`not-implemented-${reportId}-${Date.now()}`} reportId={reportId} />;
+            case 3:
+                return <ReportGenderDistribution key={`fresh-3-${Date.now()}`} data={genderDistribution.data} loading={genderDistribution.loading} error={genderDistribution.error} />;
             default:
                 return null;
         }

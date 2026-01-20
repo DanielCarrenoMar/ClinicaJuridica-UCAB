@@ -5,6 +5,14 @@ import {
 import BarChart from './BarChart';
 import { styleDocument } from "./ReportDocument";
 
+// Interfaz para los datos del backend
+interface GenderDataItem {
+  tipo: string;
+  genero: string;
+  cantidad: number;
+}
+
+// Interfaz para los datos transformados (formato original)
 interface GenderData {
   label: string;
   value: number;
@@ -12,18 +20,58 @@ interface GenderData {
 }
 
 interface ReportGenderDistributionProps {
-  data?: GenderData[];
+  data?: GenderDataItem[];
+  loading?: boolean;
+  error?: Error | null;
 }
 
-function ReportGenderDistribution({ data }: ReportGenderDistributionProps) {
-  // Si no hay datos, mostrar mensaje
-  if (!data || data.length === 0) {
+// Colores predefinidos para géneros
+const genderColors = {
+  'Masculino': '#4169E1',
+  'Femenino': '#FF69B4',
+  'Otro': '#9370DB',
+  'No especifica': '#808080'
+};
+
+function ReportGenderDistribution({ data = [], loading = false, error = null }: ReportGenderDistributionProps) {
+  // Transformar datos del backend al formato esperado
+  const transformedData: GenderData[] = data.map((item) => ({
+    label: `${item.tipo} - ${item.genero}`,
+    value: Number(item.cantidad) || 0,
+    color: genderColors[item.genero as keyof typeof genderColors] || '#808080'
+  }));
+
+  if (loading) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Género</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center' }}>Cargando datos...</Text>
+        </View>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Género</Text>
+        <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
+          <Text style={{ fontSize: 12, textAlign: 'center', color: 'red' }}>
+            Error: {error.message}
+          </Text>
+        </View>
+      </>
+    );
+  }
+
+  if (transformedData.length === 0) {
     return (
       <>
         <Text style={styleDocument.title}>Distribución de Solicitantes y Beneficiarios por Género</Text>
         <View style={{ ...styleDocument.section, backgroundColor: "transparent" }}>
           <Text style={{ fontSize: 12, textAlign: 'center' }}>
-            No hay datos disponibles para este reporte
+            No hay datos disponibles para el período seleccionado
           </Text>
         </View>
       </>
@@ -31,10 +79,10 @@ function ReportGenderDistribution({ data }: ReportGenderDistributionProps) {
   }
 
   // Calcular porcentajes dinámicamente
-  const totalPersonas = data.reduce((sum, item) => sum + item.value, 0);
-  const dataWithPercentages = data.map(item => ({
+  const totalPersonas = transformedData.reduce((sum, item) => sum + item.value, 0);
+  const dataWithPercentages = transformedData.map(item => ({
     ...item,
-    porcentaje: (item.value / totalPersonas) * 100
+    porcentaje: totalPersonas > 0 ? (item.value / totalPersonas) * 100 : 0
   }));
 
   return (
@@ -45,7 +93,7 @@ function ReportGenderDistribution({ data }: ReportGenderDistributionProps) {
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', gap: 40 }}>
           <View style={{ alignItems: 'center' }}>
             <BarChart 
-              data={data}
+              data={transformedData}
               width={300}
               height={200}
               barWidth={25}
