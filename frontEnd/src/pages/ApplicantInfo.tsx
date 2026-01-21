@@ -22,6 +22,8 @@ import type { BeneficiaryTypeModel } from "#domain/typesModel.ts"
 import { useGetBeneficiaryById, useUpdateBeneficiary } from "#domain/useCaseHooks/useBeneficiary.ts";
 import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ApplicantPdfDocument from "./ApplicantPdfDocument.tsx";
 
 export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
@@ -792,9 +794,14 @@ export default function ApplicantInfo() {
                                 Guardar
                             </Button>
                         ) : (
-                            <Button onClick={() => { }} icon={<FilePdf />} variant="outlined" className="h-10 w-32">
-                                Exportar
-                            </Button>
+                            <PDFDownloadLink
+                                document={<ApplicantPdfDocument data={localApplicantData ?? applicantData} type={type ?? "Solicitante"} />}
+                                fileName={`${(type ?? "Solicitante").toLowerCase()}_${localApplicantData?.identityCard || applicantData.identityCard}.pdf`}
+                            >
+                                <Button onClick={() => { }} icon={<FilePdf />} variant="outlined" className="h-10 w-32">
+                                    Exportar
+                                </Button>
+                            </PDFDownloadLink>
                         )
                     }
                 </div>

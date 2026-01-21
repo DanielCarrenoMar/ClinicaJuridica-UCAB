@@ -103,9 +103,9 @@ export default function CaseInvolucrados({
                     />
                 </article>
 
-                <article>
+                <article className="flex-1 flex flex-col min-h-0">
                     <h4 className="text-label-small mb-2">Responsables</h4>
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 flex-1 min-h-0">
                         <section>
                             <header className="flex justify-between items-center mb-2">
                                 <h5 className="text-body-large">Profesor</h5>
@@ -141,7 +141,7 @@ export default function CaseInvolucrados({
                                 <p className="text-body-small">Sin Profesor Asignado</p>
                             )}
                         </section>
-                        <section>
+                        <section className="flex-1 flex flex-col min-h-0">
                             <header className="flex justify-between items-center mb-2">
                                 <h5 className="text-body-large">Estudiantes</h5>
                                 {permissionLevel < 3 && (
@@ -152,7 +152,7 @@ export default function CaseInvolucrados({
                             </header>
                             {
                                 permissionLevel < 3 ? (
-                                    <InBox>
+                                    <InBox className="flex-1 min-h-0 overflow-y-auto">
                                         <ul className='flex flex-col gap-3'>
                                             {localCaseStudents.map((student) => (
                                                 <li key={student.identityCard}>
@@ -165,16 +165,16 @@ export default function CaseInvolucrados({
                                         </ul>
                                     </InBox>
                                 ) : (
-                                    <>
+                                    <InBox className="flex-1 min-h-0 overflow-y-auto">
                                         {localCaseStudents.length === 0 && (<p className="text-body-small">Sin Estudiantes Asignados</p>)}
-                                        <ul>
+                                        <ul className='flex flex-col gap-3'>
                                             {localCaseStudents.map((student) => (
-                                                <li key={student.identityCard} className="mb-2">
+                                                <li key={student.identityCard}>
                                                     <PersonCard to={`/usuario/${student.identityCard}`} icon={<UserCircle />} person={student} />
                                                 </li>
                                             ))}
                                         </ul>
-                                    </>
+                                    </InBox>
                                 )
                             }
                         </section>
@@ -193,7 +193,7 @@ export default function CaseInvolucrados({
                             placeholder="Buscar por nombre o cédula..."
                             onClose={() => setIsTeacherSearchDialogOpen(false)}
                             users={teachers.filter(t => t.identityCard !== localCaseData?.teacherId)}
-                            onSelect={(teacher) => { 
+                            onSelect={(teacher) => {
                                 onChange({ teacherId: teacher.identityCard });
                                 onChange({ teacherName: teacher.fullName });
                                 setIsTeacherSearchDialogOpen(false);
@@ -205,10 +205,15 @@ export default function CaseInvolucrados({
 
             <section className="flex-1 flex flex-col">
                 <header className="flex justify-between items-center mb-4">
-                    <h4 className="text-label-small ">Beneficiarios</h4>
+                    <h4 className="text-label-small flex gap-2 items-center">
+                        Beneficiarios:
+                        <span className="bg-surface-container text-onSurface-variant px-2 py-0.5 rounded-full text-[15px] font-bold">
+                            {localCaseBeneficiaries.length}
+                        </span>
+                    </h4>
                     <Button variant="outlined" className='h-10' onClick={() => setIsBeneficiarySearchDialogOpen(true)}>Añadir</Button>
                 </header>
-                <InBox>
+                <InBox className="flex-1 min-h-0 overflow-y-auto">
                     <ul className='flex flex-col gap-3'>
                         {localCaseBeneficiaries.length === 0 && (
                             <p className="text-body-small">Sin Beneficiarios Asignados</p>

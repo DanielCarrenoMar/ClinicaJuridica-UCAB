@@ -73,7 +73,7 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                             placeholder="********"
                             type="password"
                         />
-                        <span className="text-xs text-onSurface/60 ml-1">Dejar en blanco para mantener la actual</span>
+                        <span className="text-xs text-onSurface/60 ml-1">Dejar en blanco para mantener la Contraseña actual</span>
                     </div>
                 )}
             </div>
@@ -91,19 +91,30 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
             </div>
 
             {localStudent && (
-                <div className="col-span-1">
-                    <TitleDropdown
-                        label="Tipo de Estudiante"
-                        disabled={isInputsDisabled}
-                        selectedValue={localStudent.type}
-                        onSelectionChange={(value) => handleStudentChange({ type: value as StudentTypeModel })}
-                    >
-                        <DropdownOption value="regular">Regular</DropdownOption>
-                        <DropdownOption value="volunteer">Voluntario</DropdownOption>
-                        <DropdownOption value="graduate">Egresado</DropdownOption>
-                        <DropdownOption value="service">Servicio Comunitario</DropdownOption>
-                    </TitleDropdown>
-                </div>
+                <>
+                    <div className="col-span-1">
+                        <TitleDropdown
+                            label="Tipo de Estudiante"
+                            disabled={isInputsDisabled}
+                            selectedValue={localStudent.type}
+                            onSelectionChange={(value) => handleStudentChange({ type: value as StudentTypeModel })}
+                        >
+                            <DropdownOption value="regular">Regular</DropdownOption>
+                            <DropdownOption value="volunteer">Voluntario</DropdownOption>
+                            <DropdownOption value="graduate">Egresado</DropdownOption>
+                            <DropdownOption value="service">Servicio Comunitario</DropdownOption>
+                        </TitleDropdown>
+                    </div>
+                    <div className="col-span-1">
+                        <TitleTextInput
+                            label="NRC"
+                            value={localStudent.nrc || ""}
+                            onChange={(text) => handleStudentChange({ nrc: text })}
+                            disabled={isInputsDisabled}
+                            placeholder="Ej:12345"
+                        />
+                    </div>
+                </>
             )}
 
             {localTeacher && (

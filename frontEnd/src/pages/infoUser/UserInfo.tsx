@@ -18,6 +18,8 @@ import { useGetStudentById, useUpdateStudentById } from '#domain/useCaseHooks/us
 import { modelToStudentDao, type StudentModel } from '#domain/models/student.ts'
 import { useNotifications } from '#/context/NotificationsContext.tsx'
 import { useAuth } from '#/context/AuthContext.tsx'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import UserPdfDocument from './components/UserPdfDocument.tsx'
 
 function UserInfo() {
   const { userId } = useParams<{ userId: string }>()
@@ -299,9 +301,20 @@ function UserInfo() {
                 Guardar
               </Button>
             ) : (
-              <Button onClick={() => { }} icon={<FilePdf />} variant='outlined' className='w-32'>
-                Exportar
-              </Button>
+              <PDFDownloadLink
+                document={
+                  <UserPdfDocument
+                    user={localUser ?? user}
+                    student={localStudent ?? student ?? undefined}
+                    teacher={localTeacher ?? teacher ?? undefined}
+                  />
+                }
+                fileName={`usuario_${localUser?.identityCard || user.identityCard}.pdf`}
+              >
+                <Button onClick={() => { }} icon={<FilePdf />} variant='outlined' className='w-32'>
+                  Exportar
+                </Button>
+              </PDFDownloadLink>
             )
           }
         </span>
