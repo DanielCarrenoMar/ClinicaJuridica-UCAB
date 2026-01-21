@@ -82,6 +82,7 @@ function CreateCaseCaseStep() {
     const isFormValid =
         (caseDAO.idLegalArea || 0) !== 0 &&
         !!caseDAO.idNucleus &&
+        !!caseDAO.processType &&
         !!caseDAO.problemSummary &&
         caseDAO.problemSummary.trim().length > 0;
 

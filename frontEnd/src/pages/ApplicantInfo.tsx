@@ -24,6 +24,7 @@ import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ApplicantPdfDocument from "./ApplicantPdfDocument.tsx";
+import { calculateAge } from "../utils/dateUtils.ts";
 
 export default function ApplicantInfo() {
     const { id } = useParams<{ id: string }>();
@@ -138,6 +139,14 @@ export default function ApplicantInfo() {
         if (!idNationality) errors.idNationality = "La nacionalidad es obligatoria";
         if (!gender) errors.gender = "El género es obligatorio";
 
+        // Validate age (must be 18+ for Applicants, not Beneficiaries)
+        if (birthDate && type !== 'Beneficiario') {
+            const age = calculateAge(birthDate);
+            if (age < 18) {
+                errors.birthDate = "El solicitante debe ser mayor de edad (18 años o más)";
+            }
+        }
+
 
         setValidationErrors(prev => {
             // Preserve async Duplicate ID error if sync checks pass for ID
@@ -156,7 +165,8 @@ export default function ApplicantInfo() {
         localApplicantData?.fullName, localApplicantData?.identityCard,
         localApplicantData?.birthDate, localApplicantData?.idNationality, localApplicantData?.gender,
         localApplicantData?.idState, localApplicantData?.municipalityNumber, localApplicantData?.parishNumber,
-        localApplicantData?.stateName, localApplicantData?.municipalityName, localApplicantData?.parishName
+        localApplicantData?.stateName, localApplicantData?.municipalityName, localApplicantData?.parishName,
+        type
     ]);
 
     useEffect(() => {

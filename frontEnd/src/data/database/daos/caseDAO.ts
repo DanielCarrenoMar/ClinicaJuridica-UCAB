@@ -14,7 +14,7 @@ export interface CaseDAO {
 
 export const defaultCaseDAO: CaseDAO = {
   problemSummary: "",
-  processType: "A",
+  processType: "",
   applicantId: "",
   idNucleus: "",
   idLegalArea: 0,

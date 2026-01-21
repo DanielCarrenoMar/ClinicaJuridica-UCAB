@@ -17,6 +17,7 @@ import ConfirmDialog from "#components/dialogs/ConfirmDialog.tsx";
 import { useBlocker, useNavigate } from "react-router";
 import DatePicker from "#components/DatePicker.tsx";
 import { activityConditionData, characteristicsData, educationLevelData, locationData, workConditionData } from "#domain/seedData.ts";
+import { calculateAge } from "../utils/dateUtils.ts";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
@@ -178,8 +179,16 @@ function CreateCaseApplicantStep() {
             errors.identityCard = "La cédula solo debe contener números";
         }
 
+        // Validate age (must be 18+)
+        if (applicantModel.birthDate) {
+            const age = calculateAge(applicantModel.birthDate);
+            if (age < 18) {
+                errors.birthDate = "El solicitante debe ser mayor de edad (18 años o más)";
+            }
+        }
+
         setValidationErrors(errors);
-    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount, applicantModel.identityCard]);
+    }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount, applicantModel.identityCard, applicantModel.birthDate]);
 
     useEffect(() => {
         return () => {
@@ -351,6 +360,7 @@ function CreateCaseApplicantStep() {
                     onChange={(text) => { updateApplicantModel({ birthDate: new Date(text) }); }}
                     disabled={isFieldDisabled('birthDate')}
                 />
+                {validationErrors.birthDate && <span className="text-xs text-error mt-1">{validationErrors.birthDate}</span>}
             </div>
             <div className="col-span-1">
                 <TitleDropdown
