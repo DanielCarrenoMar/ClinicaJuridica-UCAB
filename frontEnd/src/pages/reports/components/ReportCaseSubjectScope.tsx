@@ -98,7 +98,7 @@ function ReportCaseSubjectScope({ startDate, endDate }: ReportProps) {
           }));
 
           return (
-            <View key={subject} style={styleDocument.section}>
+            <View key={subject} style={styleDocument.section} wrap={false}>
               <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' }}>
                 {subject}
               </Text>

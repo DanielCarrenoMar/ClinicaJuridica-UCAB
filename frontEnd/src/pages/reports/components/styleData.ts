@@ -19,7 +19,7 @@ export const styleDocument = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     marginBottom: 10,
-    color: '#0056b3',
+    color: '#000000',
   },
   logo: {
     width: 100,
@@ -42,7 +42,7 @@ export const styleDocument = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     marginBottom: 15,
-    color: '#2c3e50',
+    color: '#000000',
   },
   section: {
     display: "flex",

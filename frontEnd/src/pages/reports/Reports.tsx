@@ -111,8 +111,8 @@ const reportOptions = [
 
 function Reports() {
     const [selectedReportIds, setSelectedReportIds] = useState<number[]>([]);
-    const [startDate, setStartDate] = useState<Date | undefined>(new Date("2023-01-01"));
-    const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+    const [startDate, setStartDate] = useState<Date | undefined>();
+    const [endDate, setEndDate] = useState<Date | undefined>();
     const [isLoading, setIsLoading] = useState(false);
 
     const dummyDoc = useMemo(() => (
@@ -121,7 +121,6 @@ function Reports() {
         </Document>
     ), []);
 
-    // Efecto para simular carga al cambiar filtros y dar retroalimentación visual
     useEffect(() => {
         if (selectedReportIds.length > 0 && startDate && endDate) {
             setIsLoading(true);
@@ -132,7 +131,6 @@ function Reports() {
         }
     }, [selectedReportIds, startDate, endDate]);
 
-    // Crear componentes frescos cada vez con datos
     const createFreshComponent = useCallback((reportId: number, start?: Date, end?: Date) => {
         if (reportId === 1) {
             return <ReportCaseSubject key={`fresh-1-${Date.now()}`} startDate={start} endDate={end} />;
