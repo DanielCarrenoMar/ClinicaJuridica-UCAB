@@ -278,16 +278,16 @@ function Reports() {
                         <div className="w-full space-y-3">
                             <DatePicker
                                 label="Fecha de inicio"
-                                value={startDate?.toLocaleDateString() || undefined}
-                                onChange={(date) => setStartDate(new Date(date))}
+                                value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                                onChange={(date) => setStartDate(date ? new Date(date) : undefined)}
                                 id="start-date"
                             />
                             <DatePicker
                                 label="Fecha de fin"
-                                value={endDate?.toLocaleDateString() || undefined}
-                                onChange={(date) => setEndDate(new Date(date))}
+                                value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                                onChange={(date) => setEndDate(date ? new Date(date) : undefined)}
                                 id="end-date"
-                                min={startDate?.toLocaleDateString() || undefined}
+                                min={startDate ? startDate.toISOString().split('T')[0] : undefined}
                             />
                         </div>
                     </section>
