@@ -206,10 +206,10 @@ export default function CaseInvolucrados({
             <section className="flex-1 flex flex-col">
                 <header className="flex justify-between items-center mb-4">
                     <h4 className="text-label-small flex gap-2 items-center">
-                        Beneficiarios:
-                        <span className="bg-surface-container text-onSurface-variant px-2 py-0.5 rounded-full text-[15px] font-bold">
+                        <span className="text-onSurface/70">
                             {localCaseBeneficiaries.length}
                         </span>
+                        Beneficiarios
                     </h4>
                     <Button variant="outlined" className='h-10' onClick={() => setIsBeneficiarySearchDialogOpen(true)}>Añadir</Button>
                 </header>
