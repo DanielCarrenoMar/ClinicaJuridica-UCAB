@@ -214,9 +214,9 @@ export default function CaseInfo() {
                                 document={
                                     <CasePdfDocument
                                         caseData={caseData}
-                                        students={caseStudents} // Use fetched students
-                                        beneficiaries={caseBeneficiaries} // Use fetched beneficiaries
-                                        documents={caseDocuments} // Use fetched documents
+                                        students={caseStudents || []} // Use fetched students
+                                        beneficiaries={caseBeneficiaries || []} // Use fetched beneficiaries
+                                        documents={caseDocuments || []} // Use fetched documents
                                     />
                                 }
                                 fileName={`${caseData.compoundKey || "Caso"}.pdf`}

@@ -101,7 +101,7 @@ interface CasePdfDocumentProps {
 }
 
 const DisplayValue = ({ value }: { value?: string | number | null }) => {
-    if (value === undefined || value === null || value === '' || value === '—') {
+    if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '') || value === '—') {
         return <Text style={styles.noPresenta}>No presenta</Text>;
     }
     return <Text>{value}</Text>;
@@ -110,6 +110,7 @@ const DisplayValue = ({ value }: { value?: string | number | null }) => {
 const DateValue = ({ date }: { date?: Date | string | null }) => {
     if (!date) return <Text style={styles.noPresenta}>No presenta</Text>;
     const d = new Date(date);
+    if (isNaN(d.getTime())) return <Text style={styles.noPresenta}>No presenta</Text>;
     return <Text>{d.toLocaleDateString("es-ES")}</Text>;
 }
 
@@ -120,7 +121,7 @@ export default function CasePdfDocument({ caseData, students, beneficiaries, doc
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.title}>Ficha del Caso</Text>
-                        <Text style={styles.subtitle}>{caseData.compoundKey}</Text>
+                        <Text style={styles.subtitle}><DisplayValue value={caseData.compoundKey} /></Text>
                     </View>
                     <View>
                         <Text style={{ fontSize: 9 }}>Generado el: {new Date().toLocaleDateString("es-ES")}</Text>
@@ -186,9 +187,9 @@ export default function CasePdfDocument({ caseData, students, beneficiaries, doc
                     </View>
                 </View>
 
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Involucrados: Estudiantes</Text>
-                    {students.length > 0 ? (
+                {students.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Involucrados: Estudiantes</Text>
                         <View style={styles.tableContainer}>
                             <View style={styles.tableHeader}>
                                 <Text style={styles.tableCell}>Cédula</Text>
@@ -198,21 +199,19 @@ export default function CasePdfDocument({ caseData, students, beneficiaries, doc
                             </View>
                             {students.map((student, index) => (
                                 <View key={index} style={styles.tableRow}>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{student.identityCard}</Text>
-                                    <Text style={[styles.tableCellWide, styles.textSmall]}>{student.fullName}</Text>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{student.email}</Text>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{student.type}</Text>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DisplayValue value={student.identityCard} /></View>
+                                    <View style={[styles.tableCellWide, styles.textSmall]}><DisplayValue value={student.fullName} /></View>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DisplayValue value={student.email} /></View>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DisplayValue value={student.type} /></View>
                                 </View>
                             ))}
                         </View>
-                    ) : (
-                        <Text style={styles.noPresenta}>No presenta estudiantes asignados.</Text>
-                    )}
-                </View>
+                    </View>
+                )}
 
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Involucrados: Beneficiarios</Text>
-                    {beneficiaries.length > 0 ? (
+                {beneficiaries.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Involucrados: Beneficiarios</Text>
                         <View style={styles.tableContainer}>
                             <View style={styles.tableHeader}>
                                 <Text style={styles.tableCell}>Cédula</Text>
@@ -222,21 +221,19 @@ export default function CasePdfDocument({ caseData, students, beneficiaries, doc
                             </View>
                             {beneficiaries.map((b, index) => (
                                 <View key={index} style={styles.tableRow}>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{b.identityCard}</Text>
-                                    <Text style={[styles.tableCellWide, styles.textSmall]}>{b.fullName}</Text>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{b.relationship}</Text>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{b.caseType}</Text>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DisplayValue value={b.identityCard} /></View>
+                                    <View style={[styles.tableCellWide, styles.textSmall]}><DisplayValue value={b.fullName} /></View>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DisplayValue value={b.relationship} /></View>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DisplayValue value={b.caseType} /></View>
                                 </View>
                             ))}
                         </View>
-                    ) : (
-                        <Text style={styles.noPresenta}>No presenta beneficiarios asignados.</Text>
-                    )}
-                </View>
+                    </View>
+                )}
 
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Documentos y Recaudos</Text>
-                    {documents.length > 0 ? (
+                {documents.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Documentos y Recaudos</Text>
                         <View style={styles.tableContainer}>
                             <View style={styles.tableHeader}>
                                 <Text style={styles.tableCellWide}>Título</Text>
@@ -245,16 +242,14 @@ export default function CasePdfDocument({ caseData, students, beneficiaries, doc
                             </View>
                             {documents.map((doc, index) => (
                                 <View key={index} style={styles.tableRow}>
-                                    <Text style={[styles.tableCellWide, styles.textSmall]}>{doc.title}</Text>
-                                    <Text style={[styles.tableCellWide, styles.textSmall]}>{doc.description}</Text>
-                                    <Text style={[styles.tableCell, styles.textSmall]}>{new Date(doc.submissionDate).toLocaleDateString("es-ES")}</Text>
+                                    <View style={[styles.tableCellWide, styles.textSmall]}><DisplayValue value={doc.title} /></View>
+                                    <View style={[styles.tableCellWide, styles.textSmall]}><DisplayValue value={doc.description} /></View>
+                                    <View style={[styles.tableCell, styles.textSmall]}><DateValue date={doc.submissionDate} /></View>
                                 </View>
                             ))}
                         </View>
-                    ) : (
-                        <Text style={styles.noPresenta}>No presenta documentos cargados.</Text>
-                    )}
-                </View>
+                    </View>
+                )}
             </Page>
         </Document>
     );
