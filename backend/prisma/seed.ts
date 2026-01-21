@@ -688,6 +688,125 @@ async function main() {
             END IF;
         END $$;
     `);
+
+    console.log('Creating check constraint for Semester endDate > startDate');
+    await prisma.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'semester_end_after_start_check'
+            ) THEN
+                ALTER TABLE "Semester"
+                ADD CONSTRAINT semester_end_after_start_check
+                CHECK (
+                    "endDate" > "startDate"
+                );
+            END IF;
+        END $$;
+    `);
+
+    console.log('Creating check constraints for Housing bathroom/bedroom counts');
+    await prisma.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'housing_bathroom_count_check'
+            ) THEN
+                ALTER TABLE "Housing"
+                ADD CONSTRAINT housing_bathroom_count_check
+                CHECK (
+                    "bathroomCount" IS NULL OR "bathroomCount" >= 0
+                );
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'housing_bedroom_count_check'
+            ) THEN
+                ALTER TABLE "Housing"
+                ADD CONSTRAINT housing_bedroom_count_check
+                CHECK (
+                    "bedroomCount" IS NULL OR "bedroomCount" >= 0
+                );
+            END IF;
+        END $$;
+    `);
+
+    console.log('Creating check constraints for FamilyHome counts and income');
+    await prisma.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'familyhome_membercount_min_check'
+            ) THEN
+                ALTER TABLE "FamilyHome"
+                ADD CONSTRAINT familyhome_membercount_min_check
+                CHECK (
+                    "memberCount" IS NULL OR "memberCount" >= 1
+                );
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'familyhome_workingmembercount_check'
+            ) THEN
+                ALTER TABLE "FamilyHome"
+                ADD CONSTRAINT familyhome_workingmembercount_check
+                CHECK (
+                    "workingMemberCount" IS NULL
+                    OR ("workingMemberCount" >= 0 AND "memberCount" IS NOT NULL AND "memberCount" >= "workingMemberCount")
+                );
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'familyhome_children7to12count_check'
+            ) THEN
+                ALTER TABLE "FamilyHome"
+                ADD CONSTRAINT familyhome_children7to12count_check
+                CHECK (
+                    "children7to12Count" IS NULL
+                    OR ("children7to12Count" >= 0 AND "memberCount" IS NOT NULL AND "memberCount" >= "children7to12Count")
+                );
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'familyhome_studentchildrencount_check'
+            ) THEN
+                ALTER TABLE "FamilyHome"
+                ADD CONSTRAINT familyhome_studentchildrencount_check
+                CHECK (
+                    "studentChildrenCount" IS NULL
+                    OR ("studentChildrenCount" >= 0 AND "memberCount" IS NOT NULL AND "memberCount" >= "studentChildrenCount")
+                );
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'familyhome_monthlyincome_check'
+            ) THEN
+                ALTER TABLE "FamilyHome"
+                ADD CONSTRAINT familyhome_monthlyincome_check
+                CHECK (
+                    "monthlyIncome" IS NULL OR "monthlyIncome" >= 0
+                );
+            END IF;
+        END $$;
+    `);
+
+    
 }
 main()
     .catch((e) => {
