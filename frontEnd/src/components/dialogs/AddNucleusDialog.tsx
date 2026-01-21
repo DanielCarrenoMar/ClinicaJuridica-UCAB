@@ -74,7 +74,7 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
         <Dialog open={open} onClose={handleClose} title="Añadir Núcleo">
             <div className="flex flex-col gap-6">
                 <TitleTextInput
-                    label="Nombre del Núcleo"
+                    label="Nombre del Núcleo*"
                     placeholder="Ej. Núcleo Guayana"
                     value={idNucleus}
                     onChange={setIdNucleus}
@@ -82,7 +82,7 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
 
                 <div className="grid grid-cols-3 gap-4">
                     <TitleDropdown
-                        label="Estado"
+                        label="Estado*"
                         selectedValue={stateIndex !== null ? stateIndex : undefined}
                         onSelectionChange={(val) => {
                             setStateIndex(val as number);
@@ -96,7 +96,7 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
                     </TitleDropdown>
 
                     <TitleDropdown
-                        label="Municipio"
+                        label="Municipio*"
                         selectedValue={munIndex !== null ? munIndex : undefined}
                         onSelectionChange={(val) => {
                             setMunIndex(val as number);
@@ -110,7 +110,7 @@ export default function AddNucleusDialog({ open, onClose, onAdd }: Props) {
                     </TitleDropdown>
 
                     <TitleDropdown
-                        label="Parroquia"
+                        label="Parroquia*"
                         selectedValue={parishName}
                         onSelectionChange={(val) => setParishName(val as string)}
                         disabled={munIndex === null}

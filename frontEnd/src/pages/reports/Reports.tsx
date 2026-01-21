@@ -153,21 +153,21 @@ function Reports() {
             return <ReportCaseType key={`fresh-6-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 7) {
-            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} startDate={start} endDate={end}/>;
+            return <ReportBeneficiaryParishDistribution key={`fresh-7-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 8) {
-            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} startDate={start} endDate={end}/>;
+            return <ReportStudentInvolvement key={`fresh-8-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 9) {
-            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} startDate={start} endDate={end}/>;
+            return <ReportCaseTypeDistribution key={`fresh-9-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 10) {
-            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} startDate={start} endDate={end}/>;
+            return <ReportProfessorInvolvement key={`fresh-10-${Date.now()}`} startDate={start} endDate={end} />;
         }
         if (reportId === 11) {
-            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} startDate={start} endDate={end}/>;
+            return <ReportBeneficiaryTypeDistribution key={`fresh-11-${Date.now()}`} startDate={start} endDate={end} />;
         }
-        
+
         return null;
     }, []);
 
@@ -178,9 +178,9 @@ function Reports() {
 
         const selectedReports = reportOptions.filter(r => selectedReportIds.includes(r.id));
         const timestamp = Date.now();
-        
+
         try {
-            
+
             if (!validateDateRange(startDate, endDate)) {
                 console.warn('Invalid date range: start date must be before end date');
                 return null;
@@ -189,7 +189,7 @@ function Reports() {
             console.error('Error parsing dates:', error);
             return null;
         }
-        
+
         return (
             <ReportDocument key={`doc-${timestamp}`} startDate={startDate} endDate={endDate}>
                 {selectedReports.map(report => (
@@ -208,8 +208,8 @@ function Reports() {
     }, [reportDoc, updatePdfInstance, dummyDoc]);
 
     const handleReportSelect = (id: number) => {
-        const newSelection = selectedReportIds.includes(id) 
-            ? selectedReportIds.filter(item => item !== id) 
+        const newSelection = selectedReportIds.includes(id)
+            ? selectedReportIds.filter(item => item !== id)
             : [...selectedReportIds, id];
         setSelectedReportIds(newSelection);
     };
@@ -242,9 +242,9 @@ function Reports() {
                     </div>
                 </span>
                 <span className="flex items-center gap-4 h-full">
-                    <Button 
-                        onClick={handleDownloadPDF} 
-                        variant="outlined" 
+                    <Button
+                        onClick={handleDownloadPDF}
+                        variant="outlined"
                         icon={<FilePdf />}
                         disabled={!startDate || !endDate || selectedReportIds.length === 0 || pdfInstance.loading}
                     >
@@ -257,7 +257,7 @@ function Reports() {
                 <div className="flex-3 p-4 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto">
                     {reportOptions.map((option) => (
                         <OptionCard
-                            className='h-32'
+                            className='min-h-32 h-auto'
                             key={option.id}
                             title={option.title}
                             description={option.description}

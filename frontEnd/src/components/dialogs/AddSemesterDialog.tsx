@@ -57,18 +57,18 @@ export default function AddSemesterDialog({ open, onClose, onAdd }: Props) {
             <Dialog open={open} onClose={handleClose} title="Añadir Semestre">
                 <div className="flex flex-col gap-4">
                     <TitleTextInput
-                        label="Término"
+                        label="Término*"
                         placeholder="Ej. 2025 - 2026"
                         value={term}
                         onChange={setTerm}
                     />
                     <DatePicker
-                        label="Fecha de Inicio"
+                        label="Fecha de Inicio*"
                         value={startDate}
                         onChange={setStartDate}
                     />
                     <DatePicker
-                        label="Fecha de Fin"
+                        label="Fecha de Fin*"
                         value={endDate}
                         onChange={setEndDate}
                     />

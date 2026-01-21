@@ -183,7 +183,7 @@ export default function AddUserDialog({ open, onClose, onSuccess }: AddUserDialo
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col">
                         <TitleTextInput
-                            label="Cédula *"
+                            label="Cédula*"
                             placeholder="12345678"
                             value={identityCard}
                             onChange={setIdentityCard}
@@ -193,7 +193,7 @@ export default function AddUserDialog({ open, onClose, onSuccess }: AddUserDialo
                         )}
                     </div>
                     <TitleTextInput
-                        label="Nombre Completo *"
+                        label="Nombre Completo*"
                         placeholder="Juan Pérez"
                         value={fullName}
                         onChange={setFullName}
@@ -203,14 +203,14 @@ export default function AddUserDialog({ open, onClose, onSuccess }: AddUserDialo
                 {/* Row 2: Email & Password */}
                 <div className="grid grid-cols-2 gap-4">
                     <FormInput
-                        label="Correo Electrónico *"
+                        label="Correo Electrónico*"
                         type="email"
                         placeholder="correo@ejemplo.com"
                         value={email}
                         onChangeText={setEmail}
                     />
                     <FormInput
-                        label="Contraseña *"
+                        label="Contraseña*"
                         type="password"
                         placeholder="********"
                         value={password}
@@ -221,7 +221,7 @@ export default function AddUserDialog({ open, onClose, onSuccess }: AddUserDialo
                 {/* Row 3: Role & Gender */}
                 <div className="grid grid-cols-2 gap-4">
                     <TitleDropdown
-                        label="Tipo de Usuario *"
+                        label="Tipo de Usuario*"
                         selectedValue={role}
                         onSelectionChange={(val) => setRole(val as any)}
                     >
@@ -244,13 +244,13 @@ export default function AddUserDialog({ open, onClose, onSuccess }: AddUserDialo
                 {role === 'E' && (
                     <div className="grid grid-cols-2 gap-4">
                         <TitleTextInput
-                            label="NRC (Código de Materia)"
-                            placeholder="12345 (Opcional)"
+                            label="NRC"
+                            placeholder="12345"
                             value={nrc}
                             onChange={setNrc}
                         />
                         <TitleDropdown
-                            label="Tipo de Estudiante *"
+                            label="Tipo de Estudiante*"
                             selectedValue={studentType}
                             onSelectionChange={(val) => setStudentType(val as any)}
                         >
@@ -265,7 +265,7 @@ export default function AddUserDialog({ open, onClose, onSuccess }: AddUserDialo
                 {role === 'P' && (
                     <div className="grid grid-cols-2 gap-4">
                         <TitleDropdown
-                            label="Tipo de Profesor *"
+                            label="Tipo de Profesor*"
                             selectedValue={teacherType}
                             onSelectionChange={(val) => setTeacherType(val as any)}
                         >

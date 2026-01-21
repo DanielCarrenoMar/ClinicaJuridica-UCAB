@@ -20,10 +20,9 @@ export default function OptionCard({
     <button
       className={`
         relative flex bg-surface/70 hover:bg-surface w-full cursor-pointer items-start gap-5 overflow-hidden rounded-3xl border-2 px-4 py-2.5 text-left transition-all duration-200
-        ${
-          selected
-            ? "border-success "
-            : "border-transparent"
+        ${selected
+          ? "border-success "
+          : "border-transparent"
         }
         ${className}
       `}
@@ -34,7 +33,7 @@ export default function OptionCard({
           <div className="text-success [&>svg]:size-6">
             {icon}
           </div>
-          <p className="text-nowrap text-body-large whitespace-nowrap font-medium text-onSurface">
+          <p className="text-body-large font-medium text-onSurface">
             {title}
           </p>
         </div>
@@ -42,7 +41,7 @@ export default function OptionCard({
           {description}
         </p>
       </div>
-      
+
       {selected && (
         <div className="shrink-0 text-success [&>svg]:size-6">
           <CheckCircle />
