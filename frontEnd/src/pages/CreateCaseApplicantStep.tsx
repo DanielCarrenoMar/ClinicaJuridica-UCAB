@@ -240,9 +240,12 @@ function CreateCaseApplicantStep() {
             return;
         }
 
-        // Normalize head level if applicant is head of household to avoid dirty state
+        // Normalize head level and study time if applicant is head of household to avoid dirty state
         if (foundApplicant.isHeadOfHousehold && foundApplicant.applicantEducationLevel !== undefined) {
             foundApplicant.headEducationLevelId = foundApplicant.applicantEducationLevel;
+            if (foundApplicant.applicantStudyTime !== undefined) {
+                foundApplicant.headStudyTime = foundApplicant.applicantStudyTime;
+            }
         }
 
         setDbOriginalData({ ...foundApplicant });
@@ -287,12 +290,24 @@ function CreateCaseApplicantStep() {
     }, [applicantModel.stateName, applicantModel.municipalityName]);
 
     useEffect(() => {
-        if (applicantModel.isHeadOfHousehold &&
-            applicantModel.applicantEducationLevel !== undefined &&
-            applicantModel.headEducationLevelId !== applicantModel.applicantEducationLevel) {
-            updateApplicantModel({ headEducationLevelId: applicantModel.applicantEducationLevel });
+        if (applicantModel.isHeadOfHousehold) {
+            const updates: Partial<ApplicantModel> = {};
+
+            if (applicantModel.applicantEducationLevel !== undefined &&
+                applicantModel.headEducationLevelId !== applicantModel.applicantEducationLevel) {
+                updates.headEducationLevelId = applicantModel.applicantEducationLevel;
+            }
+
+            if (applicantModel.applicantStudyTime !== undefined &&
+                applicantModel.headStudyTime !== applicantModel.applicantStudyTime) {
+                updates.headStudyTime = applicantModel.applicantStudyTime;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                updateApplicantModel(updates);
+            }
         }
-    }, [applicantModel.isHeadOfHousehold, applicantModel.applicantEducationLevel]);
+    }, [applicantModel.isHeadOfHousehold, applicantModel.applicantEducationLevel, applicantModel.applicantStudyTime]);
 
     const identificationInputs = (
         <>
@@ -463,7 +478,7 @@ function CreateCaseApplicantStep() {
                 </TitleDropdown>
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-1">
                 <TitleDropdown
                     label="Educación alcanzada"
                     selectedValue={applicantModel.applicantEducationLevel || undefined}
@@ -475,13 +490,22 @@ function CreateCaseApplicantStep() {
                     ))}
                 </TitleDropdown>
             </div>
+            <div className="col-span-1">
+                <TitleTextInput
+                    label="Tiempo de estudio"
+                    value={applicantModel.applicantStudyTime || ""}
+                    onChange={(text) => { updateApplicantModel({ applicantStudyTime: text }); }}
+                    disabled={!applicantModel.applicantEducationLevel || isFieldDisabled('applicantStudyTime')}
+                />
+            </div>
+            <div className="col-span-1" />
 
             <div className="col-span-1">
                 <TitleDropdown
                     label="Condición Trabajo"
                     selectedValue={applicantModel.workConditionId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ workConditionId: value as number, activityConditionId: undefined }); }}
-                    disabled={isFieldDisabled('workConditionId')}
+                    disabled={isFieldDisabled('workConditionId') || !!applicantModel.activityConditionId}
                 >
                     {workConditionData.map((condition, index) => (
                         <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
@@ -493,7 +517,7 @@ function CreateCaseApplicantStep() {
                     label="Condición Actividad"
                     selectedValue={applicantModel.activityConditionId || undefined}
                     onSelectionChange={(value) => { updateApplicantModel({ activityConditionId: value as number, workConditionId: undefined }); }}
-                    disabled={isFieldDisabled('activityConditionId')}
+                    disabled={isFieldDisabled('activityConditionId') || !!applicantModel.workConditionId}
                 >
                     {activityConditionData.map((condition, index) => (
                         <DropdownOption key={index} value={index + 1}>{condition.name}</DropdownOption>
@@ -754,12 +778,18 @@ function CreateCaseApplicantStep() {
                         label="Educación alcanzada por jefe del hogar"
                         selectedValue={applicantModel.headEducationLevelId || undefined}
                         onSelectionChange={(value) => { updateApplicantModel({ headEducationLevelId: value as number }); }}
-                        disabled={isFieldDisabled('headEducationLevelId') || applicantModel.isHeadOfHousehold !== false}
+                        disabled={applicantModel.isHeadOfHousehold !== false || isFieldDisabled('headEducationLevelId')}
                     >
                         {educationLevelData.map((level, index) => (
                             <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
                         ))}
                     </TitleDropdown>
+                    <TitleTextInput
+                        label="Tiempo de estudio del jefe de hogar"
+                        value={applicantModel.headStudyTime || ""}
+                        onChange={(text) => { updateApplicantModel({ headStudyTime: text }); }}
+                        disabled={applicantModel.isHeadOfHousehold !== false || !applicantModel.headEducationLevelId || isFieldDisabled('headStudyTime')}
+                    />
                 </div>
             </div>
         </>

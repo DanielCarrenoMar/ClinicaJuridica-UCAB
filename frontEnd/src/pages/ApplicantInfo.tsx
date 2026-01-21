@@ -86,9 +86,12 @@ export default function ApplicantInfo() {
             setType(applicant.type);
             setHasId(applicant.hasId ?? null);
 
-            // Normalize head level if applicant is head of household to avoid dirty state on load
+            // Normalize head level and study time if applicant is head of household to avoid dirty state on load
             if (applicant.isHeadOfHousehold && applicant.applicantEducationLevel !== undefined) {
                 applicant.headEducationLevelId = applicant.applicantEducationLevel;
+                if (applicant.applicantStudyTime !== undefined) {
+                    applicant.headStudyTime = applicant.applicantStudyTime;
+                }
             }
 
             setApplicantData(applicant);
@@ -176,12 +179,24 @@ export default function ApplicantInfo() {
     }, [localApplicantData?.stateName, localApplicantData?.municipalityName, localApplicantData?.idState, localApplicantData?.municipalityNumber]);
 
     useEffect(() => {
-        if (localApplicantData?.isHeadOfHousehold &&
-            localApplicantData.applicantEducationLevel !== undefined &&
-            localApplicantData.headEducationLevelId !== localApplicantData.applicantEducationLevel) {
-            handleChange({ headEducationLevelId: localApplicantData.applicantEducationLevel });
+        if (localApplicantData?.isHeadOfHousehold) {
+            const updates: Partial<ApplicantModel> = {};
+
+            if (localApplicantData.applicantEducationLevel !== undefined &&
+                localApplicantData.headEducationLevelId !== localApplicantData.applicantEducationLevel) {
+                updates.headEducationLevelId = localApplicantData.applicantEducationLevel;
+            }
+
+            if (localApplicantData.applicantStudyTime !== undefined &&
+                localApplicantData.headStudyTime !== localApplicantData.applicantStudyTime) {
+                updates.headStudyTime = localApplicantData.applicantStudyTime;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                handleChange(updates);
+            }
         }
-    }, [localApplicantData?.isHeadOfHousehold, localApplicantData?.applicantEducationLevel]);
+    }, [localApplicantData?.isHeadOfHousehold, localApplicantData?.applicantEducationLevel, localApplicantData?.applicantStudyTime]);
 
     // Check duplicate ID
     useEffect(() => {
@@ -451,7 +466,7 @@ export default function ApplicantInfo() {
                         </TitleDropdown>
                     </div>
 
-                    <div className="col-span-3">
+                    <div className="col-span-1">
                         <TitleDropdown
                             label="Educación alcanzada"
                             selectedValue={localApplicantData.applicantEducationLevel || undefined}
@@ -462,6 +477,15 @@ export default function ApplicantInfo() {
                             ))}
                         </TitleDropdown>
                     </div>
+                    <div className="col-span-1">
+                        <TitleTextInput
+                            label="Tiempo de estudio"
+                            value={localApplicantData.applicantStudyTime || ""}
+                            onChange={(text) => { handleChange({ applicantStudyTime: text }); }}
+                            disabled={!localApplicantData.applicantEducationLevel}
+                        />
+                    </div>
+                    <div className="col-span-1" />
 
                     <div className="col-span-1">
                         <TitleDropdown
@@ -728,6 +752,12 @@ export default function ApplicantInfo() {
                             <DropdownOption key={index} value={index + 1}>{level.name}</DropdownOption>
                         ))}
                     </TitleDropdown>
+                    <TitleTextInput
+                        label="Tiempo de estudio del jefe de hogar"
+                        value={localApplicantData.headStudyTime || ""}
+                        onChange={(text) => { handleChange({ headStudyTime: text }); }}
+                        disabled={localApplicantData.isHeadOfHousehold !== false || !localApplicantData.headEducationLevelId}
+                    />
                 </div>
             </div>
         </>
