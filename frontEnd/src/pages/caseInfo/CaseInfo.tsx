@@ -22,6 +22,10 @@ import CaseHistory from '#pages/caseInfo/components/CaseHistory.tsx';
 import CaseInvolucrados from '#pages/caseInfo/components/CaseInvolucrados.tsx';
 import { useCreateCaseAction } from '#domain/useCaseHooks/useCaseActions.ts';
 import type { CaseActionDAO } from '#database/daos/caseActionDAO.ts';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import CasePdfDocument from './components/CasePdfDocument';
+import { useGetSupportDocumentByCaseId } from '#domain/useCaseHooks/useCase.ts';
+import { baseButtonStyles, variantButtonStyles } from '#components/Button.tsx';
 const STATUS_COLORS: Record<CaseStatusTypeModel, string> = {
     "Abierto": "bg-success! text-white border-0",
     "En Espera": "bg-warning! text-white border-0",
@@ -52,6 +56,13 @@ export default function CaseInfo() {
     const { beneficiaries: caseBeneficiaries, loadBeneficiaries: loadCaseBeneficiaries } = useGetBeneficiariesByCaseId(safeId);
     const { setStudentsToCase } = useSetStudentsToCase()
     const { setBeneficiariesToCase } = useSetBeneficiariesToCase()
+    const { supportDocument: caseDocuments, loadSupportDocuments: loadAllDocuments } = useGetSupportDocumentByCaseId(safeId);
+
+    useEffect(() => {
+        if (safeId) {
+            loadAllDocuments(safeId, { limit: 1000 });
+        }
+    }, [safeId, loadAllDocuments]);
 
     const [localCaseData, setLocalCaseData] = useState<CaseModel>();
     const [localCaseStudents, setLocalStudents] = useState<PersonModel[]>([]); // Local state for students
@@ -199,9 +210,27 @@ export default function CaseInfo() {
                         isDataModified ? (
                             <Button variant='resalted' className='w-32' onClick={saveChanges} disabled={updating}>Guardar</Button>
                         ) : (
-                            <Button variant="outlined" className='w-32' onClick={() => { }} icon={<FilePdf />}>
-                                Exportar
-                            </Button>
+                            <PDFDownloadLink
+                                document={
+                                    <CasePdfDocument
+                                        caseData={caseData}
+                                        students={caseStudents} // Use fetched students
+                                        beneficiaries={caseBeneficiaries} // Use fetched beneficiaries
+                                        documents={caseDocuments} // Use fetched documents
+                                    />
+                                }
+                                fileName={`${caseData.compoundKey || "Caso"}.pdf`}
+                                className={`${baseButtonStyles} ${variantButtonStyles['outlined']} w-32`}
+                            >
+                                {({ loading }) => (
+                                    <>
+                                        <span className="group-hover:animate-pulsing group-hover:animate-duration-400">
+                                            <FilePdf />
+                                        </span>
+                                        {loading ? 'Generando...' : 'Exportar'}
+                                    </>
+                                )}
+                            </PDFDownloadLink>
                         )
                     }
                 </span>
