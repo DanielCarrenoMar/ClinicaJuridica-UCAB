@@ -99,7 +99,7 @@ function LateralMenuLayer() {
                     permissionLevel <= 1 && <>
                         <LateralMenuItem id='semestres' label='Semestres' icon={<Clock />} link='/semestres' />
                         <LateralMenuItem id='nucleos' label='Nucleos' icon={<MapPinAlt />} link='/nucleos' />
-                        <LateralMenuItem id='configuracion' label='Configuración' icon={<Cog />} link='/configuracion' />
+                        {/*<LateralMenuItem id='configuracion' label='Configuración' icon={<Cog />} link='/configuracion' />*/}
                     </>
                 }
             </LateralMenu>
