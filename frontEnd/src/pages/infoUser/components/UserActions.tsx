@@ -24,8 +24,8 @@ export default function UserActions({ userId }: UserActionsProps) {
 
   useEffect(() => {
     if (!userId) return;
-    refresh({ page, limit: pageSize });
-  }, [page, pageSize, refresh, userId]);
+    refresh();
+  }, [refresh, userId]);
 
   useEffect(() => {
     setPage(1);
@@ -47,8 +47,14 @@ export default function UserActions({ userId }: UserActionsProps) {
     return fuse.search(searchQuery).map(result => result.item);
   }, [actions, searchQuery]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredActions.length / pageSize));
+  const pagedActions = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredActions.slice(start, start + pageSize);
+  }, [filteredActions, page, pageSize]);
+
   const canGoPrev = page > 1;
-  const canGoNext = !loading && !error && actions.length === pageSize;
+  const canGoNext = page < totalPages;
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -73,7 +79,7 @@ export default function UserActions({ userId }: UserActionsProps) {
               actions.length === 0 && !loading && !error &&
               <p className="text-body-medium text-onSurface/70 text-center">No hay acciones de casos disponibles.</p>
             }
-            {!error && filteredActions.map((action, index) => (
+            {!error && pagedActions.map((action, index) => (
               <CaseActionCard
                 key={index}
                 caseAction={action}

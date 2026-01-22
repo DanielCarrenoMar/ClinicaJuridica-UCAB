@@ -32,8 +32,8 @@ export default function CaseHistory({ caseId, user }: CaseHistoryProps) {
     const pageSize = 10;
 
     useEffect(() => {
-        loadCaseActions(caseId, { page, limit: pageSize });
-    }, [caseId, loadCaseActions, page, pageSize]);
+        loadCaseActions(caseId);
+    }, [caseId, loadCaseActions]);
 
     useEffect(() => {
         setPage(1);
@@ -58,8 +58,14 @@ export default function CaseHistory({ caseId, user }: CaseHistoryProps) {
         return caseActionsFuse.search(trimmed).map(r => r.item);
     }, [caseActions, caseActionsFuse, caseActionSearchQuery]);
 
+    const totalPages = Math.max(1, Math.ceil(visibleCaseActions.length / pageSize));
+    const pagedCaseActions = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        return visibleCaseActions.slice(start, start + pageSize);
+    }, [page, pageSize, visibleCaseActions]);
+
     const canGoPrev = page > 1;
-    const canGoNext = !caseActionsLoading && !caseActionsError && caseActions.length === pageSize;
+    const canGoNext = page < totalPages;
 
     return (
         <div className="flex flex-col h-full gap-6">
@@ -87,7 +93,7 @@ export default function CaseHistory({ caseId, user }: CaseHistoryProps) {
                                 <p className="text-body-small">No hay acciones registradas para este caso.</p>
                             </span>
                         ) : (
-                            visibleCaseActions
+                            pagedCaseActions
                                 .map((caseAction) => (
                                     <CaseActionCard
                                         key={caseAction.actionNumber}
@@ -138,7 +144,7 @@ export default function CaseHistory({ caseId, user }: CaseHistoryProps) {
                             registryDate: ""
                         };
                         await createAction(newAction);
-                        loadCaseActions(caseId, { page, limit: pageSize });
+                        loadCaseActions(caseId);
                     } catch (error: any) {
                         notyError(error.message || "Error al crear la acción del caso");
                         console.error("Error creating case action:", error);

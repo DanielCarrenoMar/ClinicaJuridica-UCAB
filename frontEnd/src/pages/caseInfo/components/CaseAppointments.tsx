@@ -37,8 +37,8 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
     const pageSize = 10;
 
     useEffect(() => {
-        loadAppointments(caseId, { page, limit: pageSize });
-    }, [caseId, loadAppointments, page, pageSize]);
+        loadAppointments(caseId);
+    }, [caseId, loadAppointments]);
 
     useEffect(() => {
         setPage(1);
@@ -71,8 +71,14 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
             .map(x => x.appointment);
     }, [appointments, appointmentsFuse, searchQuery]);
 
+    const totalPages = Math.max(1, Math.ceil(visibleAppointments.length / pageSize));
+    const pagedAppointments = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        return visibleAppointments.slice(start, start + pageSize);
+    }, [page, pageSize, visibleAppointments]);
+
     const canGoPrev = page > 1;
-    const canGoNext = appointments.length === pageSize;
+    const canGoNext = page < totalPages;
 
     return (
         <div className="flex flex-col h-full gap-6">
@@ -91,7 +97,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
             </section>
 
             <section className="flex-1 flex flex-col gap-4 pb-20 overflow-y-auto">
-                {visibleAppointments
+                {pagedAppointments
                     .map(apt => (
                         <AppointmentCard
                             key={apt.appointmentNumber}
@@ -137,7 +143,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                     if (!selectedAppointment) return;
                     try {
                         await deleteAppt(selectedAppointment.idCase, selectedAppointment.appointmentNumber);
-                        loadAppointments(caseId, { page, limit: pageSize });
+                        loadAppointments(caseId);
                         setIsAppointmentDialogOpen(false);
                         setSelectedAppointment(null);
                     } catch (error: any) {
@@ -165,7 +171,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                             registryDate: ""
                         };
                         await createNewAppointment(newAppt);
-                        loadAppointments(caseId, { page, limit: pageSize });
+                        loadAppointments(caseId);
                     } catch (error: any) {
                         console.error("Error creating appointment:", error);
                         notyError(error.message || "Error al crear la cita");
@@ -180,7 +186,7 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                 onSave={async (daoAppointment) => {
                     try {
                         await updateAppt(daoAppointment.idCase, daoAppointment);
-                        loadAppointments(daoAppointment.idCase, { page, limit: pageSize });
+                        loadAppointments(daoAppointment.idCase);
                         setIsEditAppointmentDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating appointment:", error);

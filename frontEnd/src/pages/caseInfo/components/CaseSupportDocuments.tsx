@@ -32,8 +32,8 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
     const pageSize = 10;
 
     useEffect(() => {
-        loadSupportDocuments(caseId, { page, limit: pageSize });
-    }, [caseId, loadSupportDocuments, page, pageSize]);
+        loadSupportDocuments(caseId);
+    }, [caseId, loadSupportDocuments]);
 
     useEffect(() => {
         setPage(1);
@@ -57,8 +57,14 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
         return supportDocumentsFuse.search(trimmed).map(r => r.item);
     }, [supportDocuments, supportDocumentsFuse, supportSearchQuery]);
 
+    const totalPages = Math.max(1, Math.ceil(visibleSupportDocuments.length / pageSize));
+    const pagedSupportDocuments = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        return visibleSupportDocuments.slice(start, start + pageSize);
+    }, [page, pageSize, visibleSupportDocuments]);
+
     const canGoPrev = page > 1;
-    const canGoNext = supportDocuments.length === pageSize;
+    const canGoNext = page < totalPages;
 
     return (
         <div className="flex flex-col h-full gap-6">
@@ -77,7 +83,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
             </section>
 
             <section className="flex-1 flex flex-col gap-4 pb-20 overflow-y-auto">
-                {visibleSupportDocuments
+                {pagedSupportDocuments
                     .map(doc => (
                         <SupportDocumentCard
                             key={doc.supportNumber}
@@ -126,7 +132,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                     if (!selectedSupportDocument) return;
                     try {
                         await deleteSupDocument(selectedSupportDocument.idCase, selectedSupportDocument.supportNumber);
-                        loadSupportDocuments(caseId, { page, limit: pageSize });
+                        loadSupportDocuments(caseId);
                         setIsSupportDialogOpen(false);
                         setSelectedSupportDocument(null);
                     } catch (error: any) {
@@ -159,7 +165,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                         }
 
                         await createNewSupportDocument(docData);
-                        loadSupportDocuments(caseId, { page, limit: pageSize });
+                        loadSupportDocuments(caseId);
                     } catch (error: any) {
                         console.error("Error creating support document:", error);
                         notyError(error.message || "Error al crear el recaudo");
@@ -190,7 +196,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                         }
 
                         await updateSupDocument(idCase, docData);
-                        loadSupportDocuments(caseId, { page, limit: pageSize });
+                        loadSupportDocuments(caseId);
                         setIsEditSupportDialogOpen(false);
                     } catch (error: any) {
                         console.error("Error updating support document:", error);

@@ -52,7 +52,7 @@ export default function UserCases({ userId, userType }: UserCasesProps) {
           cases.length === 0 && !loading && !error &&
           <p className="text-body-medium text-onSurface/70 text-center">No hay casos disponibles.</p>
         }
-        <ul className='flex flex-col gap-2'>
+        <ul className='flex flex-col gap-3'>
           {!error && cases.map((caseItem) => (
             <li className='shrink-0'>
 
