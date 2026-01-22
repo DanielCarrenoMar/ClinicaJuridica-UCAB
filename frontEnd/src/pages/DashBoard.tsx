@@ -11,7 +11,7 @@ import { useState } from "react";
 import LinkButton from "#components/LinkButton.tsx";
 
 function DashBoard() {
-    const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
+    const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions({page: 1, limit: 15});
     const { statusAmounts } = useGetStatusCaseAmounts();
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);

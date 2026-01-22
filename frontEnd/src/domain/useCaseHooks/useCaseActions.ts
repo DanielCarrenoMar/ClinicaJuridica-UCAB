@@ -3,7 +3,7 @@ import type { CaseActionModel } from "#domain/models/caseAction.ts";
 import { useCallback, useEffect, useState } from "react";
 import type { CaseActionDAO } from "#database/daos/caseActionDAO.ts";
 
-export function useGetAllCaseActions() {
+export function useGetAllCaseActions(params?: { page?: number; limit?: number }) {
     const { findAllCaseActions } = getCaseActionRepository();
 
     const [caseActions, setCaseActions] = useState<CaseActionModel[]>([]);
@@ -21,11 +21,11 @@ export function useGetAllCaseActions() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [findAllCaseActions]);
 
     useEffect(() => {
-        loadCaseActions();
-    }, [loadCaseActions]);
+        loadCaseActions(params);
+    }, []);
 
     return {
         caseActions,
