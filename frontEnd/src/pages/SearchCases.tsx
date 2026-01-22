@@ -35,13 +35,9 @@ function SearchCases() {
         courtFilters.length > 0 ||
         termFilters.length > 0;
 
-    const { cases: realCases, loading, error, refresh } = useGetCases();
+    const { cases: realCases, loading, error } = useGetCases();
     const [page, setPage] = useState(1);
     const pageSize = 15;
-
-    useEffect(() => {
-        refresh({ page, limit: pageSize });
-    }, [page, pageSize, refresh]);
 
     useEffect(() => {
         setPage(1);
@@ -99,8 +95,14 @@ function SearchCases() {
         });
     }, [filteredCases, fuse, searchText]);
 
-        const canGoPrev = page > 1;
-        const canGoNext = !loading && !error && realCases.length === pageSize;
+    const totalPages = Math.max(1, Math.ceil(searchResults.length / pageSize));
+    const pagedResults = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        return searchResults.slice(start, start + pageSize);
+    }, [page, pageSize, searchResults]);
+
+    const canGoPrev = page > 1;
+    const canGoNext = page < totalPages;
 
 
     const handleFilterChange = useCallback((key: string, values: (string | number)[]) => {
@@ -212,7 +214,7 @@ function SearchCases() {
                     )
                 }
                 {
-                    !loading && searchResults.map(({ caseData, matches }) => (
+                    !loading && pagedResults.map(({ caseData, matches }) => (
                         <li key={caseData.compoundKey}>
                             <CaseCard caseData={caseData} matches={matches} />
                         </li>

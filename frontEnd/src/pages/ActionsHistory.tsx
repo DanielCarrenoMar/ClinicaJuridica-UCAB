@@ -10,16 +10,12 @@ import Button from "#components/Button.tsx";
 import { ArrowLeft, ArrowRight } from "flowbite-react-icons/outline";
 
 function ActionsHistory() {
-    const { caseActions, refresh, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
+    const { caseActions, loading: loadingCaseActions, error: errorCaseActions } = useGetAllCaseActions();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCaseAction, setSelectedCaseAction] = useState<CaseActionModel | null>(null);
     const [isCaseActionDetailsDialogOpen, setIsCaseActionDetailsDialogOpen] = useState(false);
     const [page, setPage] = useState(1);
     const pageSize = 15;
-
-    useEffect(() => {
-        refresh({ page, limit: pageSize });
-    }, [page, pageSize, refresh]);
 
     useEffect(() => {
         setPage(1);
@@ -44,8 +40,14 @@ function ActionsHistory() {
         return fuse.search(searchQuery).map(result => result.item);
     }, [caseActions, searchQuery]);
 
+    const totalPages = Math.max(1, Math.ceil(filteredActions.length / pageSize));
+    const pagedActions = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        return filteredActions.slice(start, start + pageSize);
+    }, [filteredActions, page, pageSize]);
+
     const canGoPrev = page > 1;
-    const canGoNext = !loadingCaseActions && !errorCaseActions && caseActions.length === pageSize;
+    const canGoNext = page < totalPages;
 
     return (
         <div className="flex flex-col h-full min-h-0">
@@ -72,7 +74,7 @@ function ActionsHistory() {
                         caseActions.length === 0 && !loadingCaseActions && !errorCaseActions &&
                         <p className="text-body-medium text-onSurface/70 text-center">No hay acciones de casos disponibles.</p>
                     }
-                    {!errorCaseActions && filteredActions.map((action, index) => (
+                    {!errorCaseActions && pagedActions.map((action, index) => (
                         <CaseActionCard
                             key={index}
                             caseAction={action}
