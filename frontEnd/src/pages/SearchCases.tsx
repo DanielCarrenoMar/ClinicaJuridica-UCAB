@@ -8,6 +8,8 @@ import { useSearchParams } from "react-router";
 import { useGetCases } from "#domain/useCaseHooks/useCase.ts";
 import { useLateralMenuContext } from "#layers/LateralMenuLayer.tsx";
 import { Close, ArrowLeft, ArrowRight } from "flowbite-react-icons/outline";
+import Dropdown from "#components/Dropdown/Dropdown.tsx";
+import DropdownOption from "#components/Dropdown/DropdownOption.tsx";
 
 function SearchCases() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -38,10 +40,15 @@ function SearchCases() {
     const { cases: realCases, loading, error } = useGetCases();
     const [page, setPage] = useState(1);
     const pageSize = 15;
+    const [sortOrder, setSortOrder] = useState("lastActionAsc");
 
     useEffect(() => {
         setPage(1);
     }, [searchParams]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [sortOrder]);
 
     const cases = useMemo(() => [...realCases], [realCases]);
 
@@ -95,11 +102,36 @@ function SearchCases() {
         });
     }, [filteredCases, fuse, searchText]);
 
-    const totalPages = Math.max(1, Math.ceil(searchResults.length / pageSize));
+    const sortedResults = useMemo(() => {
+        const compareOptionalDates = (a?: Date, b?: Date, direction: "asc" | "desc" = "asc") => {
+            if (!a && !b) return 0;
+            if (!a) return 1;
+            if (!b) return -1;
+            return direction === "asc" ? a.getTime() - b.getTime() : b.getTime() - a.getTime();
+        };
+
+        const sorted = [...searchResults];
+        sorted.sort((a, b) => {
+            switch (sortOrder) {
+                case "lastActionAsc":
+                    return compareOptionalDates(a.caseData.lastActionDate, b.caseData.lastActionDate, "asc");
+                case "createdAtDesc":
+                    return b.caseData.createdAt.getTime() - a.caseData.createdAt.getTime();
+                case "createdAtAsc":
+                    return a.caseData.createdAt.getTime() - b.caseData.createdAt.getTime();
+                case "lastActionDesc":
+                default:
+                    return compareOptionalDates(a.caseData.lastActionDate, b.caseData.lastActionDate, "desc");
+            }
+        });
+        return sorted;
+    }, [searchResults, sortOrder]);
+
+    const totalPages = Math.max(1, Math.ceil(sortedResults.length / pageSize));
     const pagedResults = useMemo(() => {
         const start = (page - 1) * pageSize;
-        return searchResults.slice(start, start + pageSize);
-    }, [page, pageSize, searchResults]);
+        return sortedResults.slice(start, start + pageSize);
+    }, [page, pageSize, sortedResults]);
 
     const canGoPrev = page > 1;
     const canGoNext = page < totalPages;
@@ -127,8 +159,8 @@ function SearchCases() {
     return (
         <div className="flex flex-col h-full min-h-0">
             <div className="mb-3">
-                <span>
-                    <ul className="flex gap-3">
+                <span className="flex items-center justify-between max-w-5xl flex-wrap-reverse gap-3">
+                    <ul className="flex gap-3 flex-wrap">
                         <li>
                             <DropdownCheck
                                 label="Estatus"
@@ -196,6 +228,21 @@ function SearchCases() {
                             </Button>
                         </li>
                     </ul>
+                    <span className="flex">
+                        <span className="text-body-medium whitespace-nowrap self-center mr-2">
+                            Ordenar por:
+                        </span>
+                        <Dropdown
+                            label="Ordenar por"
+                            selectedValue={sortOrder}
+                            onSelectionChange={(value) => setSortOrder(value as string)}
+                        >
+                            <DropdownOption value="lastActionDesc">Acción más lejana</DropdownOption>
+                            <DropdownOption value="lastActionAsc">Acción más cercana</DropdownOption>
+                            <DropdownOption value="createdAtDesc">Creación más lejana</DropdownOption>
+                            <DropdownOption value="createdAtAsc">Creación más cercana</DropdownOption>
+                        </Dropdown>
+                    </span>
                 </span>
             </div >
             <ul className="flex flex-col gap-3 overflow-y-auto min-h-0">
