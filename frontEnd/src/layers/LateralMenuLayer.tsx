@@ -111,9 +111,8 @@ function LateralMenuLayer() {
                             onToggle={setIsSearchOpen}
                             defaultValue={defaultSearchText}
                             onSearch={(value) => {
-                                const newParams = locationId === 'busqueda'
-                                    ? new URLSearchParams(location.search)
-                                    : new URLSearchParams();
+                                if (locationId === 'busqueda')  return;
+                                const newParams = new URLSearchParams()
                                 if (value) {
                                     newParams.set('q', value);
                                 } else {
@@ -121,6 +120,18 @@ function LateralMenuLayer() {
                                 }
                                 navigate(`/busqueda?${newParams.toString()}`);
                             }}
+                            onChange={
+                                (value) => {
+                                    if (locationId !== 'busqueda') return;
+                                    const newParams = new URLSearchParams(location.search);
+                                    if (value) {
+                                        newParams.set('q', value);
+                                    } else {
+                                        newParams.delete('q');
+                                    }
+                                    navigate(`/busqueda?${newParams.toString()}`);
+                                }
+                            }
                             placeholder="Buscar Caso"
                         />
                         <div ref={assignedCasesRef} className="relative">
