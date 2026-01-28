@@ -14,9 +14,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { email, password }: LoginReqDTO = req.body;
-
-    const result = await loginService.authenticateUser(email, password);
+    const result = await loginService.authenticateUser(req.body as LoginReqDTO);
     
     if (!result.success) {
       res.status(401).json(result);

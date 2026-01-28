@@ -1,37 +1,36 @@
-// @ts-nocheck
 import prisma from '#src/config/database.js';
+import { LoginReqDTO, LoginResDTO } from '@app/shared/dtos/LoginDTO';
 import { PasswordUtil } from '../utils/password.util.js';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '#src/config.js';
 
 class LoginService {
-  async authenticateUser(email: string, password: string) {
+  async authenticateUser({ email, password }: LoginReqDTO) {
     try {
-      // Fetch user by email
-      const users = await prisma.$queryRaw`
-        SELECT 
-          u."identityCard",
-          u."fullName",
-          u.gender,
-          u.email,
-          u.password,
-          u."isActive",
-          u.type
-        FROM "User" u
-        WHERE u.email = ${email} 
-          AND u."isActive" = true
-      `;
+      const fondUser = await prisma.user.findFirst({
+        where: {
+          email: email,
+          isActive: true,
+        },
+        select: {
+          identityCard: true,
+          fullName: true,
+          gender: true,
+          email: true,
+          password: true,
+          isActive: true,
+          type: true,
+        },
+      });
 
-      // Check if user exists
-      if (!users || users.length === 0) {
+      if (!fondUser) {
         return {
           success: false,
           message: 'Credenciales inválidas o usuario inactivo'
         };
       }
 
-      const user = users[0];
-
-      // Compare password with hashed version
-      const isMatch = await PasswordUtil.compare(password, user.password);
+      const isMatch = await PasswordUtil.compare(password, fondUser.password);
 
       if (!isMatch) {
         return {
@@ -40,13 +39,15 @@ class LoginService {
         };
       }
 
-      // Remove password from response
-      delete user.password;
+      const response:LoginResDTO = {
+        fullName: fondUser.fullName,
+        token: jwt.sign({ email: fondUser.email }, JWT_SECRET, { expiresIn: '1h' })
+      };
 
       return {
         success: true,
         message: 'Login exitoso',
-        data: user
+        data: response
       };
 
     } catch (error: any) {

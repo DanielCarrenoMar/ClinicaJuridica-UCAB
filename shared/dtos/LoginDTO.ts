@@ -1,7 +1,6 @@
 export interface LoginResDTO {
-    success: boolean;
+    fullName: string;
     token?: string;
-    message?: string;
 }
 
 export interface LoginReqDTO {
