@@ -4,8 +4,8 @@ import { PasswordUtil } from '../utils/password.util.js';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '#src/config.js';
 
-class LoginService {
-  async authenticateUser({ email, password }: LoginReqDTO) {
+class authService {
+  async loginUser({ email, password }: LoginReqDTO) {
     try {
       const fondUser = await prisma.user.findFirst({
         where: {
@@ -66,4 +66,4 @@ class LoginService {
   }
 }
 
-export default new LoginService();
+export default new authService();

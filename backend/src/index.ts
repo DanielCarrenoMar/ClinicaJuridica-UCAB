@@ -19,7 +19,8 @@ app.use(express.json());
 app.use((req, res, next) => {
   const token = req.cookies.access_token;
   try {
-    const data = jwt.verify(token, JWT_SECRET);
+    const data = jwt.verify(token, JWT_SECRET) as {identityCard: string, role: string};
+    req.user = data;
     console.log(data);
   } catch {
     console.log('No token o token inválido');

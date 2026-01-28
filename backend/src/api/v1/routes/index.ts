@@ -9,7 +9,7 @@ import teacherRoutes from './teacher.routes.js';
 import healthRoutes from './health.routes.js'; // Asegúrate de crear este archivo
 import appointmentRoutes from './appointment.routes.js';
 import supportDocumentRoutes from './supportDocument.routes.js';
-import loginRoutes from './login.routes.js';
+import loginRoutes from './auth.routes.js';
 import semesterRoutes from './semester.routes.js';
 import nucleusRoutes from './nucleus.routes.js';
 import reportRoutes from './report.routes.js';

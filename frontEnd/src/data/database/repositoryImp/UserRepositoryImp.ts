@@ -27,7 +27,7 @@ export function getUserRepository(): UserRepository {
             return daoToUserModel(userDAO);
         },
         authenticate: async (email, password) => {
-            const response = await fetch(AUTH_URL, {
+            const response = await fetch(`${AUTH_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
