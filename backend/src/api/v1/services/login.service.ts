@@ -41,12 +41,18 @@ class LoginService {
 
       const response:LoginResDTO = {
         fullName: fondUser.fullName,
-        token: jwt.sign({ email: fondUser.email }, JWT_SECRET, { expiresIn: '1h' })
+        identityCard: fondUser.identityCard,
+        email: fondUser.email,
+        isActive: fondUser.isActive,
+        gender: fondUser.gender,
+        password: "",
+        type: fondUser.type as any,
       };
 
       return {
         success: true,
         message: 'Login exitoso',
+        token: jwt.sign({ identityCard: fondUser.identityCard, role: fondUser.type }, JWT_SECRET, { expiresIn: '1h' }),
         data: response
       };
 

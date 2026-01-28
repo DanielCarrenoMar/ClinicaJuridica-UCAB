@@ -2,6 +2,7 @@ import type { UserRepository } from "#domain/repositories.ts";
 import { USER_URL } from "./apiUrl";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 import { daoToUserModel } from "#domain/models/user.ts";
+import type { LoginResDTO } from "@app/shared/dtos/LoginDTO";
 
 const AUTH_URL = "http://localhost:3000/api/v1/auth";
 
@@ -29,7 +30,8 @@ export function getUserRepository(): UserRepository {
             const response = await fetch(AUTH_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -43,8 +45,8 @@ export function getUserRepository(): UserRepository {
                 throw new Error(result.message || 'Credenciales inválidas');
             }
 
-            const userDAO: UserDAO = result.data;
-            return daoToUserModel(userDAO);
+            const loginDTO: LoginResDTO = result.data;
+            return daoToUserModel(loginDTO);
         },
         updateUser: async (id, data) => {
             const response = await fetch(`${USER_URL}/${id}`, {

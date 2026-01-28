@@ -19,6 +19,7 @@
     "#assets/*": "./src/assets/*"
   },
   "dependencies": {
+    "@app/shared": "workspace:*",
     "@react-pdf/renderer": "^4.3.2",
     "@tailwindcss/vite": "^4.1.18",
     "animejs": "^4.2.2",

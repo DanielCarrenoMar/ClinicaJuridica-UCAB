@@ -1,6 +1,13 @@
+import type { GenderTypeDTO, UserTypeDTO } from "../typesDTO";
+
 export interface LoginResDTO {
+    identityCard: string;
     fullName: string;
-    token?: string;
+    gender: GenderTypeDTO | null;
+    email: string;
+    password: string;
+    isActive: boolean;
+    type: UserTypeDTO;
 }
 
 export interface LoginReqDTO {

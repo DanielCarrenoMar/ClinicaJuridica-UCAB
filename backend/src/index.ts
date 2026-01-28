@@ -1,13 +1,31 @@
 import express from 'express';
 import cors from 'cors';
-
+import cookieParser from 'cookie-parser';
 import apiRoutes from './api/v1/routes/index.js';
-import { PORT } from './config.js';
+import { JWT_SECRET, PORT } from './config.js';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 
-app.use(cors());
+app.use(cors(
+  {
+    origin: 'http://localhost:5173',
+    credentials: true // Permite envío de cookies
+  }
+));
+app.use(cookieParser())
 app.use(express.json());
+
+app.use((req, res, next) => {
+  const token = req.cookies.access_token;
+  try {
+    const data = jwt.verify(token, JWT_SECRET);
+    console.log(data);
+  } catch {
+    console.log('No token o token inválido');
+  }
+  next();
+})
 
 app.use((req, res, next) => {
   console.log(`${new Date().toLocaleTimeString()} - ${req.method} ${req.path}`);

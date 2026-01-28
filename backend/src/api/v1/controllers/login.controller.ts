@@ -14,14 +14,22 @@ export async function login(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const result = await loginService.authenticateUser(req.body as LoginReqDTO);
+    const {token, ...result} = await loginService.authenticateUser(req.body as LoginReqDTO);
     
     if (!result.success) {
       res.status(401).json(result);
       return;
     }
-    
-    res.status(200).json(result);
+
+    res
+    .cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1000, // 1 hora
+    })
+    .status(200)
+    .json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: msg });

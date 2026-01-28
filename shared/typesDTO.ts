@@ -1,0 +1,11 @@
+export type GenderTypeDTO = "M" | "F";
+export type UserTypeDTO = "E" | "P" | "C";
+export type TeacherTypeDTO = "R" | "V";
+export type StudentTypeDTO = "R" | "V" | "E" | "S";
+export type IdNationalityTypeDTO = "V" | "E" | "J";
+export type BeneficiaryTypeDTO = "B" | "S";
+export type MaritalStatusTypeDTO = "S" | "C" | "D" | "V";
+export type ProcessTypeDTO = "T" | "A" | "CM" | "R" | "";
+export type CaseBeneficiaryTypeDTO = "D" | "I";
+export type AppointmentStatusTypeDTO = "C" | "P" | "R";
+export type CaseStatusTypeDTO = "A" | "T" | "P" | "C";

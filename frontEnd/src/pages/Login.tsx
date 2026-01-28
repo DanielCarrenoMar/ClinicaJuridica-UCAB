@@ -16,7 +16,7 @@ export default function Login() {
     useEffect(() => {
         if (user) {
             setShowSuccess(true);
-            navigate('/');
+            //navigate('/');
         }
     }, [user, navigate]);
 
