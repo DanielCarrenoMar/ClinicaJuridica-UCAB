@@ -1,4 +1,5 @@
 import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO, AppointmentStatusTypeDAO, CaseBeneficiaryTypeDAO, BeneficiaryTypeDAO, UserTypeDAO, TeacherTypeDAO, StudentTypeDAO } from "#database/typesDAO.ts";
+import type { UserTypeDTO } from "@app/shared/typesDTO";
 
 export type IdNacionalityTypeModel = "V" | "E" | "J";
 export type IDTypeModel = 'V' | 'E' | 'J';
@@ -164,13 +165,13 @@ export function typeDaoToBeneficiaryTypeModel(type: BeneficiaryTypeDAO): Benefic
     }
 }
 
-export function typeDaoToUserTypeModel(dao: UserTypeDAO): UserTypeModel {
+export function typeDtoToUserTypeModel(dao: UserTypeDTO): UserTypeModel {
     switch (dao) {
-        case "E":
+        case "STUDENT":
             return "Estudiante";
-        case "C":
+        case "COORDINATOR":
             return "Coordinador";
-        case "P":
+        case "TEACHER":
             return "Profesor";
     }
 }

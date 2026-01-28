@@ -16,6 +16,7 @@ export default function ProtectedRoute({ requiredLevel, redirectPath = '/' }: Pr
     }
 
     if (!permissionLevel || permissionLevel > requiredLevel) {
+        console.log("Redirecting due to insufficient permissions", { permissionLevel, requiredLevel });
         return <Navigate to={redirectPath} replace />;
     }
 

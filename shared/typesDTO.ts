@@ -1,5 +1,5 @@
 export type GenderTypeDTO = "M" | "F";
-export type UserTypeDTO = "E" | "P" | "C";
+export type UserTypeDTO = "STUDENT" | "TEACHER" | "COORDINATOR";
 export type TeacherTypeDTO = "R" | "V";
 export type StudentTypeDTO = "R" | "V" | "E" | "S";
 export type IdNationalityTypeDTO = "V" | "E" | "J";

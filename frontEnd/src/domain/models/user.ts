@@ -2,9 +2,9 @@ import {
     typeDaoToGenderTypeModel, 
     typeModelToGenderTypeDao,
     type GenderTypeModel,
-    typeDaoToUserTypeModel,
     typeModelToUserTypeDao,
-    type UserTypeModel
+    type UserTypeModel,
+    typeDtoToUserTypeModel
 } from "#domain/typesModel.ts";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 
@@ -23,7 +23,7 @@ export interface UserModel {
 export function daoToUserModel(dao: UserDAO): UserModel {
     const { type, gender, ...rest } = dao;
     return {
-        type: typeDaoToUserTypeModel(type),
+        type: typeDtoToUserTypeModel(type),
         gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
         ...rest
     }

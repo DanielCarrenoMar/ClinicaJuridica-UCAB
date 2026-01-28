@@ -65,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = async (mail: string, password: string) => {
         const loggedInUser = await loginUser(mail, password);
+        console.log("Logged in user:", loggedInUser);
         if (loggedInUser) {
             localStorage.setItem('user', JSON.stringify({ email: mail, password }));
             setUser(loggedInUser);
