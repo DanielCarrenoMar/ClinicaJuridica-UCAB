@@ -1,0 +1,14 @@
+{
+  "name": "clinica-juridica-workspace",
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ],
+    "overrides": {
+      "vite": "npm:rolldown-vite@7.1.14"
+    }
+  }
+}

@@ -23,14 +23,8 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.28.2",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "prisma"
-    ]
-  },
   "dependencies": {
+    "@app/shared": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.2.0",
     "@supabase/supabase-js": "^2.90.1",

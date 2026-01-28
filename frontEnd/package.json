@@ -48,14 +48,5 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.50.1",
     "vite": "npm:rolldown-vite@7.1.14"
-  },
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:rolldown-vite@7.1.14"
-    },
-    "onlyBuiltDependencies": [
-      "@prisma/engines",
-      "prisma"
-    ]
   }
 }

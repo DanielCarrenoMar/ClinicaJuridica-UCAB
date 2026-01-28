@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express';
 import loginService from '../services/login.service.js';
 
