@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 app.use('/api/v1', apiRoutes);
 
 const server = app.listen(PORT, async () => {
-  console.log(`🚀 Servidor en http://localhost:${port}`);
+  console.log(`🚀 Servidor en http://localhost:${PORT}`);
 });
 
 server.on('error', (error) => {
