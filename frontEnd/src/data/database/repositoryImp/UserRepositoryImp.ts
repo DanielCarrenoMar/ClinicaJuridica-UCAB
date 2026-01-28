@@ -48,6 +48,18 @@ export function getUserRepository(): UserRepository {
             const loginDTO: LoginResDTO = result.data;
             return daoToUserModel(loginDTO);
         },
+        findActualUser: async () => {
+            const response = await fetch(`${AUTH_URL}/me`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || 'Error en autenticación');
+            }
+            const userDAO: UserDAO = result.data;
+            return daoToUserModel(userDAO);
+        },
         updateUser: async (id, data) => {
             const response = await fetch(`${USER_URL}/${id}`, {
                 method: 'PUT',

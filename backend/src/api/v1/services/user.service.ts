@@ -92,33 +92,41 @@ class UserService {
 
   async getUserById(id: string) {
     try {
-      const result = await prisma.$queryRaw`
-        SELECT 
-          u.*,
-          u."fullName" AS "fullname",
-          s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
-          t.term AS "teacherTerm", t.type AS "teacherType"
-        FROM "User" u
-        LEFT JOIN "Student" s ON u."identityCard" = s."identityCard"
-        LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard"
-        WHERE u."identityCard" = ${id}
-      `;
+      const foundUser = await prisma.user.findUnique({
+        where: {
+          identityCard: id
+        },
+        include: {
+          students: {
+            select: {
+              term: true,
+              nrc: true,
+              type: true
+            }
+          },
+          teachers: {
+            select: {
+              term: true,
+              type: true
+            }
+          }
+        }
+      });
 
-      if (!Array.isArray(result) || result.length === 0) {
+      if (!foundUser) {
         return { success: false, message: 'Usuario no encontrado' };
       }
 
-      const user = result[0];
       const data = {
-        ...user,
-        student: user.studentTerm ? {
-          term: user.studentTerm,
-          nrc: user.studentNrc,
-          type: user.studentType
+        ...foundUser,
+        student: foundUser.students.length > 0 ? {
+          term: foundUser.students[0].term,
+          nrc: foundUser.students[0].nrc,
+          type: foundUser.students[0].type
         } : null,
-        teacher: user.teacherTerm ? {
-          term: user.teacherTerm,
-          type: user.teacherType
+        teacher: foundUser.teachers.length > 0 ? {
+          term: foundUser.teachers[0].term,
+          type: foundUser.teachers[0].type
         } : null
       };
 

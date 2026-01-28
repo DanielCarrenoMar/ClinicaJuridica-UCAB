@@ -1,6 +1,6 @@
 import type { UserModel, UserTypeModel } from '../domain/models/user.ts';
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { useLoginUser } from '../domain/useCaseHooks/useUser.ts';
+import { createContext, useContext, useState, type ReactNode } from 'react';
+import { useGetActualUser, useLoginUser } from '../domain/useCaseHooks/useUser.ts';
 
 interface AuthContextType {
     user: UserModel | null;
@@ -26,61 +26,24 @@ export function roleToPermissionLevel(role: UserTypeModel): number {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<UserModel | null>(null);
-    const [authLoading, setAuthLoading] = useState(true);
-
     const { login: loginUser, loading: loginLoading, error, clearError } = useLoginUser();
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (!storedUser) {
-            setAuthLoading(false);
-            return;
-        }
-
-        const { email, password } = JSON.parse(storedUser) as { email?: string; password?: string };
-        if (!email || !password) {
-            localStorage.removeItem('user');
-            setAuthLoading(false);
-            return;
-        }
-
-        void (async () => {
-            try {
-                const loggedInUser = await loginUser(email, password);
-                if (loggedInUser) {
-                    setUser(loggedInUser);
-                } else {
-                    // If login fails (e.g. credential change), clear storage
-                    localStorage.removeItem('user');
-                }
-            } catch (e) {
-                console.error("Auto-login failed:", e);
-                localStorage.removeItem('user');
-            } finally {
-                setAuthLoading(false);
-            }
-        })();
-    }, []); // Removed [loginUser] dependency to avoid re-running on loginUser change which shouldn't happen but is safer empty
+    const { user, loading: actualUserLoading, error: actualUserError, refresh: refreshActualUser } = useGetActualUser();
 
     const login = async (mail: string, password: string) => {
         const loggedInUser = await loginUser(mail, password);
         console.log("Logged in user:", loggedInUser);
         if (loggedInUser) {
-            localStorage.setItem('user', JSON.stringify({ email: mail, password }));
-            setUser(loggedInUser);
+            refreshActualUser();
         }
     };
 
     const logout = () => {
-        setUser(null);
-        localStorage.removeItem('user');
-        clearError();
+        // Clear user state on logout
     };
 
     // Default to a high number (low permission) if no user
     const permissionLevel = user ? roleToPermissionLevel(user.type) : 99;
-    const loading = loginLoading || authLoading;
+    const loading = loginLoading || actualUserLoading;
 
     return (
         <AuthContext.Provider value={{ user, permissionLevel, login, logout, loading, error, clearError }}>

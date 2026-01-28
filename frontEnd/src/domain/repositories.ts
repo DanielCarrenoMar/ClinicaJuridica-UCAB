@@ -101,6 +101,7 @@ export interface UserRepository {
     findUserById(id: string): Promise<UserModel | null>;
     updateUser(id: string, data: Partial<UserDAO>): Promise<UserModel>;
     authenticate(email: string, password: string): Promise<UserModel>;
+    findActualUser(): Promise<UserModel | null>;
     createUser(data: UserDAO): Promise<any>;
 }
 

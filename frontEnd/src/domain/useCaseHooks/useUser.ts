@@ -129,6 +129,37 @@ export function useLoginUser() {
 	};
 }
 
+export function useGetActualUser() {
+	const { findActualUser } = getUserRepository();
+	const [user, setUser] = useState<UserModel | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
+
+	const loadActualUser = useCallback(async () => {
+		setLoading(true);
+		try {
+			const data = await findActualUser();
+			setUser(data);
+			setError(null);
+		} catch (err) {
+			setError(err as Error);
+			throw err;
+		} finally {
+			setLoading(false);
+		}
+	}, [findActualUser]);
+
+	useEffect(() => {
+		void loadActualUser();
+	}, []);
+	return {
+		user,
+		loading,
+		error,
+		refresh: loadActualUser,
+	};
+}
+
 export function useUpdateUserById() {
 	const { updateUser: updateUserData } = getUserRepository();
 	const [loading, setLoading] = useState(false);
