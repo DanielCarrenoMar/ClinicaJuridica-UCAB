@@ -1,6 +1,6 @@
-import type{ CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
+import type{ CaseBeneficiaryTypeDTO } from "@app/shared/typesDTO";
 
 export interface BeneficiaryTypeDistribution {
-  type: CaseBeneficiaryTypeDAO; 
+  type: CaseBeneficiaryTypeDTO; 
   count: number;
 }

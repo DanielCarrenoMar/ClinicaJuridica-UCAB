@@ -1,6 +1,6 @@
-import type{ TeacherTypeDAO } from "#database/typesDAO.ts";
+import type{ TeacherTypeDTO } from "@app/shared/typesDTO";
 
 export interface ProfessorInvolvement {
-  type: TeacherTypeDAO;
+  type: TeacherTypeDTO;
   count: number;
 }

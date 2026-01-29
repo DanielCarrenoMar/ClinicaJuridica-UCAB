@@ -1,7 +1,7 @@
-import type { CaseStatusTypeDAO } from "../typesDAO.ts";
+import type { CaseStatusTypeDTO } from "../typesDAO.ts";
 
 export interface CaseStatusDAO {
-  status: CaseStatusTypeDAO;
+  status: CaseStatusTypeDTO;
   reason?: string;
   userId: string;
 }

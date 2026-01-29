@@ -1,6 +1,6 @@
 import { 
-    typeDaoToGenderTypeModel, 
-    typeModelToGenderTypeDao,
+    typeDtoToGenderTypeModel, 
+    typeModelToGenderTypeDto,
     type GenderTypeModel,
     typeModelToUserTypeDao,
     type UserTypeModel,
@@ -24,7 +24,7 @@ export function daoToUserModel(dao: UserDAO): UserModel {
     const { type, gender, ...rest } = dao;
     return {
         type: typeDtoToUserTypeModel(type),
-        gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
+        gender: gender ? typeDtoToGenderTypeModel(gender) : undefined,
         ...rest
     }
 }
@@ -34,6 +34,6 @@ export function modelToUserDao(model: UserModel): UserDAO {
     return {
         ...rest,
         type: typeModelToUserTypeDao(type),
-        gender: gender ? typeModelToGenderTypeDao(gender) : undefined
+        gender: gender ? typeModelToGenderTypeDto(gender) : undefined
     }
 }

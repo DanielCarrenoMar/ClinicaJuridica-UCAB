@@ -1,5 +1,5 @@
 import type { CaseDAO } from "./caseDAO.ts";
-import type { CaseStatusTypeDAO } from "../typesDAO.ts";
+import type { CaseStatusTypeDTO } from "../typesDAO.ts";
 
 export interface CaseInfoDAO extends CaseDAO {
   idCase: number;
@@ -10,7 +10,7 @@ export interface CaseInfoDAO extends CaseDAO {
   term: string;
   lastActionDate?: Date;
   lastActionDescription?: string;
-  caseStatus: CaseStatusTypeDAO;
+  caseStatus: CaseStatusTypeDTO;
   compoundKey: string;
   createdAt: string;
   subjectName: string;

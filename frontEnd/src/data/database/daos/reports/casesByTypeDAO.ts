@@ -1,6 +1,6 @@
-import type { ProcessTypeDAO } from "#database/typesDAO.ts";
+import type { ProcessTypeDTO } from "@app/shared/typesDTO";
 
 export interface CasesByType {
-  type: ProcessTypeDAO;
+  type: ProcessTypeDTO;
   count: number;
 }

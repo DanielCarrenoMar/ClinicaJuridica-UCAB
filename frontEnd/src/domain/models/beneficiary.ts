@@ -1,5 +1,5 @@
 import type { BeneficiaryInfoDAO } from "#database/daos/beneficiaryInfoDAO.ts";
-import { typeDaoToBeneficiaryTypeModel, typeDaoToGenderTypeModel, type BeneficiaryTypeModel, type GenderTypeModel, type IdNacionalityTypeModel } from "#domain/typesModel.ts";
+import { typeDtoToBeneficiaryTypeModel, typeDtoToGenderTypeModel, type BeneficiaryTypeModel, type GenderTypeModel, type IdNacionalityTypeModel } from "#domain/typesModel.ts";
 
 
 export interface BeneficiaryModel {
@@ -21,8 +21,8 @@ export interface BeneficiaryModel {
 export function daoToBeneficiaryModel(dao: BeneficiaryInfoDAO): BeneficiaryModel {
     return {
         ...dao,
-        type: typeDaoToBeneficiaryTypeModel(dao.type),
-        gender: typeDaoToGenderTypeModel(dao.gender),
+        type: typeDtoToBeneficiaryTypeModel(dao.type),
+        gender: typeDtoToGenderTypeModel(dao.gender),
         birthDate: new Date(dao.birthDate)
     }
 }

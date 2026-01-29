@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { AppointmentStatusTypeModel } from '#domain/typesModel.ts';
-import { typeModelToAppointmentStatusTypeDao } from '#domain/typesModel.ts';
+import { typeModelToAppointmentStatusTypeDto } from '#domain/typesModel.ts';
 import Button from '#components/Button.tsx';
 import DropdownOption from '#components/Dropdown/DropdownOption.tsx';
 import TextInput from '#components/TextInput.tsx';
@@ -72,7 +72,7 @@ export default function EditAppointmentDialog({
             plannedDate: convertToISO(plannedDate),
             executionDate: executionDate ? convertToISO(executionDate) : undefined,
             guidance: guidance || undefined,
-            status: typeModelToAppointmentStatusTypeDao(status as AppointmentStatusTypeModel) as any
+            status: typeModelToAppointmentStatusTypeDto(status as AppointmentStatusTypeModel) as any
         };
 
         onSave(updateData);

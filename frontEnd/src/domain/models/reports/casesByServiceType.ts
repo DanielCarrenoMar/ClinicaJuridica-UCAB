@@ -1,5 +1,5 @@
 import type { ProcessTypeModel } from "#domain/typesModel.ts";
-import { typeDaoToProcessTypeModel } from "#domain/typesModel.ts";
+import { typeDtoToProcessTypeModel } from "#domain/typesModel.ts";
 import type { CasesByServiceType } from "#database/daos/reports/casesByServiceTypeDAO.ts";
 
 export interface CasesByServiceTypeModel {
@@ -9,7 +9,7 @@ export interface CasesByServiceTypeModel {
 
 export function casesByServiceTypeDAOToModel(dao: CasesByServiceType): CasesByServiceTypeModel {
   return {
-    serviceType: typeDaoToProcessTypeModel(dao.serviceType),
+    serviceType: typeDtoToProcessTypeModel(dao.serviceType),
     count: dao.count,
   };
 }

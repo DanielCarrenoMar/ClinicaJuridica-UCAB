@@ -1,10 +1,10 @@
 import type { UserModel } from "./user.ts";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
 import {
-    typeDaoToGenderTypeModel,
-    typeDaoToTeacherTypeModel,
-    typeModelToGenderTypeDao,
-    typeModelToTeacherTypeDao,
+    typeDtoToGenderTypeModel,
+    typeDtoToTeacherTypeModel,
+    typeModelToGenderTypeDto,
+    typeModelToTeacherTypeDto,
     type TeacherTypeModel
 } from "#domain/typesModel.ts";
 
@@ -18,8 +18,8 @@ export interface TeacherModel extends Omit<UserModel, 'type'> {
 export function daoToTeacherModel(dao: TeacherDAO): TeacherModel {
     const { type, gender, ...rest } = dao;
     return {
-        type: typeDaoToTeacherTypeModel(type),
-        gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
+        type: typeDtoToTeacherTypeModel(type),
+        gender: gender ? typeDtoToGenderTypeModel(gender) : undefined,
         ...rest
     }
 }
@@ -27,7 +27,7 @@ export function daoToTeacherModel(dao: TeacherDAO): TeacherModel {
 export function modelToTeacherDao(model: TeacherModel): TeacherDAO {
     return {
         ...model,
-        type: typeModelToTeacherTypeDao(model.type),
-        gender: model.gender ? typeModelToGenderTypeDao(model.gender) : undefined
+        type: typeModelToTeacherTypeDto(model.type),
+        gender: model.gender ? typeModelToGenderTypeDto(model.gender) : undefined
     }
 }

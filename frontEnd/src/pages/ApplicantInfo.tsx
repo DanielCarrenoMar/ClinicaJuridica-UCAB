@@ -20,7 +20,7 @@ import { locationData, characteristicsData } from "#domain/seedData.ts";
 import { educationLevelData, workConditionData, activityConditionData } from "#domain/seedData.ts";
 import type { BeneficiaryTypeModel } from "#domain/typesModel.ts"
 import { useGetBeneficiaryById, useUpdateBeneficiary } from "#domain/useCaseHooks/useBeneficiary.ts";
-import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
+import { typeModelToGenderTypeDto } from "#domain/typesModel.ts";
 import type { BeneficiaryTypeDAO } from "#database/typesDAO.ts";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ApplicantPdfDocument from "./ApplicantPdfDocument.tsx";
@@ -264,7 +264,7 @@ export default function ApplicantInfo() {
             const beneficiaryData = {
                 identityCard: localApplicantData.identityCard,
                 fullName: localApplicantData.fullName || "",
-                gender: localApplicantData.gender ? typeModelToGenderTypeDao(localApplicantData.gender) : "M",
+                gender: localApplicantData.gender ? typeModelToGenderTypeDto(localApplicantData.gender) : "M",
                 birthDate: localApplicantData.birthDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
                 idNationality: localApplicantData.idNationality || "V",
                 hasId: hasId ?? false,

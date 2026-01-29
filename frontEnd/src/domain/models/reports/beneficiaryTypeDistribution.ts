@@ -1,5 +1,5 @@
 import type { CaseBeneficiaryTypeModel } from "#domain/typesModel.ts";
-import { typeDaoToCaseBeneficiaryTypeModel } from "#domain/typesModel.ts";
+import { typeDtoToCaseBeneficiaryTypeModel } from "#domain/typesModel.ts";
 import type { BeneficiaryTypeDistribution } from "#database/daos/reports/beneficiaryTypeDistributionDAO.ts";
 
 export interface BeneficiaryTypeDistributionModel {
@@ -9,7 +9,7 @@ export interface BeneficiaryTypeDistributionModel {
 
 export function beneficiaryTypeDistributionDAOToModel(dao: BeneficiaryTypeDistribution): BeneficiaryTypeDistributionModel {
   return {
-    type: typeDaoToCaseBeneficiaryTypeModel(dao.type),
+    type: typeDtoToCaseBeneficiaryTypeModel(dao.type),
     count: dao.count,
   };
 }

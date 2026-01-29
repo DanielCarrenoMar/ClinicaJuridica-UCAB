@@ -1,13 +1,13 @@
-import type { BeneficiaryTypeDAO, GenderTypeDAO, IdNationalityTypeDAO as NationalityTypeDAO } from "../typesDAO.ts";
+import type { BeneficiaryTypeDTO, GenderTypeDTO, IdNationalityTypeDTO as NationalityTypeDTO } from "../typesDAO.ts";
 
 export interface BeneficiaryDAO {
   identityCard: string;
-  gender: GenderTypeDAO;
+  gender: GenderTypeDTO;
   birthDate: string;
   fullName: string;
-  idNationality: NationalityTypeDAO;
+  idNationality: NationalityTypeDTO;
   hasId: boolean;
-  type: BeneficiaryTypeDAO;
+  type: BeneficiaryTypeDTO;
   idState?: number;
   municipalityNumber?: number;
   parishNumber?: number;

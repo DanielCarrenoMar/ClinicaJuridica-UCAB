@@ -1,5 +1,5 @@
 import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO, AppointmentStatusTypeDAO, CaseBeneficiaryTypeDAO, BeneficiaryTypeDAO, UserTypeDAO, TeacherTypeDAO, StudentTypeDAO } from "#database/typesDAO.ts";
-import type { UserTypeDTO } from "@app/shared/typesDTO";
+import type { AppointmentStatusTypeDTO, BeneficiaryTypeDTO, CaseBeneficiaryTypeDTO, CaseStatusTypeDTO, GenderTypeDTO, MaritalStatusTypeDTO, ProcessTypeDTO, StudentTypeDTO, TeacherTypeDTO, UserTypeDTO } from "@app/shared/typesDTO";
 
 export type IdNacionalityTypeModel = "V" | "E" | "J";
 export type IDTypeModel = 'V' | 'E' | 'J';
@@ -18,7 +18,7 @@ export type UserTypeModel = "Coordinador" | "Profesor" | "Estudiante";
 export type TeacherTypeModel = "REGULAR" | "VOLUNTEER";
 export type StudentTypeModel = "regular" | "volunteer" | "graduate" | "service";
 
-export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel {
+export function typeDtoToGenderTypeModel(gender: GenderTypeDTO): GenderTypeModel {
     switch (gender) {
         case 'M':
             return 'Masculino';
@@ -26,7 +26,7 @@ export function typeDaoToGenderTypeModel(gender: GenderTypeDAO): GenderTypeModel
             return 'Femenino';
     }
 }
-export function typeModelToGenderTypeDao(gender: GenderTypeModel): GenderTypeDAO {
+export function typeModelToGenderTypeDto(gender: GenderTypeModel): GenderTypeDTO {
     switch (gender) {
         case 'Masculino':
             return 'M';
@@ -35,138 +35,139 @@ export function typeModelToGenderTypeDao(gender: GenderTypeModel): GenderTypeDAO
     }
 }
 
-export function typeDaoToMaritalStatusTypeModel(dao: MaritalStatusTypeDAO): MaritalStatusTypeModel {
-    switch (dao) {
-        case "S":
+export function typeDtoToMaritalStatusTypeModel(dto: MaritalStatusTypeDTO): MaritalStatusTypeModel {
+    switch (dto) {
+        case "SINGLE":
             return "Soltero";
-        case "C":
+        case "MARRIED":
             return "Casado";
-        case "D":
+        case "DIVORCED":
             return "Divorciado";
-        case "V":
+        case "WIDOWED":
             return "Viudo";
     }
 }
-export function typeModelToMaritalStatusTypeDao(model: MaritalStatusTypeModel): MaritalStatusTypeDAO {
+export function typeModelToMaritalStatusTypeDto(model: MaritalStatusTypeModel): MaritalStatusTypeDTO {
     switch (model) {
         case "Soltero":
-            return "S";
+            return "SINGLE";
         case "Casado":
-            return "C";
+            return "MARRIED";
         case "Divorciado":
-            return "D";
+            return "DIVORCED";
         case "Viudo":
-            return "V";
+            return "WIDOWED";
     }
 }
 
-export function typeDaoToProcessTypeModel(processTypeDAO: ProcessTypeDAO): ProcessTypeModel {
-    switch (processTypeDAO) {
-        case "A":
+export function typeDtoToProcessTypeModel(dto: ProcessTypeDTO): ProcessTypeModel {
+    switch (dto) {
+        case "ADVICE":
             return "Asesoria";
-        case "CM":
+        case "MEDIATION":
             return "Conciliacion y mediacion";
-        case "R":
+        case "DRAFTING":
             return "Redaccion";
-        case "T":
+        case "IN_PROGRESS":
             return "Tramite";
     }
 }
-export function typeModelToProcessTypeDao(processTypeModel: ProcessTypeModel): ProcessTypeDAO {
+export function typeModelToProcessTypeDto(processTypeModel: ProcessTypeModel): ProcessTypeDTO {
     switch (processTypeModel) {
         case "Asesoria":
-            return "A";
+            return "ADVICE";
         case "Conciliacion y mediacion":
-            return "CM";
+            return "MEDIATION";
         case "Redaccion":
-            return "R";
+            return "DRAFTING";
         case "Tramite":
-            return "T";
+            return "IN_PROGRESS";
     }
 }
 
-export function typeDaoToCaseStatusTypeModel(caseStatusDAO: CaseStatusTypeDAO): CaseStatusTypeModel {
-    switch (caseStatusDAO) {
-        case "A":
+export function typeDtoToCaseStatusTypeModel(dto: CaseStatusTypeDTO): CaseStatusTypeModel {
+    switch (dto) {
+        case "OPEN":
             return "Abierto";
-        case "T":
+        case "IN_PROGRESS":
             return "En Espera";
-        case "P":
+        case "PAUSED":
             return "Pausado";
-        case "C":
+        case "CLOSED":
             return "Cerrado";
     }
 }
-export function typeModelToCaseStatusTypeDao(caseStatusModel: CaseStatusTypeModel): CaseStatusTypeDAO {
+export function typeModelToCaseStatusTypeDto(caseStatusModel: CaseStatusTypeModel): CaseStatusTypeDTO {
     switch (caseStatusModel) {
         case "Abierto":
-            return "A";
+            return "OPEN";
         case "En Espera":
-            return "T";
+            return "IN_PROGRESS";
         case "Pausado":
-            return "P";
+            return "PAUSED";
         case "Cerrado":
-            return "C";
+            return "CLOSED";
     }
 }
 
-export function typeDaoToAppointmentStatusTypeModel(appointmentStatusDAO: AppointmentStatusTypeDAO): AppointmentStatusTypeModel {
-    switch (appointmentStatusDAO) {
-        case "R":
+export function typeDtoToAppointmentStatusTypeModel(dto: AppointmentStatusTypeDTO): AppointmentStatusTypeModel {
+    switch (dto) {
+        case "COMPLETED":
             return "Completada";
-        case "P":
+        case "SCHEDULED":
             return "Programada";
-        case "C":
+        case "CANCELLED":
             return "Cancelada";
     }
 }
-export function typeModelToAppointmentStatusTypeDao(appointmentStatusModel: AppointmentStatusTypeModel): AppointmentStatusTypeDAO {
+export function typeModelToAppointmentStatusTypeDto(appointmentStatusModel: AppointmentStatusTypeModel): AppointmentStatusTypeDTO {
     switch (appointmentStatusModel) {
         case "Completada":
-            return "R";
+            return "COMPLETED";
         case "Programada":
-            return "P";
+            return "SCHEDULED";
         case "Cancelada":
-            return "C";
+            return "CANCELLED";
     }
 }
 
-export function typeModelToCaseBeneficiaryTypeDao(type: CaseBeneficiaryTypeModel): CaseBeneficiaryTypeDAO {
+export function typeDtoToCaseBeneficiaryTypeModel(type: CaseBeneficiaryTypeDTO): CaseBeneficiaryTypeModel {
     switch (type) {
-        case "Directo":
-            return "D";
-        case "Indirecto":
-            return "I";
-    }
-}
-export function typeDaoToCaseBeneficiaryTypeModel(type: CaseBeneficiaryTypeDAO): CaseBeneficiaryTypeModel {
-    switch (type) {
-        case "D":
+        case "DIRECT":
             return "Directo";
-        case "I":
+        case "INDIRECT":
             return "Indirecto";
     }
 }
-
-export function typeModelToBeneficiaryTypeDao(type: BeneficiaryTypeModel): BeneficiaryTypeDAO {
+export function typeModelToCaseBeneficiaryTypeDto(type: CaseBeneficiaryTypeModel): CaseBeneficiaryTypeDTO {
     switch (type) {
-        case "Beneficiario":
-            return "B";
-        case "Solicitante":
-            return "S";
+        case "Directo":
+            return "DIRECT";
+        case "Indirecto":
+            return "INDIRECT";
     }
 }
-export function typeDaoToBeneficiaryTypeModel(type: BeneficiaryTypeDAO): BeneficiaryTypeModel {
+
+export function typeDtoToBeneficiaryTypeModel(type: BeneficiaryTypeDTO): BeneficiaryTypeModel {
     switch (type) {
-        case "B":
+        case "BENEFICIARY":
             return "Beneficiario";
-        case "S":
+        case "APPLICANT":
             return "Solicitante";
     }
 }
 
-export function typeDtoToUserTypeModel(dao: UserTypeDTO): UserTypeModel {
-    switch (dao) {
+export function typeModelToBeneficiaryTypeDto(type: BeneficiaryTypeModel): BeneficiaryTypeDTO {
+    switch (type) {
+        case "Beneficiario":
+            return "BENEFICIARY";
+        case "Solicitante":
+            return "APPLICANT";
+    }
+}
+
+export function typeDtoToUserTypeModel(dto: UserTypeDTO): UserTypeModel {
+    switch (dto) {
         case "STUDENT":
             return "Estudiante";
         case "COORDINATOR":
@@ -186,44 +187,44 @@ export function typeModelToUserTypeDao(model: UserTypeModel): UserTypeDAO {
     }
 }
 
-export function typeDaoToTeacherTypeModel(dao: TeacherTypeDAO): TeacherTypeModel {
-    switch (dao) {
-        case "R":
+export function typeDtoToTeacherTypeModel(dto: TeacherTypeDTO): TeacherTypeModel {
+    switch (dto) {
+        case "REGULAR":
             return "REGULAR";
-        case "V":
+        case "VOLUNTEER":
             return "VOLUNTEER";
     }
 }
-export function typeModelToTeacherTypeDao(model: TeacherTypeModel): TeacherTypeDAO {
+export function typeModelToTeacherTypeDto(model: TeacherTypeModel): TeacherTypeDTO {
     switch (model) {
         case "REGULAR":
-            return "R";
+            return "REGULAR";
         case "VOLUNTEER":
-            return "V";
+            return "VOLUNTEER";
     }
 }
 
-export function typeDaoToStudentTypeModel(dao: StudentTypeDAO): StudentTypeModel {
-    switch (dao) {
-        case "R":
+export function typeDtoToStudentTypeModel(dto: StudentTypeDTO): StudentTypeModel {
+    switch (dto) {
+        case "REGULAR":
             return "regular";
-        case "V":
+        case "VOLUNTEER":
             return "volunteer";
-        case "E":
+        case "GRADUATE":
             return "graduate";
-        case "S":
+        case "SERVICE":
             return "service";
     }
 }
-export function typeModelToStudentTypeDao(model: StudentTypeModel): StudentTypeDAO {
+export function typeModelToStudentTypeDto(model: StudentTypeModel): StudentTypeDTO {
     switch (model) {
         case "regular":
-            return "R";
+            return "REGULAR";
         case "volunteer":
-            return "V";
+            return "VOLUNTEER";
         case "graduate":
-            return "E";
+            return "GRADUATE";
         case "service":
-            return "S";
+            return "SERVICE";
     }
 }

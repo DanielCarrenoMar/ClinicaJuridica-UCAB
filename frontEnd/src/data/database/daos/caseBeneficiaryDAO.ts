@@ -1,11 +1,11 @@
-import type { CaseBeneficiaryTypeDAO, IdNationalityTypeDAO } from "../typesDAO.ts";
+import type { CaseBeneficiaryTypeDTO, IdNationalityTypeDTO } from "../typesDAO.ts";
 
 export interface CaseBeneficiaryDAO {
   identityCard: string;
   idCase: number;
   fullName: string;
-  idNationality?: IdNationalityTypeDAO;
+  idNationality?: IdNationalityTypeDTO;
   relationship: string;
-  caseType: CaseBeneficiaryTypeDAO;
+  caseType: CaseBeneficiaryTypeDTO;
   description: string;
 }

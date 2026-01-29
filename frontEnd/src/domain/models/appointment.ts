@@ -1,6 +1,6 @@
 import type { AppointmentInfoDAO } from "#database/daos/appointmentInfoDAO.ts";
 import type { AppointmentStatusTypeModel } from "#domain/typesModel.ts";
-import { typeDaoToAppointmentStatusTypeModel } from "#domain/typesModel.ts";
+import { typeDtoToAppointmentStatusTypeModel } from "#domain/typesModel.ts";
 export interface AppointmentModel {
     idCase: number;
     appointmentNumber: number;
@@ -20,7 +20,7 @@ export function daoToAppointmentModel(dao: AppointmentInfoDAO): AppointmentModel
         registryDate: new Date(registryDate),
         plannedDate: new Date(plannedDate),
         executionDate: executionDate ? new Date(executionDate) : undefined,
-        status: typeDaoToAppointmentStatusTypeModel(status),
+        status: typeDtoToAppointmentStatusTypeModel(status),
         ...rest
     }
 }

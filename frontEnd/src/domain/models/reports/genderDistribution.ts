@@ -1,5 +1,5 @@
 import type { BeneficiaryTypeModel, GenderTypeModel } from "#domain/typesModel.ts";
-import { typeDaoToGenderTypeModel } from "#domain/typesModel.ts";
+import { typeDtoToGenderTypeModel } from "#domain/typesModel.ts";
 import type { GenderDistribution } from "#database/daos/reports/genderDistributionDAO.ts";
 
 export interface GenderDistributionModel {
@@ -11,7 +11,7 @@ export interface GenderDistributionModel {
 export function genderDistributionDAOToModel(dao: GenderDistribution): GenderDistributionModel {
   return {
     type: dao.type == "Applicants" ? "Solicitante" : "Beneficiario",
-    gender: typeDaoToGenderTypeModel(dao.gender),
+    gender: typeDtoToGenderTypeModel(dao.gender),
     count: dao.count,
   };
 }

@@ -1,7 +1,7 @@
-import type{ GenderTypeDAO } from "#database/typesDAO.ts";
+import type{ GenderTypeDTO } from "@app/shared/typesDTO";
 
 export interface GenderDistribution {
   type: 'Applicants' | 'Beneficiaries';
-  gender: GenderTypeDAO;
+  gender: GenderTypeDTO;
   count: number;
 }

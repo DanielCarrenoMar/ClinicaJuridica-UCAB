@@ -1,11 +1,11 @@
 import type { BeneficiaryDAO } from "./beneficiaryDAO.ts";
-import type { MaritalStatusTypeDAO } from "../typesDAO.ts";
+import type { MaritalStatusTypeDTO } from "@app/shared/typesDTO";
 
 export interface ApplicantDAO extends Omit<BeneficiaryDAO, 'hasId' | 'type'> {
 	email?: string;
 	cellPhone?: string;
 	homePhone?: string;
-	maritalStatus?: MaritalStatusTypeDAO;
+	maritalStatus?: MaritalStatusTypeDTO;
 	isConcubine?: boolean;
 	isHeadOfHousehold?: boolean;
 	headEducationLevelId?: number;

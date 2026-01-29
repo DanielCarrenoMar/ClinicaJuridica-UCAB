@@ -7,7 +7,7 @@ import type { StudentModel } from '../models/student';
 import type { CaseStatusDAO } from '#database/daos/caseStatusDAO.ts';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
 import type { SupportDocumentModel } from '#domain/models/supportDocument.ts'
-import { typeModelToCaseStatusTypeDao } from '#domain/typesModel.ts';
+import { typeModelToCaseStatusTypeDto } from '#domain/typesModel.ts';
 import type { CaseActionModel } from '#domain/models/caseAction.ts';
 import type { CaseBeneficiaryDAO } from '#database/daos/caseBeneficiaryDAO.ts';
 import type { CaseBeneficiaryModel } from '#domain/models/caseBeneficiary.ts';
@@ -107,7 +107,7 @@ export function useUpdateCaseWithCaseModel(userId: string) {
     const updateCase = async (id: number, data: CaseModel) => {
         setLoading(true);
         const caseStatusDao: CaseStatusDAO = {
-            status: typeModelToCaseStatusTypeDao(data.caseStatus),
+            status: typeModelToCaseStatusTypeDto(data.caseStatus),
             userId: userId
         }
         const caseDao: CaseDAO = modelToCaseDao(data, userId);

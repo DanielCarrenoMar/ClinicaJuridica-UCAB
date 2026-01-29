@@ -8,7 +8,7 @@ import Dialog from "#components/dialogs/Dialog.tsx";
 import { locationData } from "#domain/seedData.ts";
 import type { BeneficiaryDAO } from "#database/daos/beneficiaryDAO.ts";
 import type { GenderTypeModel } from "#domain/typesModel.ts";
-import { typeModelToGenderTypeDao } from "#domain/typesModel.ts";
+import { typeModelToGenderTypeDto } from "#domain/typesModel.ts";
 import { useGetBeneficiaryById } from "#domain/useCaseHooks/useBeneficiary.ts";
 
 interface NewBeneficiaryDialogProps {
@@ -93,7 +93,7 @@ export default function CreateBeneficiaryDialog({
     onCreate({
       identityCard: identityCard.trim(),
       hasId: identityCard.trim().length > 0,
-      gender: typeModelToGenderTypeDao(gender),
+      gender: typeModelToGenderTypeDto(gender),
       type: "B",
       fullName: fullName.trim(),
       birthDate: birthDate,

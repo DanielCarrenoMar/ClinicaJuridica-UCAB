@@ -1,10 +1,10 @@
 import type { UserModel } from "./user.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import {
-    typeDaoToGenderTypeModel,
-    typeDaoToStudentTypeModel,
-    typeModelToGenderTypeDao,
-    typeModelToStudentTypeDao,
+    typeDtoToGenderTypeModel,
+    typeDtoToStudentTypeModel,
+    typeModelToGenderTypeDto,
+    typeModelToStudentTypeDto,
     type StudentTypeModel
 } from "#domain/typesModel.ts";
 
@@ -19,8 +19,8 @@ export interface StudentModel extends Omit<UserModel, 'type'> {
 export function daoToStudentModel(dao: StudentDAO): StudentModel {
     const { type, gender, ...rest } = dao;
     return {
-        type: typeDaoToStudentTypeModel(type),
-        gender: gender ? typeDaoToGenderTypeModel(gender) : undefined,
+        type: typeDtoToStudentTypeModel(type),
+        gender: gender ? typeDtoToGenderTypeModel(gender) : undefined,
         ...rest
     }
 }
@@ -28,7 +28,7 @@ export function daoToStudentModel(dao: StudentDAO): StudentModel {
 export function modelToStudentDao(model: StudentModel): StudentDAO {
     return {
         ...model,
-        type: typeModelToStudentTypeDao(model.type),
-        gender: model.gender ? typeModelToGenderTypeDao(model.gender) : undefined
+        type: typeModelToStudentTypeDto(model.type),
+        gender: model.gender ? typeModelToGenderTypeDto(model.gender) : undefined
     }
 }
