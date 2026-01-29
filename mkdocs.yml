@@ -1,7 +1,7 @@
 site_name: Documentación de Clinica Juridad UCAB
 
 extra_css:
-  - stylesheets/extra.css
+  - extra.css
 
 theme:
   name: material
@@ -47,6 +47,6 @@ markdown_extensions:
       custom_checkbox: true
 
 nav:
-  - 'General': 'pages/index.md'
+  - General: 'pages/index.md'
   - Módulos de Negocio:
     - Autenticación: 'pages/modules/auth.md'
