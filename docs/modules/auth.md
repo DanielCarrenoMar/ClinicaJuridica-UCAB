@@ -7,7 +7,7 @@ El sistema de autenticación utiliza **JSON Web Tokens (JWT)** para gestionar se
 
 - El usuario envía sus credenciales (cédula/email y contraseña) al endpoint de autenticación (por ejemplo, `/api/v1/auth/login`).
 - El backend valida las credenciales. Si son correctas, genera un JWT que contiene información relevante del usuario (por ejemplo, `identityCard` y `role`).
-- El JWT se firma usando una clave secreta (`JWT_SECRET`) y se establece un **tiempo de expiración** (por ejemplo, 1 hora).
+- El JWT se firma usando una clave secreta (`JWT_SECRET`) y se establece un **tiempo de expiración**.
 - El token se envía al cliente como una **cookie HTTP Only** llamada `access_token`.
 
 ## 2. Middleware para extraer el usuario
@@ -19,7 +19,7 @@ El sistema de autenticación utiliza **JSON Web Tokens (JWT)** para gestionar se
 
 ## 3. Tiempo límite de la sesión
 
-- El JWT tiene un tiempo de expiración definido al momento de su creación (por ejemplo, 1 hora).
+- El JWT tiene un tiempo de expiración definido al momento de su creación.
 - Cuando el token expira, el middleware lo detecta como inválido y el usuario debe volver a autenticarse.
 - Esto protege contra sesiones indefinidas y mejora la seguridad.
 
