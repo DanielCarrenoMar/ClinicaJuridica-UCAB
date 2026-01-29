@@ -52,7 +52,7 @@ class authService {
       return {
         success: true,
         message: 'Login exitoso',
-        token: jwt.sign({ identityCard: fondUser.identityCard, role: fondUser.type }, JWT_SECRET, { expiresIn: '1h' }),
+        token: jwt.sign({ identityCard: fondUser.identityCard, role: fondUser.type }, JWT_SECRET, { expiresIn: '7d' }),
         data: response
       };
 
