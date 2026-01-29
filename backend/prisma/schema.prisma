@@ -15,64 +15,64 @@ enum Gender {
 }
 
 enum UserType {
-  STUDENT     @map("E")
-  TEACHER     @map("P")
-  COORDINATOR @map("C")
+  STUDENT
+  TEACHER
+  COORDINATOR
 }
 
 enum TeacherType {
-  REGULAR   @map("R")
-  VOLUNTEER @map("V") // Visiting -> Voluntario
+  REGULAR
+  VOLUNTEER // Visiting -> Voluntario
 }
 
 enum StudentType {
-  REGULAR   @map("R")
-  VOLUNTEER @map("V") // Visiting -> Voluntario
-  GRADUATE  @map("E") // External -> Egresado
-  SERVICE   @map("S")
+  REGULAR
+  VOLUNTEER // Visiting -> Voluntario
+  GRADUATE // External -> Egresado
+  SERVICE
 }
 
 enum idNationality {
-  VENEZUELAN @map("V")
-  FOREIGNER  @map("E")
-  LEGAL      @map("J")
+  VENEZUELAN
+  FOREIGNER
+  LEGAL
 }
 
 enum BeneficiaryType {
-  BENEFICIARY @map("B")
-  APPLICANT   @map("S") // Spouse -> Solicitante
+  BENEFICIARY
+  APPLICANT // Spouse -> Solicitante
 }
 
 enum MaritalStatus {
-  SINGLE   @map("S")
-  MARRIED  @map("C")
-  DIVORCED @map("D")
-  WIDOWED  @map("V")
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
 }
 
 enum ProcessType {
-  IN_PROGRESS @map("T") // Tramite
-  ADVICE      @map("A") // Asesoria
-  MEDIATION   @map("CM") // Conciliacion y mediacion
-  DRAFTING    @map("R") // Redaccion
+  IN_PROGRESS // Tramite
+  ADVICE // Asesoria
+  MEDIATION // Conciliacion y mediacion
+  DRAFTING // Redaccion
 }
 
 enum CaseBeneficiaryType {
-  DIRECT   @map("D")
-  INDIRECT @map("I")
+  DIRECT
+  INDIRECT
 }
 
 enum AppointmentStatus {
-  CANCELLED @map("C")
-  SCHEDULED @map("P") // Planificada
-  COMPLETED @map("R") // Realizada
+  CANCELLED
+  SCHEDULED // Planificada
+  COMPLETED // Realizada
 }
 
 enum CaseStatusEnum {
-  OPEN        @map("A") // Abierto
-  IN_PROGRESS @map("T") // En Tramite
-  PAUSED      @map("P") // En Pausa
-  CLOSED      @map("C") // Cerrado
+  OPEN // Abierto
+  IN_PROGRESS // En Tramite
+  PAUSED // En Pausa
+  CLOSED // Cerrado
 }
 
 // Tables
