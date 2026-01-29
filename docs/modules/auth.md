@@ -5,7 +5,7 @@ El sistema de autenticación utiliza **JSON Web Tokens (JWT)** para gestionar se
 
 ## 1. Inicio de sesión y generación del JWT
 
-- El usuario envía sus credenciales (cédula/email y contraseña) al endpoint de autenticación (por ejemplo, `/api/v1/auth/login`).
+- El usuario envía sus credenciales (cédula/email y contraseña) al endpoint de autenticación `/api/v1/auth/login`.
 - El backend valida las credenciales. Si son correctas, genera un JWT que contiene información relevante del usuario (por ejemplo, `identityCard` y `role`).
 - El JWT se firma usando una clave secreta (`JWT_SECRET`) y se establece un **tiempo de expiración**.
 - El token se envía al cliente como una **cookie HTTP Only** llamada `access_token`.
