@@ -21,7 +21,6 @@ app.use((req, res, next) => {
   try {
     const data = jwt.verify(token, JWT_SECRET) as {identityCard: string, role: string};
     req.user = data;
-    console.log(data);
   } catch {
     console.log('No token o token inválido');
   }

@@ -13,23 +13,24 @@ import authRoutes from './auth.routes.js';
 import semesterRoutes from './semester.routes.js';
 import nucleusRoutes from './nucleus.routes.js';
 import reportRoutes from './report.routes.js';
+import { isCoordinator, isStudent, isTeacher } from '../middlewares/roles.middleware.js';
 
 const router = Router();
 
-router.use('/users', userRoutes);
-router.use('/applicants', applicantRoutes);
-router.use('/cases', caseRoutes);
-router.use('/beneficiary', beneficiaryRoutes);
-router.use('/case-actions', caseActionRoutes);
-router.use('/students', studentRoutes);
-router.use('/teachers', teacherRoutes);
+router.use('/users', isTeacher, userRoutes);
+router.use('/applicants', isStudent, applicantRoutes);
+router.use('/cases', isStudent, caseRoutes);
+router.use('/beneficiary', isStudent, beneficiaryRoutes);
+router.use('/case-actions', isStudent, caseActionRoutes);
+router.use('/students', isStudent, studentRoutes);
+router.use('/teachers', isTeacher, teacherRoutes);
 router.use('/salud', healthRoutes);
-router.use('/appointments', appointmentRoutes);
-router.use('/support-documents', supportDocumentRoutes);
+router.use('/appointments', isStudent, appointmentRoutes);
+router.use('/support-documents', isStudent, supportDocumentRoutes);
 router.use('/auth', authRoutes);
-router.use('/semesters', semesterRoutes);
-router.use('/nuclei', nucleusRoutes);
-router.use('/report', reportRoutes);
+router.use('/semesters', isCoordinator, semesterRoutes);
+router.use('/nuclei', isCoordinator, nucleusRoutes);
+router.use('/report', isStudent, reportRoutes);
 
 // Ruta raíz de la API v1
 router.get('/', (req, res) => {
