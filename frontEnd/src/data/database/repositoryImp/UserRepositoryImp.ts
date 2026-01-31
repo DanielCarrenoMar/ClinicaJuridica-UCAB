@@ -13,64 +13,50 @@ export function getUserRepository(): UserRepository {
             if (params?.page !== undefined) query.set('page', String(params.page));
             if (params?.limit !== undefined) query.set('limit', String(params.limit));
             const url = query.toString() ? `${USER_URL}?${query.toString()}` : USER_URL;
-            const responseUsers = await fetch(url);
-            if (!responseUsers.ok) return [];
+            const responseUsers = await fetch(url, { method: 'GET', credentials: 'include' });
             const usersData = await responseUsers.json();
+            if (!responseUsers.ok) throw new Error(usersData.message || 'Error fetching users');
             const usersDAO: UserDAO[] = usersData.data;
             return usersDAO.map(daoToUserModel);
         },
         findUserById: async (id) => {
-            const responseUser = await fetch(`${USER_URL}/${id}`);
-            if (!responseUser.ok) return null;
+            const responseUser = await fetch(`${USER_URL}/${id}`, { method: 'GET', credentials: 'include' });
             const userData = await responseUser.json();
+            if (!responseUser.ok) throw new Error(userData.message || 'Error fetching user');
             const userDAO: UserDAO = userData.data;
             return daoToUserModel(userDAO);
         },
         authenticate: async (email, password) => {
             const response = await fetch(`${AUTH_URL}/login`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-                credentials: 'include'
+                body: JSON.stringify({ email, password })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error en autenticación');
-            }
-
             const result = await response.json();
-
-            if (!result.success) {
-                throw new Error(result.message || 'Credenciales inválidas');
-            }
+            if (!response.ok) throw new Error(result.message || 'Error en autenticación');
+            if (!result.success) throw new Error(result.message || 'Credenciales inválidas');
 
             const loginDTO: LoginResDTO = result.data;
             return daoToUserModel(loginDTO);
         },
         findActualUser: async () => {
-            const response = await fetch(`${AUTH_URL}/me`, {
-                method: 'POST',
-                credentials: 'include'
-            });
+            const response = await fetch(`${AUTH_URL}/me`, { method: 'POST', credentials: 'include' });
             const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || 'Error en autenticación');
-            }
+            if (!response.ok) throw new Error(result.message || 'Error en autenticación');
             const userDAO: UserDAO = result.data;
             return daoToUserModel(userDAO);
         },
         updateUser: async (id, data) => {
             const response = await fetch(`${USER_URL}/${id}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al actualizar el usuario');
-            }
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error al actualizar el usuario');
             const updatedUserDAO: UserDAO = result.data;
             return daoToUserModel(updatedUserDAO);
         },
@@ -78,14 +64,13 @@ export function getUserRepository(): UserRepository {
         createUser: async (data: UserDAO) => {
             const response = await fetch(USER_URL, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al crear usuario');
-            }
-            return await response.json();
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error al crear usuario');
+            return result;
         }
     } as UserRepository;
 }

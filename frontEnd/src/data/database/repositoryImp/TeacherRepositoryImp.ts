@@ -12,16 +12,16 @@ export function getTeacherRepository(): TeacherRepository {
             if (params?.page !== undefined) query.set('page', String(params.page));
             if (params?.limit !== undefined) query.set('limit', String(params.limit));
             const url = query.toString() ? `${TEACHER_URL}?${query.toString()}` : TEACHER_URL;
-            const response = await fetch(url);
-            if (!response.ok) return [];
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const teachersData = await response.json();
+            if (!response.ok) throw new Error(teachersData.message || 'Error fetching teachers');
             const teacherDAOs: TeacherDAO[] = teachersData.data;
             return teacherDAOs.map(daoToTeacherModel);
         },
         findTeacherById: async (id) => {
-            const responseTeacher = await fetch(`${TEACHER_URL}/${id}`);
-            if (!responseTeacher.ok) return null;
+            const responseTeacher = await fetch(`${TEACHER_URL}/${id}`, { method: 'GET', credentials: 'include' });
             const teacherData = await responseTeacher.json();
+            if (!responseTeacher.ok) throw new Error(teacherData.message || 'Error fetching teacher');
             const teacherDAO: TeacherDAO = teacherData.data;
             return daoToTeacherModel(teacherDAO);
         },
@@ -33,9 +33,9 @@ export function getTeacherRepository(): TeacherRepository {
             const url = query.toString()
                 ? `${TEACHER_URL}/${id}/cases?${query.toString()}`
                 : `${TEACHER_URL}/${id}/cases`;
-            const response = await fetch(url);
-            if (!response.ok) return [];
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching cases for teacher');
             const daoList: CaseInfoDAO[] = result.data;
             return daoList.map(daoToCaseModel);
         },
@@ -43,14 +43,12 @@ export function getTeacherRepository(): TeacherRepository {
         updateTeacher: async (id, data) => {
             const response = await fetch(`${TEACHER_URL}/${id}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al actualizar el profesor');
-            }
             const result = await response.json();
+            if (!response.ok) throw new Error(result?.message || 'Error al actualizar el profesor');
             const updatedTeacherDAO: TeacherDAO = result.data;
             return daoToTeacherModel(updatedTeacherDAO);
         },
@@ -58,14 +56,13 @@ export function getTeacherRepository(): TeacherRepository {
         createTeacher: async (data: Omit<TeacherDAO, 'term'>) => {
             const response = await fetch(TEACHER_URL, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al crear profesor');
-            }
-            return await response.json();
+            const result = await response.json();
+            if (!response.ok) throw new Error(result?.message || 'Error al crear profesor');
+            return result;
         }
 
     } as TeacherRepository;

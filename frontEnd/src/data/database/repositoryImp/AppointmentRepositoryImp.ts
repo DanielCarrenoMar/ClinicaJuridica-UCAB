@@ -9,46 +9,53 @@ export function getAppointmentRepository(): AppointmentRepository {
             if (params?.page !== undefined) query.set('page', String(params.page));
             if (params?.limit !== undefined) query.set('limit', String(params.limit));
             const url = query.toString() ? `${APPOINTMENT_URL}?${query.toString()}` : APPOINTMENT_URL;
-            const responseAppointment = await fetch(url);
+            const responseAppointment = await fetch(url, { method: 'GET', credentials: 'include' });
             const appointmentData = await responseAppointment.json();
+            if (!responseAppointment.ok) throw new Error(appointmentData.message || 'Error fetching appointments');
             const appointmentDAOs: AppointmentInfoDAO[] = appointmentData.data;
             return appointmentDAOs.map(daoToAppointmentModel);
         },
         findAppointmentById: async (id: number) => {
-            const responseAppointment = await fetch(`${APPOINTMENT_URL}/${id}`);
-            if (!responseAppointment.ok) return null;
+            const responseAppointment = await fetch(`${APPOINTMENT_URL}/${id}`, { method: 'GET', credentials: 'include' });
             const appointmentData = await responseAppointment.json();
+            if (!responseAppointment.ok) throw new Error(appointmentData.message || 'Error fetching appointment');
             const appointmentDAO: AppointmentInfoDAO = appointmentData.data;
             return daoToAppointmentModel(appointmentDAO);
         },
         createAppointment: async (data) => {
             const response = await fetch(APPOINTMENT_URL, {
                 method: "POST",
+                credentials: 'include',
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(data),
             });
-            if (!response.ok) throw new Error("Error creating appointment");
             const datas = await response.json();
+            if (!response.ok) throw new Error(datas.message || "Error creating appointment");
             const appointmentDAO: AppointmentInfoDAO = datas.data;
             return daoToAppointmentModel(appointmentDAO);
         },
         updateAppointment: async (id, data) => {
             const response = await fetch(`${APPOINTMENT_URL}/${id}`, {
                 method: "PUT",
+                credentials: 'include',
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(data),
             });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error updating appointment');
             return result.data;
         },
         deleteAppointment: async (idCase, appointmentNumber) => {
-            await fetch(`${APPOINTMENT_URL}/${idCase}/${appointmentNumber}`, {
-                method: 'DELETE'
+            const response = await fetch(`${APPOINTMENT_URL}/${idCase}/${appointmentNumber}`, {
+                method: 'DELETE',
+                credentials: 'include'
             });
+            const result = await response.json().catch(() => null);
+            if (!response.ok) throw new Error(result?.message || 'Error deleting appointment');
         },
     }
 }

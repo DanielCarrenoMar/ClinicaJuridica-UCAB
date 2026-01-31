@@ -20,11 +20,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/cases/by-subject?${query.toString()}` : `${REPORT_URL}/cases/by-subject`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching cases by subject');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching cases by subject');
             return (result.data || []).map(casesBySubjectDAOToModel);
         },
 
@@ -33,11 +31,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/cases/by-subject-scope?${query.toString()}` : `${REPORT_URL}/cases/by-subject-scope`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching cases by subject scope');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching cases by subject scope');
             return (result.data || []).map(casesBySubjectScopeDAOToModel);
         },
 
@@ -46,11 +42,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/gender-distribution?${query.toString()}` : `${REPORT_URL}/gender-distribution`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching gender distribution');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching gender distribution');
             return (result.data || []).map(genderDistributionDAOToModel);
         },
 
@@ -59,11 +53,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/state-distribution?${query.toString()}` : `${REPORT_URL}/state-distribution`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching state distribution');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching state distribution');
             return (result.data || []).map(stateDistributionDAOToModel);
         },
 
@@ -72,11 +64,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/parish-distribution?${query.toString()}` : `${REPORT_URL}/parish-distribution`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching parish distribution');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching parish distribution');
             return (result.data || []).map(parishDistributionDAOToModel);
         },
 
@@ -85,11 +75,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/cases/by-type?${query.toString()}` : `${REPORT_URL}/cases/by-type`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching cases by type');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching cases by type');
             return (result.data || []).map(casesByTypeDAOToModel);
         },
 
@@ -98,11 +86,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/beneficiaries/by-parish?${query.toString()}` : `${REPORT_URL}/beneficiaries/by-parish`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching beneficiaries by parish');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching beneficiaries by parish');
             return (result.data || []).map(beneficiariesByParishDAOToModel);
         },
 
@@ -111,11 +97,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/students/involvement?${query.toString()}` : `${REPORT_URL}/students/involvement`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching student involvement');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching student involvement');
             return (result.data || []).map(studentInvolvementDAOToModel);
         },
 
@@ -124,11 +108,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/cases/by-service-type?${query.toString()}` : `${REPORT_URL}/cases/by-service-type`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching cases by service type');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching cases by service type');
             return (result.data || []).map(casesByServiceTypeDAOToModel);
         },
 
@@ -137,11 +119,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/professors/involvement?${query.toString()}` : `${REPORT_URL}/professors/involvement`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching professor involvement');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching professor involvement');
             return (result.data || []).map(professorInvolvementDAOToModel);
         },
 
@@ -150,11 +130,9 @@ export function getReportRepository(): ReportRepository {
             if (startDate) query.set('startDate', startDate.toISOString());
             if (endDate) query.set('endDate', endDate.toISOString());
             const url = query.toString() ? `${REPORT_URL}/beneficiaries/type-distribution?${query.toString()}` : `${REPORT_URL}/beneficiaries/type-distribution`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Error fetching beneficiary type distribution');
-            }
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
             const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error fetching beneficiary type distribution');
             return (result.data || []).map(beneficiaryTypeDistributionDAOToModel);
         }
     };
