@@ -359,9 +359,9 @@ model Case {
   createdAt      DateTime    @default(now())
   processType    ProcessType
 
-  applicantId String @db.VarChar(20)
-  idNucleus   String @db.VarChar(63)
-  term        String @db.VarChar(10)
+  applicantId String  @db.VarChar(20)
+  idNucleus   String  @db.VarChar(63)
+  term        String  @db.VarChar(10)
   idLegalArea Int
   teacherId   String? @db.VarChar(20)
   teacherTerm String? @db.VarChar(10)
@@ -371,7 +371,7 @@ model Case {
   nucleus   Nucleus   @relation(fields: [idNucleus], references: [idNucleus], onDelete: Restrict, onUpdate: Cascade)
   semester  Semester  @relation(fields: [term], references: [term], onDelete: Restrict, onUpdate: Cascade)
   legalArea LegalArea @relation(fields: [idLegalArea], references: [idLegalArea], onDelete: Restrict, onUpdate: Cascade)
-  teacher   Teacher?   @relation(fields: [teacherId, teacherTerm], references: [identityCard, term], onDelete: Restrict, onUpdate: Cascade)
+  teacher   Teacher?  @relation(fields: [teacherId, teacherTerm], references: [identityCard, term], onDelete: Restrict, onUpdate: Cascade)
   court     Court?    @relation(fields: [idCourt], references: [idCourt], onDelete: Restrict, onUpdate: Cascade)
 
   beneficiaries    CaseBeneficiary[]
@@ -425,15 +425,15 @@ model CaseAction {
 model Appointment {
   idCase            Int
   appointmentNumber Int
-  plannedDate       DateTime
+  plannedDate       DateTime?
   executionDate     DateTime?
   status            AppointmentStatus
   guidance          String?
-  userId            String            @db.VarChar(20)
+  userId            String?           @db.VarChar(20)
   registryDate      DateTime
 
-  case Case @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
-  user User @relation(fields: [userId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
+  case Case  @relation(fields: [idCase], references: [idCase], onDelete: Cascade, onUpdate: Cascade)
+  user User? @relation(fields: [userId], references: [identityCard], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([idCase, appointmentNumber])
 }
