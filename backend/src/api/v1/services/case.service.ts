@@ -490,10 +490,10 @@ class CaseService {
           )
         )
         SELECT 
-          COUNT(*) FILTER (WHERE "status" = 'T') AS "inProgressAmount",
-          COUNT(*) FILTER (WHERE "status" = 'A') AS "openAmount",
-          COUNT(*) FILTER (WHERE "status" = 'P') AS "pausedAmount",
-          COUNT(*) FILTER (WHERE "status" = 'C') AS "closedAmount"
+          COUNT(*) FILTER (WHERE "status" = 'IN_PROGRESS') AS "inProgressAmount",
+          COUNT(*) FILTER (WHERE "status" = 'OPEN') AS "openAmount",
+          COUNT(*) FILTER (WHERE "status" = 'PAUSED') AS "pausedAmount",
+          COUNT(*) FILTER (WHERE "status" = 'CLOSED') AS "closedAmount"
         FROM LatestStatuses
       `;
 
