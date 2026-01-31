@@ -41,6 +41,16 @@ export function getUserRepository(): UserRepository {
             const loginDTO: LoginResDTO = result.data;
             return daoToUserModel(loginDTO);
         },
+        logout: async () => {
+            const response = await fetch(`${AUTH_URL}/logout`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+            const responseData = await response.json();
+            if (!response.ok) {
+                throw new Error(responseData.message || 'Error during logout');
+            }
+        },
         findActualUser: async () => {
             const response = await fetch(`${AUTH_URL}/me`, { method: 'POST', credentials: 'include' });
             const result = await response.json();

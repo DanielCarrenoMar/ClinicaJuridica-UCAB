@@ -1,6 +1,6 @@
 import type { UserModel, UserTypeModel } from '../domain/models/user.ts';
-import { createContext, useContext, useState, type ReactNode } from 'react';
-import { useGetActualUser, useLoginUser } from '../domain/useCaseHooks/useUser.ts';
+import { createContext, useContext, type ReactNode } from 'react';
+import { useGetActualUser, useLoginUser, useLogoutUser } from '../domain/useCaseHooks/useUser.ts';
 
 interface AuthContextType {
     user: UserModel | null;
@@ -27,21 +27,22 @@ export function roleToPermissionLevel(role: UserTypeModel): number {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const { login: loginUser, loading: loginLoading, error, clearError } = useLoginUser();
-    const { user, loading: actualUserLoading, error: actualUserError, refresh: refreshActualUser } = useGetActualUser();
+    const {logout: logoutUser} = useLogoutUser();
+    const { user, loading: actualUserLoading, refresh: refreshActualUser } = useGetActualUser();
 
     const login = async (mail: string, password: string) => {
         const loggedInUser = await loginUser(mail, password);
-        console.log("Logged in user:", loggedInUser);
         if (loggedInUser) {
             refreshActualUser();
         }
     };
 
     const logout = () => {
-        // Clear user state on logout
+        logoutUser().then(() => {
+            refreshActualUser();
+        });
     };
 
-    // Default to a high number (low permission) if no user
     const permissionLevel = user ? roleToPermissionLevel(user.type) : 99;
     const loading = loginLoading || actualUserLoading;
 

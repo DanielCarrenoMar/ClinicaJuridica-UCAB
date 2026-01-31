@@ -129,6 +129,31 @@ export function useLoginUser() {
 	};
 }
 
+export function useLogoutUser() {
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	const logout = async (): Promise<void> => {
+		setLoading(true);
+		setError(null);
+		try {
+			const userRepository = getUserRepository();
+			await userRepository.logout();
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Error desconocido en el logout';
+			setError(errorMessage);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	return {
+		logout,
+		loading,
+		error
+	};
+}
+
 export function useGetActualUser() {
 	const { findActualUser } = getUserRepository();
 	const [user, setUser] = useState<UserModel | null>(null);
