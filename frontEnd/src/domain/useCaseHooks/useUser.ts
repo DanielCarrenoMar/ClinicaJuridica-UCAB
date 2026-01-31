@@ -1,6 +1,7 @@
 import type { UserDAO } from "#database/daos/userDAO.ts";
 import { getUserRepository } from "#database/repositoryImp/UserRepositoryImp.ts";
 import type { UserModel } from "#domain/models/user.ts";
+import { set } from "animejs";
 import { useCallback, useEffect, useState } from "react";
 
 export function useGetAllUsers() {
@@ -168,6 +169,7 @@ export function useGetActualUser() {
 			setError(null);
 		} catch (err) {
 			setError(err as Error);
+			setUser(null);
 			throw err;
 		} finally {
 			setLoading(false);
