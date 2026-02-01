@@ -53,7 +53,8 @@ export async function getAppointmentById(req: Request, res: Response): Promise<v
 
 export async function createAppointment(req: Request, res: Response): Promise<void> {
     try {
-        const errorMsg = validateRequiredParams<AppointmentReqDTO>(req.body, ['idCase', 'plannedDate', 'status']);
+        const data: AppointmentReqDTO = req.body;
+        const errorMsg = validateRequiredParams<AppointmentReqDTO>(data, ['idCase', 'plannedDate', 'status']);
         if (errorMsg) {
             res.status(400).json({
             success: false,
@@ -62,7 +63,23 @@ export async function createAppointment(req: Request, res: Response): Promise<vo
             return;
         }
 
-        const result = await appointmentService.createAppointment(req.body);
+        if (isNaN(Date.parse(data.plannedDate))) {
+            res.status(400).json({
+                success: false,
+                message: 'La fecha planificada no es una fecha válida.'
+            });
+            return;
+        }
+
+        if (data.executionDate && isNaN(Date.parse(data.executionDate))) {
+            res.status(400).json({
+                success: false,
+                message: 'La fecha de ejecución no es una fecha válida.'
+            });
+            return;
+        }
+
+        const result = await appointmentService.createAppointment(data);
 
         if (!result.success) {
             res.status(400).json(result);
