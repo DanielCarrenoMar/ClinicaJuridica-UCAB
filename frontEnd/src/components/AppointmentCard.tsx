@@ -3,11 +3,10 @@ import { Link } from 'react-router';
 
 interface AppointmentCardProps {
     appointment: AppointmentModel;
-    applicantName: string;
     onClick: () => void;
 }
 
-export default function AppointmentCard({ appointment, applicantName, onClick }: AppointmentCardProps) {
+export default function AppointmentCard({ appointment, onClick }: AppointmentCardProps) {
     const dateLabel = appointment.status === "Completada" ? "Realizada el" :
         appointment.status === "Cancelada" ? "Cancelada el" : "Programada para el";
 
@@ -25,8 +24,8 @@ export default function AppointmentCard({ appointment, applicantName, onClick }:
         >
             <header className="flex justify-between items-center w-full">
                 <span className="flex items-center text-body-medium">
-                    Creada por&nbsp;
-                    <Link to="#" className="text-body-large hover:underline" onClick={(e) => e.stopPropagation()}>{applicantName}</Link>
+                    Responsable&nbsp;
+                    <Link to="#" className="text-body-large hover:underline" onClick={(e) => e.stopPropagation()}>{appointment.userName}</Link>
                 </span>
                 <div className="text-body-medium">
                     <strong className='text-body-large'>{dateLabel}</strong> {dateString}

@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express';
 import appointmentService from '../services/appointment.service.js';
 import { parsePagination } from '../utils/pagination.util.js';
+import { validateRequiredParams } from '../utils/checkParameters.util.js';
+import { AppointmentReqDTO } from '@app/shared/dtos/AppoimentDTO';
 
 export async function getAllAppointments(req: Request, res: Response): Promise<void> {
     try {
@@ -51,15 +53,16 @@ export async function getAppointmentById(req: Request, res: Response): Promise<v
 
 export async function createAppointment(req: Request, res: Response): Promise<void> {
     try {
-        const data = req.body;
-
-        // Validate required fields
-        if (!data.idCase || !data.plannedDate || !data.userId || !data.status) {
-            res.status(400).json({ success: false, message: 'Faltan campos requeridos (idCase, plannedDate, userId, status).' });
+        const errorMsg = validateRequiredParams<AppointmentReqDTO>(req.body, ['idCase', 'plannedDate', 'status']);
+        if (errorMsg) {
+            res.status(400).json({
+            success: false,
+            message: errorMsg
+            });
             return;
         }
 
-        const result = await appointmentService.createAppointment(data);
+        const result = await appointmentService.createAppointment(req.body);
 
         if (!result.success) {
             res.status(400).json(result);

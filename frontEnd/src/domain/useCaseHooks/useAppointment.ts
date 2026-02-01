@@ -2,6 +2,7 @@ import { getAppointmentRepository } from "#database/repositoryImp/AppointmentRep
 import { useState, useEffect, useCallback } from "react";
 import type { AppointmentModel } from "#domain/models/appointment.ts";
 import type { AppointmentDAO } from "#database/daos/appointmentDAO.ts";
+import type { AppointmentReqDTO } from "@app/shared/dtos/AppoimentDTO";
 export function useFindAllAppointments() {
     const { findAllAppointments } = getAppointmentRepository();
     const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
@@ -69,7 +70,7 @@ export function useCreateAppointment() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const createAppointmentData = useCallback(async (appointmentData: AppointmentDAO) => {
+    const createAppointmentData = useCallback(async (appointmentData: AppointmentReqDTO) => {
         setLoading(true);
         try {
             const newAppointment = await createAppointment(appointmentData);

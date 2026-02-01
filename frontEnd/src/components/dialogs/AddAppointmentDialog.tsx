@@ -2,14 +2,14 @@ import { useState } from 'react';
 import Button from '#components/Button.tsx';
 import TextInput from '#components/TextInput.tsx';
 import Dialog from '#components/dialogs/Dialog.tsx';
-import type { AppointmentDAO } from '#database/daos/appointmentDAO.ts';
-import type { AppointmentStatusTypeDAO } from '#database/typesDAO.ts';
 import DateTimePicker from '#components/DateTimePicker.tsx';
+import type { AppointmentStatusTypeDTO } from '@app/shared/typesDTO';
+import type { AppointmentReqDTO } from '@app/shared/dtos/AppoimentDTO';
 
 interface AddAppointmentDialogProps {
     open: boolean;
     onClose: () => void;
-    onAdd: (daoAppointment: Omit<AppointmentDAO, "appointmentNumber" | "idCase" | "userId" | "registryDate">) => void;
+    onAdd: (daoAppointment: Omit<AppointmentReqDTO, "appointmentNumber" | "idCase" | "userId" | "registryDate">) => void;
 }
 
 export default function AddAppointmentDialog({
@@ -23,33 +23,47 @@ export default function AddAppointmentDialog({
 
     if (!open) return null;
 
-    const handleSubmit = () => {
-        if (!plannedDate && !executionDate) return;
-
-        let status: AppointmentStatusTypeDAO = "P";
-        if (executionDate && !plannedDate) {
-            status = "R";
-        }
-
-        onAdd({
-            plannedDate: plannedDate ? plannedDate : executionDate,
-            executionDate: executionDate ? executionDate : undefined,
-            guidance: guidance || undefined,
-            status: status,
-        });
-
-        // Reset form
+    function closeSelf() {
         setPlannedDate("");
         setExecutionDate("");
         setGuidance("");
         onClose();
+    }
+
+    const handleSubmit = () => {
+        // Prevent submission if both are set or neither is set
+        if ((plannedDate.length !== 0 && executionDate.length !== 0) || 
+            (plannedDate.length === 0 && executionDate.length === 0)) {
+            return;
+        }
+
+        let status: AppointmentStatusTypeDTO = "SCHEDULED";
+        if (executionDate && !plannedDate) {
+            status = "COMPLETED";
+        }
+
+        const convertToISO = (datetimeLocal: string): string => {
+            if (!datetimeLocal) return "";
+            return new Date(datetimeLocal).toISOString();
+        };
+
+        const finalDate = plannedDate.length !== 0 ? plannedDate : executionDate;
+
+        onAdd({
+            plannedDate: convertToISO(finalDate),
+            executionDate: executionDate.length !== 0 ? convertToISO(executionDate) : undefined,
+            guidance: guidance || undefined,
+            status: status,
+        });
+
+        closeSelf()
     };
 
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
     return (
-        <Dialog open={open} title="Nueva Cita" onClose={onClose}>
+        <Dialog open={open} title="Nueva Cita" onClose={closeSelf}>
             <div className="flex flex-col gap-4">
                 <DateTimePicker
                     label="Planificada para*"
@@ -83,7 +97,7 @@ export default function AddAppointmentDialog({
                     variant="resalted"
                     className='min-w-48 w-1/2'
                     onClick={handleSubmit}
-                    disabled={!plannedDate && !executionDate}
+                    disabled={plannedDate.length !== 0 && executionDate.length !== 0}
                 >
                     Añadir
                 </Button>

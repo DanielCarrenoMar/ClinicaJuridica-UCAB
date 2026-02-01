@@ -36,6 +36,7 @@ import type { StudentInvolvementModel } from "./models/reports/studentInvolvemen
 import type { CasesByServiceTypeModel } from "./models/reports/casesByServiceType";
 import type { ProfessorInvolvementModel } from "./models/reports/professorInvolvement";
 import type { BeneficiaryTypeDistributionModel } from "./models/reports/beneficiaryTypeDistribution";
+import type { AppointmentReqDTO } from "@app/shared/dtos/AppoimentDTO";
 
 export interface BeneficiaryRepository {
     findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
@@ -83,7 +84,7 @@ export interface CaseActionRepository {
 export interface AppointmentRepository {
     findAllAppointments(params?: { page?: number; limit?: number }): Promise<AppointmentModel[]>;
     findAppointmentById(id: number): Promise<AppointmentModel | null>;
-    createAppointment(data: AppointmentDAO): Promise<AppointmentModel>;
+    createAppointment(data: AppointmentReqDTO): Promise<AppointmentModel>;
     updateAppointment(id: number, data: Partial<AppointmentDAO>): Promise<AppointmentModel>;
     deleteAppointment(idCase: number, appointmentNumber: number): Promise<void>;
 }

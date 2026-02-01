@@ -257,7 +257,6 @@ export default function CaseInfo() {
                 {activeTab === 'Citas' && (
                     <CaseAppointments
                         caseId={caseData.idCase}
-                        applicantName={caseData.applicantName}
                         user={user}
                     />
                 )}

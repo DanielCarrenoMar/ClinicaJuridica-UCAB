@@ -425,7 +425,7 @@ model CaseAction {
 model Appointment {
   idCase            Int
   appointmentNumber Int
-  plannedDate       DateTime?
+  plannedDate       DateTime
   executionDate     DateTime?
   status            AppointmentStatus
   guidance          String?

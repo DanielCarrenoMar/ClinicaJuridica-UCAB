@@ -6,22 +6,20 @@ import AppointmentDetailsDialog from '#components/dialogs/AppointmentDetailsDial
 import AddAppointmentDialog from '#components/dialogs/AddAppointmentDialog.tsx';
 import EditAppointmentDialog from '#components/dialogs/EditAppointmentDialog.tsx';
 import type { AppointmentModel } from '#domain/models/appointment.ts';
-import type { AppointmentInfoDAO } from '#database/daos/appointmentInfoDAO.ts';
-import type { AppointmentStatusTypeDAO } from '#database/typesDAO.ts';
 import type { UserModel } from '#domain/models/user.ts';
 import { useGetAppointmentByCaseId } from '#domain/useCaseHooks/useCase.ts';
 import { useCreateAppointment, useUpdateAppointment, useDeleteAppointment } from '#domain/useCaseHooks/useAppointment.ts';
 import { useNotifications } from '#/context/NotificationsContext';
 import Fuse from 'fuse.js';
 import { ArrowLeft, ArrowRight } from 'flowbite-react-icons/outline';
+import type { AppointmentReqDTO } from '@app/shared/dtos/AppoimentDTO';
 
 interface CaseAppointmentsProps {
     caseId: number;
-    applicantName: string;
     user: UserModel | null;
 }
 
-export default function CaseAppointments({ caseId, applicantName, user }: CaseAppointmentsProps) {
+export default function CaseAppointments({ caseId, user }: CaseAppointmentsProps) {
     const { notyError } = useNotifications();
     const { appointments, loadAppointments } = useGetAppointmentByCaseId(caseId);
     const { createAppointment: createNewAppointment } = useCreateAppointment();
@@ -102,7 +100,6 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                         <AppointmentCard
                             key={apt.appointmentNumber}
                             appointment={apt}
-                            applicantName={applicantName}
                             onClick={() => {
                                 setSelectedAppointment(apt);
                                 setIsAppointmentDialogOpen(true);
@@ -159,15 +156,14 @@ export default function CaseAppointments({ caseId, applicantName, user }: CaseAp
                 onAdd={async (data) => {
                     if (!user) return;
                     try {
-                        const newAppt: AppointmentInfoDAO = {
+                        const newAppt: AppointmentReqDTO = {
                             idCase: caseId,
                             appointmentNumber: 0,
                             plannedDate: data.plannedDate,
                             executionDate: data.executionDate,
-                            status: (data.status || "P") as AppointmentStatusTypeDAO,
+                            status: data.status,
                             guidance: data.guidance,
-                            userId: user.identityCard,
-                            userName: user.fullName,
+                            userId: data.status === "COMPLETED" ? user.identityCard : undefined,
                             registryDate: ""
                         };
                         await createNewAppointment(newAppt);
