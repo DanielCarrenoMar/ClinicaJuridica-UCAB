@@ -1,5 +1,6 @@
 ﻿// @ts-nocheck
 import prisma from '#src/config/database.js';
+import { AppointmentResDTO } from '@app/shared/dtos/AppoimentDTO';
 
 class CaseService {
   async getAllCases(pagination?: { page: number; limit: number; all: boolean }) {
@@ -639,60 +640,69 @@ class CaseService {
       const all = pagination?.all ?? false;
       const offset = (page - 1) * limit;
 
-      const totalRows = await prisma.$queryRaw`
-        SELECT COUNT(*)::int as total
-        FROM "Appointment"
-        WHERE "idCase" = ${id}
-      `;
-      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+      const totalRows = await prisma.appointment.count({
+        where: { idCase: id }
+      })
 
-      const appointments = all
-        ? await prisma.$queryRaw`
-          SELECT 
-            a."idCase",
-            a."appointmentNumber",
-            a."plannedDate",
-            a."executionDate",
-            a."status",
-            a."guidance",
-            a."registryDate",
-            u."fullName" as "userName",
-            u."email" as "userEmail",
-            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-          FROM "Appointment" a
-          JOIN "User" u ON a."userId" = u."identityCard"
-          JOIN "Case" c ON a."idCase" = c."idCase"
-          WHERE a."idCase" = ${id}
-          ORDER BY a."plannedDate" DESC
-        `
-        : await prisma.$queryRaw`
-          SELECT 
-            a."idCase",
-            a."appointmentNumber",
-            a."plannedDate",
-            a."executionDate",
-            a."status",
-            a."guidance",
-            a."registryDate",
-            u."fullName" as "userName",
-            u."email" as "userEmail",
-            (c."idNucleus" || '_' || c."term" || '_' || c."idCase") as "compoundKey"
-          FROM "Appointment" a
-          JOIN "User" u ON a."userId" = u."identityCard"
-          JOIN "Case" c ON a."idCase" = c."idCase"
-          WHERE a."idCase" = ${id}
-          ORDER BY a."plannedDate" DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
+      const rawAppointments = await prisma.appointment.findMany({
+        where: {
+          idCase: id,
+        },
+        orderBy: {
+          plannedDate: 'desc',
+        },
+        take: all ? undefined : limit,
+        skip: all ? undefined : offset,
 
-      const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+        select: {
+          idCase: true,
+          appointmentNumber: true,
+          plannedDate: true,
+          executionDate: true,
+          status: true,
+          guidance: true,
+          registryDate: true,
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            }
+          },
+          case: {
+            select: {
+              idNucleus: true,
+              term: true,
+              idCase: true,
+            }
+          }
+        }
+      });
+
+      const appointments: AppointmentResDTO[] = rawAppointments.map((a) => ({
+        idCase: a.idCase,
+        appointmentNumber: a.appointmentNumber,
+        plannedDate: a.plannedDate,
+        executionDate: a.executionDate,
+        status: a.status,
+        guidance: a.guidance,
+        registryDate: a.registryDate,
+
+        userName: a.user?.fullName,
+        userEmail: a.user?.email,
+
+        compoundKey: a.case
+          ? `${a.case.idNucleus}_${a.case.term}_${a.case.idCase}`
+          : null
+      }));
+
+      const totalPages = all ? 1 : Math.max(1, Math.ceil(totalRows / limit));
       return {
         success: true,
         data: appointments,
         pagination: {
           page,
-          limit: all ? total : limit,
-          total,
+          limit: all ? totalRows : limit,
+          total: totalRows,
           totalPages,
           all
         }
