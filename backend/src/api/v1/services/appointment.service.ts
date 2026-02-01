@@ -76,10 +76,17 @@ class AppointmentService {
 
   async createAppointment(data: AppointmentReqDTO) : Promise<PacketDTO<AppointmentResDTO>> {
     try {
+      const maxAppt = await prisma.appointment.findFirst({
+        where: { idCase: data.idCase },
+        orderBy: { appointmentNumber: 'desc' },
+        select: { appointmentNumber: true }
+      });
+      const nextAppointmentNumber = (maxAppt?.appointmentNumber ?? 0) + 1;
+
       const newAppointment = await prisma.appointment.create({
         data: {
           idCase: data.idCase,
-          appointmentNumber: data.appointmentNumber,
+          appointmentNumber: nextAppointmentNumber,
           plannedDate: data.plannedDate,
           executionDate: data.executionDate || null,
           status: data.status,
