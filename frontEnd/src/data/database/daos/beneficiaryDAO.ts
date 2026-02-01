@@ -1,4 +1,4 @@
-import type { BeneficiaryTypeDTO, GenderTypeDTO, IdNationalityTypeDTO as NationalityTypeDTO } from "../typesDAO.ts";
+import type { BeneficiaryTypeDTO, GenderTypeDTO, IdNationalityTypeDTO as NationalityTypeDTO } from "@app/shared/typesDTO.ts";
 
 export interface BeneficiaryDAO {
   identityCard: string;
