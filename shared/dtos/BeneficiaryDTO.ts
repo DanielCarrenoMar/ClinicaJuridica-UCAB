@@ -1,4 +1,5 @@
-import type { BeneficiaryTypeDTO, GenderTypeDTO, IdNationalityTypeDTO } from "../typesDTO.ts";
+import type { BeneficiaryTypeDTO, GenderTypeDTO, IdNationalityTypeDTO } from "@app/shared/typesDTO";
+
 
 export interface BeneficiaryReqDTO {
   identityCard: string;
