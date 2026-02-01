@@ -4,7 +4,7 @@ import { LoginReqDTO } from '@app/shared/dtos/LoginDTO';
 import { validateRequiredParams } from '../utils/checkParameters.util.js';
 import userService from '#services/user.service.js';
 
-export async function login(req: Request, res: Response): Promise<void> {
+export async function login(req: Request, res: Response) {
   try {
     const errorMsg = validateRequiredParams<LoginReqDTO>(req.body, ['email', 'password']);
     if (errorMsg) {
@@ -15,7 +15,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { token, ...result } = await loginService.loginUser(req.body as LoginReqDTO);
+    const { data, ...result } = await loginService.loginUser(req.body as LoginReqDTO);
 
     if (!result.success) {
       res.status(401).json(result);
@@ -23,7 +23,7 @@ export async function login(req: Request, res: Response): Promise<void> {
     }
 
     res
-      .cookie('access_token', token, {
+      .cookie('access_token', data?.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
@@ -37,7 +37,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function logout(req: Request, res: Response): Promise<void> {
+export async function logout(res: Response) {
   res
     .clearCookie('access_token', {
       httpOnly: true,
@@ -48,7 +48,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
     .json({ success: true, message: 'Logout exitoso' });
 }
 
-export async function getCurrentUser(req: Request, res: Response): Promise<void> {
+export async function getCurrentUser(req: Request, res: Response) {
   if (!req.user) {
     res.status(401).json({ success: false, message: 'No autenticado' });
     return;

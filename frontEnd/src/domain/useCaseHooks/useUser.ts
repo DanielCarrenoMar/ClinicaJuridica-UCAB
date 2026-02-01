@@ -1,7 +1,6 @@
 import type { UserDAO } from "#database/daos/userDAO.ts";
 import { getUserRepository } from "#database/repositoryImp/UserRepositoryImp.ts";
 import type { UserModel } from "#domain/models/user.ts";
-import { set } from "animejs";
 import { useCallback, useEffect, useState } from "react";
 
 export function useGetAllUsers() {
@@ -101,20 +100,20 @@ export function useLoginUser() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const login = async (email: string, password: string): Promise<UserModel | null> => {
+	const login = async (email: string, password: string): Promise<Boolean> => {
 		setLoading(true);
 		setError(null);
 
 		try {
 			const userRepository = getUserRepository();
-			const user = await userRepository.authenticate(email, password);
+			await userRepository.authenticate(email, password);
 			setLoading(false);
-			return user;
-		} catch (err) {
+			return true;
+		} catch (err: any) {
 			setLoading(false);
-			const errorMessage = err instanceof Error ? err.message : 'Error desconocido en el login';
+			const errorMessage = err.message || 'Error desconocido en el login';
 			setError(errorMessage);
-			return null;
+			return false;
 		}
 	};
 

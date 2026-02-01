@@ -1,6 +1,6 @@
 export interface PacketDTO<T = unknown> {
 	success: boolean;
-	data: T | null;
+	data?: T | undefined;
 	error?: unknown;
 	message?: string;
 }

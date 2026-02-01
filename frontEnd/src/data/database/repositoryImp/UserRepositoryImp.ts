@@ -2,7 +2,7 @@ import type { UserRepository } from "#domain/repositories.ts";
 import { USER_URL } from "./apiUrl";
 import type { UserDAO } from "#database/daos/userDAO.ts";
 import { daoToUserModel } from "#domain/models/user.ts";
-import type { LoginResDTO } from "@app/shared/dtos/LoginDTO";
+import type { PacketDTO } from "@app/shared/dtos/packets/PacketDTO";
 
 const AUTH_URL = "http://localhost:3000/api/v1/auth";
 
@@ -34,12 +34,9 @@ export function getUserRepository(): UserRepository {
                 body: JSON.stringify({ email, password })
             });
 
-            const result = await response.json();
+            const result: PacketDTO = await response.json();
             if (!response.ok) throw new Error(result.message || 'Error en autenticación');
             if (!result.success) throw new Error(result.message || 'Credenciales inválidas');
-
-            const loginDTO: LoginResDTO = result.data;
-            return daoToUserModel(loginDTO);
         },
         logout: async () => {
             const response = await fetch(`${AUTH_URL}/logout`, {

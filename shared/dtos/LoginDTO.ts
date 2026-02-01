@@ -1,16 +1,6 @@
-import type { GenderTypeDTO, UserTypeDTO } from "../typesDTO";
+import { PacketDTO } from "./packets/PacketDTO";
 
 export interface LoginReqDTO {
     email: string;
     password: string;
-}
-
-export interface LoginResDTO {
-    identityCard: string;
-    fullName: string;
-    gender: GenderTypeDTO | null;
-    email: string;
-    password: string;
-    isActive: boolean;
-    type: UserTypeDTO;
 }
