@@ -7,7 +7,7 @@ import { useGetAllUsers, useGetUserById, useUpdateUserById } from '#domain/useCa
 import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
-import { modelToUserDao, type UserModel } from '#domain/models/user.ts'
+import { modelToUserDto, type UserModel } from '#domain/models/user.ts'
 import Box from '#components/Box.tsx'
 import DropdownOption from '#components/Dropdown/DropdownOption.tsx'
 import Dropdown from '#components/Dropdown/Dropdown.tsx'
@@ -166,29 +166,17 @@ function UserInfo() {
 
     // Prepare password update
     // We modify localUser temporarily or create a special payload
-    let finalUserDao: any = modelToUserDao(localUser);
-    if (newPassword) {
-      finalUserDao.password = newPassword;
-    } else {
-      delete finalUserDao.password; // Ensure we don't send hash or empty string if that's what modelToUserDao produces
-    }
+    let finalUserDto = modelToUserDto(localUser);
 
     // Student/Teacher updates don't involve password usually, but User update does.
 
     if (user.type === 'Estudiante' && localStudent) {
-      // If updating student, we might need to update USER part too if user fields changed or password changed.
-      // updateStudentById usually updates student fields. 
-      // If we used updateStudentById, does it update user fields? 
-      // Checked backend student.service.updateStudent: calls userService.updateUser!
-      // So use updateStudentById with merged data is better?
-      // modelToStudentDao returns StudentDAO. Does it include User fields?
-      // StudentDAO extends Omit<UserDAO, 'type'>. It SHOULD include password.
 
       const studentDao: any = modelToStudentDao(localStudent);
       // Merge user fields into studentDao just in case localUser has changes (fullName etc)
       studentDao.fullName = localUser.fullName;
       studentDao.email = localUser.email;
-      studentDao.gender = modelToUserDao(localUser).gender; // use helper
+      studentDao.gender = modelToUserDto(localUser).gender; // use helper
 
       if (newPassword) studentDao.password = newPassword;
       else delete studentDao.password;
@@ -201,7 +189,7 @@ function UserInfo() {
       const teacherDao: any = modelToTeacherDao(localTeacher);
       teacherDao.fullName = localUser.fullName;
       teacherDao.email = localUser.email;
-      teacherDao.gender = modelToUserDao(localUser).gender;
+      teacherDao.gender = modelToUserDto(localUser).gender;
 
       if (newPassword) teacherDao.password = newPassword;
       else delete teacherDao.password;
@@ -212,7 +200,7 @@ function UserInfo() {
     }
 
     // Regular User / Coordinator / direct User update
-    updateUserById(localUser.identityCard, finalUserDao).catch(notyError)
+    updateUserById(localUser.identityCard, finalUserDto).catch(notyError)
     setIsDataModified(false);
   }
 

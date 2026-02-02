@@ -17,7 +17,6 @@ import type { UserModel } from "./models/user";
 import type { TeacherModel } from "./models/teacher";
 import type { CaseBeneficiaryModel } from "./models/caseBeneficiary";
 import type { CaseBeneficiaryTypeDAO } from "#database/typesDAO.ts";
-import type { UserDAO } from "#database/daos/userDAO.ts";
 import type { StudentDAO } from "#database/daos/studentDAO.ts";
 import type { TeacherDAO } from "#database/daos/teacherDAO.ts";
 import type { SemesterModel } from "./models/semester";
@@ -37,6 +36,7 @@ import type { CasesByServiceTypeModel } from "./models/reports/casesByServiceTyp
 import type { ProfessorInvolvementModel } from "./models/reports/professorInvolvement";
 import type { BeneficiaryTypeDistributionModel } from "./models/reports/beneficiaryTypeDistribution";
 import type { AppointmentReqDTO } from "@app/shared/dtos/AppoimentDTO";
+import type { UserReqDTO } from "@app/shared/dtos/UserDTO";
 
 export interface BeneficiaryRepository {
     findAllBeneficiaries(params?: { page?: number; limit?: number }): Promise<BeneficiaryModel[]>;
@@ -100,11 +100,11 @@ export interface SupportDocumentRepository {
 export interface UserRepository {
     findAllUsers(params?: { page?: number; limit?: number }): Promise<UserModel[]>;
     findUserById(id: string): Promise<UserModel | null>;
-    updateUser(id: string, data: Partial<UserDAO>): Promise<UserModel>;
+    updateUser(id: string, data: Partial<UserReqDTO>): Promise<UserModel>;
     authenticate(email: string, password: string): Promise<void>;
     logout(): Promise<void>;
     findActualUser(): Promise<UserModel | null>;
-    createUser(data: UserDAO): Promise<any>;
+    createUser(data: UserReqDTO): Promise<any>;
 }
 
 export interface StudentRepository {

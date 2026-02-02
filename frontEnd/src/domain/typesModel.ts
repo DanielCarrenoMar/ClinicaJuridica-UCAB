@@ -176,14 +176,14 @@ export function typeDtoToUserTypeModel(dto: UserTypeDTO): UserTypeModel {
             return "Profesor";
     }
 }
-export function typeModelToUserTypeDao(model: UserTypeModel): UserTypeDAO {
+export function typeModelToUserTypeDto(model: UserTypeModel): UserTypeDTO {
     switch (model) {
         case "Estudiante":
-            return "E";
+            return "STUDENT";
         case "Coordinador":
-            return "C";
+            return "COORDINATOR";
         case "Profesor":
-            return "P";
+            return "TEACHER";
     }
 }
 

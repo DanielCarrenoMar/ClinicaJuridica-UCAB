@@ -1,8 +1,8 @@
 import type { UserRepository } from "#domain/repositories.ts";
 import { USER_URL } from "./apiUrl";
-import type { UserDAO } from "#database/daos/userDAO.ts";
-import { daoToUserModel } from "#domain/models/user.ts";
+import { dtoToUserModel } from "#domain/models/user.ts";
 import type { PacketDTO } from "@app/shared/dtos/packets/PacketDTO";
+import type { UserResDTO } from "@app/shared/dtos/UserDTO";
 
 const AUTH_URL = "http://localhost:3000/api/v1/auth";
 
@@ -16,15 +16,15 @@ export function getUserRepository(): UserRepository {
             const responseUsers = await fetch(url, { method: 'GET', credentials: 'include' });
             const usersData = await responseUsers.json();
             if (!responseUsers.ok) throw new Error(usersData.message || 'Error fetching users');
-            const usersDAO: UserDAO[] = usersData.data;
-            return usersDAO.map(daoToUserModel);
+            const usersDAO: UserResDTO[] = usersData.data;
+            return usersDAO.map(dtoToUserModel);
         },
         findUserById: async (id) => {
             const responseUser = await fetch(`${USER_URL}/${id}`, { method: 'GET', credentials: 'include' });
             const userData = await responseUser.json();
             if (!responseUser.ok) throw new Error(userData.message || 'Error fetching user');
-            const userDAO: UserDAO = userData.data;
-            return daoToUserModel(userDAO);
+            const userDTO: UserResDTO = userData.data;
+            return dtoToUserModel(userDTO);
         },
         authenticate: async (email, password) => {
             const response = await fetch(`${AUTH_URL}/login`, {
@@ -52,8 +52,8 @@ export function getUserRepository(): UserRepository {
             const response = await fetch(`${AUTH_URL}/me`, { method: 'POST', credentials: 'include' });
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || 'Error en autenticación');
-            const userDAO: UserDAO = result.data;
-            return daoToUserModel(userDAO);
+            const userDTO: UserResDTO = result.data;
+            return dtoToUserModel(userDTO);
         },
         updateUser: async (id, data) => {
             const response = await fetch(`${USER_URL}/${id}`, {
@@ -64,11 +64,11 @@ export function getUserRepository(): UserRepository {
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || 'Error al actualizar el usuario');
-            const updatedUserDAO: UserDAO = result.data;
-            return daoToUserModel(updatedUserDAO);
+            const updatedUserResDTO: UserResDTO = result.data;
+            return dtoToUserModel(updatedUserResDTO);
         },
 
-        createUser: async (data: UserDAO) => {
+        createUser: async (data: UserResDTO) => {
             const response = await fetch(USER_URL, {
                 method: 'POST',
                 credentials: 'include',

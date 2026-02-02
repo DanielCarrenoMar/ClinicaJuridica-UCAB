@@ -1,6 +1,8 @@
-﻿// @ts-nocheck
-import prisma from '#src/config/database.js';
+﻿import prisma from '#src/config/database.js';
+import { PacketDTO } from '@app/shared/dtos/packets/PacketDTO';
 import { PasswordUtil } from '../utils/password.util.js';
+import { PacketPaginationDTO } from '@app/shared/dtos/packets/PacketPaginationDTO';
+import { UserReqDTO, UserResDTO } from '@app/shared/dtos/UserDTO';
 
 class UserService {
   private normalizeType(type: string): string {
@@ -18,7 +20,7 @@ class UserService {
     return (g === 'M' || g === 'F') ? g : 'M';
   }
 
-  async getAllUsers(pagination?: { page: number; limit: number; all: boolean }) {
+  async getAllUsers(pagination?: { page: number; limit: number; all: boolean }): Promise<PacketPaginationDTO<UserResDTO[]>> {
     try {
       const semester = await prisma.semester.findFirst({
         orderBy: { startDate: 'desc' },
@@ -30,53 +32,28 @@ class UserService {
       const all = pagination?.all ?? false;
       const offset = (page - 1) * limit;
 
-      const totalRows = await prisma.$queryRaw`
-        SELECT COUNT(*)::int as total
-        FROM "User" u
-        LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
-        LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
-        WHERE u."type" = 'C' 
-           OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
-           OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
-      `;
-      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+      const total = await prisma.user.count()
 
-      const users: any[] = all
-        ? await prisma.$queryRaw`
-          SELECT 
-            u.*,
-            u."fullName" AS "fullname",
-            s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
-            t.term AS "teacherTerm", t.type AS "teacherType"
-          FROM "User" u
-          LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
-          LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
-          WHERE u."type" = 'C' 
-             OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
-             OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
-          ORDER BY u."identityCard" ASC
-        `
-        : await prisma.$queryRaw`
-          SELECT 
-            u.*,
-            u."fullName" AS "fullname",
-            s.term AS "studentTerm", s.nrc AS "studentNrc", s.type AS "studentType",
-            t.term AS "teacherTerm", t.type AS "teacherType"
-          FROM "User" u
-          LEFT JOIN "Student" s ON u."identityCard" = s."identityCard" AND s."term" = ${currentTerm}
-          LEFT JOIN "Teacher" t ON u."identityCard" = t."identityCard" AND t."term" = ${currentTerm}
-          WHERE u."type" = 'C' 
-             OR (u."type" = 'E' AND s."identityCard" IS NOT NULL)
-             OR (u."type" = 'P' AND t."identityCard" IS NOT NULL)
-          ORDER BY u."identityCard" ASC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
+      const users = await prisma.user.findMany(
+        {
+          select: {
+            identityCard: true,
+            fullName: true,
+            gender: true,
+            email: true,
+            isActive: true,
+            type: true,
+          },
+          skip: all ? undefined : offset,
+          take: all ? undefined : limit,
+          orderBy: { fullName: 'asc' }
+        }
+      )
 
       const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
       return {
         success: true,
         data: users,
-        count: total,
         pagination: {
           page,
           limit: all ? total : limit,
@@ -86,116 +63,88 @@ class UserService {
         }
       };
     } catch (error: any) {
-      return { success: false, error: error.message };
+      console.error(error);
+      return { success: false, error: "Error al obtener usuarios", pagination: { page: 1, limit: 0, total: 0, totalPages: 0, all: false } };
     }
   }
 
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<PacketDTO<UserResDTO>> {
     try {
       const foundUser = await prisma.user.findUnique({
         where: {
           identityCard: id
         },
-        include: {
-          students: {
-            select: {
-              term: true,
-              nrc: true,
-              type: true
-            }
-          },
-          teachers: {
-            select: {
-              term: true,
-              type: true
-            }
-          }
-        }
+        select: {
+          identityCard: true,
+          fullName: true,
+          gender: true,
+          email: true,
+          isActive: true,
+          type: true,
+        },
       });
 
       if (!foundUser) {
         return { success: false, message: 'Usuario no encontrado' };
       }
 
-      const data = {
-        ...foundUser,
-        student: foundUser.students.length > 0 ? {
-          term: foundUser.students[0].term,
-          nrc: foundUser.students[0].nrc,
-          type: foundUser.students[0].type
-        } : null,
-        teacher: foundUser.teachers.length > 0 ? {
-          term: foundUser.teachers[0].term,
-          type: foundUser.teachers[0].type
-        } : null
-      };
-
-      return { success: true, data };
+      return { success: true, data: foundUser };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
 
-  async createUser(data: any) {
+  async createUser(data: UserReqDTO): Promise<PacketDTO<UserResDTO>> {
     try {
-      const existing = await prisma.$queryRaw`
-        SELECT "identityCard" FROM "User" 
-        WHERE "identityCard" = ${data.identityCard} OR "email" = ${data.email}
-        LIMIT 1
-      `;
+      const existing = await prisma.user.findMany({
+        where: {
+          OR: [
+            { identityCard: data.identityCard },
+            { email: data.email }
+          ]
+        },
+        take: 1
+      });
 
       if (existing.length > 0) {
         return { success: false, message: 'Cedula o Email ya registrado' };
       }
 
-      const type = this.normalizeType(data.type);
-      const gender = this.normalizeGender(data.gender);
-      const fullName = data.fullName ?? data.fullname ?? data.name;
-
-      // Validate password
-      const validation = PasswordUtil.validate(data.password);
-      if (!validation.success) {
-        return { success: false, message: validation.message };
-      }
-
-      // Hash password
-      const hashedPass = await PasswordUtil.hash(data.password);
-
-      // Map UserType explicitly for DB (Enum values are 'E', 'P', 'C')
-      let userTypeDB = 'E';
-      if (type === 'P' || type === 'TEACHER') userTypeDB = 'P';
-      else if (type === 'C' || type === 'COORDINATOR') userTypeDB = 'C';
-      else userTypeDB = 'E'; // Default Student
+      const hashedPass = await PasswordUtil.hash("admin");
 
       // Get current term for Teacher record (needed if Coordinator)
       let currentTerm = '';
-      if (userTypeDB === 'C') {
+      if (data.type === 'COORDINATOR') {
         const semester = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' }, take: 1 });
         if (!semester) return { success: false, message: 'No hay semestres activos para registrar al coordinador como profesor.' };
         currentTerm = semester.term;
       }
 
-      await prisma.$transaction(async (tx) => {
-        await tx.$executeRaw`
-          INSERT INTO "User" ("identityCard", "fullName", "email", "password", "isActive", "type", "gender")
-          VALUES (${data.identityCard}, ${fullName}, ${data.email}, ${hashedPass}, ${data.isActive ?? true}, ${userTypeDB}::"UserType", ${gender}::"Gender")
-        `;
-
-        if (userTypeDB === 'C') {
-          await tx.$executeRaw`
-                INSERT INTO "Coordinator" ("identityCard")
-                VALUES (${data.identityCard})
-            `;
-
-          // Also register as Teacher (Coordinator is always REGULAR)
-          const teacherTypeDB = 'R';
-
-          await tx.$executeRaw`
-            INSERT INTO "Teacher" ("identityCard", "term", "type")
-            VALUES (${data.identityCard}, ${currentTerm}, ${teacherTypeDB}::"TeacherType")
-          `;
+      await prisma.user.create({
+        data: {
+          identityCard: data.identityCard,
+          fullName: data.fullName,
+          email: data.email,
+          password: hashedPass,
+          isActive: data.isActive ?? true,
+          type: data.type,
         }
-      });
+      })
+
+      if (data.type === 'COORDINATOR') {
+        await prisma.coordinator.create({
+          data: {
+            identityCard: data.identityCard
+          }
+        });
+        await prisma.teacher.create({
+          data: {
+            identityCard: data.identityCard,
+            term: currentTerm,
+            type: 'REGULAR'
+          }
+        });
+      }
 
       return { success: true, message: 'Creado exitosamente' };
     } catch (error: any) {
@@ -203,7 +152,7 @@ class UserService {
     }
   }
 
-  async updateUser(id: string, data: any) {
+  async updateUser(id: string, data: any): Promise<PacketDTO<UserResDTO>> {
     try {
       const fullName = data.fullName ?? data.fullname ?? data.name;
 

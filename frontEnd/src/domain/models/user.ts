@@ -2,11 +2,11 @@ import {
     typeDtoToGenderTypeModel, 
     typeModelToGenderTypeDto,
     type GenderTypeModel,
-    typeModelToUserTypeDao,
+    typeModelToUserTypeDto,
     type UserTypeModel,
     typeDtoToUserTypeModel
 } from "#domain/typesModel.ts";
-import type { UserDAO } from "#database/daos/userDAO.ts";
+import type { UserResDTO } from "@app/shared/dtos/UserDTO";
 
 export type { UserTypeModel };
 
@@ -15,13 +15,12 @@ export interface UserModel {
     fullName: string;
     gender?: GenderTypeModel;
     email: string;
-    password: string;
     isActive: boolean;
     type: UserTypeModel;
 }
 
-export function daoToUserModel(dao: UserDAO): UserModel {
-    const { type, gender, ...rest } = dao;
+export function dtoToUserModel(dto: UserResDTO): UserModel {
+    const { type, gender, ...rest } = dto;
     return {
         type: typeDtoToUserTypeModel(type),
         gender: gender ? typeDtoToGenderTypeModel(gender) : undefined,
@@ -29,11 +28,11 @@ export function daoToUserModel(dao: UserDAO): UserModel {
     }
 }
 
-export function modelToUserDao(model: UserModel): UserDAO {
+export function modelToUserDto(model: UserModel): UserResDTO {
     const { type, gender, ...rest } = model;
     return {
         ...rest,
-        type: typeModelToUserTypeDao(type),
+        type: typeModelToUserTypeDto(type),
         gender: gender ? typeModelToGenderTypeDto(gender) : undefined
     }
 }

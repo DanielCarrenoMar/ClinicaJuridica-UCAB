@@ -1,6 +1,6 @@
-import type { UserDAO } from "#database/daos/userDAO.ts";
 import { getUserRepository } from "#database/repositoryImp/UserRepositoryImp.ts";
 import type { UserModel } from "#domain/models/user.ts";
+import type { UserReqDTO } from "@app/shared/dtos/UserDTO";
 import { useCallback, useEffect, useState } from "react";
 
 export function useGetAllUsers() {
@@ -191,7 +191,7 @@ export function useUpdateUserById() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
-	const updateUserById = useCallback(async (id: string, data: Partial<UserDAO>) => {
+	const updateUserById = useCallback(async (id: string, data: Partial<UserReqDTO>) => {
 		setLoading(true);
 		try {
 			await updateUserData(id, data);
@@ -215,7 +215,7 @@ export function useCreateUser() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
-	const createUser = useCallback(async (data: any) => {
+	const createUser = useCallback(async (data: UserReqDTO) => {
 		setLoading(true);
 		try {
 			const result = await createUserRepo(data);
