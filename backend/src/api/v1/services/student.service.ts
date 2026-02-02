@@ -1,23 +1,22 @@
 import prisma from '#src/config/database.js';
 import userService from './user.service.js';
 import { PasswordUtil } from '../utils/password.util.js';
+import { PacketPaginationDTO } from '@app/shared/dtos/packets/PacketPaginationDTO';
+import { StudentResDTO } from '@app/shared/dtos/StudentDTO';
+import { PacketDTO } from '@app/shared/dtos/packets/PacketDTO';
 
 class StudentService {
-  async getAllStudents(term?: string, pagination?: { page: number; limit: number; all: boolean }) {
+  async getAllStudents(term?: string, pagination?: { page: number; limit: number; all: boolean }): Promise<PacketPaginationDTO<StudentResDTO[]>> {
     try {
       let resolvedTerm = term;
 
       if (!resolvedTerm) {
-        const termRows = await prisma.$queryRaw`
-          SELECT MAX("term") as term
-          FROM "Semester"
-        ` as Array<{ term: string | null }>;
-
-        resolvedTerm = termRows?.[0]?.term ?? undefined;
+        const term = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' } });
+        resolvedTerm = term?.term ?? undefined;
       }
 
       if (!resolvedTerm) {
-        return { success: false, message: 'No se encontró un término válido' };
+        return { success: false, message: 'No se encontró un término válido', pagination: {page: 1, limit: 15, total: 0, totalPages: 0, all: false} };
       }
 
       const page = pagination?.page ?? 1;
@@ -25,52 +24,43 @@ class StudentService {
       const all = pagination?.all ?? false;
       const offset = (page - 1) * limit;
 
-      const totalRows = await prisma.$queryRaw`
-        SELECT COUNT(*)::int as total
-        FROM "Student" s
-        WHERE s."term" = ${resolvedTerm}
-      `;
-      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+      const total = await prisma.student.count({
+        where: { term: resolvedTerm }
+      });
 
-      const students = all
-        ? await prisma.$queryRaw`
-          SELECT
-            u."identityCard",
-            u."fullName",
-            u."gender",
-            u."email",
-            u."isActive",
-            u."type" AS "userType",
-            s."term",
-            s."nrc",
-            s."type" AS "studentType"
-          FROM "Student" s
-          JOIN "User" u ON s."identityCard" = u."identityCard"
-          WHERE s."term" = ${resolvedTerm}
-          ORDER BY u."fullName"
-        `
-        : await prisma.$queryRaw`
-          SELECT
-            u."identityCard",
-            u."fullName",
-            u."gender",
-            u."email",
-            u."isActive",
-            u."type" AS "userType",
-            s."term",
-            s."nrc",
-            s."type" AS "studentType"
-          FROM "Student" s
-          JOIN "User" u ON s."identityCard" = u."identityCard"
-          WHERE s."term" = ${resolvedTerm}
-          ORDER BY u."fullName"
-          LIMIT ${limit} OFFSET ${offset}
-        `;
+      const students = await prisma.student.findMany({
+        where: { term: resolvedTerm },
+        include: {
+          user: {
+            omit: {
+              password: true,
+              type: true
+            }
+          }
+        },
+        orderBy: {
+          user: { fullName: 'asc' }
+        },
+        skip: all ? undefined : offset,
+        take: all ? undefined : limit
+      });
 
       const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+
+      const data: StudentResDTO[] = students.map(s => ({
+        identityCard: s.identityCard,
+        fullName: s.user.fullName,
+        email: s.user.email,
+        isActive: s.user.isActive,
+        gender: s.user.gender || undefined,
+        term: s.term,
+        nrc: s.nrc || undefined,
+        type: s.type
+      }));
+
       return {
         success: true,
-        data: students,
+        data: data,
         pagination: {
           page,
           limit: all ? total : limit,
@@ -80,49 +70,54 @@ class StudentService {
         }
       };
     } catch (error: any) {
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, pagination: {page: 1, limit: 15, total: 0, totalPages: 0, all: false} };
     }
   }
 
-  async getStudentById(identityCard: string, term?: string) {
+  async getStudentById(identityCard: string, term?: string): Promise<PacketDTO<StudentResDTO>> {
     try {
-      const termRows = term
-        ? null
-        : (await prisma.$queryRaw`
-            SELECT MAX("term") as term
-            FROM "Student"
-            WHERE "identityCard" = ${identityCard}
-          `) as Array<{ term: string | null }>;
-
-      const resolvedTerm = term ?? termRows?.[0]?.term ?? undefined;
+      let resolvedTerm = term;
 
       if (!resolvedTerm) {
+        const term = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' } });
+        resolvedTerm = term?.term ?? undefined;
+      }
+
+      if (!resolvedTerm) {
+        return { success: false, message: 'No se encontró un término válido'};
+      }
+
+      const result = await prisma.student.findFirst({
+        where: {
+          identityCard,
+          term: resolvedTerm
+        },
+        include: {
+          user: {
+            omit: {
+              password: true,
+              type: true
+            }
+          }
+        }
+      });
+
+      if (!result) {
         return { success: false, message: 'Estudiante no encontrado' };
       }
 
-      const result = await prisma.$queryRaw`
-        SELECT
-          u."identityCard",
-          u."fullName",
-          u."fullName" AS "fullname",
-          u."gender",
-          u."email",
-          u."password",
-          u."isActive",
-          u."type" AS "userType",
-          s."term",
-          s."nrc",
-          s."type"
-        FROM "Student" s
-        JOIN "User" u ON s."identityCard" = u."identityCard"
-        WHERE s."identityCard" = ${identityCard} AND s."term" = ${resolvedTerm}
-      `;
-
-      if (!Array.isArray(result) || result.length === 0) {
-        return { success: false, message: 'Estudiante no encontrado' };
+      const student: StudentResDTO = {
+        identityCard: result.identityCard,
+        fullName: result.user.fullName,
+        email: result.user.email,
+        isActive: result.user.isActive,
+        gender: result.user.gender || undefined,
+        term: result.term,
+        nrc: result.nrc || undefined,
+        type: result.type
       }
 
-      return { success: true, data: result[0] };
+      return { success: true, data: student };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

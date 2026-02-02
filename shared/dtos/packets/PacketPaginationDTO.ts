@@ -1,4 +1,4 @@
-import { PacketDTO } from "./PacketDTO";
+import { PacketDTO } from "./PacketDTO.js";
 
 export interface PacketPaginationDTO<T = unknown> extends PacketDTO<T> {
     pagination: {

@@ -1,23 +1,22 @@
 import prisma from '#src/config/database.js';
 import userService from './user.service.js';
 import { PasswordUtil } from '../utils/password.util.js';
+import { TeacherResDTO } from '@app/shared/dtos/TeacherDTO';
+import { PacketPaginationDTO } from '@app/shared/dtos/packets/PacketPaginationDTO';
+import { PacketDTO } from '@app/shared/dtos/packets/PacketDTO';
 
 class TeacherService {
-  async getAllTeachers(term?: string, pagination?: { page: number; limit: number; all: boolean }) {
+  async getAllTeachers(term?: string, pagination?: { page: number; limit: number; all: boolean }): Promise<PacketPaginationDTO<TeacherResDTO[]>> {
     try {
       let resolvedTerm = term;
 
       if (!resolvedTerm) {
-        const termRows = await prisma.$queryRaw`
-          SELECT MAX("term") as term
-          FROM "Semester"
-        ` as Array<{ term: string | null }>;
-
-        resolvedTerm = termRows?.[0]?.term ?? undefined;
+        const term = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' } });
+        resolvedTerm = term?.term ?? undefined;
       }
 
       if (!resolvedTerm) {
-        return { success: false, message: 'No se encontró un término válido' };
+        return { success: false, message: 'No se encontró un término válido', pagination: {page: 1, limit: 15, total: 0, totalPages: 0, all: false} };
       }
 
       const page = pagination?.page ?? 1;
@@ -25,47 +24,36 @@ class TeacherService {
       const all = pagination?.all ?? false;
       const offset = (page - 1) * limit;
 
-      const totalRows = await prisma.$queryRaw`
-        SELECT COUNT(*)::int as total
-        FROM "Teacher" t
-        WHERE t."term" = ${resolvedTerm}
-      `;
-      const total = Array.isArray(totalRows) ? Number(totalRows[0]?.total ?? 0) : 0;
+      const total = await prisma.teacher.count({
+        where: { term: resolvedTerm }
+      });
 
-      const teachers = all
-        ? await prisma.$queryRaw`
-          SELECT
-            u."identityCard",
-            u."fullName",
-            u."gender",
-            u."email",
-            u."isActive",
-            u."type" AS "userType",
-            t."term",
-            t."type" AS "teacherType"
-          FROM "Teacher" t
-          JOIN "User" u ON t."identityCard" = u."identityCard"
-          WHERE t."term" = ${resolvedTerm}
-          ORDER BY u."fullName"
-        `
-        : await prisma.$queryRaw`
-          SELECT
-            u."identityCard",
-            u."fullName",
-            u."gender",
-            u."email",
-            u."isActive",
-            u."type" AS "userType",
-            t."term",
-            t."type" AS "teacherType"
-          FROM "Teacher" t
-          JOIN "User" u ON t."identityCard" = u."identityCard"
-          WHERE t."term" = ${resolvedTerm}
-          ORDER BY u."fullName"
-          LIMIT ${limit} OFFSET ${offset}
-        `;
+      const result = await prisma.teacher.findMany({
+        where: { term: resolvedTerm },
+        include: {
+          user: {
+            omit: {
+              password: true,
+              type: true
+            }
+          }
+        },
+        skip: all ? undefined : offset,
+        take: all ? undefined : limit
+      });
 
       const totalPages = all ? 1 : Math.max(1, Math.ceil(total / limit));
+
+      const teachers: TeacherResDTO[] = result.map((teacher) => ({
+        identityCard: teacher.identityCard,
+        fullName: teacher.user.fullName,
+        gender: teacher.user.gender,
+        email: teacher.user.email,
+        isActive: teacher.user.isActive,
+        term: teacher.term,
+        type: teacher.type
+      }));
+
       return {
         success: true,
         data: teachers,
@@ -78,48 +66,56 @@ class TeacherService {
         }
       };
     } catch (error: any) {
-      return { success: false, error: error.message };
+      console.error(error);
+      return { success: false, error: "Error al obtener los profesores", pagination: {page: 1, limit: 15, total: 0, totalPages: 0, all: false} };
     }
   }
 
-  async getTeacherById(identityCard: string, term?: string) {
+  async getTeacherById(identityCard: string, term?: string): Promise<PacketDTO<TeacherResDTO>> {
     try {
-      const termRows = term
-        ? null
-        : (await prisma.$queryRaw`
-            SELECT MAX("term") as term
-            FROM "Teacher"
-            WHERE "identityCard" = ${identityCard}
-          `) as Array<{ term: string | null }>;
-
-      const resolvedTerm = term ?? termRows?.[0]?.term ?? undefined;
+      let resolvedTerm = term;
 
       if (!resolvedTerm) {
+        const term = await prisma.semester.findFirst({ orderBy: { startDate: 'desc' } });
+        resolvedTerm = term?.term ?? undefined;
+      }
+
+      if (!resolvedTerm) {
+        return { success: false, message: 'No se encontró un término válido' };
+      }
+
+      const result = await prisma.teacher.findUnique({
+        where: {
+          identityCard_term: {
+            identityCard,
+            term: resolvedTerm
+          }
+        },
+        include: {
+          user: {
+            omit: {
+              password: true,
+              type: true
+            }
+          }
+        }
+      });
+
+      if (!result) {
         return { success: false, message: 'Profesor no encontrado' };
       }
 
-      const result = await prisma.$queryRaw`
-        SELECT
-          u."identityCard",
-          u."fullName",
-          u."fullName" AS "fullname",
-          u."gender",
-          u."email",
-          u."password",
-          u."isActive",
-          u."type" AS "userType",
-          t."term",
-          t."type"
-        FROM "Teacher" t
-        JOIN "User" u ON t."identityCard" = u."identityCard"
-        WHERE t."identityCard" = ${identityCard} AND t."term" = ${resolvedTerm}
-      `;
+      const teacher: TeacherResDTO = {
+        identityCard: result.identityCard,
+        fullName: result.user.fullName,
+        gender: result.user.gender,
+        email: result.user.email,
+        isActive: result.user.isActive,
+        term: result.term,
+        type: result.type
+      };
 
-      if (!Array.isArray(result) || result.length === 0) {
-        return { success: false, message: 'Profesor no encontrado' };
-      }
-
-      return { success: true, data: result[0] };
+      return { success: true, data: teacher };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
