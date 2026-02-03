@@ -51,13 +51,6 @@ function CreateCase() {
 
     const isSubmittingCreateCase = createCaseLoading || createApplicantLoading || updateApplicantLoading || setBeneficiariesLoading;
 
-    useEffect(() => {
-        console.log("applicantModel updated:", applicantModel);
-    }, [applicantModel]);
-    useEffect(() => {
-        console.log("caseDAO updated:", caseDAO);
-    }, [caseDAO]);
-
     function updateCaseDAO(updatedFields: Partial<CaseDAO>) {
         setCaseDAO((prev) => ({
             ...prev,
