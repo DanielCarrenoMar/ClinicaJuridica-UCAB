@@ -1,3 +1,5 @@
+import { PacketPaginationQueryDTO } from "@app/shared/dtos/packets/PacketPaginationDTO";
+
 export type PaginationParams = {
   page: number;
   limit: number;
@@ -23,15 +25,11 @@ function parseNumber(value: unknown, fallback: number): number {
   return fallback;
 }
 
-export function parsePagination(query: Record<string, unknown>): PaginationParams {
-  const pageRaw = query.page ?? query.pagina;
-  const limitRaw = query.limit ?? query.cantidad ?? query.perPage;
-  const allRaw = query.all ?? query.todas ?? query.allPages;
+export function parsePagination(query: Partial<PacketPaginationQueryDTO>): PacketPaginationQueryDTO {
+  const all = parseBoolean(query.all) ?? !(query.page !== undefined && query.limit !== undefined);
+  const page = all ? 1 : Math.max(1, parseNumber(query.page, 1));
+  const limit = all ? 0 : Math.max(1, parseNumber(query.limit, 15));
+  const search = query.search ?? '';
 
-  const hasPageAndLimit = pageRaw !== undefined && limitRaw !== undefined;
-  const all = parseBoolean(allRaw) ?? !hasPageAndLimit;
-  const page = all ? 1 : Math.max(1, parseNumber(pageRaw, 1));
-  const limit = all ? 0 : Math.max(1, parseNumber(limitRaw, 15));
-
-  return { page, limit, all };
+  return { page, limit, all, search };
 }

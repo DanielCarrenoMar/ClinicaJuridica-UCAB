@@ -9,3 +9,10 @@ export interface PacketPaginationDTO<T = unknown> extends PacketDTO<T> {
         all: boolean;
     }
 }
+
+export interface PacketPaginationQueryDTO {
+    page: number;
+    limit: number;
+    all: boolean;
+    search: string;
+}

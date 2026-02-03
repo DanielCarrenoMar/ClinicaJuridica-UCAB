@@ -1,13 +1,11 @@
 ﻿// @ts-nocheck
 import prisma from '#src/config/database.js';
 import { AppointmentResDTO } from '@app/shared/dtos/AppoimentDTO';
+import { PacketPaginationQueryDTO } from '@app/shared/dtos/packets/PacketPaginationDTO';
 
 class CaseService {
-  async getAllCases(pagination?: { page: number; limit: number; all: boolean }) {
+  async getAllCases({all, page, limit, search}: PacketPaginationQueryDTO) {
     try {
-      const page = pagination?.page ?? 1;
-      const limit = pagination?.limit ?? 15;
-      const all = pagination?.all ?? false;
       const offset = (page - 1) * limit;
 
       const totalRows = await prisma.$queryRaw`

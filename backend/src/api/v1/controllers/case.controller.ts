@@ -5,12 +5,9 @@ import { parsePagination } from '../utils/pagination.util.js';
 
 export async function getAllCases(req: Request, res: Response): Promise<void> {
   try {
-    const { q } = req.query;
     const pagination = parsePagination(req.query as Record<string, unknown>);
 
-    const result = q && typeof q === 'string'
-      ? await caseService.searchCases(q, pagination)
-      : await caseService.getAllCases(pagination);
+    const result = await caseService.getAllCases(pagination);
 
     res.status(200).json(result);
   } catch (error: unknown) {
