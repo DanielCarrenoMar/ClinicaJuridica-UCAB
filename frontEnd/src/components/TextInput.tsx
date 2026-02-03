@@ -1,6 +1,7 @@
 import type { ChangeEvent, ReactNode } from 'react';
 
 interface TextInputProps {
+  id?: string;
   defaultText?: string;
   value?: string;
   onChangeText?: (text: string) => void;
@@ -16,6 +17,7 @@ interface TextInputProps {
 }
 
 export default function TextInput({
+  id = undefined,
   defaultText,
   value,
   onChangeText,
@@ -43,6 +45,7 @@ export default function TextInput({
       {
         multiline ? (
           <textarea
+            id={id}
             disabled={disabled}
             value={isControlled ? value : undefined}
             defaultValue={!isControlled ? (defaultText || '') : undefined}
@@ -53,6 +56,7 @@ export default function TextInput({
           />
         ) : (
           <input
+          id={id}
             type={type}
             disabled={disabled}
             value={isControlled ? value : undefined}

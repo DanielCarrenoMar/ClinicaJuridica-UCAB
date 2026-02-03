@@ -34,12 +34,11 @@ export default function TitleTextInput({
 
   return (
     <div className={`flex flex-col gap-2 items-start`}>
-      <div className={`flex items-center px-1.5 w-full ${className} ${disabled ? 'opacity-70' : ''}`}>
-        <p className="text-body-large text-onSurface">
+      <label htmlFor={label} className={`flex text-body-large *:items-center px-1.5 w-full ${className} ${disabled ? 'opacity-70' : ''}`}>
           {label}
-        </p>
-      </div>
+      </label>
       <TextInput
+        id={label}
         defaultText={value}
         onChangeText={onChange}
         placeholder={placeholder}

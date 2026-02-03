@@ -17,7 +17,7 @@ import ConfirmDialog from "#components/dialogs/ConfirmDialog.tsx";
 import { useBlocker, useNavigate } from "react-router";
 import DatePicker from "#components/DatePicker.tsx";
 import { activityConditionData, characteristicsData, educationLevelData, locationData, workConditionData } from "#domain/seedData.ts";
-import { calculateAge } from "../utils/dateUtils.ts";
+import { validateApplicant } from "#domain/validations/applicantValidation.ts";
 
 const LOOKUP_DEBOUNCE_MS = 600;
 const AUTOFILL_SPINNER_MS = 420;
@@ -131,8 +131,8 @@ function CreateCaseApplicantStep() {
     const isAutoFillDisabled = isApplyingAutoFill || loadingApplicantOrBeneficiary;
     const showAutoFillSpinner = isApplyingAutoFill || loadingApplicantOrBeneficiary;
 
-    useEffect(() => {
-        setHaveMinDataToNextStep(!!(
+    function haveMInDataToNextStep(){
+        return !!(
             isVerifyingIdentityCard &&
             !showAutoFillToast &&
             Object.keys(validationErrors).length === 0 &&
@@ -144,7 +144,11 @@ function CreateCaseApplicantStep() {
             !isNaN(applicantModel.birthDate.getTime()) &&
             applicantModel.idNationality !== undefined &&
             applicantModel.gender !== undefined
-        ));
+        )
+    }
+
+    useEffect(() => {
+        setHaveMinDataToNextStep(haveMInDataToNextStep());
         /*console.log("Have min data to next step:", {
             "isVerifyingIdentityCard": isVerifyingIdentityCard,
             "NOT showAutoFillToast": !showAutoFillToast,
@@ -157,36 +161,8 @@ function CreateCaseApplicantStep() {
         });*/
     }, [applicantModel, showAutoFillToast, isVerifyingIdentityCard, isApplyingAutoFill, validationErrors]);
 
-    // Validation Effect
     useEffect(() => {
-        const errors: Record<string, string> = {};
-        const { memberCount, workingMemberCount, children7to12Count, studentChildrenCount } = applicantModel;
-
-        if (memberCount !== undefined && memberCount !== null) {
-            if (workingMemberCount !== undefined && workingMemberCount !== null && workingMemberCount > memberCount) {
-                errors.workingMemberCount = "No pueden trabajar más personas de las que viven en casa";
-            }
-            if (children7to12Count !== undefined && children7to12Count !== null && children7to12Count > memberCount) {
-                errors.children7to12Count = "No puede haber más niños de los que viven en casa";
-            }
-            if (studentChildrenCount !== undefined && studentChildrenCount !== null && studentChildrenCount > memberCount) {
-                errors.studentChildrenCount = "No puede haber más niños de los que viven en casa";
-            }
-        }
-
-        // Validate identity card contains only numbers
-        if (applicantModel.identityCard && /[^0-9]/.test(applicantModel.identityCard)) {
-            errors.identityCard = "La cédula solo debe contener números";
-        }
-
-        // Validate age (must be 18+)
-        if (applicantModel.birthDate) {
-            const age = calculateAge(applicantModel.birthDate);
-            if (age < 18) {
-                errors.birthDate = "El solicitante debe ser mayor de edad (18 años o más)";
-            }
-        }
-
+        const errors = validateApplicant(applicantModel);
         setValidationErrors(errors);
     }, [applicantModel.memberCount, applicantModel.workingMemberCount, applicantModel.children7to12Count, applicantModel.studentChildrenCount, applicantModel.identityCard, applicantModel.birthDate]);
 
