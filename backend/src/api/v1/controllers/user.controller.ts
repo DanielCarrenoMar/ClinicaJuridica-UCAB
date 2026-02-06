@@ -71,18 +71,6 @@ export async function changeUserStatus(req: Request, res: Response): Promise<voi
   }
 }
 
-export async function changePassword(req: Request, res: Response): Promise<void> {
-  try {
-    const id = req.params.id;
-    const { password } = req.body;
-    const result = await userService.updateUser(id, { password });
-    res.status(result.success ? 200 : 400).json(result);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Error desconocido';
-    res.status(500).json({ success: false, error: msg });
-  }
-}
-
 export async function getUserCases(req: Request, res: Response): Promise<void> {
   try {
     const id = req.params.id;

@@ -38,6 +38,17 @@ export function getUserRepository(): UserRepository {
             if (!response.ok) throw new Error(result.message || 'Error en autenticación');
             if (!result.success) throw new Error(result.message || 'Credenciales inválidas');
         },
+        changeLoginlUserPassword: async (currentPassword, newPassword) => {
+            const response = await fetch(`${AUTH_URL}/change-password`, {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+            const result: PacketDTO = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Error changing password');
+            return result.success;
+        },
         logout: async () => {
             const response = await fetch(`${AUTH_URL}/logout`, {
                 method: 'POST',

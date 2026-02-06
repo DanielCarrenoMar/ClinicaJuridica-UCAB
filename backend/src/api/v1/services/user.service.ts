@@ -5,21 +5,6 @@ import { PacketPaginationDTO } from '@app/shared/dtos/packets/PacketPaginationDT
 import { UserReqDTO, UserResDTO } from '@app/shared/dtos/UserDTO';
 
 class UserService {
-  private normalizeType(type: string): string {
-    if (!type) return 'E';
-    const t = type.toUpperCase();
-    if (t === 'STUDENT' || t === 'E') return 'E';
-    if (t === 'TEACHER' || t === 'P') return 'P';
-    if (t === 'COORDINATOR' || t === 'C') return 'C';
-    return 'E';
-  }
-
-  private normalizeGender(gender: string): string {
-    if (!gender) return 'M';
-    const g = gender.toUpperCase();
-    return (g === 'M' || g === 'F') ? g : 'M';
-  }
-
   async getAllUsers(pagination?: { page: number; limit: number; all: boolean }): Promise<PacketPaginationDTO<UserResDTO[]>> {
     try {
       const semester = await prisma.semester.findFirst({
@@ -152,30 +137,20 @@ class UserService {
     }
   }
 
-  async updateUser(id: string, data: any): Promise<PacketDTO<UserResDTO>> {
+  async updateUser(id: string, data: UserReqDTO): Promise<PacketDTO<UserResDTO>> {
     try {
-      const fullName = data.fullName ?? data.fullname ?? data.name;
 
-      let passwordToUpdate = data.password;
-      if (passwordToUpdate) {
-        const validation = PasswordUtil.validate(passwordToUpdate);
-        if (!validation.success) {
-          return { success: false, message: validation.message };
+      const updatedUser = await prisma.user.update({
+        where: { identityCard: id },
+        data: {
+          fullName: data.fullName,
+          email: data.email,
+          isActive: data.isActive,
+          gender: data.gender,
         }
-        passwordToUpdate = await PasswordUtil.hash(passwordToUpdate);
-      }
+      })
 
-      await prisma.$executeRaw`
-        UPDATE "User" SET
-          "fullName" = COALESCE(${fullName}, "fullName"),
-          "email" = COALESCE(${data.email}, "email"),
-          "password" = COALESCE(${passwordToUpdate}, "password"),
-          "isActive" = COALESCE(${data.isActive}, "isActive"),
-          "gender" = COALESCE(${data.gender ? this.normalizeGender(data.gender) : null}, "gender"),
-          "type" = COALESCE(${data.type ? this.normalizeType(data.type) : null}, "type")
-        WHERE "identityCard" = ${id}
-      `;
-      return { success: true, message: 'Actualizado correctamente' };
+      return { success: true, message: 'Actualizado correctamente', data: updatedUser };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 import { UserCircle, User, Clock, Close, FilePdf } from 'flowbite-react-icons/outline'
 import { File } from 'flowbite-react-icons/solid'
 import Tabs from '#components/Tabs.tsx'
-import { useGetAllUsers, useGetUserById, useUpdateUserById } from '#domain/useCaseHooks/useUser.ts'
+import { useChangeLoginlUserPassword, useGetAllUsers, useGetUserById, useUpdateUserById } from '#domain/useCaseHooks/useUser.ts'
 import UserGeneral from './components/UserGeneral.tsx'
 import UserCases from './components/UserCases.tsx'
 import UserActions from './components/UserActions.tsx'
@@ -32,8 +32,9 @@ function UserInfo() {
   const { updateUserById } = useUpdateUserById()
   const { updateStudentById } = useUpdateStudentById()
   const { updateTeacherById } = useUpdateTeacherById()
+  const { changePassword } = useChangeLoginlUserPassword()
 
-  const { notyError } = useNotifications()
+  const { notyError, notyMessage } = useNotifications()
 
   const [localUser, setLocalUser] = useState<UserModel>();
   const [localStudent, setLocalStudent] = useState<StudentModel>();
@@ -173,13 +174,9 @@ function UserInfo() {
     if (user.type === 'Estudiante' && localStudent) {
 
       const studentDao: any = modelToStudentDao(localStudent);
-      // Merge user fields into studentDao just in case localUser has changes (fullName etc)
       studentDao.fullName = localUser.fullName;
       studentDao.email = localUser.email;
       studentDao.gender = modelToUserDto(localUser).gender; // use helper
-
-      if (newPassword) studentDao.password = newPassword;
-      else delete studentDao.password;
 
       updateStudentById(localStudent.identityCard, studentDao).catch(notyError)
       setIsDataModified(false);
@@ -191,15 +188,18 @@ function UserInfo() {
       teacherDao.email = localUser.email;
       teacherDao.gender = modelToUserDto(localUser).gender;
 
-      if (newPassword) teacherDao.password = newPassword;
-      else delete teacherDao.password;
-
       updateTeacherById(localTeacher.identityCard, teacherDao).catch(notyError)
       setIsDataModified(false);
       return
     }
 
-    // Regular User / Coordinator / direct User update
+    if (newPassword && newPassword.trim() !== '') {
+      changePassword('temporary', newPassword)
+      .then((isChange) => {
+        if (isChange) notyMessage('Contraseña actualizada correctamente');
+      })
+      .catch(notyError)
+    }
     updateUserById(localUser.identityCard, finalUserDto).catch(notyError)
     setIsDataModified(false);
   }

@@ -210,6 +210,32 @@ export function useUpdateUserById() {
 	};
 }
 
+export function useChangeLoginlUserPassword() {
+	const { changeLoginlUserPassword } = getUserRepository();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<Error | null>(null);
+
+	const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+		setLoading(true);
+		try {
+			const result = await changeLoginlUserPassword(currentPassword, newPassword);
+			setError(null);
+			return result;
+		} catch (err) {
+			setError(err as Error);
+			throw err;
+		} finally {
+			setLoading(false);
+		}
+	}, [changeLoginlUserPassword]);
+
+	return {
+		changePassword,
+		loading,
+		error,
+	};
+}
+
 export function useCreateUser() {
 	const { createUser: createUserRepo } = getUserRepository();
 	const [loading, setLoading] = useState(false);

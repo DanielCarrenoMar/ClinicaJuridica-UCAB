@@ -6,7 +6,7 @@ import { LoginReqDTO } from '@app/shared/dtos/LoginDTO';
 import { PacketDTO } from '@app/shared/dtos/packets/PacketDTO';
 
 class authService {
-  async loginUser({ email, password }: LoginReqDTO) : Promise<PacketDTO<{ token: string }>> {
+  async loginUser({ email, password }: LoginReqDTO): Promise<PacketDTO<{ token: string }>> {
     try {
       const fondUser = await prisma.user.findFirst({
         where: {
@@ -54,6 +54,20 @@ class authService {
       };
     }
   }
+
+  async changeUserPassword(id: string, newPassword: string): Promise<PacketDTO<null>> {
+    try {
+      const hashedPass = await PasswordUtil.hash(newPassword);
+      await prisma.user.update({
+        where: { identityCard: id },
+        data: { password: hashedPass }
+      });
+      return { success: true, message: 'Contraseña actualizada correctamente' };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
 }
 
 export default new authService();

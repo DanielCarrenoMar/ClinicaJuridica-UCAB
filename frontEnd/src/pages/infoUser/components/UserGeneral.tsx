@@ -8,7 +8,6 @@ import type { TeacherModel } from '#domain/models/teacher.ts';
 import type { UserModel } from '#domain/models/user.ts';
 import type { GenderTypeModel, StudentTypeModel, TeacherTypeModel } from '#domain/typesModel.ts';
 
-
 interface UserGeneralProps {
     localUser?: UserModel;
     localStudent?: StudentModel;
@@ -70,7 +69,7 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                             label="Contraseña"
                             value={newPassword}
                             onChange={(text) => setNewPassword(text)}
-                            placeholder="********"
+                            placeholder=""
                             type="password"
                         />
                         <span className="text-xs text-onSurface/60 ml-1">Dejar en blanco para mantener la Contraseña actual</span>

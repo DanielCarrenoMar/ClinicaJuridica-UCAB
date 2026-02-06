@@ -15,7 +15,6 @@ router.post('/', userController.createUser);
 // Modificar usuarios
 router.put('/:id', userController.updateUser);
 router.patch('/:id/status', userController.changeUserStatus);
-router.patch('/:id/password', userController.changePassword);
 
 // Borrar usuarios
 router.delete('/:id', userController.deleteUser);

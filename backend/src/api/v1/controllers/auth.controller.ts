@@ -3,6 +3,7 @@ import loginService from '../services/auth.service.js';
 import { LoginReqDTO } from '@app/shared/dtos/LoginDTO';
 import { validateRequiredParams } from '../utils/checkParameters.util.js';
 import userService from '#services/user.service.js';
+import authService from '../services/auth.service.js';
 
 export async function login(req: Request, res: Response) {
   try {
@@ -62,6 +63,22 @@ export async function getCurrentUser(req: Request, res: Response) {
     }
     res.status(200).json(result);
 
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Error desconocido';
+    res.status(500).json({ success: false, error: msg });
+  }
+}
+
+export async function changePassword(req: Request, res: Response): Promise<void> {
+  if (!req.user) {
+    res.status(401).json({ success: false, message: 'No autenticado' });
+    return;
+  }
+  try {
+    const id = req.user.identityCard;
+    const { newPassword } = req.body;
+    const result = await authService.changeUserPassword(id, newPassword);
+    res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
     res.status(500).json({ success: false, error: msg });
