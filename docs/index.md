@@ -1,0 +1,1 @@
+Gestiona casos con toda su información: solicitante, beneficiarios, documentos, citas, acciones realizadas y más. Administra a los estudiantes, profesores y coordinadores involucrados en cada caso. Además, controla quién accede al sistema activando y desactivando usuarios.
