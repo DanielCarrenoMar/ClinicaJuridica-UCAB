@@ -37,3 +37,10 @@ Puedes ver la documentacion online [aquí](https://danielcarrenomar.github.io/Cl
 
 ### Imagenes
 
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/ade03bfc-c288-4b51-ac00-419526fad2a8" />
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/34123645-760b-47bd-ab4f-d832d5123ef9" />
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/c1b99695-add9-421b-96bf-bc6e50ffe103" />
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/53e03ac6-f887-40bf-9a9f-d035ae619d7e" />
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/e13a8b8d-b7d9-4952-bc61-b0ad72381907" />
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/8406794c-4783-416e-9fc4-fd50c28d3322" />
+<img width="800" height="360" alt="" src="https://github.com/user-attachments/assets/39c5597b-2524-4de2-9068-c2891ac50f69" />
