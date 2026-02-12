@@ -2,7 +2,7 @@
     <img src="https://github.com/DanielCarrenoMar/Snake-XPR_UCAB/assets/144462396/d30c8055-4d82-4a05-b0f3-5f74c85ffb7f" alt="Logo" title="Logo" align="right" height="70" />
 </a>
 
-# [![React](https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB)](#) Sistema de Clinica Juridad UCAB Guayana
+# [![React](https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB)](#) Sistema de Clínica Jurídica UCAB Guayana
 
 Gestiona casos con toda su información: solicitante, beneficiarios, documentos, citas, acciones realizadas y más. Administra a los estudiantes, profesores y coordinadores involucrados en cada caso. Además, controla quién accede al sistema activando y desactivando usuarios.
 En colaboración con [@emiliofalconi](https://github.com/emiliofalconi), [@Bloodbay8](https://github.com/Bloodbay8) y [@Pedro Carvajal](https://github.com/pedr01801).
