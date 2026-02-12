@@ -5,6 +5,9 @@
 # [![React](https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB)](#) Sistema de Clinica Juridad UCAB Guayana
 
 Gestiona casos con toda su información: solicitante, beneficiarios, documentos, citas, acciones realizadas y más. Administra a los estudiantes, profesores y coordinadores involucrados en cada caso. Además, controla quién accede al sistema activando y desactivando usuarios.
+En colaboración con [@emiliofalconi](https://github.com/emiliofalconi), [@Bloodbay8](https://github.com/Bloodbay8) y [@Pedro Carvajal](https://github.com/pedr01801).
+
+Creado como proyecto de la materia *Sistema de Base de Datos* en el quinto semestre de la [UCAB](https://www.ucab.edu.ve/).
 
 ## Características ⭐
 
