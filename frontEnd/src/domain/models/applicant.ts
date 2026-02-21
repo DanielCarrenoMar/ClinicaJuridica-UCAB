@@ -1,6 +1,6 @@
 import type { ApplicantDAO } from "#database/daos/applicantDAO.ts";
 import type { ApplicantInfoDAO } from "#database/daos/applicantInfoDAO.ts";
-import { typeDtoToGenderTypeModel, typeDtoToMaritalStatusTypeModel, typeModelToGenderTypeDto, typeModelToMaritalStatusTypeDto, type MaritalStatusTypeModel } from "#domain/typesModel.ts";
+import { typeDtoToGenderTypeModel, typeDtoToMaritalStatusTypeModel, typeModelToGenderTypeDto, typeModelToIdNationalityTypeDto, typeModelToMaritalStatusTypeDto, type MaritalStatusTypeModel } from "#domain/typesModel.ts";
 import type { BeneficiaryModel } from "./beneficiary";
 
 export interface ApplicantModel extends Omit<BeneficiaryModel, 'hasId' | 'type'> {
@@ -64,6 +64,7 @@ export function modelToApplicantDao(model: ApplicantModel): ApplicantDAO {
 		birthDate: birthDate.toISOString(),
 		gender: typeModelToGenderTypeDto(gender),
 		maritalStatus: maritalStatus ? typeModelToMaritalStatusTypeDto(maritalStatus) : undefined,
-		servicesIdAvailable: servicesIdAvailable
+		servicesIdAvailable: servicesIdAvailable,
+		idNationality: typeModelToIdNationalityTypeDto(model.idNationality)
 	};
 }

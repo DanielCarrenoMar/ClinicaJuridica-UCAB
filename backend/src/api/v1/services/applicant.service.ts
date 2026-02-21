@@ -433,7 +433,7 @@ class ApplicantService {
             VALUES (
               ${data.identityCard}, ${data.fullName}, ${data.gender}, 
               CAST(${data.birthDate} AS DATE), ${data.idNationality}, 
-              true, 'S', ${toDbValue(data.idState)}, ${toDbValue(data.municipalityNumber)}, ${toDbValue(data.parishNumber)}
+              true, 'APPLICANT', ${toDbValue(data.idState)}, ${toDbValue(data.municipalityNumber)}, ${toDbValue(data.parishNumber)}
             )
           `;
         }

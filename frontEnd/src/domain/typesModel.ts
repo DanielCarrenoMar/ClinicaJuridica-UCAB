@@ -1,5 +1,5 @@
 import type { CaseStatusTypeDAO, GenderTypeDAO, MaritalStatusTypeDAO, ProcessTypeDAO, AppointmentStatusTypeDAO, CaseBeneficiaryTypeDAO, BeneficiaryTypeDAO, UserTypeDAO, TeacherTypeDAO, StudentTypeDAO } from "#database/typesDAO.ts";
-import type { AppointmentStatusTypeDTO, BeneficiaryTypeDTO, CaseBeneficiaryTypeDTO, CaseStatusTypeDTO, GenderTypeDTO, MaritalStatusTypeDTO, ProcessTypeDTO, StudentTypeDTO, TeacherTypeDTO, UserTypeDTO } from "@app/shared/typesDTO";
+import type { AppointmentStatusTypeDTO, BeneficiaryTypeDTO, CaseBeneficiaryTypeDTO, CaseStatusTypeDTO, GenderTypeDTO, IdNationalityTypeDTO, MaritalStatusTypeDTO, ProcessTypeDTO, StudentTypeDTO, TeacherTypeDTO, UserTypeDTO } from "@app/shared/typesDTO";
 
 export type IdNacionalityTypeModel = "V" | "E" | "J";
 export type IDTypeModel = 'V' | 'E' | 'J';
@@ -17,6 +17,27 @@ export type BeneficiaryTypeModel = "Beneficiario" | "Solicitante";
 export type UserTypeModel = "Coordinador" | "Profesor" | "Estudiante";
 export type TeacherTypeModel = "REGULAR" | "VOLUNTEER";
 export type StudentTypeModel = "regular" | "volunteer" | "graduate" | "service";
+
+export function typeDtoToIdNationalityTypeModel(dto: IdNationalityTypeDTO): IdNacionalityTypeModel {
+    switch (dto) {
+        case "VENEZUELAN":
+            return "V";
+        case "FOREIGNER":
+            return "E";
+        case "LEGAL":
+            return "J";
+    }
+}
+export function typeModelToIdNationalityTypeDto(model: IdNacionalityTypeModel): IdNationalityTypeDTO {
+    switch (model) {
+        case "V":
+            return "VENEZUELAN";
+        case "E":
+            return "FOREIGNER";
+        case "J":
+            return "LEGAL";
+    }
+}
 
 export function typeDtoToGenderTypeModel(gender: GenderTypeDTO): GenderTypeModel {
     switch (gender) {
