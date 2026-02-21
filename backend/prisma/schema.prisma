@@ -27,8 +27,8 @@ enum TeacherType {
 
 enum StudentType {
   REGULAR
-  VOLUNTEER // Visiting -> Voluntario
-  GRADUATE // External -> Egresado
+  VOLUNTEER
+  GRADUATE
   SERVICE
 }
 
@@ -40,7 +40,7 @@ enum idNationality {
 
 enum BeneficiaryType {
   BENEFICIARY
-  APPLICANT // Spouse -> Solicitante
+  APPLICANT
 }
 
 enum MaritalStatus {
