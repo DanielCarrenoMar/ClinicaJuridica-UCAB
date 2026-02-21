@@ -47,9 +47,10 @@ class authService {
       };
 
     } catch (error: any) {
+      console.error('Error en el proceso de autenticación:', error);
       return {
         success: false,
-        error: error.message,
+        error: 'Error en el proceso de autenticación',
         message: 'Error en el proceso de autenticación'
       };
     }
