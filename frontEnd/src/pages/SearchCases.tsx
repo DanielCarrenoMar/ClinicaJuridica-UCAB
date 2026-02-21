@@ -159,7 +159,7 @@ function SearchCases() {
     return (
         <div className="flex flex-col h-full min-h-0">
             <div className="mb-3">
-                <span className="flex items-center justify-between max-w-5xl flex-wrap-reverse gap-3">
+                <span className="flex items-center justify-between max-w-5xl flex-wrap gap-3">
                     <ul className="flex gap-3 flex-wrap">
                         <li>
                             <DropdownCheck
