@@ -237,10 +237,10 @@ function SearchCases() {
                             selectedValue={sortOrder}
                             onSelectionChange={(value) => setSortOrder(value as string)}
                         >
-                            <DropdownOption value="lastActionDesc">Acción más lejana</DropdownOption>
                             <DropdownOption value="lastActionAsc">Acción más cercana</DropdownOption>
-                            <DropdownOption value="createdAtDesc">Creación más lejana</DropdownOption>
+                            <DropdownOption value="lastActionDesc">Acción más lejana</DropdownOption>
                             <DropdownOption value="createdAtAsc">Creación más cercana</DropdownOption>
+                            <DropdownOption value="createdAtDesc">Creación más lejana</DropdownOption>
                         </Dropdown>
                     </span>
                 </span>
