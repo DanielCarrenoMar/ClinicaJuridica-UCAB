@@ -23,28 +23,23 @@ export async function getAllAppointments(req: Request, res: Response): Promise<v
 
 export async function getAppointmentById(req: Request, res: Response): Promise<void> {
     try {
-        const { id } = req.params;
-        // Assuming the ID passed is just 'appointmentNumber' is risky without caseId. 
-        // However, trying to fit the typical REST pattern where ID is unique.
-        // Given the constraints, if the frontend sends a composite ID like "caseId-apptNum", we could parse it.
-        // Or if the user just wants to fetch by AppointmentNumber assuming they know the context?
-        // Let's try to parse "idCase-appointmentNumber" if possible, or just expect two params in a different route?
-        // For now, based on "getAppointmentById(id: number)" in the frontend, it seems impossible with composite key.
-        // I will implement a check. If it's a number, maybe fail or try to search?
-        // Actually, I will implement it such that it expects idCase if query param exists?
+        const { id, appointmentNumber } = req.params;
+        const idCase = parseInt(id);
+        const apptNumber = parseInt(appointmentNumber);
 
-        // Simplest approach: The user code sends `${APPOINTMENT_URL}/${id}`.
-        // If 'id' is sent, we need to know what it is. 
-        // I will assume for now that logic might be flawed in the frontend or I serve All for that case?
-        // Let's just implement a placeholder or try to parse.
+        if (isNaN(idCase) || isNaN(apptNumber)) {
+            res.status(400).json({ success: false, message: 'ID de caso o número de cita inválido' });
+            return;
+        }
 
-        // Better yet, I'll implement getAppointmentsByCaseId if the route allows filtering.
-        // But sticking to strict "get by id":
-        // I will assume the ID passed is just the "idCase" to get all appointments?
-        // No, that's "findAll".
+        const result = await appointmentService.getAppointmentById(idCase, apptNumber);
 
-        res.status(501).json({ success: false, message: 'Fetching by single ID not fully supported for composite key Appointments without structured ID.' });
+        if (!result.success) {
+            res.status(404).json(result);
+            return;
+        }
 
+        res.status(200).json(result);
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : 'Error desconocido al buscar cita';
         res.status(500).json({ success: false, error: msg });

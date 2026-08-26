@@ -40,6 +40,7 @@ function UserInfo() {
   const [localStudent, setLocalStudent] = useState<StudentModel>();
   const [localTeacher, setLocalTeacher] = useState<TeacherModel>();
   const [newPassword, setNewPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState('General')
   const [isDataModified, setIsDataModified] = useState(false)
@@ -57,6 +58,7 @@ function UserInfo() {
     if (user) {
       setLocalUser(user)
       setNewPassword('')
+      setCurrentPassword('')
     }
   }, [user])
 
@@ -72,16 +74,6 @@ function UserInfo() {
     }
   }, [teacher])
 
-  useEffect(() => {
-    if (user) {
-      setLocalUser(user)
-      setNewPassword('') // Reset password field
-    }
-  }, [user])
-
-  // ... other useEffects
-
-  // Data modified check needed. Include newPassword check.
   useEffect(() => {
     const isUserChanged = JSON.stringify(localUser) !== JSON.stringify(user);
     const isStudentChanged = student && localStudent ? JSON.stringify(localStudent) !== JSON.stringify(student) : false;
@@ -157,6 +149,7 @@ function UserInfo() {
     setLocalStudent(student ?? undefined);
     setLocalTeacher(teacher ?? undefined);
     setNewPassword('');
+    setCurrentPassword('');
     setIsDataModified(false);
   }
 
@@ -165,24 +158,34 @@ function UserInfo() {
     if (!user) return;
     if (validationErrors.identityCard) return;
 
-    // Prepare password update
-    // We modify localUser temporarily or create a special payload
-    let finalUserDto = modelToUserDto(localUser);
+    if (newPassword.trim() !== '') {
+      if (!currentPassword.trim()) {
+        notyError('Ingresa tu contraseña actual para poder cambiarla.');
+        return;
+      }
+      changePassword(currentPassword, newPassword)
+        .then((isChange) => {
+          if (isChange) {
+            notyMessage('Contraseña actualizada correctamente');
+            setNewPassword('');
+            setCurrentPassword('');
+          }
+        })
+        .catch(notyError)
+    }
 
-    // Student/Teacher updates don't involve password usually, but User update does.
+    const finalUserDto = modelToUserDto(localUser);
 
     if (user.type === 'Estudiante' && localStudent) {
-
       const studentDao: any = modelToStudentDao(localStudent);
       studentDao.fullName = localUser.fullName;
       studentDao.email = localUser.email;
-      studentDao.gender = modelToUserDto(localUser).gender; // use helper
+      studentDao.gender = modelToUserDto(localUser).gender;
 
       updateStudentById(localStudent.identityCard, studentDao).catch(notyError)
       setIsDataModified(false);
       return
     } else if (user.type === 'Profesor' && localTeacher) {
-      // Similar logic for teacher
       const teacherDao: any = modelToTeacherDao(localTeacher);
       teacherDao.fullName = localUser.fullName;
       teacherDao.email = localUser.email;
@@ -193,13 +196,6 @@ function UserInfo() {
       return
     }
 
-    if (newPassword && newPassword.trim() !== '') {
-      changePassword('temporary', newPassword)
-      .then((isChange) => {
-        if (isChange) notyMessage('Contraseña actualizada correctamente');
-      })
-      .catch(notyError)
-    }
     updateUserById(localUser.identityCard, finalUserDto).catch(notyError)
     setIsDataModified(false);
   }
@@ -222,6 +218,8 @@ function UserInfo() {
             validationErrors={validationErrors}
             newPassword={newPassword}
             setNewPassword={setNewPassword}
+            currentPassword={currentPassword}
+            setCurrentPassword={setCurrentPassword}
             canEditPassword={canEditPassword}
           />
         );

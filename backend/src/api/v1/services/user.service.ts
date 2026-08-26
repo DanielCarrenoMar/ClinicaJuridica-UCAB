@@ -95,7 +95,12 @@ class UserService {
         return { success: false, message: 'Cedula o Email ya registrado' };
       }
 
-      const hashedPass = await PasswordUtil.hash("admin");
+      const passwordCheck = PasswordUtil.validate(data.password ?? '');
+      if (!passwordCheck.success) {
+        return { success: false, message: passwordCheck.message };
+      }
+
+      const hashedPass = await PasswordUtil.hash(data.password!);
 
       // Get current term for Teacher record (needed if Coordinator)
       let currentTerm = '';
@@ -158,16 +163,16 @@ class UserService {
 
   async getUserCases(id: string) {
     try {
-      const userRows = await prisma.$queryRaw`SELECT "type" FROM "User" WHERE "identityCard" = ${id}`;
+      const userRows = await prisma.$queryRaw<{ type: string }[]>`SELECT "type" FROM "User" WHERE "identityCard" = ${id}`;
       if (userRows.length === 0) return { success: false, message: 'Usuario no encontrado' };
 
       const type = userRows[0].type;
-      let cases = [];
+      let cases: any[] = [];
 
-      if (type === 'P') {
-        cases = await prisma.$queryRaw`SELECT * FROM "Case" WHERE "teacherId" = ${id} ORDER BY "createdAt" DESC`;
+      if (type === 'TEACHER' || type === 'COORDINATOR') {
+        cases = await prisma.$queryRaw<any[]>`SELECT * FROM "Case" WHERE "teacherId" = ${id} ORDER BY "createdAt" DESC`;
       } else {
-        cases = await prisma.$queryRaw`
+        cases = await prisma.$queryRaw<any[]>`
           SELECT c.* FROM "Case" c
           INNER JOIN "AssignedStudent" a ON c."idCase" = a."idCase"
           WHERE a."studentId" = ${id}

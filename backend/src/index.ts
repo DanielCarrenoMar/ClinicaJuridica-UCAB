@@ -34,6 +34,11 @@ app.use((req, res, next) => {
 
 app.use('/api/v1', apiRoutes);
 
+app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(error);
+  res.status(400).json({ success: false, message: error.message || 'Error en la solicitud' });
+});
+
 const server = app.listen(PORT, async () => {
   console.log(`🚀 Servidor en http://localhost:${PORT}`);
 });

@@ -241,14 +241,8 @@ async function fetchApplicantsList(db: any, pagination?: { page: number; limit: 
           LIMIT ${limit} OFFSET ${offset}
         `;
 
-    // We need to fetch housing details for EACH applicant efficiently. 
-    // Doing N+1 query for simplicity now, but ideally updated query to JSON_AGG/ARRAY_AGG everything.
-    // For now, let's keep it simple as this list probably isn't huge yet.
-
+    // N+1 query for housing details per applicant; could move to JSON_AGG if the list grows large.
     const results = await Promise.all(rows.map(async (row: any) => {
-      // We'll ignore the COALESCE logic in SQL for servicesIdAvailable and re-fetch to be consistent 
-      // OR we can trust SQL for services but we miss other housing details.
-      // Better to re-fetch all housing details properly.
       const { servicesIdAvailable: _svc, ...rest } = row;
       const housingDetails = await fetchHousingDetails(db, row.identityCard);
       const merged = { ...rest, ...housingDetails };
@@ -303,20 +297,8 @@ const HOUSING_CHARACTERISTIC_NAMES: Record<string, string> = {
 };
 
 async function saveHousingDetails(tx: any, applicantId: string, data: ApplicantDAO) {
-  // 1. Handle services (multi-select)
-  if (data.servicesIdAvailable !== undefined) {
-    // Delete existing services (using a fixed ID/Name for services if possible, or assumed logic)
-    // IMPORTANT: The prompt implies services are also in HousingDetail.
-    // Assuming we can identify services by a characteristic, but the seed says 'Artefactos Domesticos...'?
-    // Wait, the seed has 'Artefactos Domesticos' as one characteristic.
-    // BUT verify seedData.ts line 141 servicesData has IDs 1-7.
-    // However, in seed.ts lines 50-52 'Artefactos...' is created.
-    // The previous code inserted directly into HousingDetail with detailNumber.
-    // Let's keep the existing logic for servicesIdAvailable but wrapped here?
-    // No, let's keep services logic as is in the main function or integrate it.
-
-    // Let's focus on the single-selects first.
-  }
+  // servicesIdAvailable (multi-select) is saved separately in createApplicant/updateApplicant,
+  // under the 'Artefactos Domesticos...' characteristic — not handled here.
 
   const housingFields: (keyof ApplicantDAO)[] = [
     'houseType',
@@ -344,16 +326,7 @@ async function saveHousingDetails(tx: any, applicantId: string, data: ApplicantD
         WHERE "applicantId" = ${applicantId} AND "idCharacteristic" = ${characteristic.idCharacteristic}
       `;
 
-      // Insert new detail.
-      // NOTE: Frontend sends index (0-based) or value?
-      // Seed says detailNumber = detailCounter++ (1-based).
-      // Assuming frontend sends 0-based index from a list, we might need value + 1.
-      // Checking CreateCaseApplicantStep.tsx...
-      // It iterates map((t, i) => <DropdownOption value={i}>)
-      // So frontend sends 0, 1, 2...
-      // Database seed starts at 1.
-      // So we need value + 1.
-
+      // Frontend sends a 0-based option index, but detailNumber is 1-based in the DB (per seed.ts).
       const detailNumber = value + 1;
 
       try {
@@ -469,19 +442,6 @@ class ApplicantService {
         `;
         if (data.servicesIdAvailable && data.servicesIdAvailable.length > 0) {
           try {
-            // For services, we need to know the characteristic ID for 'Artefactos Domesticos...'?
-            // Or is servicesIdAvailable relating to a different table?
-            // Looking at previous code: INSERT INTO "HousingDetail" ("applicantId", "detailNumber") ...
-            // It was missing "idCharacteristic"! This would fail a NOT NULL constraint if idCharacteristic is not default.
-            // Schema says: idCharacteristic Int.
-            // Previous code: INSERT INTO "HousingDetail" ("applicantId", "detailNumber") VALUES ...
-            // This works ONLY if idCharacteristic is not required or has default?
-            // Checking schema... idCharacteristic Int (REQUIRED).
-            // The previous code WAS BROKEN because it didn't supply idCharacteristic.
-            // I must fix this too.
-            // Services correspond to 'Artefactos Domesticos...' in seed?
-            // Seed data: 'Artefactos Domesticos, bienes o servicios del hogar' (line 50)
-
             const serviceChar = await tx.housingCharacteristic.findUnique({ where: { name: 'Artefactos Domesticos, bienes o servicios del hogar' } });
             if (serviceChar) {
               for (const serviceId of data.servicesIdAvailable) {
@@ -601,10 +561,6 @@ class ApplicantService {
           try {
             const serviceChar = await tx.housingCharacteristic.findUnique({ where: { name: 'Artefactos Domesticos, bienes o servicios del hogar' } });
             if (serviceChar) {
-              // First ensure HousingDetail parent/structure exists if needed? 
-              // HousingDetail depends on Housing. We just upserted Housing, so it should exist.
-
-              // Delete only services
               await tx.$executeRaw`
                     DELETE FROM "HousingDetail" 
                     WHERE "applicantId" = ${newId} AND "idCharacteristic" = ${serviceChar.idCharacteristic}

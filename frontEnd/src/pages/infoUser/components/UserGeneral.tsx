@@ -18,10 +18,12 @@ interface UserGeneralProps {
     validationErrors: Record<string, string>;
     newPassword?: string;
     setNewPassword?: (pass: string) => void;
+    currentPassword?: string;
+    setCurrentPassword?: (pass: string) => void;
     canEditPassword?: boolean;
 }
 
-export default function UserGeneral({ localUser, localStudent, localTeacher, handleUserChange, handleStudentChange, handleTeacherChange, validationErrors, newPassword, setNewPassword, canEditPassword }: UserGeneralProps) {
+export default function UserGeneral({ localUser, localStudent, localTeacher, handleUserChange, handleStudentChange, handleTeacherChange, validationErrors, newPassword, setNewPassword, currentPassword, setCurrentPassword, canEditPassword }: UserGeneralProps) {
 
     if (!localUser) {
         return <LoadingSpinner />;
@@ -66,13 +68,25 @@ export default function UserGeneral({ localUser, localStudent, localTeacher, han
                 {canEditPassword && setNewPassword && (
                     <div>
                         <TitleTextInput
-                            label="Contraseña"
+                            label="Contraseña actual"
+                            value={currentPassword}
+                            onChange={(text) => setCurrentPassword?.(text)}
+                            placeholder=""
+                            type="password"
+                        />
+                        <span className="text-xs text-onSurface/60 ml-1">Requerida solo si vas a cambiar la contraseña</span>
+                    </div>
+                )}
+                {canEditPassword && setNewPassword && (
+                    <div>
+                        <TitleTextInput
+                            label="Contraseña nueva"
                             value={newPassword}
                             onChange={(text) => setNewPassword(text)}
                             placeholder=""
                             type="password"
                         />
-                        <span className="text-xs text-onSurface/60 ml-1">Dejar en blanco para mantener la Contraseña actual</span>
+                        <span className="text-xs text-onSurface/60 ml-1">Dejar en blanco para mantener la contraseña actual</span>
                     </div>
                 )}
             </div>

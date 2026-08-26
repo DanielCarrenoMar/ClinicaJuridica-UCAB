@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import * as caseController from '../controllers/case.controller.js';
+import { verifyCaseAccess } from '../middlewares/caseAccess.middleware.js';
 
 const router = Router();
 
-router.get('/', caseController.getAllCases); 
+router.param('id', verifyCaseAccess);
+
+router.get('/', caseController.getAllCases);
 router.post('/', caseController.createCase);
 
 router.get('/status/amount', caseController.getStatusCaseAmount);
@@ -25,11 +28,6 @@ router.post('/:id/actions', caseController.addAction);
 router.get('/:id/actions/', caseController.getActionsInfoFromCaseId);
 router.get('/:id/beneficiaries', caseController.getBeneficiariesFromCaseId);
 router.patch('/:id/status', caseController.changeCaseStatus);
-
-router.get('/:id/documents', caseController.getDocuments);
-router.post('/:id/documents', caseController.createDocumentByCaseId);
-router.delete('/:id/documents/:docId', caseController.deleteDocument);
-router.get('/:id/documents/:docId', caseController.getDocumentByCaseId);
 
 router.post('/:id/students', caseController.addStudentToCase);
 router.delete('/:id/students/:studentId', caseController.removeStudentFromCase);
