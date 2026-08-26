@@ -217,30 +217,6 @@ export async function getStatusCaseAmount(req: Request, res: Response): Promise<
   }
 }
 
-export async function scheduleAppointment(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Agendar Cita' no implementada aún" });
-}
-
-export async function updateAppointmentStatus(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Actualizar Cita' no implementada aún" });
-}
-
-export async function getDocuments(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Ver Documentos' no implementada aún" });
-}
-
-export async function createDocumentByCaseId(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Subir Documento' no implementada aún" });
-}
-
-export async function deleteDocument(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Eliminar Documento' no implementada aún" });
-}
-
-export async function getDocumentByCaseId(req: Request, res: Response): Promise<void> {
-  res.status(501).json({ success: false, message: "Funcionalidad 'Eliminar Documento' no implementada aún" });
-}
-
 export async function createStatusForCaseId(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;

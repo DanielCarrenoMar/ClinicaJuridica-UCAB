@@ -22,10 +22,23 @@ export async function getAllSupportDocuments(req: Request, res: Response): Promi
 
 export async function getSupportDocumentById(req: Request, res: Response): Promise<void> {
     try {
-        const { id } = req.params;
-        // As with appointments, fetching by single ID is ambiguous without supportNumber.
-        // Assuming usage might be limited or requires query params if expanded later.
-        res.status(501).json({ success: false, message: 'Fetching by single ID not fully supported for composite key Documents.' });
+        const { id, supportNumber } = req.params;
+        const idCase = parseInt(id);
+        const suppNumber = parseInt(supportNumber);
+
+        if (isNaN(idCase) || isNaN(suppNumber)) {
+            res.status(400).json({ success: false, message: 'ID de caso o número de documento inválido' });
+            return;
+        }
+
+        const result = await supportDocumentService.getSupportDocumentById(idCase, suppNumber);
+
+        if (!result.success) {
+            res.status(404).json(result);
+            return;
+        }
+
+        res.status(200).json(result);
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : 'Error desconocido al buscar documento';
         res.status(500).json({ success: false, error: msg });

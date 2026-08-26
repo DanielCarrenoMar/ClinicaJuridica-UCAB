@@ -9,14 +9,12 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ requiredLevel, redirectPath = '/' }: ProtectedRouteProps) {
     const { permissionLevel, loading } = useAuth();
 
-    // Assuming lower number = higher permission
-    // If user's level is greater than required level, they don't have permission
+    // Lower number = higher permission; redirect if the user's level exceeds what's required.
     if (loading) {
         return <div className="flex h-screen w-full items-center justify-center bg-background"><div className="size-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>;
     }
 
     if (!permissionLevel || permissionLevel > requiredLevel) {
-        console.log("Redirecting due to insufficient permissions", { permissionLevel, requiredLevel });
         return <Navigate to={redirectPath} replace />;
     }
 

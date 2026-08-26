@@ -56,8 +56,27 @@ class authService {
     }
   }
 
-  async changeUserPassword(id: string, newPassword: string): Promise<PacketDTO<null>> {
+  async changeUserPassword(id: string, currentPassword: string, newPassword: string): Promise<PacketDTO<null>> {
     try {
+      const user = await prisma.user.findUnique({
+        where: { identityCard: id },
+        select: { password: true }
+      });
+
+      if (!user) {
+        return { success: false, message: 'Usuario no encontrado' };
+      }
+
+      const isMatch = await PasswordUtil.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return { success: false, message: 'La contraseña actual es incorrecta' };
+      }
+
+      const passwordCheck = PasswordUtil.validate(newPassword);
+      if (!passwordCheck.success) {
+        return { success: false, message: passwordCheck.message };
+      }
+
       const hashedPass = await PasswordUtil.hash(newPassword);
       await prisma.user.update({
         where: { identityCard: id },

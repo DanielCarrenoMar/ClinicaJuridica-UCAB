@@ -7,6 +7,7 @@ export interface UserReqDTO {
     email: string;
     isActive: boolean;
     type: UserTypeDTO;
+    password?: string;
 }
 
 export type UserResDTO  = UserReqDTO;

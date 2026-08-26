@@ -94,7 +94,7 @@ export default function CaseSupportDocuments({ caseId }: CaseSupportDocumentsPro
                             }}
                             onDownload={(e) => {
                                 e.stopPropagation();
-                                console.log("Downloading", doc.title);
+                                notyError('Este recaudo no tiene un archivo asociado para descargar.');
                             }}
                         />
                     ))}

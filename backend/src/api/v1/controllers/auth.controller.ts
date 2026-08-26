@@ -76,8 +76,14 @@ export async function changePassword(req: Request, res: Response): Promise<void>
   }
   try {
     const id = req.user.identityCard;
-    const { newPassword } = req.body;
-    const result = await authService.changeUserPassword(id, newPassword);
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ success: false, message: 'Se requiere la contraseña actual y la nueva' });
+      return;
+    }
+
+    const result = await authService.changeUserPassword(id, currentPassword, newPassword);
     res.status(result.success ? 200 : 400).json(result);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
